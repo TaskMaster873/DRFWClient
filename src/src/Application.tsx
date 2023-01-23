@@ -18,7 +18,7 @@ export class Application extends Logger {
     }
 
     private onReportStatistics(objective: any) : void {
-        //console.log(objective);
+        //console.log(objective); wasssssup
     }
 
     private registerEvents() : void {
