@@ -14,7 +14,12 @@ export class PasswordStrength extends React.Component<PasswordStrengthType, Pass
     private elementExist(param: any) : boolean {
         return (param !== null && param)
     }
-
+    
+    /** param event - un évènement lorsqu'il y a un changement HTML
+     * 
+     * 
+     * Change la couleur selon la force du mot de passe 
+     * */
     analyze(event: React.ChangeEvent<HTMLInputElement>) {
         if(this.elementExist(event?.target?.value)) {
             
