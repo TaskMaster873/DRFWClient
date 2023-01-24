@@ -1,8 +1,8 @@
 <div align="center">
 
-![TaskMaster](.docs/Logo.png)
+![TaskMaster Logo](docs/Logo.png)
 
-# Projet Synthèse
+# TaskMaster
 
 </div>
 
