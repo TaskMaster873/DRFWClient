@@ -17,6 +17,7 @@ import { Index } from "./pages/index";
 import { About } from "./pages/about";
 
 import { ComponentExample } from "./components/homepage/ComponentExample";
+import { Login } from "./pages/Login";
 
 export class Engine extends React.Component {
 	private logger: Logger = new Logger(`Engine`, `#20f6a4`);
@@ -50,6 +51,9 @@ export class Engine extends React.Component {
 									<li>
 										<Link to="/test">Users</Link>
 									</li>
+									<li>
+										<Link to="/test">Login</Link>
+									</li>
 								</ul>
 							</nav>
 						</div>
@@ -60,6 +64,7 @@ export class Engine extends React.Component {
 				<Route path="/" element={<Index/>} />
 					<Route path="/about" element={<About/>} />
 					<Route path="/test" element={<ComponentExample/>} />
+					<Route path="/login" element={<Login/>} />
 				</Routes>
 			</Router>
 		</div>;
