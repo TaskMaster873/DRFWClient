@@ -6,11 +6,8 @@ on:
       - main
       - dev
     types:
-      - opened
-  push:
-    branches:
-      - main
-      - dev
+      - closed
+      - merged
 jobs:
   create-release:
     runs-on: ubuntu-latest
@@ -60,6 +57,14 @@ jobs:
       - name: Build
         run: npm run build
         shell: bash
+      - name: "✏️ Generate release changelog"
+        id: changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: echo "previous_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo '')" >> $GITHUB_ENV
+      - name: Get the changelog
+        run: echo "${{ steps.changelog.outputs.changelog }}"
       - name: Package
         run: |-
           SOURCEPATH=.
@@ -89,7 +94,8 @@ jobs:
            --include '**/*.json' \
            --include '**/*.env' \
            --include '**/*.txt' \
-           --include '**/*.Procfile'
+           --include '**/*.Procfile' \
+           --include '**/*.md'
         shell: bash
       - name: Tag Release
         uses: mathieudutour/github-tag-action@v6.0
@@ -103,9 +109,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.determine_version.outputs.semVer }}+run${{ github.run_number }}-attempt${{ github.run_attempt }}
-          release_name: Release ${{ steps.determine_version.outputs.semVer }} Run ${{ github.run_number }} Attempt ${{ github.run_attempt }}
+          release_name: Release ${{ steps.determine_version.outputs.semVer }} Run ${{ github.run_number }}
           draft: 'false'
           prerelease: 'false'
+          body: |
+            All notable changes to this project will be documented in this file.
+            ${{ steps.changelog.outputs.changelog }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
