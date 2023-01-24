@@ -17,8 +17,6 @@ TaskMaster est un gestionnaire d'horaire pour entreprise. En tant qu'application
 
 ## Installation
 
-[//]: # (TODO : Remplacez le nom de l'exécutable par celui dans ".gitlab-ci.yml". Voir la variable BUILD_NAME.)
-
 Téléchargez la dernière version [stable de l'application][Releases]. Décompressez l'archive dans un dossier 
 et mettez le en ligne sur un serveur web.
 
@@ -29,29 +27,23 @@ développement.
 
 ### Prérequis
 
-[//]: # (TODO : Ajouter tout autre logiciel nécessaire au développement.)
-[//]: # (TODO : Notez que les hyperliens sont décrits à la fin de ce document.)
-
 * [Git] - Système de contrôle de version. Utilisez la dernière version.
 * [NodeJs] - Environnement JavaScript.
 * [IntelliJ Idea] - IDE. Vous pouvez utiliser également n'importe quel autre IDE.
 
 ### Compiler une version de développement
 
-[//]: # (TODO : Adaptez ces instructions à votre situation.)
-
 Clonez le dépôt. Téléchargez les dépendances *NodeJs* via la commande `npm i`. Ensuite, démarrez le programme
 en mode débogage via la commande `npm run dev`.
 
 ### Compiler une version stable
 
-Suivez les instructions pour compiler une version de développement. Ensuite, utilisez la commande `npm run build` pour créer 
-un exécutable dans le dossier `/target/release/`. Vous y trouverez un fichier `app` (ou `app.exe` sur Windows).
+Suivez les instructions pour compiler une version de développement. Ensuite, utilisez la commande `npm run build` pour créer une version prête à deployer dans le dossier `/build/`.
 
 
 ## Tester le projet
 
-Vous êtes fortement encouragés à tester [la dernière version][Releases] de l'applicaiton. Si vous 
+Vous êtes fortement encouragés à tester [la dernière version][Releases] de l'application. Si vous 
 rencontrez un bogue, vous êtes priés de le [signaler][Submit Bug] et de fournir une explication détaillée du problème 
 avec les étapes pour le reproduire. Les captures d'écran et les vidéos sont les bienvenues.
 
@@ -89,7 +81,5 @@ X
 [IntelliJ Idea]: https://www.jetbrains.com/idea/
 [GitLab CI]: https://docs.gitlab.com/ee/ci/
 
-[//]: # (TODO : Modifiez ces hyperlien pour qu'ils ciblent votre projet à la place. Conservez le restant de l'URL.)
-[//]: # (       Ici, vous devez remplacer "https://gitlab.com/csfpwmjv/projet-synthese/starter-game" par le votre.)
 [Submit Bug]: https://github.com/BlobMaster41/DRFWClient/issues/new
 [Releases]: https://github.com/BlobMaster41/DRFWClient/releases
