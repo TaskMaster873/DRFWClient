@@ -11,7 +11,7 @@ export class Index extends React.Component {
     public render() : JSX.Element {
         this.logger.log(`Rendering Index...`);
 
-        return <div>Hello world!</div>
+        return <div className="container"></div>
     }
 
     // do stuff...
