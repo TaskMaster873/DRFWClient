@@ -28,7 +28,7 @@
   "scripts": {
     "webpack": "webpack",
     "dev": "webpack serve",
-    "build": "webpack --mode production --progress",
+    "build": "webpack --mode production --progress"
   },
   "eslintConfig": {
     "extends": [
