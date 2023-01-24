@@ -6,11 +6,8 @@ on:
       - main
       - dev
     types:
-      - opened
-  push:
-    branches:
-      - main
-      - dev
+      - closed
+      - merged
 jobs:
   create-release:
     runs-on: ubuntu-latest
