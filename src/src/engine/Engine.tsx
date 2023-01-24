@@ -17,6 +17,9 @@ import { Index } from "./pages/index";
 import { About } from "./pages/about";
 
 import { ComponentExample } from "./components/homepage/ComponentExample";
+import { LoginPage } from "./pages/LoginPage";
+import { ComponentLogin } from "./components/homepage/ComponentLogin";
+import { PasswordStrength } from "./components/ComponentPasswordPower";
 
 export class Engine extends React.Component {
 	private logger: Logger = new Logger(`Engine`, `#20f6a4`);
@@ -50,6 +53,12 @@ export class Engine extends React.Component {
 									<li>
 										<Link to="/test">Users</Link>
 									</li>
+									<li>
+										<Link to="/login">Login</Link>
+									</li>
+									<li>
+										<Link to="/regex">regex</Link>
+									</li>
 								</ul>
 							</nav>
 						</div>
@@ -60,6 +69,8 @@ export class Engine extends React.Component {
 				<Route path="/" element={<Index/>} />
 					<Route path="/about" element={<About/>} />
 					<Route path="/test" element={<ComponentExample/>} />
+					<Route path="/login" element={<ComponentLogin/>} />
+					<Route path="/regex" element={<PasswordStrength backgroundColor={""}/>} />
 				</Routes>
 			</Router>
 		</div>;
