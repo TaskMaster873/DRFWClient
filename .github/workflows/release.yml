@@ -93,7 +93,8 @@ jobs:
            --include '**/*.json' \
            --include '**/*.env' \
            --include '**/*.txt' \
-           --include '**/*.Procfile'
+           --include '**/*.Procfile' \
+           --include '**/*.md'
         shell: bash
       - name: Tag Release
         uses: mathieudutour/github-tag-action@v6.0
