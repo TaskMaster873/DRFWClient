@@ -26,7 +26,6 @@ import {
 import { Index } from "./pages/index";
 import { About } from "./pages/about";
 
-import { ComponentExample } from "./components/homepage/ComponentExample";
 import { LoginPage } from "./pages/LoginPage";
 import { ComponentLogin } from "./components/homepage/ComponentLogin";
 import { PasswordStrength } from "./components/ComponentPasswordPower";
