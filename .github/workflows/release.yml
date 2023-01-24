@@ -97,6 +97,7 @@ jobs:
           custom_tag: ${{ steps.determine_version.outputs.semVer }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - id: create_release
         name: Create Release
         uses: actions/create-release@v1
