@@ -11,7 +11,7 @@ TaskMaster est un gestionnaire d'horaire pour entreprise. En tant qu'application
 
 <div align="center">
 
-![Aperçu du Projet Synthèse](.docs/Preview.png)
+![Aperçu du Projet Synthèse](docs/Preview.png)
 
 </div>
 
