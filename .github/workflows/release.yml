@@ -116,6 +116,12 @@ jobs:
           draft: 'false'
           prerelease: 'false'
           body: |
+            <div align="center">
+              # Changelog 
+            ![Projet Synthèse](.docs/Logo.png) 
+            </div>
+            
+            All notable changes to this project will be documented in this file.
             ${{ steps.changelog.outputs.changelog }}
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
