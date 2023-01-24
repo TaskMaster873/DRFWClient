@@ -60,6 +60,10 @@ jobs:
       - name: Build
         run: npm run build
         shell: bash
+      - name: Release Build Changelog
+        uses: mikepenz/release-changelog-builder-action@v3.6.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Package
         run: |-
           SOURCEPATH=.

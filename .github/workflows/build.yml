@@ -51,10 +51,6 @@ jobs:
     - name: Build
       run: npm run build
       shell: bash
-    - name: Build Changelog
-      uses: mikepenz/release-changelog-builder-action@{latest-release}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 permissions:
   contents: read
   issues: write
