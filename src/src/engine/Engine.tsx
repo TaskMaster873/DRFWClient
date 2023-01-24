@@ -54,7 +54,7 @@ export class Engine extends React.Component {
                 <Nav className="me-auto">
                   <Nav.Link href="/schedule">Horaire</Nav.Link>
                   <Nav.Link href="/about">À propos</Nav.Link>
-                  <Nav.Link href="/employees">Employees</Nav.Link>
+                  <Nav.Link href="/employees">Employés</Nav.Link>
                 </Nav>
                 <Nav>
                   <Nav.Link href="/login">Login</Nav.Link>
@@ -70,8 +70,11 @@ export class Engine extends React.Component {
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<About />} />
             <Route path="/employees" element={<Employees />} />
-            <Route path="/login" element={<ComponentLogin/>} />
-					  <Route path="/regex" element={<PasswordStrength backgroundColor={""}/>} />
+            <Route path="/login" element={<ComponentLogin />} />
+            <Route
+              path="/regex"
+              element={<PasswordStrength backgroundColor={""} />}
+            />
           </Routes>
         </Router>
       </div>
