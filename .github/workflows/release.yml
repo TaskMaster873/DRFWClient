@@ -1,11 +1,9 @@
 name: Create Release
 run-name: ${{ github.actor }} creating a release!
 on:
-  pull_request_target:
+  push:
     branches:
       - main
-    types:
-      - merged
 jobs:
   create-release:
     runs-on: ubuntu-latest
