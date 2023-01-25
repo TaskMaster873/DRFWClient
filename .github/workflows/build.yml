@@ -98,15 +98,15 @@ jobs:
         OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
       with:
         version: ${{ steps.determine_version.outputs.semVer }}
-        packages: DRFWClient
+        packages: TaskMaster
         overwrite_mode: OverwriteExisting
     - name: Create Octopus Release
       uses: OctopusDeploy/create-release-action@v1
       with:
         api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-        project: DRFWClient
+        project: TaskMaster
         server: ${{ secrets.OCTOPUSSERVERURL }}
-        deploy_to: Development
+        deploy_to: develop
         packages: DRFWClient:${{ steps.determine_version.outputs.semVer }}
 permissions:
   contents: read
