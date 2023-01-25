@@ -89,7 +89,7 @@ jobs:
         OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
         OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
       with:
-        packages: TaskMaster.${{ steps.determine_version.outputs.semVer }}.zip
+        packages: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
         overwrite_mode: OverwriteExisting
     - name: Generate Octopus Deploy build information
       uses: OctopusDeploy/push-build-information-action@v1
