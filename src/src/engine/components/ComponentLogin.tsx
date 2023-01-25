@@ -23,29 +23,31 @@ export class ComponentLogin extends React.Component {
           <h4 className="text-center mt-4 mb-4">Se connecter à Task Master</h4>
         </div>
         <Form>
-          <Form.Label>Numéro d'employé</Form.Label>
+          <Form.Label className="mt-2">Numéro d'employé</Form.Label>
           <Form.Control
-            className="row"
+            className="row mt-1"
             type="text"
             placeholder="Entrez le numéro d'employé"
           />
 
-          <Form.Label>Mot de passe </Form.Label>
+          <Form.Label className="mt-4">Mot de passe </Form.Label>
           <Form.Control
-            className="row"
+            className="row mt-1"
             type="password"
             placeholder="Entrez votre mot de passe"
           />
           <Form.Text className="text-muted">{this.errorMessage}</Form.Text>
-          <Button
-            className="mt-4"
-            variant="primary"
-            size="lg"
-            type="submit"
-            value="Submit"
-          >
-            Connexion
-          </Button>
+          <div className="me-4">
+            <Button
+              className="mt-4 d-block text-center mx-auto"
+              variant="primary"
+              size="lg"
+              type="submit"
+              value="Submit"
+            >
+              Connexion
+            </Button>
+          </div>
         </Form>
       </div>
     );
