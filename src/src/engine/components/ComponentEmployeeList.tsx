@@ -1,4 +1,5 @@
 import React from "react";
+import { Table, Button } from "react-bootstrap";
 import { EmployeeList } from "../types/EmployeeList";
 
 export class ComponentEmployeeList extends React.Component {
