@@ -1,5 +1,5 @@
 import React from "react";
-import { Logger } from "../../Logger";
+import { Logger } from "../Logger";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 
