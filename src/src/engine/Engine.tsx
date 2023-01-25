@@ -29,6 +29,7 @@ import { Employees } from "./pages/employees";
 import { About } from "./pages/about";
 import { Login } from "./pages/login";
 import { Memes } from "./pages/memes";
+import { AddEmploye } from "./pages/addEmploye";
 
 export class Engine extends React.Component {
   private logger: Logger = new Logger(`Engine`, `#20f6a4`);
@@ -74,6 +75,7 @@ export class Engine extends React.Component {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/memes" element={<Memes />} />
+            <Route path="/creer-employe" element={<AddEmploye />} />
           </Routes>
         </Router>
       </div>
