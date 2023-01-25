@@ -106,7 +106,7 @@ jobs:
         api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
         project: TaskMaster
         server: ${{ secrets.OCTOPUSSERVERURL }}
-        deploy_to: develop
+        deploy_to: Development
         packages: DRFWClient:${{ steps.determine_version.outputs.semVer }}
 permissions:
   contents: read
