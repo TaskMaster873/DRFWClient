@@ -62,11 +62,12 @@ jobs:
         octo pack \
          --basePath ${SOURCEPATH} \
          --outFolder ${OUTPUTPATH} \
-         --id DRFWClient \
+         --id TaskMaster \
          --version ${{ steps.determine_version.outputs.semVer }} \
          --format zip \
          --overwrite \
          --include '**/*.html' \
+         --include '**/*.sh' \
          --include '**/*.htm' \
          --include '**/*.css' \
          --include '**/*.js' \
@@ -89,7 +90,7 @@ jobs:
         OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
         OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
       with:
-        packages: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
+        packages: TaskMaster.${{ steps.determine_version.outputs.semVer }}.zip
         overwrite_mode: OverwriteExisting
     - name: Generate Octopus Deploy build information
       uses: OctopusDeploy/push-build-information-action@v1
@@ -108,6 +109,7 @@ jobs:
         server: ${{ secrets.OCTOPUSSERVERURL }}
         deploy_to: Development
         packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
+        
 permissions:
   contents: read
   issues: write
