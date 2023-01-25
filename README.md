@@ -59,7 +59,7 @@ Veuillez lire [CONTRIBUTING.md](CONTRIBUTING.md) pour plus de détails sur notre
 
 * **David Lawton** - *Programmeur*
 * **Romin Martignat** - *Programmeur*
-* **Félex-Antoine Belleau** - *Programmeur*
+* **Félix-Antoine Belleau** - *Programmeur*
 * **William Blanchet Lafernière** - *Programmeur*
 * **Benjamin Lemelin** - *Professeur en informatique*
 
@@ -69,9 +69,13 @@ Consultez le fichier [CHANGELOG.md](CHANGELOG.md) pour la liste des changements 
 
 ## License
 
+[//]: # (TODO : Si vous désirez que votre projet soit Open-Source (ce qui est PAS une obligation), adaptez cette section.)
+
 X
 
 ## Remerciements
+
+[//]: # (TODO : Remercier toute personne ou groupe ayant contribué au projet, mais qui n'est pas un auteur.)
 
 X
 
@@ -79,7 +83,6 @@ X
 [Git]: https://git-scm.com/downloads
 [NodeJs]: https://nodejs.org/en/
 [IntelliJ Idea]: https://www.jetbrains.com/idea/
-[GitLab CI]: https://docs.gitlab.com/ee/ci/
 
 [Submit Bug]: https://github.com/BlobMaster41/DRFWClient/issues/new
 [Releases]: https://github.com/BlobMaster41/DRFWClient/releases
