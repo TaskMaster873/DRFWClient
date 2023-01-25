@@ -83,15 +83,6 @@ jobs:
          --include '**/*.Procfile' \
          --include '**/*.md'
       shell: bash
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
-        asset_name: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
-        asset_content_type: application/octet-stream
     - name: Push packages to Octopus Deploy
       uses: OctopusDeploy/push-package-action@v2
       env:
