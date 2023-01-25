@@ -49,10 +49,6 @@ avec les étapes pour le reproduire. Les captures d'écran et les vidéos sont l
 
 ## Auteurs
 
-[//]: # (TODO : Ajoutez vous noms ici ainsi que le nom de tout artiste ayant participé au projet avec un lien vers son portfolio.)
-[//]: # (       Inscrivez aussi, en détail, ce sur quoi chaque membre de l'équipe a principalement travaillé.)
-[//]: # (       Vous n'êtes pas obligé d'inclure mon nom dans les auteurs du projet. C'est pour vous montrer comment faire.)
-
 * **David Lawton** - *Programmeur(Front-End)*
 * **Romin Martignat** - *Programmeur(Front-End)*
 * **Félix-Antoine Belleau** - *Programmeur(Back-End)*
@@ -65,13 +61,9 @@ Consultez la description de [la dernière version][Releases] de l'application.
 
 ## License
 
-[//]: # (TODO : Si vous désirez que votre projet soit Open-Source (ce qui est PAS une obligation), adaptez cette section.)
-
 X
 
 ## Remerciements
-
-[//]: # (TODO : Remercier toute personne ou groupe ayant contribué au projet, mais qui n'est pas un auteur.)
 
 X
 
