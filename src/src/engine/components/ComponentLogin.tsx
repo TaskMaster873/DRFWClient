@@ -1,6 +1,5 @@
 import React from "react";
-import { Logger } from "../../Logger";
-import '../../../deps/css/bootstrap.min.css';
+import { Logger } from "../Logger";
 import Form from 'react-bootstrap/Form';
 
 
