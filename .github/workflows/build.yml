@@ -86,16 +86,16 @@ jobs:
     - name: Push packages to Octopus Deploy
       uses: OctopusDeploy/push-package-action@v2
       env:
-        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_TOKEN }}
-        OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER_URL }}
+        OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+        OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
       with:
         packages: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
         overwrite_mode: OverwriteExisting
     - name: Generate Octopus Deploy build information
       uses: OctopusDeploy/push-build-information-action@v1
       env:
-        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_TOKEN }}
-        OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER_URL }}
+        OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+        OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
       with:
         version: ${{ steps.determine_version.outputs.semVer }}
         packages: DRFWClient
@@ -103,9 +103,9 @@ jobs:
     - name: Create Octopus Release
       uses: OctopusDeploy/create-release-action@v1
       with:
-        api_key: ${{ secrets.OCTOPUS_API_TOKEN }}
+        api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
         project: DRFWClient
-        server: ${{ secrets.OCTOPUS_SERVER_URL }}
+        server: ${{ secrets.OCTOPUSSERVERURL }}
         deploy_to: Development
         packages: DRFWClient:${{ steps.determine_version.outputs.semVer }}
 permissions:
