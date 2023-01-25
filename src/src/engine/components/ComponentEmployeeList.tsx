@@ -13,7 +13,7 @@ export class ComponentEmployeeList extends React.Component {
       <div className="container">
         <div>
           {this.list.map((elem) => (
-            <div>{elem}</div>
+            <div>{ elem }</div>
           ))}
         </div>
       </div>

@@ -5,6 +5,7 @@ import Form from 'react-bootstrap/Form';
 
 export class ComponentLogin extends React.Component {
     private logger: Logger = new Logger(`MyFunComponent`, `#20f6a4`, false);
+    private errorMessage = "";
 
     public render(): JSX.Element {
         this.logger.log(`Rendering my fun component...`);
@@ -22,7 +23,6 @@ export class ComponentLogin extends React.Component {
               <Form.Label>Mot de passe </Form.Label>
               <Form.Control type="text" placeholder="Entrez votre mot de passe" />
               <Form.Text className="text-muted">
-                Il doit avoir au moins 32 caractères.
               </Form.Text>
             </Form.Group>
             </Form>

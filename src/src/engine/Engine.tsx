@@ -9,7 +9,7 @@ import "../deps/css/Engine.css";
 
 /* === Images === */
 // @ts-ignore
-//import * as Logo from '../deps/images/logo_color.png';
+import Logo from "../deps/images/logo.png";
 
 /* === External Icons === */
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -44,6 +44,13 @@ export class Engine extends React.Component {
         <Router>
           <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Container>
+              <img
+                className="me-3"
+                src={Logo}
+                alt="Logo TaskMaster"
+                width={50}
+                height={60}
+              />
               <Navbar.Brand href="/">Task Master</Navbar.Brand>
               <Navbar.Toggle aria-controls="responsive-navbar-nav" />
               <Navbar.Collapse id="responsive-navbar-nav">
