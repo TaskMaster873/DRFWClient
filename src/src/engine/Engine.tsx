@@ -6,6 +6,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 
 import "../deps/css/Engine.css";
+import "../deps/css/index.css";
 
 /* === Images === */
 // @ts-ignore
