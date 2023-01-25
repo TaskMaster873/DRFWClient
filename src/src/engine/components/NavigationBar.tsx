@@ -10,6 +10,7 @@ import Logo from "../../deps/images/logo.png";
 
 export class NavigationBar extends React.Component {
   private logger: Logger = new Logger(`NavigationBar`, `#20f6a4`);
+  private isLoggedIn: boolean = false;
 
   public render(): JSX.Element {
     return (
@@ -31,7 +32,7 @@ export class NavigationBar extends React.Component {
               <Nav.Link href="/about">À propos</Nav.Link>
             </Nav>
             <Nav activeKey={location.pathname} className="ms-auto">
-              <Nav.Link href="/login">Login</Nav.Link>
+              {this.loginButton()}
               <Nav.Link href="/memes">Dank memes</Nav.Link>
             </Nav>
           </Navbar.Collapse>
@@ -39,4 +40,14 @@ export class NavigationBar extends React.Component {
       </Navbar>
     );
   }
+
+  private loginButton() {
+    if (this.isLoggedIn) {
+      return <Nav.Link onClick={this.logOut}>Se déconnecter</Nav.Link>;
+    } else {
+      return <Nav.Link href="/login">Connexion</Nav.Link>;
+    }
+  }
+
+  private logOut() {}
 }
