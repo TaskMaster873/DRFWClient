@@ -6,11 +6,8 @@ on:
       - main
       - dev
     types:
-      - opened
-  push:
-    branches:
-      - main
-      - dev
+      - closed
+      - merged
 jobs:
   create-release:
     runs-on: ubuntu-latest
@@ -116,11 +113,6 @@ jobs:
           draft: 'false'
           prerelease: 'false'
           body: |
-            <div align="center">
-              # Changelog 
-            ![Projet Synthèse](.docs/Logo.png) 
-            </div>
-            
             All notable changes to this project will be documented in this file.
             ${{ steps.changelog.outputs.changelog }}
       - name: Upload Release Asset

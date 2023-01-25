@@ -1,78 +1,74 @@
 import { Logger } from "./Logger";
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
 
-import '../deps/css/bootstrap.min.css';
-import '../deps/css/Engine.css';
+import "../deps/css/Engine.css";
 
 /* === Images === */
-// @ts-ignore 
+// @ts-ignore
 //import * as Logo from '../deps/images/logo_color.png';
 
 /* === External Icons === */
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBolt, faCode, faEnvelope, faCube, faCodeBranch, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBolt,
+  faCode,
+  faEnvelope,
+  faCube,
+  faCodeBranch,
+  faFilter,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { Index } from "./pages/index";
+import { Schedule } from "./pages/schedule";
+import { Employees } from "./pages/employees";
 import { About } from "./pages/about";
-
-import { ComponentExample } from "./components/homepage/ComponentExample";
-import { LoginPage } from "./pages/LoginPage";
-import { ComponentLogin } from "./components/homepage/ComponentLogin";
-import { PasswordStrength } from "./components/ComponentPasswordPower";
+import { Login } from "./pages/login";
+import { Memes } from "./pages/memes";
 
 export class Engine extends React.Component {
-	private logger: Logger = new Logger(`Engine`, `#20f6a4`);
+  private logger: Logger = new Logger(`Engine`, `#20f6a4`);
 
-	public render() : JSX.Element {
-		this.logger.log(`Running rendering engine...`);
-		let pageJSX = <this.Navigation />;
+  public render(): JSX.Element {
+    let pageJSX = <this.Navigation />;
 
-		return pageJSX
-	}
+    return pageJSX;
+  }
 
-	//<img src={Logo.default} alt="FunLogo"/>
-	private Navigation() : JSX.Element {
-		return <div id="rs_home">
-			<Router>
-				<div id="rs_header">
-					<div className="container-fluid">
-						<div className="row d-flex align-items-center">
-							<div className="col">
-
-							</div>
-							<div className="col-auto">
-							<nav id="rs_main_menu">
-								<ul>
-									<li>
-										<Link to="/">Home</Link>
-									</li>
-									<li>
-										<Link to="/about">About</Link>
-									</li>
-									<li>
-										<Link to="/test">Users</Link>
-									</li>
-									<li>
-										<Link to="/login">Login</Link>
-									</li>
-									<li>
-										<Link to="/regex">regex</Link>
-									</li>
-								</ul>
-							</nav>
-						</div>
-					</div>
-				</div>
-			</div>
-			<Routes>
-				<Route path="/" element={<Index/>} />
-					<Route path="/about" element={<About/>} />
-					<Route path="/test" element={<ComponentExample/>} />
-					<Route path="/login" element={<ComponentLogin/>} />
-					<Route path="/regex" element={<PasswordStrength backgroundColor={""}/>} />
-				</Routes>
-			</Router>
-		</div>;
-	}
+  private Navigation(): JSX.Element {
+    return (
+      <div>
+        <Router>
+          <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+            <Container>
+              <Navbar.Brand href="/">Task Master</Navbar.Brand>
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+              <Navbar.Collapse id="responsive-navbar-nav">
+                <Nav activeKey={location.pathname}>
+                  <Nav.Link href="/schedule">Horaire</Nav.Link>
+                  <Nav.Link href="/employees">Employés</Nav.Link>
+                  <Nav.Link href="/about">À propos</Nav.Link>
+                </Nav>
+                <Nav activeKey={location.pathname}>
+                  <Nav.Link href="/login">Login</Nav.Link>
+                  <Nav.Link href="/memes">Dank memes</Nav.Link>
+                </Nav>
+              </Navbar.Collapse>
+            </Container>
+          </Navbar>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/employees" element={<Employees />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/memes" element={<Memes />} />
+          </Routes>
+        </Router>
+      </div>
+    );
+  }
 }
