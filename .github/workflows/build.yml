@@ -109,7 +109,6 @@ jobs:
         server: ${{ secrets.OCTOPUSSERVERURL }}
         deploy_to: Development
         packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
-        
 permissions:
   contents: read
   issues: write
