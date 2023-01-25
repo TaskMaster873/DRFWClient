@@ -4,7 +4,7 @@ import { ComponentAddEmployee } from "../components/ComponentAddEmployee";
 import { Logger } from "../Logger";
 import { JobTitleList } from "../types/JobTitleList";
 
-export class AddEmploye extends React.Component {
+export class AddEmployee extends React.Component {
   private logger: Logger = new Logger(`Employees`, `#20f6a4`, false);
   private list: string[] = ["Menusier", " Plombier"];
 
@@ -14,6 +14,10 @@ export class AddEmploye extends React.Component {
 
   public render(): JSX.Element {
     let listData: JobTitleList = { list: this.list };
-    return <Container className="mt-3"><ComponentAddEmployee {...listData} /></Container>;
+    return (
+      <Container className="mt-3">
+        <ComponentAddEmployee {...listData} />
+      </Container>
+    );
   }
 }

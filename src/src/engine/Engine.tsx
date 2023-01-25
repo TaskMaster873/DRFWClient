@@ -22,7 +22,7 @@ import { Employees } from "./pages/employees";
 import { About } from "./pages/about";
 import { Login } from "./pages/login";
 import { Memes } from "./pages/memes";
-import { AddEmploye } from "./pages/addEmploye";
+import { AddEmployee } from "./pages/addEmployee";
 import { NavigationBar } from "./components/NavigationBar";
 
 export class Engine extends React.Component {
@@ -46,7 +46,7 @@ export class Engine extends React.Component {
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
             <Route path="/memes" element={<Memes />} />
-            <Route path="/creer-employe" element={<AddEmploye />} />
+            <Route path="/add-employee" element={<AddEmployee />} />
           </Routes>
         </Router>
       </div>
