@@ -1,4 +1,7 @@
 import React from "react";
+import { Button } from "react-bootstrap";
+import DropdownButton from "react-bootstrap/esm/DropdownButton";
+import DropdownItem from "react-bootstrap/esm/DropdownItem";
 import Table from 'react-bootstrap/Table';
 import { EmployeeList } from "../types/EmployeeList";
 
@@ -11,36 +14,31 @@ export class ComponentSchedule extends React.Component {
 
   public render(): JSX.Element {
     return (
-        <Table responsive>
+        <div>
+        <Table responsive striped bordered hover>
           <thead>
             <tr>
-              <th>Heures de la journée</th>
-              {Array.from({ length: this.list.length }).map((_, index) => (
-                <th key={index}>{this.list[index]}</th>
-              ))}
+              <th>#</th>
+              <th>Prénom</th>
+              <th>Nom</th>
+              <th>Tel</th>
+              <th>Role</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
               {Array.from({ length: this.list.length }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
+                <tr>
+                  <td key={index+"a"}><a>{this.list[index]}</a></td>
+                  <td key={index}>{index}</td>
+                  <td key={index+"b"}>Nom</td>
+                  <td key={index+"c"}>Tel</td>
+                  <td key={index+"d"}>Role</td>
+                </tr>
               ))}
-            </tr>
-            <tr>
-              <td>2</td>
-              {Array.from({ length: this.list.length }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
-              ))}
-            </tr>
-            <tr>
-              <td>3</td>
-              {Array.from({ length: this.list.length }).map((_, index) => (
-                <td key={index}>Table cell {index}</td>
-              ))}
-            </tr>
           </tbody>
         </Table>
+        <Button href="/creer-employe">Ajouter</Button>
+        </div>
       );
   }
 }
