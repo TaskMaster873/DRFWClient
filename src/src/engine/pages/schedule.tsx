@@ -1,15 +1,18 @@
 import React from "react";
 import { Container } from "react-bootstrap";
 import { Logger } from "../Logger";
+import { ComponentSchedule } from "../components/ComponentSchedule";
+import { EmployeeList } from "../types/EmployeeList";
 
 export class Schedule extends React.Component {
   private logger: Logger = new Logger(`Schedule`, `#20f6a4`, false);
-
+  private list: string[] = ["George", "Magalie"];
   public componentDidMount() {
     document.title = "Horaire - Task Manager";
   }
 
   public render(): JSX.Element {
-    return <Container>Horaire global</Container>;
+    let listData: EmployeeList = { list: this.list };
+    return <Container> <ComponentSchedule  {...listData} /> </Container>;
   }
 }
