@@ -1,21 +1,42 @@
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: jest.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(), // Deprecated
-    removeListener: jest.fn(), // Deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
+/**
+ * @jest-environment jsdom
+ */
+import MatchMediaMock from 'jest-matchmedia-mock';
+
+test('use jsdom in this test file', () => {
+    const element = document.createElement('div');
+    expect(element).not.toBeNull();
 });
 
-import {Application} from "../src/Application";
+let matchMedia;
+describe('Test TaskMaster Client Configurations', () => {
+    beforeAll(() => {
+        matchMedia = new MatchMediaMock();
+    });
 
-it('renders without crashing', () => {
+    afterEach(() => {
+        matchMedia.clear();
+    });
 
-  let app = new Application();
-  app.start();
+    test('Test if match media is defined', () => {
+        const mediaQuery = '(prefers-color-scheme: light)';
+        const firstListener = jest.fn();
+        const secondListener = jest.fn();
+        const mql = window.matchMedia(mediaQuery);
+
+        mql.addListener(ev => ev.matches && firstListener());
+        mql.addListener(ev => ev.matches && secondListener());
+
+        matchMedia.useMediaQuery(mediaQuery);
+
+        expect(firstListener).toBeCalledTimes(1);
+        expect(secondListener).toBeCalledTimes(1);
+    });
+
+    test('Render app without crashing', () => {
+        const { Application } = require('../src/Application')
+
+        let app = new Application();
+        app.start();
+    });
 });
