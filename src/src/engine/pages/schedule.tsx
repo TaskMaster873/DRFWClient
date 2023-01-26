@@ -1,7 +1,7 @@
 import React from "react";
 import { Container } from "react-bootstrap";
-import { Logger } from "../Logger";
 import { ComponentSchedule } from "../components/ComponentSchedule";
+import { Logger } from "../Logger";
 import { EmployeeList } from "../types/EmployeeList";
 
 export class Schedule extends React.Component {
