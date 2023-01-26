@@ -2,11 +2,11 @@ import React from "react";
 import { Container } from "react-bootstrap";
 import { ComponentAddEmployee } from "../components/ComponentAddEmployee";
 import { Logger } from "../Logger";
-import { JobTitleList } from "../types/JobTitleList";
+import { JobTitle, JobTitleList } from "../types/JobTitleList";
 
 export class AddEmployee extends React.Component {
   private logger: Logger = new Logger(`Employees`, `#20f6a4`, false);
-  private list: string[] = ["Menusier", " Plombier"];
+  private list: JobTitle[] = [{ name: "Menusier" }, { name: "Plombier" }];
 
   public componentDidMount() {
     document.title = "Ajouter un Employé - Task Manager";
