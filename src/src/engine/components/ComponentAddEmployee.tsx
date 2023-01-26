@@ -1,7 +1,7 @@
 import React from "react";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { JobTitleList } from "../types/JobTitleList";
+import { JobTitleList } from "../types/JobTitle";
 
 export class ComponentAddEmployee extends React.Component {
     private corpsEmplois: string[] = [];
