@@ -31,13 +31,9 @@
     "webpack": "webpack",
     "dev": "webpack serve",
     "build": "webpack --mode production --progress",
-    "test": "react-scripts test",
-    "preinstall": "npx npm-force-resolutions"
+    "test": "react-scripts test"
   },
-  "resolutions": {
-    "glob-parent": "^6.0.2",
-    "nth-check": "^2.1.1"
- },
+
   "eslintConfig": {
     "extends": [
       "react-app",

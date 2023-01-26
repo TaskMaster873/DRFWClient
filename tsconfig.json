@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "outDir": "/build",
         "module": "es2022",
 		"target": "esnext",
         "lib": [
@@ -34,5 +35,8 @@
 		"src/*.tsx",
 		"src/*.ts",
 		"src/*.cjs"
+    ],
+    "exclude": [
+        "./build/**/*"
     ]
 }
