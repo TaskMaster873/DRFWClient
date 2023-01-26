@@ -1,3 +1,11 @@
+.build
+build
+build/*
+.build/*
+
+package-lock.json
+.package-lock.json
+
 # Logs
 logs
 *.log
@@ -128,5 +136,3 @@ dist
 
 .idea
 .idea/*
-
-.build
