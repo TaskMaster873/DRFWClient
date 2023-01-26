@@ -1,11 +1,11 @@
 import React from "react";
 import Table from 'react-bootstrap/Table';
-import { EmployeeList } from "../types/EmployeeList";
+import { EmployeeList, Employee } from "../types/Employee";
+
 import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
 
 export class ComponentSchedule extends React.Component {
-  private list: string[] = [];
-  
+  private list: Employee[] = [];
   constructor(props: EmployeeList) {
     super(props);
     this.list = props.list;
