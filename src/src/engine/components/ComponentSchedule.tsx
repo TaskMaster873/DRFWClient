@@ -1,9 +1,9 @@
 import React from "react";
 import Table from 'react-bootstrap/Table';
-import { EmployeeList } from "../types/EmployeeList";
+import { EmployeeList, Employee } from "../types/Employee";
 
 export class ComponentSchedule extends React.Component {
-  private list: string[] = [];
+  private list: Employee[] = [];
   constructor(props: EmployeeList) {
     super(props);
     this.list = props.list;
@@ -16,7 +16,7 @@ export class ComponentSchedule extends React.Component {
             <tr>
               <th>Heures de la journée</th>
               {Array.from({ length: this.list.length }).map((_, index) => (
-                <th key={index}>{this.list[index]}</th>
+                <th key={index}>{this.list[index].name}</th>
               ))}
             </tr>
           </thead>

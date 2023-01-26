@@ -1,9 +1,9 @@
 import React from "react";
 import { Table, Button } from "react-bootstrap";
-import { EmployeeList } from "../types/EmployeeList";
+import { EmployeeList, Employee } from "../types/Employee";
 
 export class ComponentEmployeeList extends React.Component {
-  private list: string[] = [];
+  private list: Employee[] = [];
   constructor(props: EmployeeList) {
     super(props);
     this.list = props.list;
@@ -30,7 +30,7 @@ export class ComponentEmployeeList extends React.Component {
                 <td key={index}>{index}</td>
                 <td key={index + "a"}>Nom</td>
                 <td key={index + "b"}>
-                  <a>{this.list[index]}</a>
+                  <a>{this.list[index].name}</a>
                 </td>
                 <td key={index + "c"}>Tel</td>
                 <td key={index + "d"}>Gest</td>

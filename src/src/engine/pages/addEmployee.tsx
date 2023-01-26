@@ -2,7 +2,7 @@ import React from "react";
 import { Container } from "react-bootstrap";
 import { ComponentAddEmployee } from "../components/ComponentAddEmployee";
 import { Logger } from "../Logger";
-import { JobTitleList } from "../types/JobTitleList";
+import { JobTitleList } from "../types/JobTitle";
 
 export class AddEmployee extends React.Component {
   private logger: Logger = new Logger(`Employees`, `#20f6a4`, false);
