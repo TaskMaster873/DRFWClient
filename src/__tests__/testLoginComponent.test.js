@@ -7,6 +7,7 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 let matchMedia;
+
 describe("Test TaskMaster Client Configurations", () => {
   beforeAll(() => {
     matchMedia = new MatchMediaMock();
@@ -14,6 +15,7 @@ describe("Test TaskMaster Client Configurations", () => {
 
   afterEach(() => {
     matchMedia.clear();
+    document.body.innerHTML = ``;
   });
 
   test("Test if match media is defined", () => {
@@ -37,28 +39,35 @@ describe("Test TaskMaster Client Configurations", () => {
     let app = new Application();
     app.start();
   });
-/*   test("render form inputs", async () => {
+  /* test("render form inputs", async () => {
     const { Application } = require("../src/Application");
 
     let app = new Application();
     app.start();
 
-    userEvent.click(await screen.findByText("Connexion"));
+
+    const connexionBtn = screen.getByRole("button", {
+      name: "Connexion",
+    });
+    userEvent.click(connexionBtn);
 
     const inputNo = await screen.findByTestId("noLogin");
     const inputPassword = await screen.findByTestId("passwordLogin");
     expect(inputNo).toBeInTheDocument();
     expect(inputPassword).toBeInTheDocument();
     expect(inputPassword).toHaveAttribute("type", "password");
-  });
+  }); */
 
+  /*
   test("pass invalid login infos should show error", async () => {
     const { Application } = require("../src/Application");
 
     let app = new Application();
     app.start();
 
-    userEvent.click(await screen.findByText("Connexion"));
+    const connexionBtn = await screen.getByRole("button", {
+      name: "Connexion",
+    });
 
     const invalidNoEmployee = "64389917853";
     const invalidPassword = "Jgodsgj53286";
