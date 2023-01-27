@@ -6,8 +6,12 @@ import Button from "react-bootstrap/Button";
 import Logo from "../../deps/images/logo.png";
 import { Link } from "react-router-dom";
 
-export class ComponentLogin extends React.Component {
-  private logger: Logger = new Logger(`ComponentLogin`, `#20f6a4`, false);
+export class ComponentChangePassword extends React.Component {
+  private logger: Logger = new Logger(
+    `ComponentChangePassword`,
+    `#20f6a4`,
+    false
+  );
   private errorMessage = "";
   public state: { no: any; password?: string; validated?: boolean };
 
@@ -30,46 +34,40 @@ export class ComponentLogin extends React.Component {
             width={50}
             height={60}
           />
-          <h4 className="text-center mt-4 mb-4">Se connecter à Task Master</h4>
+          <h4 className="text-center mt-4 mb-4">Changer de mot de passe</h4>
         </div>
         <Form onSubmit={this.handleSubmit}>
-          <Form.Label className="mt-2">Numéro d'employé</Form.Label>
+          <Form.Label className="mt-2">Ancien mot de passe</Form.Label>
           <Form.Control
-            id="noLogin"
+            id="oldPassword"
             className="row mt-1"
             type="number"
-            placeholder="Entrez le numéro d'employé"
+            placeholder="Entrez l'ancien mot de passe"
             value={this.state.no}
-            onChange={this.handleChange}
           />
 
-          <Form.Label className="mt-4">Mot de passe </Form.Label>
+          <Form.Label className="mt-4">Nouveau mot de passe </Form.Label>
           <Form.Control
-            id="passwordLogin"
+            id="newPassword"
             className="row mt-1"
             type="password"
-            placeholder="Entrez votre mot de passe"
-            value={this.state.password}
-            onChange={this.handleChange}
+            placeholder="Entrez le nouveau mot de passe"
           />
           <Form.Text
             className="text-muted"
             id="loginErrorMsg"
             aria-errormessage={this.errorMessage}
           ></Form.Text>
-          <div className="me-4 mt-4 d-block text-center mx-auto">
-            <Link className="d-block" to="/changePassword">
-              Mot de passe oublié ?
-            </Link>
+          <div className="me-4">
             <Button
               id="submitLogin"
-              className="mt-4"
+              className="mt-4 d-block text-center mx-auto"
               variant="primary"
               size="lg"
               type="submit"
               value="Submit"
             >
-              Connexion
+              Confirmer
             </Button>
           </div>
         </Form>
