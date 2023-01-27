@@ -12,6 +12,7 @@ import { Login } from "./pages/login";
 import { Memes } from "./pages/memes";
 import { AddEmployee } from "./pages/addEmployee";
 import { NavigationBar } from "./components/NavigationBar";
+import { ChangePassword } from "./pages/changePassword";
 
 export class Engine extends React.Component {
   public render(): JSX.Element {
@@ -28,6 +29,7 @@ export class Engine extends React.Component {
               <Route path="/login" element={<Login />} />
               <Route path="/memes" element={<Memes />} />
               <Route path="/add-employee" element={<AddEmployee />} />
+              <Route path="/changePassword" element={<ChangePassword />} />
             </Routes>
           </div>
         </BrowserRouter>
