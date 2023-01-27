@@ -1,4 +1,4 @@
-name: Create Release
+name: Create Tag & Create Release & Modify Change Log
 run-name: ${{ github.actor }} creating a release!
 on:
   push:
