@@ -71,7 +71,7 @@ jobs:
           octo pack \
            --basePath ${SOURCEPATH} \
            --outFolder ${OUTPUTPATH} \
-           --id DRFWClient \
+           --id TaskMaster \
            --version ${{ steps.determine_version.outputs.semVer }} \
            --format zip \
            --overwrite \
@@ -116,8 +116,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
-          asset_name: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
+          asset_path: TaskMaster.${{ steps.determine_version.outputs.semVer }}.zip
+          asset_name: TaskMaster.${{ steps.determine_version.outputs.semVer }}.zip
           asset_content_type: application/octet-stream
       - name: Push packages to Octopus Deploy
         uses: OctopusDeploy/push-package-action@v2
@@ -125,7 +125,7 @@ jobs:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
           OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
         with:
-          packages: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
+          packages: TaskMaster.${{ steps.determine_version.outputs.semVer }}.zip
           overwrite_mode: OverwriteExisting
       - name: Generate Octopus Deploy build information
         uses: OctopusDeploy/push-build-information-action@v1
