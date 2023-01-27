@@ -1,3 +1,11 @@
 export interface JobTitleList {
-    list: string[];
+    titles: JobTitle[];
+}
+
+export class JobTitle {
+    name: string = "";
+
+    public toString(): string {
+        return name + ', ';
+    }
 }
