@@ -1,5 +1,5 @@
 <div align="center">
-<img src="docs/Logo.png" alt="TaskMaster Logo" width="200"/>
+<img src="docs/logo.png" alt="TaskMaster Logo" width="200"/>
 
 # TaskMaster Client
 
