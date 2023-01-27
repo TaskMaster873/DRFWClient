@@ -7,7 +7,7 @@ import { LinkContainer } from "react-router-bootstrap";
 
 /* === Images === */
 // @ts-ignore
-import Logo from "../../deps/images/Logo.png";
+import Logo from "../../deps/images/logo.png";
 
 export class NavigationBar extends React.Component {
   private logger: Logger = new Logger(`NavigationBar`, `#20f6a4`);
