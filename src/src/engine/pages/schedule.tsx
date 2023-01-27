@@ -14,7 +14,7 @@ export class Schedule extends React.Component {
   public render(): JSX.Element {
     let listData: EmployeeList = { list: this.list };
     return (
-      <Container>
+      <Container className="mt-5">
         <ComponentSchedule {...listData} />
       </Container>
     );
