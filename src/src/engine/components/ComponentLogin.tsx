@@ -3,7 +3,7 @@ import { Logger } from "../Logger";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 // @ts-ignore
-import Logo from "../../deps/images/logo.png";
+import Logo from "../../deps/images/Logo.png";
 import { Link } from "react-router-dom";
 
 export class ComponentLogin extends React.Component {
