@@ -5,23 +5,57 @@ on:
     branches:
       - dev
 jobs:
-  build-and-test:
-    name: Build & Test
-    uses: ./.github/workflows/tests-dev-branchs.yml
+  #build-and-test:
+  #  name: Build & Test
+  #  uses: ./.github/workflows/tests-dev-branchs.yml
   deploy:
-    needs: build-and-test
+    #needs: build-and-test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: '0'
+    - uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.14
+      with:
+        versionSpec: 5.x
+    - id: determine_version
+      name: Determine Version
+      uses: gittools/actions/gitversion/execute@v0.9.14
+      with:
+        additionalArguments: /overrideconfig mode=Mainline
+    - name: Install Dependencies
+      run: npm i
+      shell: bash
+    - name: List Dependencies
+      run: npm list --all > dependencies.txt
+      shell: bash
+    - name: Collect Dependencies
+      uses: actions/upload-artifact@v2
+      with:
+        name: Dependencies
+        path: dependencies.txt
+    - name: List Dependency Updates
+      run: npm outdated > dependencyUpdates.txt
+      shell: bash
+    - name: Collect Dependency Updates
+      uses: actions/upload-artifact@v2
+      with:
+        name: Dependencies Updates
+        path: dependencyUpdates.txt
+    - name: Test
+      run: npm test
+      shell: bash
+    - name: Build
+      run: npm run build
+      shell: bash
     - name: Install Octopus Deploy CLI
       uses: OctopusDeploy/install-octopus-cli-action@v1
       with:
         version: latest
-    - name: Build
-      run: npm run build
-      shell: bash
     - name: Package
       run: |-
         SOURCEPATH=.
@@ -80,8 +114,3 @@ jobs:
         server: ${{ secrets.OCTOPUSSERVERURL }}
         deploy_to: Development
         packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
-
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
