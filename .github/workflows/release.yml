@@ -148,6 +148,19 @@ jobs:
           server: ${{ secrets.OCTOPUSSERVERURL }}
           channel: Production
           packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
+      - name: Deploy a Release in Octopus Deploy
+        uses: OctopusDeploy/deploy-release-action@v3.0.1
+        env:
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY  }}
+          OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
+          OCTOPUS_SPACE: 'Default'
+          with:
+            project: 'TaskMaster'
+            release_number: ${{ steps.determine_version.outputs.semVer }}
+            environments: |
+              Development
+              Staging
+                Production
 permissions:
   contents: write
   issues: write
