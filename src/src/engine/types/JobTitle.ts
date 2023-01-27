@@ -1,6 +1,5 @@
 export interface JobTitleList {
-    list: JobTitle[];
-
+    titles: JobTitle[];
 }
 
 export class JobTitle {
