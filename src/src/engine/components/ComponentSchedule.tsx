@@ -2,6 +2,9 @@ import React from "react";
 import { EmployeeList, Employee } from "../types/Employee";
 import { DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 
+/**
+ * Ceci est le composant d'horaire
+ */
 export class ComponentSchedule extends React.Component {
     private list: Employee[] = [];
     constructor(props: EmployeeList) {
@@ -23,6 +26,11 @@ export class ComponentSchedule extends React.Component {
         };
     }
 
+    /**
+     * 
+     * @returns la liste des nom d'employé formatté pour columns de DayPilotCalendar
+     *
+     */
     private doColumns() {
         let listToReturn: Array<{ name: string, id: string }>;
         listToReturn = [];
@@ -35,7 +43,7 @@ export class ComponentSchedule extends React.Component {
     public render(): JSX.Element {
         if(this.list === undefined || this.list.length == 0){
             return (
-                <div> si vous voyez ceci c'est que soit, il n'y a pas d'autorisation ou vous êtes admin et il n'y a pas d'employé dans votre liste</div>
+                <div> Il n'y a pas d'horaire à voir</div>
             );
         }
         else return (
