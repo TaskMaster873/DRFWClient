@@ -19,6 +19,9 @@ jobs:
       uses: OctopusDeploy/install-octopus-cli-action@v1
       with:
         version: latest
+    - name: Build
+      run: npm run build
+      shell: bash
     - name: Package
       run: |-
         SOURCEPATH=.
