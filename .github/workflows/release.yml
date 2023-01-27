@@ -153,14 +153,14 @@ jobs:
         env:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY  }}
           OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
-          OCTOPUS_SPACE: 'Default'
+          OCTOPUS_SPACE: Default
           with:
-            project: 'TaskMaster'
+            project: TaskMaster
             release_number: ${{ steps.determine_version.outputs.semVer }}
-            environments: |
-              Development \
-              Staging \
-              Production \
+            environments:
+              - Development
+              - Staging
+              - Production
 permissions:
   contents: write
   issues: write
