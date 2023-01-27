@@ -1,13 +1,16 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { JobTitleList } from "../types/JobTitleList";
+import { JobTitle, JobTitleList } from "../types/JobTitle";
+import { RolesList } from "../types/Roles";
 
 export class ComponentAddEmployee extends React.Component {
-  private corpsEmplois: string[] = [];
-  constructor(props: JobTitleList) {
+  private jobTitles: JobTitle[] = [];
+  private roles: string[] = [];
+  constructor(props: { titles: JobTitle[]; roles: string[] }) {
     super(props);
-    this.corpsEmplois = props.list;
+    this.jobTitles = props.titles;
+    this.roles = props.roles;
   }
   public render(): JSX.Element {
     return (
@@ -49,7 +52,7 @@ export class ComponentAddEmployee extends React.Component {
           controlId="formCorpsEmploi"
         >
           <Form.Label>Corps d'emploi de l'employé</Form.Label>
-          {this.corpsEmplois.map((corps) => (
+          {this.jobTitles.map((corps) => (
             <Form.Check
               key={`${corps}`}
               type="checkbox"
@@ -61,7 +64,7 @@ export class ComponentAddEmployee extends React.Component {
         <Form.Group className="mb-3 col-sm-12 col-md-6" controlId="formRole">
           <Form.Label>Rôle de l'employé</Form.Label>
           <Form.Select aria-label="Default select example">
-            {["Employé", "Administrateur"].map((role) => (
+            {this.roles.map((role) => (
               <option key={`${role}`} value={`${role}`}>{`${role}`}</option>
             ))}
           </Form.Select>

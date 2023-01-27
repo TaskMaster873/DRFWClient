@@ -27,7 +27,7 @@ jobs:
       with:
         version: latest
     - name: Install Dependencies
-      run: npm ci
+      run: npm i
       shell: bash
     - name: List Dependencies
       run: npm list --all > dependencies.txt
@@ -109,7 +109,7 @@ jobs:
         server: ${{ secrets.OCTOPUSSERVERURL }}
         deploy_to: Development
         packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
-        
+
 permissions:
   contents: read
   issues: write
