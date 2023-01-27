@@ -2,7 +2,8 @@ name: Test & Build & Deploy to Development Server
 run-name: ${{ github.actor }} is building the app 🚀
 on:
   push:
-    - dev
+    branches:
+      - dev
 jobs:
   build-and-test:
     name: Build & Test
