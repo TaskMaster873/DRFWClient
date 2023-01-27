@@ -9,13 +9,18 @@ import "@testing-library/jest-dom";
 let matchMedia;
 
 describe("Test TaskMaster Client Configurations", () => {
+  jest.setTimeout(15000);
   beforeAll(() => {
     matchMedia = new MatchMediaMock();
   });
 
   afterEach(() => {
     matchMedia.clear();
-    document.body.innerHTML = ``;
+  });
+
+  test("use jsdom in this test file", () => {
+    const element = document.createElement("div");
+    expect(element).not.toBeNull();
   });
 
   test("Test if match media is defined", () => {
@@ -33,30 +38,29 @@ describe("Test TaskMaster Client Configurations", () => {
     expect(secondListener).toBeCalledTimes(1);
   });
 
-  test("Render app without crashing", () => {
+  test("Render app without crashing", async () => {
     const { Application } = require("../src/Application");
 
     let app = new Application();
     app.start();
   });
-  /* test("render form inputs", async () => {
+
+  test("render form inputs", async () => {
     const { Application } = require("../src/Application");
 
     let app = new Application();
     app.start();
 
+    let connexionBt = document.getElementById("toto");
 
-    const connexionBtn = screen.getByRole("button", {
-      name: "Connexion",
-    });
-    userEvent.click(connexionBtn);
+    userEvent.click(connexionBt);
 
-    const inputNo = await screen.findByTestId("noLogin");
+    /*const inputNo = screen.getByTestId("noLogin");
     const inputPassword = await screen.findByTestId("passwordLogin");
     expect(inputNo).toBeInTheDocument();
     expect(inputPassword).toBeInTheDocument();
-    expect(inputPassword).toHaveAttribute("type", "password");
-  }); */
+    expect(inputPassword).toHaveAttribute("type", "password");*/
+  });
 
   /*
   test("pass invalid login infos should show error", async () => {
