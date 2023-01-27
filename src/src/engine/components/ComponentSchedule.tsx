@@ -35,7 +35,7 @@ export class ComponentSchedule extends React.Component {
     public render(): JSX.Element {
         if(this.list === undefined || this.list.length == 0){
             return (
-                <div> Vous n'avez pas d'horaire à regarder </div>
+                <div> si vous voyez ceci c'est que soit, il n'y a pas d'autorisation ou vous êtes admin et il n'y a pas d'employé dans votre liste</div>
             );
         }
         else return (
