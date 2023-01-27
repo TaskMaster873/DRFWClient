@@ -10,6 +10,10 @@ export class Index extends React.Component {
   }
 
   public render(): JSX.Element {
-    return <Container>Page d'accueil</Container>;
+    return (
+        <div>
+          <Container>Page d'accueil ceci est un test</Container>
+        </div>
+    );
   }
 }
