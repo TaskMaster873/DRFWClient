@@ -6,6 +6,6 @@ export class JobTitle {
     name: string = "";
 
     public toString(): string {
-        return name + ', ';
+        return this.name + ', ';
     }
 }
