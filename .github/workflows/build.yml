@@ -9,6 +9,7 @@ jobs:
     name: Build & Test
     uses: ./.github/workflows/tests-dev-branchs.yml
   deploy:
+    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
     - name: Package
