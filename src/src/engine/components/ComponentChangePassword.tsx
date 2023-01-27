@@ -6,6 +6,11 @@ import Button from "react-bootstrap/Button";
 import Logo from "../../deps/images/logo.png";
 import { Link } from "react-router-dom";
 
+/***
+ * La classe sert pour changer le mot de passe
+ * 
+ * state : no de l'employé , son mot de passe, si c'est valide
+ */
 export class ComponentChangePassword extends React.Component {
   private logger: Logger = new Logger(
     `ComponentChangePassword`,

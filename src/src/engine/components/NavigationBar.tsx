@@ -9,6 +9,9 @@ import { LinkContainer } from "react-router-bootstrap";
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
 
+/**
+ * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
+ */
 export class NavigationBar extends React.Component {
   private logger: Logger = new Logger(`NavigationBar`, `#20f6a4`);
   private isLoggedIn: boolean = false;
@@ -55,6 +58,10 @@ export class NavigationBar extends React.Component {
     );
   }
 
+  /**
+   * 
+   * @returns se déconnecter si la personne est connectée
+   */
   private loginButton() {
     if (this.isLoggedIn) {
       return <Nav.Link onClick={this.logOut}>Se déconnecter</Nav.Link>;
@@ -67,6 +74,9 @@ export class NavigationBar extends React.Component {
     }
   }
 
+  /**
+   * Je ne sais pas si il faudrait le garder
+   */
   private logOut() {
     this.logger.log(`Logging out`);
   }
