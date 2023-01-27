@@ -1,6 +1,7 @@
 import React from "react";
 import { Table, Button } from "react-bootstrap";
 import { EmployeeList, Employee } from "../types/Employee";
+import { LinkContainer } from "react-router-bootstrap";
 
 export class ComponentEmployeeList extends React.Component {
   private list: Employee[] = [];
@@ -45,7 +46,8 @@ export class ComponentEmployeeList extends React.Component {
             ))}
           </tbody>
         </Table>
-        <Button href="/add-employee">Ajouter</Button>
+        <LinkContainer to="/add-employee"><Button>Ajouter</Button></LinkContainer>
+        
       </div>
     );
   }
