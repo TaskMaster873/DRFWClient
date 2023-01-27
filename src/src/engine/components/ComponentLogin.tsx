@@ -35,21 +35,19 @@ export class ComponentLogin extends React.Component {
         <Form onSubmit={this.handleSubmit}>
           <Form.Label className="mt-2">Numéro d'employé</Form.Label>
           <Form.Control
-            id="noLogin"
+            data-testid="noLogin"
             className="row mt-1"
             type="number"
             placeholder="Entrez le numéro d'employé"
-            value={this.state.no}
             onChange={this.handleChange}
           />
 
           <Form.Label className="mt-4">Mot de passe </Form.Label>
           <Form.Control
-            id="passwordLogin"
+            data-testid="passwordLogin"
             className="row mt-1"
             type="password"
             placeholder="Entrez votre mot de passe"
-            value={this.state.password}
             onChange={this.handleChange}
           />
           <Form.Text
@@ -62,7 +60,7 @@ export class ComponentLogin extends React.Component {
               Mot de passe oublié ?
             </Link>
             <Button
-              id="submitLogin"
+              data-testid="submitLogin"
               className="mt-4"
               variant="primary"
               size="lg"
