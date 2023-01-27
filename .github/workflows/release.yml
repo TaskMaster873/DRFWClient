@@ -142,6 +142,24 @@ jobs:
           api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
           project: TaskMaster
           server: ${{ secrets.OCTOPUSSERVERURL }}
+          deploy_to: Development
+          channel: Production
+          packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
+      - name: Create Octopus Release 2
+        uses: OctopusDeploy/create-release-action@v1
+        with:
+          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          project: TaskMaster
+          server: ${{ secrets.OCTOPUSSERVERURL }}
+          deploy_to: Staging
+          channel: Production
+          packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
+      - name: Create Octopus Release 3
+        uses: OctopusDeploy/create-release-action@v1
+        with:
+          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          project: TaskMaster
+          server: ${{ secrets.OCTOPUSSERVERURL }}
           deploy_to: Production
           channel: Production
           packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
