@@ -14,7 +14,7 @@ export class Memes extends React.Component {
     return (
       <div>
         <h2 className="text-center m-4">Bing Chilling</h2>
-        <img src={Icecream} alt="Bing Chilling" />
+        <img className="image-fluid" src={Icecream} alt="Bing Chilling" />
       </div>
     );
   }
