@@ -143,6 +143,7 @@ jobs:
           project: TaskMaster
           server: ${{ secrets.OCTOPUSSERVERURL }}
           deploy_to: Production
+          channel: Production
           packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
 permissions:
   contents: write
