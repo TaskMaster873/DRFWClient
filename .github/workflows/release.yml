@@ -144,6 +144,7 @@ jobs:
         with:
           api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
           project: TaskMaster
+          space: Default
           server: ${{ secrets.OCTOPUSSERVERURL }}
           channel: Production
           packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
