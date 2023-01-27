@@ -158,9 +158,9 @@ jobs:
             project: 'TaskMaster'
             release_number: ${{ steps.determine_version.outputs.semVer }}
             environments: |
-              Development
-              Staging
-              Production
+              Development \
+              Staging \
+              Production \
 permissions:
   contents: write
   issues: write
