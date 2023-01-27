@@ -136,31 +136,13 @@ jobs:
           version: ${{ steps.determine_version.outputs.semVer }}
           packages: TaskMaster
           overwrite_mode: OverwriteExisting
-      - name: Create Octopus Release
-        uses: OctopusDeploy/create-release-action@v1
-        with:
-          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-          project: TaskMaster
-          server: ${{ secrets.OCTOPUSSERVERURL }}
-          deploy_to: Development
-          channel: Production
-          packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
-      - name: Create Octopus Release 2
-        uses: OctopusDeploy/create-release-action@v1
-        with:
-          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-          project: TaskMaster
-          server: ${{ secrets.OCTOPUSSERVERURL }}
-          deploy_to: Staging
-          channel: Production
-          packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
       - name: Create Octopus Release 3
-        uses: OctopusDeploy/create-release-action@v1
+        uses: OctopusDeploy/create-release-action@v3.0.1
         with:
-          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
           project: TaskMaster
-          server: ${{ secrets.OCTOPUSSERVERURL }}
-          deploy_to: Production
+          OCTOPUS_SPACE: 'bob'
+          OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
           channel: Production
           packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
 permissions:
