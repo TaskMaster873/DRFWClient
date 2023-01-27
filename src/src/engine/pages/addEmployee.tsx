@@ -5,7 +5,7 @@ import { Logger } from "../Logger";
 import { RolesList } from "../types/Roles";
 
 export class AddEmployee extends React.Component {
-  private logger: Logger = new Logger(`Employees`, `#20f6a4`, false);
+  private logger: Logger = new Logger(`AddEmployee`, `#20f6a4`, false);
   private titles: string[] = ["Menusier", "Plombier"];
   private roles: string[] = ["Employé", "Administrateur"];
 

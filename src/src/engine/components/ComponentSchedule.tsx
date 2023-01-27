@@ -24,21 +24,26 @@ export class ComponentSchedule extends React.Component {
     }
 
     private doColumns() {
-        let listToReturn: Array<{ name: string }>;
+        let listToReturn: Array<{ name: string, id: string }>;
         listToReturn = [];
         for (let index = 0; index < this.list.length; index++) {
-            listToReturn.push({ name: this.list[index].name });
+            listToReturn.push({ name: this.list[index].name, id: this.list[index].no.toString() });
         }
         return listToReturn;
     }
 
     public render(): JSX.Element {
-        return (
+        if(this.list === undefined || this.list.length == 0){
+            return (
+                <div> si vous voyez ceci c'est que soit, il n'y a pas d'autorisation ou vous êtes admin et il n'y a pas d'employé dans votre liste</div>
+            );
+        }
+        else return (
             <DayPilotCalendar viewType={"Resources"} columns={this.doColumns()} />
             /* <div>
             <DayPilotCalendar
             {...this.state} />
-          </div>*/
+            </div>*/
         );
     }
 }
