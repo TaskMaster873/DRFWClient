@@ -4,19 +4,48 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import Fetch from "./fetch";
+import { ComponentLogin } from "../src/engine/components/ComponentLogin";
 
-test("loads and displays greeting", async () => {
-  // ARRANGE
-  render(<Fetch url="/login" />);
+test("render form inputs", () => {
+  render(<ComponentLogin />);
 
-  // ACT
-  await userEvent.click(screen.getByText());
-  await screen.findByRole("heading");
+  const inputs = screen.getAllByRole("input");
+  const inputEmail = screen.getByTestId("noLogin");
+  const inputPassword = screen.getByTestId("passwordLogin");
+  expect(inputEmail).toBeInTheDocument();
+  expect(inputPassword).toBeInTheDocument();
+  expect(inputs).toHaveLength(2);
+  expect(inputPassword).toHaveAttribute("type", "password");
+});
 
-  // ASSERT
-  expect(screen.getByRole("heading")).toHaveTextContent("hello there");
-  expect(screen.getByRole("button")).toBeDisabled();
+test("pass invalid login infos should show error", () => {
+  render(<ComponentLogin />);
+
+  const invalidNoEmployee = "64389917853";
+  const invalidPassword = "Jgodsgj53286";
+  const inputNoLogin = screen.getByTestId("noLogin");
+  userEvent.type(inputNoLogin, invalidNoEmployee);
+  const inputPasswordLogin = screen.getByTestId("passwordLogin");
+  userEvent.type(inputPasswordLogin, invalidPassword);
+  const submitBtn = screen.getByTestId("submitLogin");
+  userEvent.click(submitBtn);
+
+  expect(inputNoLogin).toHaveValue(invalidNoEmployee);
+  expect(inputPasswordLogin).toHaveValue(invalidPassword);
+  expect(screen.queryByTestId("loginErrorMsg")).toBeInTheDocument();
+  expect(screen.queryByTestId("loginErrorMsg")).toHaveErrorMessage();
+});
+
+test("pass invalid login infos should show error", () => {
+  render(<ComponentLogin />);
+
+  const invalidNoEmployee = "86439643436";
+
+  expect(screen.getByTestId("email-input")).toHaveValue("test");
+  expect(screen.queryByTestId("loginErrorMsg")).toBeInTheDocument();
+  expect(screen.queryByTestId("error-msg").textContent).toEqual(
+    "Please enter a valid email."
+  );
 });
 
 let matchMedia;
