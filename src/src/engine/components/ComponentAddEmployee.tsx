@@ -1,13 +1,12 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { JobTitle, JobTitleList } from "../types/JobTitle";
 import { RolesList } from "../types/Roles";
 
 export class ComponentAddEmployee extends React.Component {
-  private jobTitles: JobTitle[] = [];
+  private jobTitles: string[] = [];
   private roles: string[] = [];
-  constructor(props: { titles: JobTitle[]; roles: string[] }) {
+  constructor(props: { titles: string[]; roles: string[] }) {
     super(props);
     this.jobTitles = props.titles;
     this.roles = props.roles;
