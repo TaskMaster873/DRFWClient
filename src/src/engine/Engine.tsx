@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import "../deps/css/Engine.css";
 import "../deps/css/index.css";
@@ -18,7 +18,7 @@ export class Engine extends React.Component {
   public render(): JSX.Element {
     return (
       <React.StrictMode>
-        <BrowserRouter>
+        <Router>
           <div>
             <NavigationBar />
             <Routes>
@@ -32,7 +32,7 @@ export class Engine extends React.Component {
               <Route path="/changePassword" element={<ChangePassword />} />
             </Routes>
           </div>
-        </BrowserRouter>
+        </Router>
       </React.StrictMode>
     );
   }
