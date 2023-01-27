@@ -50,7 +50,3 @@ jobs:
       - name: Build
         run: npm run build
         shell: bash
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
