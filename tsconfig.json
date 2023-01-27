@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "outDir": "/build",
         "module": "es2022",
 		"target": "esnext",
         "lib": [
@@ -21,6 +22,7 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": false,
+        "noImplicitAny": false,
         "jsx": "react-jsx"
     },
     "include": [
@@ -33,5 +35,8 @@
 		"src/*.tsx",
 		"src/*.ts",
 		"src/*.cjs"
+    ],
+    "exclude": [
+        "./build/**/*"
     ]
 }

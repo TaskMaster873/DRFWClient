@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
@@ -41,6 +40,8 @@ export class Application extends Logger {
                     <Engine />
                 </React.StrictMode>
             );
+
+            //ReactDOM.render(<Engine />, this.rootElem);
         } else {
             this.error('Root element is null or undefined!');
         }
