@@ -1,6 +1,6 @@
 name: Test & Build & Deploy to Development Server
 run-name: ${{ github.actor }} is building the app 🚀
-'on':
+on:
   push:
     - dev
 jobs:
