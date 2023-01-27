@@ -138,11 +138,14 @@ jobs:
           overwrite_mode: OverwriteExisting
       - name: Create Octopus Release 3
         uses: OctopusDeploy/create-release-action@v3.0.1
-        with:
+        env:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-          project: TaskMaster
-          OCTOPUS_SPACE: 'bob'
           OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
+        with:
+          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          project: TaskMaster
+          space: 'bob'
+          server: ${{ secrets.OCTOPUSSERVERURL }}
           channel: Production
           packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
 permissions:
