@@ -45,7 +45,7 @@ export class ComponentEmployeeList extends React.Component {
             ))}
           </tbody>
         </Table>
-        <Button href="/creer-employe">Ajouter</Button>
+        <Button href="/add-employee">Ajouter</Button>
       </div>
     );
   }
