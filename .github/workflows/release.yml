@@ -160,7 +160,7 @@ jobs:
             environments: |
               Development
               Staging
-                Production
+              Production
 permissions:
   contents: write
   issues: write
