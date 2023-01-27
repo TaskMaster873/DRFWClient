@@ -119,6 +119,31 @@ jobs:
           asset_path: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
           asset_name: DRFWClient.${{ steps.determine_version.outputs.semVer }}.zip
           asset_content_type: application/octet-stream
+      - name: Push packages to Octopus Deploy
+        uses: OctopusDeploy/push-package-action@v2
+        env:
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
+        with:
+          packages: TaskMaster.${{ steps.determine_version.outputs.semVer }}.zip
+          overwrite_mode: OverwriteExisting
+      - name: Generate Octopus Deploy build information
+        uses: OctopusDeploy/push-build-information-action@v1
+        env:
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
+        with:
+          version: ${{ steps.determine_version.outputs.semVer }}
+          packages: TaskMaster
+          overwrite_mode: OverwriteExisting
+      - name: Create Octopus Release
+        uses: OctopusDeploy/create-release-action@v1
+        with:
+          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          project: TaskMaster
+          server: ${{ secrets.OCTOPUSSERVERURL }}
+          deploy_to: Production
+          packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
 permissions:
   contents: write
   issues: write
