@@ -12,6 +12,10 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
+    - name: Install Octopus Deploy CLI
+      uses: OctopusDeploy/install-octopus-cli-action@v1
+      with:
+        version: latest
     - name: Package
       run: |-
         SOURCEPATH=.

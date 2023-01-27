@@ -25,10 +25,6 @@ jobs:
         uses: gittools/actions/gitversion/execute@v0.9.14
         with:
           additionalArguments: /overrideconfig mode=Mainline
-      - name: Install Octopus Deploy CLI
-        uses: OctopusDeploy/install-octopus-cli-action@v1
-        with:
-          version: latest
       - name: Install Dependencies
         run: npm i
         shell: bash
