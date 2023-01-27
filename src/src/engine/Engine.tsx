@@ -27,22 +27,17 @@ export class Engine extends React.Component {
                         <Routes>
 
                             <Route path="/" element={<Index/>}></Route>
-  private Navigation(): JSX.Element {
-    return (
-      <div>
-        <Router>
-          <NavigationBar />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/employees" element={<Employees />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/memes" element={<Memes />} />
-            <Route path="/add-employee" element={<AddEmployee />} />
-          </Routes>
-        </Router>
-      </div>
-    );
-  }
+
+                            <Route path="/schedule" element={<Schedule/>}/>
+                            <Route path="/employees" element={<Employees/>}/>
+                            <Route path="/about" element={<About/>}/>
+                            <Route path="/login" element={<Login/>}/>
+                            <Route path="/memes" element={<Memes/>}/>
+                            <Route path="/creer-employe" element={<AddEmployee/>}/>
+                        </Routes>
+                    </div>
+                </BrowserRouter>
+            </React.StrictMode>
+        );
+    }
 }
