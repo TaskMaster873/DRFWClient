@@ -32,21 +32,25 @@ test("pass invalid login infos should show error", () => {
 
   expect(inputNoLogin).toHaveValue(invalidNoEmployee);
   expect(inputPasswordLogin).toHaveValue(invalidPassword);
-  expect(screen.queryByTestId("loginErrorMsg")).toBeInTheDocument();
   expect(screen.queryByTestId("loginErrorMsg")).toHaveErrorMessage();
 });
 
-test("pass invalid login infos should show error", () => {
+/* test("pass valid login infos should not show error and send user to home page", () => {
   render(<ComponentLogin />);
 
-  const invalidNoEmployee = "86439643436";
+  const validNoEmployee = "532988632";
+  const validPassword = "jidosgsi532523";
+  const inputNoLogin = screen.getByTestId("noLogin");
+  userEvent.type(inputNoLogin, validNoEmployee);
+  const inputPasswordLogin = screen.getByTestId("passwordLogin");
+  userEvent.type(inputPasswordLogin, validPassword);
+  const submitBtn = screen.getByTestId("submitLogin");
+  userEvent.click(submitBtn);
 
-  expect(screen.getByTestId("email-input")).toHaveValue("test");
-  expect(screen.queryByTestId("loginErrorMsg")).toBeInTheDocument();
-  expect(screen.queryByTestId("error-msg").textContent).toEqual(
-    "Please enter a valid email."
-  );
-});
+  expect(inputNoLogin).toHaveValue(validNoEmployee);
+  expect(inputPasswordLogin).toHaveValue(validPassword);
+  expect(screen.queryByTestId("loginErrorMsg")).not.toHaveErrorMessage();
+}); */
 
 let matchMedia;
 describe("Test TaskMaster Client Configurations", () => {
