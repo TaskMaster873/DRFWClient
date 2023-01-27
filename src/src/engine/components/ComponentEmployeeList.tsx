@@ -15,20 +15,20 @@ export class ComponentEmployeeList extends React.Component {
         <h3>Liste des employés</h3>
         <Table responsive striped bordered hover>
           <thead>
-            <tr>
-              <th>#</th>
-              <th>Prénom</th>
-              <th>Nom</th>
-              <th>Tel</th>
-              <th>Gestionnaire</th>
-              <th>Role(s)</th>
-              <th>Compétences</th>
+            <tr key={"firstCol"}>
+              <th key={"no"}>#</th>
+              <th key={"firstName"}>Prénom</th>
+              <th key={"name"}>Nom</th>
+              <th key={"phoneNumber"}>Tel</th>
+              <th key={"manager"}>Gestionnaire</th>
+              <th key={"jobTitles"}>Role(s)</th>
+              <th key={"skills"}>Compétences</th>
             </tr>
           </thead>
           <tbody>
             {Array.from({ length: this.list.length }).map((_, index) => (
-              <tr>
-                <td key={index}>{index}</td>
+              <tr key={"secondCol"}>
+                <td key={"no" + index}>{index}</td>
                 <td key={"firstName " + index}>
                   <a>{this.list[index].firstName}</a>
                 </td>
@@ -38,7 +38,7 @@ export class ComponentEmployeeList extends React.Component {
                 </td>
                 <td key={"manager " + index}>{this.list[index].manager}</td>
                 <td key={"jobTitles " + index}>
-                  {this.list[index].jobTitles.toString()}
+                  {this.list[index].jobTitles.join(", ")}
                 </td>
                 <td key={"skills " + index}>{this.list[index].skills}</td>
               </tr>
