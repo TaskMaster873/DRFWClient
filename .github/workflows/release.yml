@@ -136,8 +136,8 @@ jobs:
           version: ${{ steps.determine_version.outputs.semVer }}
           packages: TaskMaster
           overwrite_mode: OverwriteExisting
-      - name: Create Octopus Release 3
-        id: create_release
+      - name: Create Octopus Release
+        id: create_release_octopus
         uses: OctopusDeploy/create-release-action@v3.0.1
         env:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
@@ -157,7 +157,7 @@ jobs:
           OCTOPUS_SPACE: Default
         with:
           project: TaskMaster
-          release_number: ${{ steps.create_release.outputs.release_number }}
+          release_number: ${{ steps.create_release_octopus.outputs.release_number }}
           environments: |
             Development
             Staging
