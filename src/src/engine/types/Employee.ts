@@ -1,7 +1,14 @@
+
+/**
+ * Liste d'employé, comme dit dans le nom
+ */
 export interface EmployeeList {
     list : Employee[];
 }
 
+/**
+ * Contient tout les renseignements des employés de l'application web
+ */
 export class Employee {
     no: number = 0;
     name: string =  "";
@@ -21,7 +28,9 @@ export class Employee {
         this.jobTitles = employee.jobTitles;
 	}
 }
-
+/**
+ * Contient tout les renseignements pour créer un nouveau employé dans la bd
+ */
 export interface EmployeeCreateDTO {
 	readonly name: string;
 	readonly firstName: string;
