@@ -53,17 +53,16 @@ describe('Test TaskMaster Client Configurations', () => {
   test("should render form inputs", async () => {
     const { Application } = require('../src/Application')
 
-    await act(async () => {
+    await act(() => {
       let app = new Application();
       app.start();
-
-      const user = userEvent.setup();
-
-      console.log(document.getElementById("loginLink"));
-      console.log(document.getElementById("loginLink"));
-      await user.click();
-      await sleep(1000);
     });
+
+    const user = userEvent.setup();
+
+    console.log(document.getElementById("loginLink"));
+    await user.click();
+    await sleep(1000);
 
     const inputNo = document.getElementById("noLogin");
     const inputPassword = document.getElementById("passwordLogin");
