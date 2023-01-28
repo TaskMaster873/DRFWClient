@@ -179,7 +179,6 @@ jobs:
           OCTOPUS_SPACE: Default
         with:
           project: TaskMaster
-          channel: Production
           release_number: ${{ steps.create_release_octopus.outputs.release_number }}
           environments: |
             Development
@@ -191,7 +190,6 @@ jobs:
           OCTOPUS_SPACE: Default
         with:
           project: TaskMaster
-          channel: Production
           release_number: ${{ steps.create_release_octopus.outputs.release_number }}
           environments: |
             Staging
@@ -203,7 +201,6 @@ jobs:
           OCTOPUS_SPACE: Default
         with:
           project: TaskMaster
-          channel: Production
           release_number: ${{ steps.create_release_octopus.outputs.release_number }}
           environments: |
             Production
