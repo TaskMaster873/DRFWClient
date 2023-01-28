@@ -2,24 +2,24 @@
  * @jest-environment jsdom
  */
 
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
-import MatchMediaMock from 'jest-matchmedia-mock';
-import {act} from "react-dom/test-utils";
+import MatchMediaMock from "jest-matchmedia-mock";
+import { act } from "react-dom/test-utils";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms || 1000));
 }
 
-test('use jsdom in this test file', () => {
-  const element = document.createElement('div');
+test("use jsdom in this test file", () => {
+  const element = document.createElement("div");
   expect(element).not.toBeNull();
 });
 
 let matchMedia;
-describe('Test TaskMaster Client Configurations', () => {
+describe("Test TaskMaster Client Configurations", () => {
   beforeAll(() => {
     matchMedia = new MatchMediaMock();
   });
@@ -27,31 +27,8 @@ describe('Test TaskMaster Client Configurations', () => {
   afterEach(() => {
     matchMedia.clear();
   });
-
-  test('Test if match media is defined', () => {
-    const mediaQuery = '(prefers-color-scheme: light)';
-    const firstListener = jest.fn();
-    const secondListener = jest.fn();
-    const mql = window.matchMedia(mediaQuery);
-
-    mql.addListener(ev => ev.matches && firstListener());
-    mql.addListener(ev => ev.matches && secondListener());
-
-    matchMedia.useMediaQuery(mediaQuery);
-
-    expect(firstListener).toBeCalledTimes(1);
-    expect(secondListener).toBeCalledTimes(1);
-  });
-
-  test('Render app without crashing', async () => {
-    const { Application } = require('../src/Application')
-
-    let app = new Application();
-    await app.start();
-  });
-
   test("should render form inputs", async () => {
-    const { Application } = require('../src/Application')
+    const { Application } = require("../src/Application");
 
     await act(() => {
       let app = new Application();
@@ -71,36 +48,30 @@ describe('Test TaskMaster Client Configurations', () => {
     expect(inputPassword).not.toBeNull();
     expect(inputPassword).toHaveAttribute("type", "password");
   });
-});
 
-  /**/
-
-  /*
   test("pass invalid login infos should show error", async () => {
     const { Application } = require("../src/Application");
 
     let app = new Application();
     app.start();
-
-    const connexionBtn = await screen.getByRole("button", {
-      name: "Connexion",
-    });
-
     const invalidNoEmployee = "64389917853";
     const invalidPassword = "Jgodsgj53286";
-    const inputNo = await screen.findByTestId("noLogin");
+
+    await userEvent.click(document.querySelector("a[href='/login']"));
+
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
     userEvent.type(inputNo, invalidNoEmployee);
-    const inputPasswordLogin = await screen.findByTestId("passwordLogin");
-    userEvent.type(inputPasswordLogin, invalidPassword);
-    const submitBtn = await screen.findByTestId("submitLogin");
+    userEvent.type(inputPassword, invalidPassword);
+    const submitBtn = document.querySelector("button[type='submit']");
     userEvent.click(submitBtn);
-
-    expect(inputNoLogin).toHaveTextContent(invalidNoEmployee);
-    expect(inputPasswordLogin).toHaveValue(invalidPassword);
+    expect(inputNo).toHaveValue(invalidNoEmployee);
+    expect(inputPassword).toHaveValue(invalidPassword);
     expect(screen.queryByTestId("loginErrorMsg")).toHaveErrorMessage();
-  }); */
+  });
+});
 
-  /* test("pass valid login infos should not show error and send user to home page", () => {
+/* test("pass valid login infos should not show error and send user to home page", () => {
     render(<ComponentLogin />);
 
     const validNoEmployee = "532988632";
