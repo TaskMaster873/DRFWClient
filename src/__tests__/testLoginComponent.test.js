@@ -7,6 +7,7 @@ import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 import MatchMediaMock from 'jest-matchmedia-mock';
+import {act} from "react-dom/test-utils";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms || 1000));
@@ -52,18 +53,21 @@ describe('Test TaskMaster Client Configurations', () => {
   test("should render form inputs", async () => {
     const { Application } = require('../src/Application')
 
-    let app = new Application();
-    app.start();
+    await act(async () => {
+      let app = new Application();
+      app.start();
 
-    const user = userEvent.setup();
+      const user = userEvent.setup();
 
-    console.log(document.getElementById("loginLink"));
-    console.log(document.getElementById("loginLink"));
-    await user.click();
-    await sleep(1000);
+      console.log(document.getElementById("loginLink"));
+      console.log(document.getElementById("loginLink"));
+      await user.click();
+      await sleep(1000);
+    });
 
     const inputNo = document.getElementById("noLogin");
     const inputPassword = document.getElementById("passwordLogin");
+
     expect(inputNo).not.toBeNull();
     expect(inputPassword).not.toBeNull();
     expect(inputPassword).toHaveAttribute("type", "password");

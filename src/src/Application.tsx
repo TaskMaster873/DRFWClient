@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 
 import { Logger } from "./engine/Logger";
 import { Engine } from "./engine/Engine";
@@ -10,13 +10,14 @@ export class Application extends Logger {
   public logColor: string = `#20dbf6`;
 
   private rootElem: HTMLElement | null = null;
+  private root: ReactDOM.Root | null = null;
 
   constructor() {
     super();
   }
 
   private onReportStatistics(objective: any): void {
-    //console.log(objective); wasssusp
+
   }
 
   private registerEvents() {
@@ -33,7 +34,15 @@ export class Application extends Logger {
 
   private renderCore(): void {
     if (this.rootElem !== null && this.rootElem) {
-      ReactDOM.render(<Engine />, this.rootElem);
+      this.root = ReactDOM.createRoot(this.rootElem);
+
+      this.root.render(
+          <React.StrictMode>
+            <Engine />
+          </React.StrictMode>
+      );
+
+      //ReactDOM.render(<Engine />, this.rootElem);
     } else {
       this.error("Root element is null or undefined!");
     }
