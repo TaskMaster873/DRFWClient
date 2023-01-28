@@ -23,7 +23,10 @@ export class Application extends Logger {
     let start = Date.now();
 
     reportWebVitals(this.onReportStatistics.bind(this));
-    this.rootElem = document.getElementById("root");
+    this.rootElem = document.createElement("div");
+    this.rootElem.id = 'root';
+    document.body.appendChild(this.rootElem);
+
     this.renderCore();
     this.log(`Took ${Date.now() - start}ms to initialize...`);
   }

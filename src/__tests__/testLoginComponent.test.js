@@ -1,20 +1,24 @@
 /**
  * @jest-environment jsdom
  */
-import MatchMediaMock from "jest-matchmedia-mock";
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Application } from "../src/Application";
 import "@testing-library/jest-dom";
 
-let matchMedia;
+import MatchMediaMock from 'jest-matchmedia-mock';
 
 function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms || DEF_DELAY));
+  return new Promise((resolve) => setTimeout(resolve, ms || 1000));
 }
 
-describe("Test TaskMaster Client Configurations", () => {
-  jest.setTimeout(15000);
+test('use jsdom in this test file', () => {
+  const element = document.createElement('div');
+  expect(element).not.toBeNull();
+});
+
+let matchMedia;
+describe('Test TaskMaster Client Configurations', () => {
   beforeAll(() => {
     matchMedia = new MatchMediaMock();
   });
@@ -23,21 +27,14 @@ describe("Test TaskMaster Client Configurations", () => {
     matchMedia.clear();
   });
 
-  test("use jsdom in this test file", () => {
-    let app = new Application();
-    app.start();
-    const element = document.createElement("div");
-    expect(element).not.toBeNull();
-  });
-
-  test("Test if match media is defined", () => {
-    const mediaQuery = "(prefers-color-scheme: light)";
+  test('Test if match media is defined', () => {
+    const mediaQuery = '(prefers-color-scheme: light)';
     const firstListener = jest.fn();
     const secondListener = jest.fn();
     const mql = window.matchMedia(mediaQuery);
 
-    mql.addListener((ev) => ev.matches && firstListener());
-    mql.addListener((ev) => ev.matches && secondListener());
+    mql.addListener(ev => ev.matches && firstListener());
+    mql.addListener(ev => ev.matches && secondListener());
 
     matchMedia.useMediaQuery(mediaQuery);
 
@@ -45,12 +42,16 @@ describe("Test TaskMaster Client Configurations", () => {
     expect(secondListener).toBeCalledTimes(1);
   });
 
-  test("Render app without crashing", async () => {
+  test('Render app without crashing', async () => {
+    const { Application } = require('../src/Application')
+
     let app = new Application();
-    app.start();
+    await app.start();
   });
 
   test("should render form inputs", async () => {
+    const { Application } = require('../src/Application')
+
     let app = new Application();
     app.start();
 
@@ -67,6 +68,9 @@ describe("Test TaskMaster Client Configurations", () => {
     expect(inputPassword).not.toBeNull();
     expect(inputPassword).toHaveAttribute("type", "password");
   });
+});
+
+  /**/
 
   /*
   test("pass invalid login infos should show error", async () => {
@@ -109,4 +113,3 @@ describe("Test TaskMaster Client Configurations", () => {
     expect(inputPasswordLogin).toHaveValue(validPassword);
     expect(screen.queryByTestId("loginErrorMsg")).not.toHaveErrorMessage();
   }); */
-});
