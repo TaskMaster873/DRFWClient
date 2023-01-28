@@ -35,7 +35,7 @@ export class ComponentLogin extends React.Component {
         <Form onSubmit={this.handleSubmit}>
           <Form.Label className="mt-2">Numéro d'employé</Form.Label>
           <Form.Control
-            data-testid="noLogin"
+            id="noLogin"
             className="row mt-1"
             type="number"
             placeholder="Entrez le numéro d'employé"
@@ -44,7 +44,7 @@ export class ComponentLogin extends React.Component {
 
           <Form.Label className="mt-4">Mot de passe </Form.Label>
           <Form.Control
-            data-testid="passwordLogin"
+            id="passwordLogin"
             className="row mt-1"
             type="password"
             placeholder="Entrez votre mot de passe"

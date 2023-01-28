@@ -4,9 +4,14 @@
 import MatchMediaMock from "jest-matchmedia-mock";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { Application } from "../src/Application";
 import "@testing-library/jest-dom";
 
 let matchMedia;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms || DEF_DELAY));
+}
 
 describe("Test TaskMaster Client Configurations", () => {
   jest.setTimeout(15000);
@@ -19,6 +24,8 @@ describe("Test TaskMaster Client Configurations", () => {
   });
 
   test("use jsdom in this test file", () => {
+    let app = new Application();
+    app.start();
     const element = document.createElement("div");
     expect(element).not.toBeNull();
   });
@@ -39,27 +46,26 @@ describe("Test TaskMaster Client Configurations", () => {
   });
 
   test("Render app without crashing", async () => {
-    const { Application } = require("../src/Application");
-
     let app = new Application();
     app.start();
   });
 
-  test("render form inputs", async () => {
-    const { Application } = require("../src/Application");
-
+  test("should render form inputs", async () => {
     let app = new Application();
     app.start();
 
-    let connexionBt = document.getElementById("toto");
+    const user = userEvent.setup();
 
-    userEvent.click(connexionBt);
+    console.log(document.getElementById("loginLink"));
+    console.log(document.getElementById("loginLink"));
+    await user.click();
+    await sleep(1000);
 
-    /*const inputNo = screen.getByTestId("noLogin");
-    const inputPassword = await screen.findByTestId("passwordLogin");
-    expect(inputNo).toBeInTheDocument();
-    expect(inputPassword).toBeInTheDocument();
-    expect(inputPassword).toHaveAttribute("type", "password");*/
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
+    expect(inputNo).not.toBeNull();
+    expect(inputPassword).not.toBeNull();
+    expect(inputPassword).toHaveAttribute("type", "password");
   });
 
   /*
