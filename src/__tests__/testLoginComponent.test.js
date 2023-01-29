@@ -12,7 +12,7 @@ import { act } from "react-dom/test-utils";
 import { constants } from "../src/engine/Constants";
 
 let matchMedia;
-describe("Test TaskMaster Client Configurations", () => {
+describe("Tests LoginComponent", () => {
   const onSubmit = jest.fn();
   beforeAll(() => {
     matchMedia = new MatchMediaMock();
@@ -60,8 +60,8 @@ describe("Test TaskMaster Client Configurations", () => {
     const inputNo = document.getElementById("noLogin");
     const inputPassword = document.getElementById("passwordLogin");
 
-    await user.type(inputPassword, validPassword);
     await user.clear(inputNo);
+    await user.type(inputPassword, validPassword);
 
     fireEvent.submit(document.querySelector("button[type='submit']"));
 
@@ -94,8 +94,47 @@ describe("Test TaskMaster Client Configurations", () => {
     const inputNo = document.getElementById("noLogin");
     const inputPassword = document.getElementById("passwordLogin");
 
-    await user.type(inputNo, validNoEmployee);
     await user.clear(inputPassword);
+    await user.type(inputNo, validNoEmployee);
+
+    fireEvent.submit(document.querySelector("button[type='submit']"));
+
+    console.log(document.getElementById("invalidLoginPassword").style);
+
+    await waitFor(() => {
+      expect(handleSubmitFn).toHaveBeenCalledTimes(0);
+    });
+    expect(inputNo.value).toBe(validNoEmployee);
+    expect(inputPassword.value).toBe("");
+    expect(document.getElementById("invalidLoginPassword").style.display).toBe(
+      ""
+    );
+  });
+
+  test("Valid employee number and password should submit form", async () => {
+    const { Application } = require("../src/Application");
+    const validNoEmployee = "523869632";
+    const validPassword = "Jfihsdgsd";
+
+    const handleSubmitFn = jest.fn();
+    render(<Form handlesubmit={handleSubmitFn} />);
+
+    act(() => {
+      let app = new Application();
+      app.start();
+    });
+
+    const user = userEvent.setup();
+
+    await user.click(document.querySelector("a[href='/login']"));
+
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
+
+    await user.clear(inputPassword);
+    await user.clear(inputNo);
+    await user.type(inputNo, validNoEmployee);
+    await user.type(inputPassword, validPassword);
 
     fireEvent.submit(document.querySelector("button[type='submit']"));
 
@@ -103,9 +142,12 @@ describe("Test TaskMaster Client Configurations", () => {
       expect(handleSubmitFn).toHaveBeenCalledTimes(0);
     });
     expect(inputNo.value).toBe(validNoEmployee);
-    expect(inputPassword.value).toBe("");
-    expect(document.getElementById("invalidLoginPassword").innerHTML).toBe(
-      constants.errorRequiredPassword
+    expect(inputPassword.value).toBe(validPassword);
+    expect(
+      document.getElementById("invalidLoginNoEmployee").style.display
+    ).toBe("");
+    expect(document.getElementById("invalidLoginPassword").style.display).toBe(
+      ""
     );
   });
 });
