@@ -168,9 +168,7 @@ jobs:
           server: ${{ secrets.OCTOPUSSERVERURL }}
           channel: Production
           packages: |
-            Development:TaskMaster:${{ steps.determine_version.outputs.semVer }}
-            Staging:TaskMaster:${{ steps.determine_version.outputs.semVer }}
-            Production:TaskMaster:${{ steps.determine_version.outputs.semVer }}
+            TaskMaster:${{ steps.determine_version.outputs.semVer }}
       - name: Deploy to Development
         uses: OctopusDeploy/deploy-release-action@v3.0.1
         env:
