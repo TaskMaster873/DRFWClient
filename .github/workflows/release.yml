@@ -182,28 +182,6 @@ jobs:
           release_number: ${{ steps.create_release_octopus.outputs.release_number }}
           environments: |
             Development
-      - name: Deploy to Staging
-        uses: OctopusDeploy/deploy-release-action@v3.0.1
-        env:
-          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY  }}
-          OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
-          OCTOPUS_SPACE: Default
-        with:
-          project: TaskMaster
-          release_number: ${{ steps.create_release_octopus.outputs.release_number }}
-          environments: |
-            Staging
-      - name: Deploy to Production
-        uses: OctopusDeploy/deploy-release-action@v3.0.1
-        env:
-          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY  }}
-          OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
-          OCTOPUS_SPACE: Default
-        with:
-          project: TaskMaster
-          release_number: ${{ steps.create_release_octopus.outputs.release_number }}
-          environments: |
-            Production
 permissions:
   contents: write
   issues: write
