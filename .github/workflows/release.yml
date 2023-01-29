@@ -167,8 +167,7 @@ jobs:
           space: Default
           server: ${{ secrets.OCTOPUSSERVERURL }}
           channel: Production
-          packages: |
-            TaskMaster:${{ steps.determine_version.outputs.semVer }}
+          packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
       - name: Deploy to Development
         uses: OctopusDeploy/deploy-release-action@v3.0.1
         env:
