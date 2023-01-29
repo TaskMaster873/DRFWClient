@@ -12,7 +12,7 @@ export class Index extends React.Component {
   public render(): JSX.Element {
     return (
         <div>
-          <Container>Page d'accueil ceci est un test 6</Container>
+          <Container>Page d'accueil. Test release MAIN.</Container>
         </div>
     );
   }
