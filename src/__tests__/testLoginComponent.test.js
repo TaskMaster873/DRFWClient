@@ -2,8 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { screen, render, waitFor, fireEvent } from "@testing-library/react";
-import Form from "react-bootstrap/Form";
+import { } from "@testing-library/react/dist/fire-event"
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
@@ -11,10 +10,25 @@ import MatchMediaMock from "jest-matchmedia-mock";
 import { act } from "react-dom/test-utils";
 import { constants } from "../src/engine/Constants";
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms || 1000));
+}
+
 let matchMedia;
 describe("Tests LoginComponent", () => {
+  const onSubmit = jest.fn();
   beforeEach(() => {
-    window._virtualConsole.emit = jest.fn();
+    //window._virtualConsole.emit = jest.fn();
+    let hidden = true;
+    Object.defineProperty(document, "hidden", {
+      configurable: true,
+      get() {
+        return hidden;
+      },
+      set(bool) {
+        hidden = Boolean(bool);
+      },
+    });
   });
   beforeAll(() => {
     matchMedia = new MatchMediaMock();
@@ -38,6 +52,8 @@ describe("Tests LoginComponent", () => {
     const inputNo = document.getElementById("noLogin");
     const inputPassword = document.getElementById("passwordLogin");
 
+    document.dispatchEvent(new Event("visibilitychange"));
+
     expect(inputNo).not.toBeNull();
     expect(inputPassword).not.toBeNull();
     expect(inputPassword).toHaveAttribute("type", "password");
@@ -46,6 +62,10 @@ describe("Tests LoginComponent", () => {
   test("Empty employee number should show error", async () => {
     const { Application } = require("../src/Application");
     const validPassword = "Jfihsdgsd";
+
+    onSubmit.mockImplementation((event) => {
+      event.preventDefault();
+    });
 
     act(() => {
       let app = new Application();
@@ -62,17 +82,17 @@ describe("Tests LoginComponent", () => {
     await user.clear(inputNo);
     await user.type(inputPassword, validPassword);
 
-    //fireEvent.submit(document.querySelector("button[type='submit']"));
     await user.click(document.querySelector("button[type='submit']"));
+
+    const errorMessage = await findByText(constants.errorRequiredEmployeeNo);
 
     expect(inputNo.value).toBe("");
     expect(inputPassword.value).toBe(validPassword);
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
     expect(
       document.querySelector("form").classList.contains("was-validated")
     ).toBeTruthy();
-    /*     expect(
-      document.getElementById("invalidLoginNoEmployee").style.display
-    ).toBe("block"); */
+    expect(errorMessage).toBeInTheDocument();
   });
 
   test("Empty password should show error", async () => {
@@ -101,10 +121,17 @@ describe("Tests LoginComponent", () => {
     expect(
       document.querySelector("form").classList.contains("was-validated")
     ).toBeTruthy();
-    /*     expect(document.getElementById("invalidLoginPassword").hidden).toBeFalsy();
+    expect(document.getElementById("invalidLoginNoEmployee")).toHaveStyle(
+      "display: none;"
+    );
+    /*     expect(
+      window.getComputedStyle(document.getElementById("invalidLoginNoEmployee"))
+        .display
+    ).toBe("block");
     expect(
-      document.getElementById("invalidLoginNoEmployee").hidden
-    ).toBeFalsy(); */
+      window.getComputedStyle(document.getElementById("invalidLoginPassword"))
+        .display
+    ).toBe("none"); */
   });
 
   test("Valid employee number and password should submit form", async () => {
@@ -137,11 +164,13 @@ describe("Tests LoginComponent", () => {
     expect(
       document.querySelector("form").classList.contains("was-validated")
     ).toBeTruthy();
-    /*     expect(
-      document.getElementById("invalidLoginNoEmployee").style.display
-    ).toBe("");
-    expect(document.getElementById("invalidLoginPassword").style.display).toBe(
-      ""
-    ); */
+    expect(
+      window.getComputedStyle(document.getElementById("invalidLoginNoEmployee"))
+        .display
+    ).toBe("none");
+    expect(
+      window.getComputedStyle(document.getElementById("invalidLoginPassword"))
+        .display
+    ).toBe("none");
   });
 });

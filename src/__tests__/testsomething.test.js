@@ -37,6 +37,6 @@ describe('Test TaskMaster Client Configurations', () => {
         const { Application } = require('../src/Application')
 
         let app = new Application();
-        await app.start();
+        app.start();
     });
 });

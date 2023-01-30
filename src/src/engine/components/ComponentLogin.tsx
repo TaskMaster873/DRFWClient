@@ -47,8 +47,9 @@ export class ComponentLogin extends React.Component {
               type="number"
               placeholder="Entrez le numéro d'employé"
               onChange={this.handleChange}
+              isInvalid={this.state.validated}
             />
-            <Form.Control.Feedback type="invalid" id="invalidLoginNoEmployee">
+            <Form.Control.Feedback type="invalid" id="invalidLoginNoEmployee" style={{display: "none"}}>
               {constants.errorRequiredEmployeeNo}
             </Form.Control.Feedback>
           </Form.Group>
