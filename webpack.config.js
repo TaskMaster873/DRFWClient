@@ -14,6 +14,7 @@ module.exports = {
     },
     devServer: { static: path.join(__dirname, "src") },
     module: {
+        unknownContextCritical: false,
         rules: [
             {
                 test: /\.(js|jsx)$/,
