@@ -3,8 +3,6 @@
  */
 import MatchMediaMock from 'jest-matchmedia-mock';
 
-
-
 let matchMedia;
 describe('Test TaskMaster Client Configurations', () => {
     beforeAll(() => {
