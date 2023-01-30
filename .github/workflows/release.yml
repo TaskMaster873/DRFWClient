@@ -20,9 +20,10 @@ jobs:
           versionSpec: 5.x
       - id: determine_version
         name: Determine Version
-        uses: gittools/actions/gitversion/execute@v0.9.14
+        uses: GitTools/actions@v0.9.15
         with:
           additionalArguments: /overrideconfig mode=Mainline
+          includePrerelease: true
       - name: Install Octopus Deploy CLI
         uses: OctopusDeploy/install-octopus-cli-action@v1
         with:
