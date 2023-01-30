@@ -20,7 +20,7 @@ jobs:
           versionSpec: 5.x
       - id: determine_version
         name: Determine Version
-        uses: gittools/actions/gitversion/actions@v0.9.15
+        uses: gittools/actions/gitversion/execute@v0.9.14
         with:
           additionalArguments: /overrideconfig mode=Mainline
           includePrerelease: true
