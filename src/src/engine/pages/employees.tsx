@@ -11,6 +11,7 @@ export class Employees extends React.Component {
   private logger: Logger = new Logger(`Employees`, `#20f6a4`, false);
   private list: Employee[] = [
     new Employee({
+      no: 0,
       name: "Blanchet",
       firstName: "Stéphane",
       phoneNumber: "581-555-5555",
@@ -18,6 +19,7 @@ export class Employees extends React.Component {
       jobTitles: ["Gestionnaire de projet", "Directeur de production"],
     }),
     new Employee({
+      no: 1,
       name: "Blanchette",
       firstName: "Roger",
       phoneNumber: "581-555-2312",

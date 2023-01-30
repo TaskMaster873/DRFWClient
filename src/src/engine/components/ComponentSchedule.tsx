@@ -1,6 +1,6 @@
 import React from "react";
 import { EmployeeList, Employee } from "../types/Employee";
-import { DayPilotCalendar } from "@daypilot/daypilot-lite-react";
+import {DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 
 /**
  * Ceci est le composant d'horaire
@@ -12,8 +12,9 @@ export class ComponentSchedule extends React.Component {
         this.list = props.list;
 
         this.state = {
+            
             viewType: "Resources",
-            startDate: "2022-11-07",
+            startDate: DayPilot.Date.today(),
             columns: [
                 { name: "Room 1", id: "R1" },
                 { name: "Room 2", id: "R2" },
@@ -40,14 +41,20 @@ export class ComponentSchedule extends React.Component {
         return listToReturn;
     }
 
+    private doEvents() {
+        let listToReturn: Array<{ id: number, text: string, start: string, end: string, resource: string }>;
+        listToReturn = [];
+        listToReturn.push({ id: 1, text: "Event 1", start: DayPilot.Date.today(), end: DayPilot.Date.now(), resource: '1' });
+        return listToReturn;
+    }
     public render(): JSX.Element {
-        if(this.list === undefined || this.list.length == 0){
+        if (this.list === undefined || this.list.length == 0) {
             return (
                 <div> Il n'y a pas d'horaire à voir</div>
             );
         }
         else return (
-            <DayPilotCalendar viewType={"Resources"} columns={this.doColumns()} />
+            <DayPilotCalendar viewType={"Resources"} columns={this.doColumns()} events= { this.doEvents() } ></DayPilotCalendar>
             /* <div>
             <DayPilotCalendar
             {...this.state} />
