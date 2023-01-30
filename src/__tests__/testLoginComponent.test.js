@@ -9,11 +9,17 @@ import "@testing-library/jest-dom";
 import MatchMediaMock from "jest-matchmedia-mock";
 import { act } from "react-dom/test-utils";
 import { constants } from "../src/engine/Constants";
-import {cleanup, findByText, fireEvent, screen, waitFor} from '@testing-library/react';
-import {LoginFormErrorType} from "../src/engine/errors/LoginFormErrorType";
+import {
+  cleanup,
+  findByText,
+  fireEvent,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
 
 function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms || 1000));
+  return new Promise((resolve) => setTimeout(resolve, ms || 1000));
 }
 
 let matchMedia;
@@ -22,122 +28,125 @@ let user;
 const validPassword = "JfihsdEEgsd";
 const validNoEmployee = "523869632";
 
-describe("Tests LoginComponent",  () => {
-    let app;
-    beforeEach(async () => {
-        user = userEvent.setup();
+describe("Tests LoginComponent", () => {
+  let app;
+  beforeEach(async () => {
+    user = userEvent.setup();
 
-        if(matchMedia) {
-            await matchMedia.clear();
-        }
+    if (matchMedia) {
+      await matchMedia.clear();
+    }
 
-        await cleanup();
+    await cleanup();
 
-        if(app !== null && app) {
-            await act(() => {
-                app.unmount();
-            });
+    if (app !== null && app) {
+      await act(() => {
+        app.unmount();
+      });
 
-            document.body.innerHTML = "";
-            app = null;
-        }
+      document.body.innerHTML = "";
+      app = null;
+    }
 
-        matchMedia = new MatchMediaMock();
+    matchMedia = new MatchMediaMock();
 
-        act(() => {
-            const { Application } = require("../src/Application");
+    act(() => {
+      const { Application } = require("../src/Application");
 
-            app = new Application();
-            app.start();
+      app = new Application();
+      app.start();
 
-            document.dispatchEvent(new Event("visibilitychange"));
-        });
+      document.dispatchEvent(new Event("visibilitychange"));
     });
+  });
 
-    test("should render form inputs", async () => {
-        await user.click(document.querySelector("a[href='/login']"));
+  test("should render form inputs", async () => {
+    await user.click(document.querySelector("a[href='/login']"));
 
-        const inputNo = document.getElementById("noLogin");
-        const inputPassword = document.getElementById("passwordLogin");
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
 
-        expect(inputNo).not.toBeNull();
-        expect(inputPassword).not.toBeNull();
-        expect(inputPassword).toHaveAttribute("type", "password");
-    });
+    expect(inputNo).not.toBeNull();
+    expect(inputPassword).not.toBeNull();
+    expect(inputPassword).toHaveAttribute("type", "password");
+  });
 
-    test("Empty employee number should show error", async () => {
-        await user.click(document.querySelector("a[href='/login']"));
+  test("Empty employee number should show error", async () => {
+    await user.click(document.querySelector("a[href='/login']"));
 
-        let formElem = document.getElementById("loginForm");
-        const inputNo = document.getElementById("noLogin");
-        const inputPassword = document.getElementById("passwordLogin");
+    let formElem = document.getElementById("loginForm");
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
 
-        await user.clear(inputNo);
-        await user.type(inputPassword, validPassword);
+    await user.clear(inputNo);
+    await user.type(inputPassword, validPassword);
 
-        fireEvent.submit(formElem);
+    fireEvent.submit(formElem);
 
-        let loginDiv = document.getElementById("loginDiv");
+    let loginDiv = document.getElementById("loginDiv");
 
-        const errorMessage = await findByText(app.rootElement, constants.errorRequiredEmployeeNo);
+    const errorMessage = await findByText(
+      app.rootElement,
+      constants.errorRequiredEmployeeNo
+    );
 
-        expect(inputNo.value).toBe("");
-        expect(inputPassword.value).toBe(validPassword);
+    expect(inputNo.value).toBe("");
+    expect(inputPassword.value).toBe(validPassword);
 
-        expect(
-            document.querySelector("form").classList.contains("was-validated")
-        ).toBeTruthy();
+    expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
 
-        expect(errorMessage).toBeInTheDocument();
-        expect(loginDiv.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
-    });
+    expect(errorMessage).toBeInTheDocument();
+    expect(loginDiv.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+  });
 
-    test("Empty password should show error", async () => {
-        await user.click(document.querySelector("a[href='/login']"));
+  test("Empty password should show error", async () => {
+    await user.click(document.querySelector("a[href='/login']"));
 
-        let formElem = document.getElementById("loginForm");
-        const inputNo = document.getElementById("noLogin");
-        const inputPassword = document.getElementById("passwordLogin");
+    let formElem = document.getElementById("loginForm");
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
 
-        await user.clear(inputPassword);
-        await user.type(inputNo, validNoEmployee);
+    await user.clear(inputPassword);
+    await user.type(inputNo, validNoEmployee);
 
-        fireEvent.submit(formElem);
+    fireEvent.submit(formElem);
 
-        let loginDiv = document.getElementById("loginDiv");
+    let loginDiv = document.getElementById("loginDiv");
 
-        expect(inputNo.value).toBe(validNoEmployee);
-        expect(inputPassword.value).toBe("");
-        expect(
-            document.querySelector("form").classList.contains("was-validated")
-        ).toBeTruthy();
+    expect(inputNo.value).toBe(validNoEmployee);
+    expect(inputPassword.value).toBe("");
+    expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
 
-        expect(loginDiv.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
-    });
+    expect(loginDiv.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+  });
 
-    test("Valid employee number and password should submit form", async () => {
-        let loginPageButton = document.getElementById("loginLink");
-        await user.click(loginPageButton);
+  test("Valid employee number and password should submit form", async () => {
+    let loginPageButton = document.getElementById("loginLink");
+    await user.click(loginPageButton);
 
-        let loginDiv = document.getElementById("loginDiv");
-        let formElem = document.getElementById("loginForm");
+    let loginDiv = document.getElementById("loginDiv");
+    let formElem = document.getElementById("loginForm");
 
-        const inputNo = document.getElementById("noLogin");
-        const inputPassword = document.getElementById("passwordLogin");
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
 
-        await user.clear(inputPassword);
-        await user.clear(inputNo);
-        await user.type(inputNo, validNoEmployee);
-        await user.type(inputPassword, validPassword);
+    await user.clear(inputPassword);
+    await user.clear(inputNo);
+    await user.type(inputNo, validNoEmployee);
+    await user.type(inputPassword, validPassword);
 
-        fireEvent.submit(formElem);
+    fireEvent.submit(formElem);
 
-        expect(inputNo.value).toBe(validNoEmployee);
-        expect(inputPassword.value).toBe(validPassword);
-        expect(
-            document.querySelector("form").classList.contains("was-validated")
-        ).toBeTruthy();
+    expect(inputNo.value).toBe(validNoEmployee);
+    expect(inputPassword.value).toBe(validPassword);
+    expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
 
-        expect(loginDiv.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
-    });
+    expect(loginDiv.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
+  });
 });
