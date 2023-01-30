@@ -9,11 +9,11 @@ import { RolesList } from "../types/Role";
  */
 export class AddEmployee extends React.Component {
   private logger: Logger = new Logger(`AddEmployee`, `#20f6a4`, false);
-  private titles: string[] = ["Menusier", "Plombier"];
+  private titles: string[] = ["Menuisier", "Plombier"];
   private roles: string[] = ["Employé", "Administrateur"];
 
   public componentDidMount() {
-    document.title = "Ajouter un Employé - Task Manager";
+    document.title = "Ajouter un Employé - TaskMaster";
   }
   /**
    * 

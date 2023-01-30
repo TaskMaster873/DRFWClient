@@ -28,7 +28,7 @@ export class Schedule extends React.Component {
     }),
   ];
   public componentDidMount() {
-    document.title = "Horaire - Task Manager";
+    document.title = "Horaire - TaskMaster";
   }
 
   /***
