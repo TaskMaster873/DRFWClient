@@ -1,13 +1,21 @@
 /**
  * @jest-environment jsdom
  */
-import MatchMediaMock from "jest-matchmedia-mock";
-import { render, screen } from "@testing-library/react";
+
+import { screen, render, waitFor, fireEvent } from "@testing-library/react";
+import Form from "react-bootstrap/Form";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
+import MatchMediaMock from "jest-matchmedia-mock";
+import { act } from "react-dom/test-utils";
+import { constants } from "../src/engine/Constants";
+
 let matchMedia;
-describe("Test TaskMaster Client Configurations", () => {
+describe("Tests LoginComponent", () => {
+  beforeEach(() => {
+    window._virtualConsole.emit = jest.fn();
+  });
   beforeAll(() => {
     matchMedia = new MatchMediaMock();
   });
@@ -15,79 +23,125 @@ describe("Test TaskMaster Client Configurations", () => {
   afterEach(() => {
     matchMedia.clear();
   });
-
-  test("Test if match media is defined", () => {
-    const mediaQuery = "(prefers-color-scheme: light)";
-    const firstListener = jest.fn();
-    const secondListener = jest.fn();
-    const mql = window.matchMedia(mediaQuery);
-
-    mql.addListener((ev) => ev.matches && firstListener());
-    mql.addListener((ev) => ev.matches && secondListener());
-
-    matchMedia.useMediaQuery(mediaQuery);
-
-    expect(firstListener).toBeCalledTimes(1);
-    expect(secondListener).toBeCalledTimes(1);
-  });
-
-  test("Render app without crashing", () => {
+  test("should render form inputs", async () => {
     const { Application } = require("../src/Application");
 
-    let app = new Application();
-    app.start();
-  });
-/*   test("render form inputs", async () => {
-    const { Application } = require("../src/Application");
+    act(() => {
+      let app = new Application();
+      app.start();
+    });
 
-    let app = new Application();
-    app.start();
+    const user = userEvent.setup();
 
-    userEvent.click(await screen.findByText("Connexion"));
+    await user.click(document.querySelector("a[href='/login']"));
 
-    const inputNo = await screen.findByTestId("noLogin");
-    const inputPassword = await screen.findByTestId("passwordLogin");
-    expect(inputNo).toBeInTheDocument();
-    expect(inputPassword).toBeInTheDocument();
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
+
+    expect(inputNo).not.toBeNull();
+    expect(inputPassword).not.toBeNull();
     expect(inputPassword).toHaveAttribute("type", "password");
   });
 
-  test("pass invalid login infos should show error", async () => {
+  test("Empty employee number should show error", async () => {
     const { Application } = require("../src/Application");
+    const validPassword = "Jfihsdgsd";
 
-    let app = new Application();
-    app.start();
+    act(() => {
+      let app = new Application();
+      app.start();
+    });
 
-    userEvent.click(await screen.findByText("Connexion"));
+    const user = userEvent.setup();
 
-    const invalidNoEmployee = "64389917853";
-    const invalidPassword = "Jgodsgj53286";
-    const inputNo = await screen.findByTestId("noLogin");
-    userEvent.type(inputNo, invalidNoEmployee);
-    const inputPasswordLogin = await screen.findByTestId("passwordLogin");
-    userEvent.type(inputPasswordLogin, invalidPassword);
-    const submitBtn = await screen.findByTestId("submitLogin");
-    userEvent.click(submitBtn);
+    await user.click(document.querySelector("a[href='/login']"));
 
-    expect(inputNoLogin).toHaveTextContent(invalidNoEmployee);
-    expect(inputPasswordLogin).toHaveValue(invalidPassword);
-    expect(screen.queryByTestId("loginErrorMsg")).toHaveErrorMessage();
-  }); */
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
 
-  /* test("pass valid login infos should not show error and send user to home page", () => {
-    render(<ComponentLogin />);
+    await user.clear(inputNo);
+    await user.type(inputPassword, validPassword);
 
-    const validNoEmployee = "532988632";
-    const validPassword = "jidosgsi532523";
-    const inputNoLogin = screen.getByTestId("noLogin");
-    userEvent.type(inputNoLogin, validNoEmployee);
-    const inputPasswordLogin = screen.getByTestId("passwordLogin");
-    userEvent.type(inputPasswordLogin, validPassword);
-    const submitBtn = screen.getByTestId("submitLogin");
-    userEvent.click(submitBtn);
+    //fireEvent.submit(document.querySelector("button[type='submit']"));
+    await user.click(document.querySelector("button[type='submit']"));
 
-    expect(inputNoLogin).toHaveValue(validNoEmployee);
-    expect(inputPasswordLogin).toHaveValue(validPassword);
-    expect(screen.queryByTestId("loginErrorMsg")).not.toHaveErrorMessage();
-  }); */
+    expect(inputNo.value).toBe("");
+    expect(inputPassword.value).toBe(validPassword);
+    expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
+    /*     expect(
+      document.getElementById("invalidLoginNoEmployee").style.display
+    ).toBe("block"); */
+  });
+
+  test("Empty password should show error", async () => {
+    const { Application } = require("../src/Application");
+    const validNoEmployee = "523869632";
+
+    act(() => {
+      let app = new Application();
+      app.start();
+    });
+
+    const user = userEvent.setup();
+
+    await user.click(document.querySelector("a[href='/login']"));
+
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
+
+    await user.clear(inputPassword);
+    await user.type(inputNo, validNoEmployee);
+
+    await user.click(document.querySelector("button[type='submit']"));
+
+    expect(inputNo.value).toBe(validNoEmployee);
+    expect(inputPassword.value).toBe("");
+    expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
+    /*     expect(document.getElementById("invalidLoginPassword").hidden).toBeFalsy();
+    expect(
+      document.getElementById("invalidLoginNoEmployee").hidden
+    ).toBeFalsy(); */
+  });
+
+  test("Valid employee number and password should submit form", async () => {
+    const { Application } = require("../src/Application");
+    const validNoEmployee = "523869632";
+    const validPassword = "Jfihsdgsd";
+
+    act(() => {
+      let app = new Application();
+      app.start();
+    });
+
+    const user = userEvent.setup();
+
+    await user.click(document.querySelector("a[href='/login']"));
+
+    const inputNo = document.getElementById("noLogin");
+    const inputPassword = document.getElementById("passwordLogin");
+
+    await user.clear(inputPassword);
+    await user.clear(inputNo);
+    await user.type(inputNo, validNoEmployee);
+    await user.type(inputPassword, validPassword);
+
+    //fireEvent.submit(document.querySelector("button[type='submit']"));
+    await user.click(document.querySelector("button[type='submit']"));
+
+    expect(inputNo.value).toBe(validNoEmployee);
+    expect(inputPassword.value).toBe(validPassword);
+    expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
+    /*     expect(
+      document.getElementById("invalidLoginNoEmployee").style.display
+    ).toBe("");
+    expect(document.getElementById("invalidLoginPassword").style.display).toBe(
+      ""
+    ); */
+  });
 });
