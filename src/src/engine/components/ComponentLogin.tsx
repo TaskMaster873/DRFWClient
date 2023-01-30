@@ -12,7 +12,7 @@ export class ComponentLogin extends React.Component {
   private logger: Logger = new Logger(`ComponentLogin`, `#20f6a4`, false);
   private errorMessage = "";
   public state: {
-    no: any;
+    no: number;
     password?: string;
     validated?: boolean;
     error: LoginFormErrorType;
@@ -21,7 +21,7 @@ export class ComponentLogin extends React.Component {
   constructor(props: {} | Readonly<{}>) {
     super(props);
     this.state = {
-      no: "",
+      no: 0,
       password: "",
       validated: false,
       error: LoginFormErrorType.NO_ERROR,
@@ -33,7 +33,7 @@ export class ComponentLogin extends React.Component {
 
   public render(): JSX.Element {
     return (
-      <div id="loginDiv" className="auth-form" data-error={this.state.error}>
+      <div className="auth-form">
         <div className="me-4">
           <img
             className="mx-auto d-block mt-5"
@@ -48,7 +48,7 @@ export class ComponentLogin extends React.Component {
           noValidate
           validated={this.state.validated}
           onSubmit={this.handleSubmit}
-          id="loginForm"
+          data-error={this.state.error}
         >
           <Form.Group>
             <Form.Label className="mt-2">Numéro d'employé</Form.Label>
