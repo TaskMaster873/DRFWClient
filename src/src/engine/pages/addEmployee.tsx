@@ -2,7 +2,7 @@ import React from "react";
 import { Container } from "react-bootstrap";
 import { ComponentAddEmployee } from "../components/ComponentAddEmployee";
 import { Logger } from "../Logger";
-import { RolesList } from "../types/Roles";
+import { RolesList } from "../types/Role";
 
 /**
  * Ceci est la page pour ajouter un employé

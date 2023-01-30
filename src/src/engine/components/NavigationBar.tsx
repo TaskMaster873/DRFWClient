@@ -68,7 +68,7 @@ export class NavigationBar extends React.Component {
     } else {
       return (
         <LinkContainer to="/login">
-          <Nav.Link>Connexion</Nav.Link>
+          <Nav.Link id="loginLink">Connexion</Nav.Link>
         </LinkContainer>
       );
     }

@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
 import { Link } from "react-router-dom";
+import { constants } from "../Constants";
 
 export class ComponentLogin extends React.Component {
   private logger: Logger = new Logger(`ComponentLogin`, `#20f6a4`, false);
@@ -32,24 +33,39 @@ export class ComponentLogin extends React.Component {
           />
           <h4 className="text-center mt-4 mb-4">Se connecter à Task Master</h4>
         </div>
-        <Form onSubmit={this.handleSubmit}>
-          <Form.Label className="mt-2">Numéro d'employé</Form.Label>
-          <Form.Control
-            data-testid="noLogin"
-            className="row mt-1"
-            type="number"
-            placeholder="Entrez le numéro d'employé"
-            onChange={this.handleChange}
-          />
-
-          <Form.Label className="mt-4">Mot de passe </Form.Label>
-          <Form.Control
-            data-testid="passwordLogin"
-            className="row mt-1"
-            type="password"
-            placeholder="Entrez votre mot de passe"
-            onChange={this.handleChange}
-          />
+        <Form
+          noValidate
+          validated={this.state.validated}
+          onSubmit={this.handleSubmit}
+        >
+          <Form.Group>
+            <Form.Label className="mt-2">Numéro d'employé</Form.Label>
+            <Form.Control
+              required
+              id="noLogin"
+              className="row mt-1"
+              type="number"
+              placeholder="Entrez le numéro d'employé"
+              onChange={this.handleChange}
+            />
+            <Form.Control.Feedback type="invalid" id="invalidLoginNoEmployee">
+              {constants.errorRequiredEmployeeNo}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <Form.Group>
+            <Form.Label className="mt-4">Mot de passe </Form.Label>
+            <Form.Control
+              required
+              id="passwordLogin"
+              className="row mt-1"
+              type="password"
+              placeholder="Entrez votre mot de passe"
+              onChange={this.handleChange}
+            />
+            <Form.Control.Feedback type="invalid" id="invalidLoginPassword">
+              {constants.errorRequiredPassword}
+            </Form.Control.Feedback>
+          </Form.Group>
           <Form.Text
             className="text-muted"
             id="loginErrorMsg"

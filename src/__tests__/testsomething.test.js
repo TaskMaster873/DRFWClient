@@ -33,10 +33,10 @@ describe('Test TaskMaster Client Configurations', () => {
         expect(secondListener).toBeCalledTimes(1);
     });
 
-    test('Render app without crashing', () => {
+    test('Render app without crashing', async () => {
         const { Application } = require('../src/Application')
 
         let app = new Application();
-        app.start();
+        await app.start();
     });
 });
