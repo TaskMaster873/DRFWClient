@@ -67,7 +67,7 @@ export class ComponentAddEmployee extends React.Component<
             <Form.Control
               required
               type="tel"
-              pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+              pattern="^(+1\s)?\d{3}[\s-]?\d{3}[\s-]?\d{4}$"
               placeholder="Tel: 000-000-0000"
             />
             <Form.Control.Feedback type="invalid">
