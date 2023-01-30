@@ -2,82 +2,101 @@
  * @jest-environment jsdom
  */
 
-import "@testing-library/react/dist/fire-event";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
 import MatchMediaMock from "jest-matchmedia-mock";
 import { act } from "react-dom/test-utils";
 import { constants } from "../src/engine/Constants";
-import {
-  cleanup,
-  findByText,
-  fireEvent,
-} from "@testing-library/react";
+import { cleanup, findByText, fireEvent } from "@testing-library/react";
 import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
 
 let matchMedia;
 let user;
 
+const validNoEmployee = "523696";
+const validFirstName = "Alfred";
+const validName = "Montmagny";
+const validPhoneNumber = "418-666-6666";
 const validPassword = "JfihsdEEgsd";
-const validNoEmployee = "523869632";
 
-describe("Tests LoginComponent", () => {
-  let app;
-  beforeEach(async () => {
-    user = userEvent.setup();
+let app;
+beforeEach(async () => {
+  user = userEvent.setup();
 
-    if (matchMedia) {
-      await matchMedia.clear();
-    }
+  if (matchMedia) {
+    await matchMedia.clear();
+  }
 
-    cleanup();
+  cleanup();
 
-    if (app !== null && app) {
-      act(() => {
-        app.unmount();
-      });
-
-      document.body.innerHTML = "";
-      app = null;
-    }
-
-    matchMedia = new MatchMediaMock();
-
+  if (app !== null && app) {
     act(() => {
-      const { Application } = require("../src/Application");
-
-      app = new Application();
-      app.start();
-
-      document.dispatchEvent(new Event("visibilitychange"));
+      app.unmount();
     });
+
+    document.body.innerHTML = "";
+    app = null;
+  }
+
+  matchMedia = new MatchMediaMock();
+
+  act(() => {
+    const { Application } = require("../src/Application");
+
+    app = new Application();
+    app.start();
+
+    document.dispatchEvent(new Event("visibilitychange"));
   });
+});
 
-  test("should render form inputs", async () => {
-    await user.click(document.querySelector("a[href='/login']"));
+test("should render form inputs", async () => {
+  await user.click(document.querySelector("a[href='/employees']"));
+  await user.click(document.querySelector("a[href='/add-employee']"));
+  const {
+    form,
+    inputNo,
+    inputFirstName,
+    inputName,
+    inputPhoneNumber,
+    inputInitialPassword,
+    inputRole,
+  } = getFields();
 
-    const inputNo = document.getElementById("noLogin");
-    const inputPassword = document.getElementById("passwordLogin");
+  expect(form).not.toBeNull();
+  expect(inputNo).not.toBeNull();
+  expect(inputFirstName).not.toBeNull();
+  expect(inputName).not.toBeNull();
+  expect(inputPhoneNumber).not.toBeNull();
+  expect(inputInitialPassword).not.toBeNull();
+  expect(inputRole).not.toBeNull();
+  expect(inputPhoneNumber).toHaveAttribute("type", "tel");
+  expect(inputInitialPassword).toHaveAttribute("type", "password");
+});
 
-    expect(inputNo).not.toBeNull();
-    expect(inputPassword).not.toBeNull();
-    expect(inputPassword).toHaveAttribute("type", "password");
-  });
-
+describe("Empty Fields Login Tests", () => {
   test("Empty employee number should show error", async () => {
-    await user.click(document.querySelector("a[href='/login']"));
+    await user.click(document.querySelector("a[href='/employees']"));
+    await user.click(document.querySelector("a[href='/add-employee']"));
 
-    let formElem = document.getElementById("loginForm");
-    const inputNo = document.getElementById("noLogin");
-    const inputPassword = document.getElementById("passwordLogin");
+    const {
+      form,
+      inputNo,
+      inputFirstName,
+      inputName,
+      inputPhoneNumber,
+      inputInitialPassword,
+      inputRole,
+    } = getFields();
 
-    await user.clear(inputNo);
-    await user.type(inputPassword, validPassword);
+    await user.type(inputFirstName, validFirstName);
+    await user.type(inputName, validName);
+    await user.type(inputPhoneNumber, validPhoneNumber);
+    await user.type(inputInitialPassword, validPassword);
+    await user.selectOptions(inputRole, inputRole.firstChild.textContent);
 
-    fireEvent.submit(formElem);
-
-    let loginDiv = document.getElementById("loginDiv");
+    fireEvent.submit(form);
 
     const errorMessage = await findByText(
       app.rootElement,
@@ -85,62 +104,68 @@ describe("Tests LoginComponent", () => {
     );
 
     expect(inputNo.value).toBe("");
-    expect(inputPassword.value).toBe(validPassword);
+    expect(inputFirstName.value).toBe(validFirstName);
+    expect(inputPhoneNumber.value).toBe(validPhoneNumber);
+    expect(inputInitialPassword.value).toBe(validPassword);
+    expect(inputRole.value).toBe(inputRole.firstChild.textContent);
 
-    expect(
-      document.querySelector("form").classList.contains("was-validated")
-    ).toBeTruthy();
+    expect(form.classList.contains("was-validated")).toBeTruthy();
 
     expect(errorMessage).toBeInTheDocument();
-    expect(loginDiv.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
-  });
-
-  test("Empty password should show error", async () => {
-    await user.click(document.querySelector("a[href='/login']"));
-
-    let formElem = document.getElementById("loginForm");
-    const inputNo = document.getElementById("noLogin");
-    const inputPassword = document.getElementById("passwordLogin");
-
-    await user.clear(inputPassword);
-    await user.type(inputNo, validNoEmployee);
-
-    fireEvent.submit(formElem);
-
-    let loginDiv = document.getElementById("loginDiv");
-
-    expect(inputNo.value).toBe(validNoEmployee);
-    expect(inputPassword.value).toBe("");
-    expect(
-      document.querySelector("form").classList.contains("was-validated")
-    ).toBeTruthy();
-
-    expect(loginDiv.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+    expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
   });
 
   test("Valid employee number and password should submit form", async () => {
-    let loginPageButton = document.getElementById("loginLink");
-    await user.click(loginPageButton);
+    await user.click(document.querySelector("a[href='/employees']"));
+    await user.click(document.querySelector("a[href='/add-employee']"));
 
-    let loginDiv = document.getElementById("loginDiv");
-    let formElem = document.getElementById("loginForm");
+    const {
+      form,
+      inputNo,
+      inputFirstName,
+      inputName,
+      inputPhoneNumber,
+      inputInitialPassword,
+      inputRole,
+    } = getFields();
 
-    const inputNo = document.getElementById("noLogin");
-    const inputPassword = document.getElementById("passwordLogin");
-
-    await user.clear(inputPassword);
-    await user.clear(inputNo);
     await user.type(inputNo, validNoEmployee);
-    await user.type(inputPassword, validPassword);
+    await user.type(inputFirstName, validFirstName);
+    await user.type(inputName, validName);
+    await user.type(inputPhoneNumber, validPhoneNumber);
+    await user.type(inputInitialPassword, validPassword);
+    await user.selectOptions(inputRole, inputRole.firstChild.textContent);
 
-    fireEvent.submit(formElem);
+    fireEvent.submit(form);
 
     expect(inputNo.value).toBe(validNoEmployee);
-    expect(inputPassword.value).toBe(validPassword);
-    expect(
-      document.querySelector("form").classList.contains("was-validated")
-    ).toBeTruthy();
+    expect(inputFirstName.value).toBe(validFirstName);
+    expect(inputPhoneNumber.value).toBe(validPhoneNumber);
+    expect(inputInitialPassword.value).toBe(validPassword);
+    expect(inputRole.value).toBe(inputRole.firstChild.textContent);
+    expect(form.classList.contains("was-validated")).toBeTruthy();
 
-    expect(loginDiv.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
+    expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
   });
 });
+
+function getFields() {
+  const form = document.querySelector("form");
+  const inputNo = document.getElementById("noAddEmployee");
+  const inputFirstName = document.getElementById("firstNameAddEmployee");
+  const inputName = document.getElementById("nameAddEmployee");
+  const inputPhoneNumber = document.getElementById("phoneNumberAddEmployee");
+  const inputInitialPassword = document.getElementById(
+    "initialPasswordAddEmployee"
+  );
+  const inputRole = document.getElementById("roleAddEmployee");
+  return {
+    form,
+    inputNo,
+    inputFirstName,
+    inputName,
+    inputPhoneNumber,
+    inputInitialPassword,
+    inputRole,
+  };
+}

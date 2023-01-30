@@ -31,8 +31,8 @@ export class Employees extends React.Component {
   }
 
   /**
-   * 
-   * @returns La liste des employés 
+   *
+   * @returns La liste des employés
    */
   public render(): JSX.Element {
     let listData: EmployeeList = { list: this.list };

@@ -47,7 +47,6 @@ export class NavigationBar extends React.Component {
             </Nav>
             <Nav activeKey={location.pathname} className="ms-auto">
               {this.loginButton()}
-
               <LinkContainer to="/memes">
                 <Nav.Link>Dank memes</Nav.Link>
               </LinkContainer>
@@ -59,7 +58,7 @@ export class NavigationBar extends React.Component {
   }
 
   /**
-   * 
+   *
    * @returns se déconnecter si la personne est connectée
    */
   private loginButton() {
