@@ -88,9 +88,7 @@ describe("Empty Fields Login Tests", () => {
   test("Empty password should show error", async () => {
     await user.click(document.querySelector("a[href='/login']"));
 
-    const inputNo = document.getElementById("noLogin");
-    const inputPassword = document.getElementById("passwordLogin");
-    const form = document.querySelector("form");
+    const { inputPassword, form, inputNo } = getFields();
 
     await user.type(inputNo, validNoEmployee);
 
@@ -108,25 +106,23 @@ describe("Empty Fields Login Tests", () => {
     expect(errorMessage).toBeInTheDocument();
     expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
   });
+});
 
-  test("Valid employee number and password should submit form", async () => {
-    await user.click(document.querySelector("a[href='/login']"));
+test("Valid employee number and password should submit form", async () => {
+  await user.click(document.querySelector("a[href='/login']"));
 
-    const inputNo = document.getElementById("noLogin");
-    const inputPassword = document.getElementById("passwordLogin");
-    const form = document.querySelector("form");
+  const { inputPassword, form, inputNo } = getFields();
 
-    await user.type(inputNo, validNoEmployee);
-    await user.type(inputPassword, validPassword);
+  await user.type(inputNo, validNoEmployee);
+  await user.type(inputPassword, validPassword);
 
-    fireEvent.submit(form);
+  fireEvent.submit(form);
 
-    expect(inputNo.value).toBe(validNoEmployee);
-    expect(inputPassword.value).toBe(validPassword);
-    expect(form.classList.contains("was-validated")).toBeTruthy();
+  expect(inputNo.value).toBe(validNoEmployee);
+  expect(inputPassword.value).toBe(validPassword);
+  expect(form.classList.contains("was-validated")).toBeTruthy();
 
-    expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
-  });
+  expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
 });
 function getFields() {
   const form = document.querySelector("form");
