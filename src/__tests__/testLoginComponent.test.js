@@ -13,8 +13,6 @@ import {
   cleanup,
   findByText,
   fireEvent,
-  screen,
-  waitFor,
 } from "@testing-library/react";
 import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
 
@@ -37,10 +35,10 @@ describe("Tests LoginComponent", () => {
       await matchMedia.clear();
     }
 
-    await cleanup();
+    cleanup();
 
     if (app !== null && app) {
-      await act(() => {
+      act(() => {
         app.unmount();
       });
 
