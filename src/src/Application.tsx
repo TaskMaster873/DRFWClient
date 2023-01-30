@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { Logger } from "./engine/Logger";
 import { Engine } from "./engine/Engine";
 import reportWebVitals from "./engine/analytics/reportWebVitals";
+import {WebsocketManager} from "./engine/networking/WebsocketManager";
 
 export class Application extends Logger {
     public moduleName: string = "Application";
@@ -12,9 +13,11 @@ export class Application extends Logger {
     private rootElem: HTMLElement | null = null;
     private root: ReactDOM.Root | null = null;
 
-    constructor() {
-        super();
-    }
+  private websocketManager: WebsocketManager = new WebsocketManager();
+
+  constructor() {
+    super();
+  }
 
     private onReportStatistics(objective: any): void {
 
@@ -31,8 +34,10 @@ export class Application extends Logger {
         this.rootElem = document.createElement("div");
         this.rootElem.id = 'root';
         document.body.appendChild(this.rootElem);
-
+        
         this.renderCore();
+        this.websocketManager.init();
+
         this.log(`Took ${Date.now() - start}ms to initialize...`);
     }
 
