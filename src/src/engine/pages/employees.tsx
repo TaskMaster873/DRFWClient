@@ -17,6 +17,13 @@ export class Employees extends React.Component {
       manager: 0,
       jobTitles: ["Gestionnaire de projet", "Directeur de production"],
     }),
+    new Employee({
+      name: "Blanchette",
+      firstName: "Roger",
+      phoneNumber: "581-555-2312",
+      manager: 0,
+      jobTitles: ["Gestionnaire de projet", "Directeur de production"],
+    }),
   ];
 
   public componentDidMount() {

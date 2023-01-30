@@ -14,7 +14,7 @@ export class ComponentEmployeeList extends React.Component {
     return (
       <div className="mt-5">
         <h3>Liste des employés</h3>
-        <Table responsive striped bordered hover>
+        <Table responsive bordered hover>
           <thead>
             <tr key={"firstCol"}>
               <th key={"no"}>#</th>

@@ -3,6 +3,10 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { RolesList } from "../types/Role";
 
+/**
+ * 
+ * Ceci est le composant pour ajouter les employés
+ */
 export class ComponentAddEmployee extends React.Component {
   private jobTitles: string[] = [];
   private roles: string[] = [];
