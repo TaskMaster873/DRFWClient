@@ -6,53 +6,67 @@ import { Engine } from "./engine/Engine";
 import reportWebVitals from "./engine/analytics/reportWebVitals";
 
 export class Application extends Logger {
-  public moduleName: string = "Application";
-  public logColor: string = `#20dbf6`;
+    public moduleName: string = "Application";
+    public logColor: string = `#20dbf6`;
 
-  private rootElem: HTMLElement | null = null;
-  private root: ReactDOM.Root | null = null;
+    private rootElem: HTMLElement | null = null;
+    private root: ReactDOM.Root | null = null;
 
-  constructor() {
-    super();
-  }
-
-  private onReportStatistics(objective: any): void {
-
-  }
-
-  private registerEvents() {
-    let start = Date.now();
-
-    reportWebVitals(this.onReportStatistics.bind(this));
-    this.rootElem = document.createElement("div");
-    this.rootElem.id = 'root';
-    document.body.appendChild(this.rootElem);
-
-    this.renderCore();
-    this.log(`Took ${Date.now() - start}ms to initialize...`);
-  }
-
-  private renderCore(): void {
-    if (this.rootElem !== null && this.rootElem) {
-      this.root = ReactDOM.createRoot(this.rootElem);
-
-      this.root.render(
-          <React.StrictMode>
-            <Engine />
-          </React.StrictMode>
-      );
-
-      //ReactDOM.render(<Engine />, this.rootElem);
-    } else {
-      this.error("Root element is null or undefined!");
+    constructor() {
+        super();
     }
-  }
 
-  public start() {
-    this.log("Starting application...");
+    private onReportStatistics(objective: any): void {
 
-    this.registerEvents();
-  }
+    }
+
+    get rootElement() : HTMLElement | null {
+        return this.rootElem;
+    }
+
+    private registerEvents() {
+        let start = Date.now();
+
+        reportWebVitals(this.onReportStatistics.bind(this));
+        this.rootElem = document.createElement("div");
+        this.rootElem.id = 'root';
+        document.body.appendChild(this.rootElem);
+
+        this.renderCore();
+        this.log(`Took ${Date.now() - start}ms to initialize...`);
+    }
+
+    private elementExists(element: any): boolean {
+        return element !== null && element !== undefined;
+    }
+
+    public unmount() : void {
+        if(this.elementExists(this.root)) {
+            this.root?.unmount();
+        }
+    }
+
+    private renderCore(): void {
+        if (this.rootElem !== null && this.rootElem) {
+            this.root = ReactDOM.createRoot(this.rootElem);
+
+            this.root.render(
+                <React.StrictMode>
+                    <Engine />
+                </React.StrictMode>
+            );
+
+            //ReactDOM.render(<Engine />, this.rootElem);
+        } else {
+            this.error("Root element is null or undefined!");
+        }
+    }
+
+    public start() {
+        this.log("Starting application...");
+
+        this.registerEvents();
+    }
 }
 /*
  import React from "react";

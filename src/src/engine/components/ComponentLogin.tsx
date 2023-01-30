@@ -6,15 +6,26 @@ import Button from "react-bootstrap/Button";
 import Logo from "../../deps/images/logo.png";
 import { Link } from "react-router-dom";
 import { constants } from "../Constants";
+import { LoginFormErrorType } from "../errors/LoginFormErrorType";
 
 export class ComponentLogin extends React.Component {
   private logger: Logger = new Logger(`ComponentLogin`, `#20f6a4`, false);
   private errorMessage = "";
-  public state: { no: any; password?: string; validated?: boolean };
+  public state: {
+    no: any;
+    password?: string;
+    validated?: boolean;
+    error: LoginFormErrorType;
+  };
 
   constructor(props: {} | Readonly<{}>) {
     super(props);
-    this.state = { no: "", password: "", validated: false };
+    this.state = {
+      no: "",
+      password: "",
+      validated: false,
+      error: LoginFormErrorType.NO_ERROR,
+    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -22,7 +33,7 @@ export class ComponentLogin extends React.Component {
 
   public render(): JSX.Element {
     return (
-      <div className="auth-form">
+      <div id="loginDiv" className="auth-form" data-error={this.state.error}>
         <div className="me-4">
           <img
             className="mx-auto d-block mt-5"
@@ -37,6 +48,7 @@ export class ComponentLogin extends React.Component {
           noValidate
           validated={this.state.validated}
           onSubmit={this.handleSubmit}
+          id="loginForm"
         >
           <Form.Group>
             <Form.Label className="mt-2">Numéro d'employé</Form.Label>
@@ -91,19 +103,32 @@ export class ComponentLogin extends React.Component {
     );
   }
 
-  handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
     const form = event.currentTarget;
-    if (form.checkValidity() === false) {
+    let isValid = form.checkValidity();
+
+    let errorType = LoginFormErrorType.NO_ERROR;
+    if (!isValid) {
       event.preventDefault();
       event.stopPropagation();
+
+      errorType = LoginFormErrorType.INVALID_FORM;
     }
-    this.setState({ validated: true });
+
+    this.setState({
+      validated: true,
+      error: errorType,
+    });
   }
 
-  handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  private handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
-    const name = target.name;
+    const name = target.id;
+
+    if (!name) {
+      throw new Error("Id is undefined for element in form.");
+    }
 
     this.setState({
       [name]: value,
