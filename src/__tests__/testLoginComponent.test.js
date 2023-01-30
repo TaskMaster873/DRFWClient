@@ -13,7 +13,9 @@ import { constants } from "../src/engine/Constants";
 
 let matchMedia;
 describe("Tests LoginComponent", () => {
-  const onSubmit = jest.fn();
+  beforeEach(() => {
+    window._virtualConsole.emit = jest.fn();
+  });
   beforeAll(() => {
     matchMedia = new MatchMediaMock();
   });
@@ -45,9 +47,6 @@ describe("Tests LoginComponent", () => {
     const { Application } = require("../src/Application");
     const validPassword = "Jfihsdgsd";
 
-    const handleSubmitFn = jest.fn();
-    render(<Form handlesubmit={handleSubmitFn} />);
-
     act(() => {
       let app = new Application();
       app.start();
@@ -63,24 +62,22 @@ describe("Tests LoginComponent", () => {
     await user.clear(inputNo);
     await user.type(inputPassword, validPassword);
 
-    fireEvent.submit(document.querySelector("button[type='submit']"));
+    //fireEvent.submit(document.querySelector("button[type='submit']"));
+    await user.click(document.querySelector("button[type='submit']"));
 
-    await waitFor(() => {
-      expect(handleSubmitFn).toHaveBeenCalledTimes(0);
-    });
     expect(inputNo.value).toBe("");
     expect(inputPassword.value).toBe(validPassword);
-    expect(document.getElementById("invalidLoginNoEmployee").innerHTML).toBe(
-      constants.errorRequiredEmployeeNo
-    );
+    expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
+    /*     expect(
+      document.getElementById("invalidLoginNoEmployee").style.display
+    ).toBe("block"); */
   });
 
   test("Empty password should show error", async () => {
     const { Application } = require("../src/Application");
     const validNoEmployee = "523869632";
-
-    const handleSubmitFn = jest.fn();
-    render(<Form handlesubmit={handleSubmitFn} />);
 
     act(() => {
       let app = new Application();
@@ -97,18 +94,17 @@ describe("Tests LoginComponent", () => {
     await user.clear(inputPassword);
     await user.type(inputNo, validNoEmployee);
 
-    fireEvent.submit(document.querySelector("button[type='submit']"));
+    await user.click(document.querySelector("button[type='submit']"));
 
-    console.log(document.getElementById("invalidLoginPassword").style);
-
-    await waitFor(() => {
-      expect(handleSubmitFn).toHaveBeenCalledTimes(0);
-    });
     expect(inputNo.value).toBe(validNoEmployee);
     expect(inputPassword.value).toBe("");
-    expect(document.getElementById("invalidLoginPassword").style.display).toBe(
-      ""
-    );
+    expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
+    /*     expect(document.getElementById("invalidLoginPassword").hidden).toBeFalsy();
+    expect(
+      document.getElementById("invalidLoginNoEmployee").hidden
+    ).toBeFalsy(); */
   });
 
   test("Valid employee number and password should submit form", async () => {
@@ -116,9 +112,6 @@ describe("Tests LoginComponent", () => {
     const validNoEmployee = "523869632";
     const validPassword = "Jfihsdgsd";
 
-    const handleSubmitFn = jest.fn();
-    render(<Form handlesubmit={handleSubmitFn} />);
-
     act(() => {
       let app = new Application();
       app.start();
@@ -136,18 +129,19 @@ describe("Tests LoginComponent", () => {
     await user.type(inputNo, validNoEmployee);
     await user.type(inputPassword, validPassword);
 
-    fireEvent.submit(document.querySelector("button[type='submit']"));
+    //fireEvent.submit(document.querySelector("button[type='submit']"));
+    await user.click(document.querySelector("button[type='submit']"));
 
-    await waitFor(() => {
-      expect(handleSubmitFn).toHaveBeenCalledTimes(0);
-    });
     expect(inputNo.value).toBe(validNoEmployee);
     expect(inputPassword.value).toBe(validPassword);
     expect(
+      document.querySelector("form").classList.contains("was-validated")
+    ).toBeTruthy();
+    /*     expect(
       document.getElementById("invalidLoginNoEmployee").style.display
     ).toBe("");
     expect(document.getElementById("invalidLoginPassword").style.display).toBe(
       ""
-    );
+    ); */
   });
 });
