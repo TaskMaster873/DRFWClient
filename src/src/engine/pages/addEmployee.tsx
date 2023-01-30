@@ -13,7 +13,7 @@ export class AddEmployee extends React.Component {
   private roles: string[] = ["Employé", "Administrateur"];
 
   public componentDidMount() {
-    document.title = "Ajouter un Employé - Task Manager";
+    document.title = "Ajouter un Employé - TaskMaster";
   }
   /**
    * 
