@@ -3,11 +3,6 @@
  */
 import MatchMediaMock from 'jest-matchmedia-mock';
 
-test('use jsdom in this test file', () => {
-    const element = document.createElement('div');
-    expect(element).not.toBeNull();
-});
-
 let matchMedia;
 describe('Test TaskMaster Client Configurations', () => {
     beforeAll(() => {
@@ -16,6 +11,11 @@ describe('Test TaskMaster Client Configurations', () => {
 
     afterEach(() => {
         matchMedia.clear();
+    });
+
+    test('jsdom is Initialized', () => {
+        const element = document.createElement('div');
+        expect(element).not.toBeNull();
     });
 
     test('Test if match media is defined', () => {
@@ -37,6 +37,6 @@ describe('Test TaskMaster Client Configurations', () => {
         const { Application } = require('../src/Application')
 
         let app = new Application();
-        await app.start();
+        app.start();
     });
 });

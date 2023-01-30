@@ -35,7 +35,8 @@
     "webpack": "webpack",
     "dev": "webpack serve",
     "build": "webpack --mode production --progress",
-    "test": "react-scripts test"
+    "test": "react-scripts test",
+    "test2": "jest --config=jest.config.js"
   },
   "resolutions": {
     "glob-parent": "^6.0.2",

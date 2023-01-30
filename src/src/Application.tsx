@@ -7,11 +7,11 @@ import reportWebVitals from "./engine/analytics/reportWebVitals";
 import {WebsocketManager} from "./engine/networking/WebsocketManager";
 
 export class Application extends Logger {
-  public moduleName: string = "Application";
-  public logColor: string = `#20dbf6`;
+    public moduleName: string = "Application";
+    public logColor: string = `#20dbf6`;
 
-  private rootElem: HTMLElement | null = null;
-  private root: ReactDOM.Root | null = null;
+    private rootElem: HTMLElement | null = null;
+    private root: ReactDOM.Root | null = null;
 
   private websocketManager: WebsocketManager = new WebsocketManager();
 
@@ -19,44 +19,59 @@ export class Application extends Logger {
     super();
   }
 
-  private onReportStatistics(objective: any): void {
+    private onReportStatistics(objective: any): void {
 
-  }
-
-  private registerEvents() {
-    let start = Date.now();
-
-    reportWebVitals(this.onReportStatistics.bind(this));
-    this.rootElem = document.createElement("div");
-    this.rootElem.id = 'root';
-    document.body.appendChild(this.rootElem);
-
-    this.renderCore();
-    this.websocketManager.init();
-    this.log(`Took ${Date.now() - start}ms to initialize...`);
-  }
-
-  private renderCore(): void {
-    if (this.rootElem !== null && this.rootElem) {
-      this.root = ReactDOM.createRoot(this.rootElem);
-
-      this.root.render(
-          <React.StrictMode>
-            <Engine />
-          </React.StrictMode>
-      );
-
-      //ReactDOM.render(<Engine />, this.rootElem);
-    } else {
-      this.error("Root element is null or undefined!");
     }
-  }
 
-  public start() {
-    this.log("Starting application...");
+    get rootElement() : HTMLElement | null {
+        return this.rootElem;
+    }
 
-    this.registerEvents();
-  }
+    private registerEvents() {
+        let start = Date.now();
+
+        reportWebVitals(this.onReportStatistics.bind(this));
+        this.rootElem = document.createElement("div");
+        this.rootElem.id = 'root';
+        document.body.appendChild(this.rootElem);
+        
+        this.renderCore();
+        this.websocketManager.init();
+
+        this.log(`Took ${Date.now() - start}ms to initialize...`);
+    }
+
+    private elementExists(element: any): boolean {
+        return element !== null && element !== undefined;
+    }
+
+    public unmount() : void {
+        if(this.elementExists(this.root)) {
+            this.root?.unmount();
+        }
+    }
+
+    private renderCore(): void {
+        if (this.rootElem !== null && this.rootElem) {
+            this.root = ReactDOM.createRoot(this.rootElem);
+
+            this.root.render(
+                <React.StrictMode>
+                    <Engine />
+                </React.StrictMode>
+            );
+
+            //ReactDOM.render(<Engine />, this.rootElem);
+        } else {
+            this.error("Root element is null or undefined!");
+        }
+    }
+
+    public start() {
+        this.log("Starting application...");
+
+        this.registerEvents();
+    }
 }
 /*
  import React from "react";
