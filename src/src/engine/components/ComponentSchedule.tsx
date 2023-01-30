@@ -85,24 +85,23 @@ export class ComponentSchedule extends React.Component {
     }
 
     public render(): JSX.Element {
-        /*this.doColumns();
-        this.doEvents();*/
+        
         if (this.list === undefined || this.list.length == 0) {
             return (
                 <div> Il n'y a pas d'horaire à voir</div>
             );
         }
         else return (
-            <div>
-                <div className="toolbar">
-                    <span ref={this.dateRef}></span> <button onClick={ev => this.changeDate()}>Change date</button>
-                </div>
+           // <div>
+            //    <div className="toolbar">
+             //       <span ref={this.dateRef}></span> <button onClick={ev => this.changeDate()}>Change date</button>
+             //   </div>
                 <div>
                     <DayPilotCalendar
                         {...this.state} />
                 </div>
 
-            </div>
+           // </div>
 
             /* <DayPilotCalendar businessBeginsHour={8} 
                     businessEndsHour={20}
