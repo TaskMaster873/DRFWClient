@@ -20,7 +20,7 @@ export class Employees extends React.Component {
   ];
 
   public componentDidMount() {
-    document.title = "Employés - Task Manager";
+    document.title = "Employés - TaskMaster";
   }
 
   /**

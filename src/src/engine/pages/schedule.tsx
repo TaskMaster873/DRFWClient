@@ -11,7 +11,7 @@ export class Schedule extends React.Component {
   private logger: Logger = new Logger(`Schedule`, `#20f6a4`, false);
   private list: Employee[] = [];
   public componentDidMount() {
-    document.title = "Horaire - Task Manager";
+    document.title = "Horaire - TaskMaster";
   }
 
   /***
