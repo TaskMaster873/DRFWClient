@@ -44,7 +44,7 @@ export class ComponentSchedule extends React.Component {
     private doEvents() {
         let listToReturn: Array<{ id: number, text: string, start: string, end: string, resource: string }>;
         listToReturn = [];
-        listToReturn.push({ id: 1, text: "Event 1", start: DayPilot.Date.today(), end: DayPilot.Date.now(), resource: '1' });
+        listToReturn.push({ id: 1, text: "Il faut mettre le temps et le titre", start: DayPilot.Date.today(), end: DayPilot.Date.now(), resource: '1' });
         return listToReturn;
     }
     public render(): JSX.Element {
