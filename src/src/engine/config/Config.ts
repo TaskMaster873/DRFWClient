@@ -13,6 +13,8 @@ class Configuration {
         localStorage.removeItem('authKey');
     }
 
+    public loginWithPassword(username: string, password: string) : void {}
+
     get authKey() : Buffer {
         let authKey = localStorage.getItem('authKey');
 

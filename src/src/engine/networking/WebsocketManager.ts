@@ -30,9 +30,14 @@ export class WebsocketManager extends Logger {
 
     private encryptionStarted: boolean = false;
 
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor
     constructor() {
         super();
+
+        Config.loginWithPassword = this.loginWithPassword.bind(this);
+    }
+
+    private async loginWithPassword(username: string, password: string) : Promise<void> {
+        await this.encryptem.generateClientCipherKeyPair(password);
     }
 
     get isSecure() : boolean {
