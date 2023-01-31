@@ -1,23 +1,28 @@
-import React from 'react';
+import React from "react";
+import { ScheduleGroup } from "../types/Schedule";
 
 export class ResourceGroups extends React.Component {
-  selectRef;
+  private selectRef: React.RefObject<HTMLSelectElement>;
+  private groups: ScheduleGroup[];
+  private onChange: any;
 
-  constructor(props: any) {
+  constructor(props: { groups: ScheduleGroup[]; onChange: any }) {
     super(props);
+    this.groups = props.groups;
+    this.onChange = props.onChange;
     this.selectRef = React.createRef();
   }
 
-  find(id) {
-    if (!this.props.items) {
+  find(id: string) {
+    if (!this.props) {
       return null;
     }
-    return this.props.items.find(item => item.id === id);
+    return this.groups.find((item) => item.id === id);
   }
 
   componentDidMount() {
-    if (this.props.items && this.props.items.length > 0) {
-      setTimeout(() => this.doOnChange(this.props.items[0]), 0);
+    if (this.groups && this.groups.length > 0) {
+      setTimeout(() => this.doOnChange(this.groups.at(0)), 0);
     }
   }
 
@@ -25,28 +30,27 @@ export class ResourceGroups extends React.Component {
     return (
       <span>
         Group: &nbsp;
-        <select onChange={ev => this.change(ev)} ref={this.selectRef}>
-          {this.props.items.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+        <select onChange={(ev) => this.change(ev)} ref={this.selectRef}>
+          {this.groups.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
         </select>
       </span>
     );
   }
 
-  change(ev) {
+  change(ev: React.ChangeEvent<HTMLSelectElement>) {
     const value = ev.target.value;
     const item = this.find(value);
     this.doOnChange(item);
   }
 
-  doOnChange(location) {
+  doOnChange(location: ScheduleGroup | undefined | null) {
     const args = { selected: location };
-    if (this.props.onChange) {
-      this.props.onChange(args);
+    if (this.onChange) {
+      this.onChange(args);
     }
   }
-
-  get selectedValue() {
-    return this.selectRef.current.value;
-  }
-
 }
