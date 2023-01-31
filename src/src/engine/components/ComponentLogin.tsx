@@ -112,11 +112,11 @@ export class ComponentLogin extends React.Component {
 
         let errorType = LoginFormErrorType.NO_ERROR;
         if (!isValid) {
-            event.preventDefault();
-            event.stopPropagation();
-
             errorType = LoginFormErrorType.INVALID_FORM;
         }
+
+        event.preventDefault();
+        event.stopPropagation();
 
         this.setState({
             validated: true,
@@ -124,6 +124,7 @@ export class ComponentLogin extends React.Component {
         });
 
         if(errorType === LoginFormErrorType.NO_ERROR) {
+            console.log(this.state.password);
             Config.loginWithPassword(this.state.id, this.state.password);
         }
     }
@@ -131,7 +132,7 @@ export class ComponentLogin extends React.Component {
     private handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
+        const name = target.name;
 
         if (!name) {
             throw new Error("Id is undefined for element in form.");

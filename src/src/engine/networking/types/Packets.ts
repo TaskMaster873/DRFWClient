@@ -4,6 +4,7 @@
 export interface AuthenticationPacketPayload {
     readOnly: boolean;
     clientAuthCipher?: Uint8Array | Buffer;
+    clientId?: string;
 }
 
 export interface ServerKeyCipherExchange {

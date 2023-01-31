@@ -1,5 +1,7 @@
 import {Logger} from "../Logger";
 import {Config} from "../config/Config";
+import { Buffer } from "buffer";
+import * as sodium from 'sodium-universal';
 
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';
@@ -304,6 +306,6 @@ export class Encryptem extends Logger {
     }
 
     private init() : void {
-
+        this.sodium = sodium;
     }
 }
