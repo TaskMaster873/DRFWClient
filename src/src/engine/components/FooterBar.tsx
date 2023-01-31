@@ -3,11 +3,11 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { LinkContainer } from "react-router-bootstrap";
 import { Logger } from "../Logger";
+import Container from "react-bootstrap/esm/Container";
 
 /* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
-import Container from "react-bootstrap/esm/Container";
 
 export class FooterBar extends React.Component {
   private logger: Logger = new Logger(`NavigationBar`, `#20f6a4`);
