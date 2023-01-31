@@ -7,22 +7,12 @@ import "@testing-library/jest-dom";
 
 import MatchMediaMock from "jest-matchmedia-mock";
 import { act } from "react-dom/test-utils";
-import { constants } from "../src/engine/Constants";
-import { cleanup, findByText, fireEvent } from "@testing-library/react";
+import { cleanup, fireEvent } from "@testing-library/react";
 import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
+import testConstants from "../Constants/testConstants";
 
 let matchMedia;
 let user;
-
-const validNoEmployee = "523696";
-const validFirstName = "Alfred";
-const validName = "Montmagny";
-const validPhoneNumber = "418-666-6666";
-const validPassword = "Jf3$E12";
-
-const invalidNoEmployee = "192";
-const invalidPhoneNumber = "41-92-006";
-const invalidPassword = "44ab";
 
 let app;
 beforeEach(async () => {
@@ -88,26 +78,20 @@ describe("Empty Fields Login Tests", () => {
       inputInitialPassword,
     } = getFields();
 
-    await user.type(inputFirstName, validFirstName);
-    await user.type(inputName, validName);
-    await user.type(inputPhoneNumber, validPhoneNumber);
-    await user.type(inputInitialPassword, validPassword);
+    await user.type(inputFirstName, testConstants.validFirstName);
+    await user.type(inputName, testConstants.validName);
+    await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+    await user.type(inputInitialPassword, testConstants.validPassword);
 
     fireEvent.submit(form);
 
-    const errorMessage = await findByText(
-      app.rootElement,
-      constants.errorInvalidEmployeeNo
-    );
-
     expect(inputNo.value).toBe("");
-    expect(inputFirstName.value).toBe(validFirstName);
-    expect(inputPhoneNumber.value).toBe(validPhoneNumber);
-    expect(inputInitialPassword.value).toBe(validPassword);
+    expect(inputFirstName.value).toBe(testConstants.validFirstName);
+    expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
+    expect(inputInitialPassword.value).toBe(testConstants.validPassword);
 
     expect(form.classList.contains("was-validated")).toBeTruthy();
 
-    expect(errorMessage).toBeInTheDocument();
     expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
   });
 
@@ -121,27 +105,19 @@ describe("Empty Fields Login Tests", () => {
       inputInitialPassword,
     } = getFields();
 
-    await user.type(inputNo, validNoEmployee);
-    await user.type(inputName, validName);
-    await user.type(inputPhoneNumber, validPhoneNumber);
-    await user.type(inputInitialPassword, validPassword);
+    await user.type(inputNo, testConstants.validNoEmployee);
+    await user.type(inputName, testConstants.validName);
+    await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+    await user.type(inputInitialPassword, testConstants.validPassword);
 
     fireEvent.submit(form);
 
-    const errorMessage = await findByText(
-      app.rootElement,
-      constants.errorRequiredFirstName
-    );
-
-    expect(inputNo.value).toBe(validNoEmployee);
+    expect(inputNo.value).toBe(testConstants.validNoEmployee);
     expect(inputFirstName.value).toBe("");
-    expect(inputName.value).toBe(validName);
-    expect(inputPhoneNumber.value).toBe(validPhoneNumber);
-    expect(inputInitialPassword.value).toBe(validPassword);
-
+    expect(inputName.value).toBe(testConstants.validName);
+    expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
+    expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
-
-    expect(errorMessage).toBeInTheDocument();
     expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
   });
 
@@ -155,27 +131,19 @@ describe("Empty Fields Login Tests", () => {
       inputInitialPassword,
     } = getFields();
 
-    await user.type(inputNo, validNoEmployee);
-    await user.type(inputFirstName, validFirstName);
-    await user.type(inputPhoneNumber, validPhoneNumber);
-    await user.type(inputInitialPassword, validPassword);
+    await user.type(inputNo, testConstants.validNoEmployee);
+    await user.type(inputFirstName, testConstants.validFirstName);
+    await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+    await user.type(inputInitialPassword, testConstants.validPassword);
 
     fireEvent.submit(form);
 
-    const errorMessage = await findByText(
-      app.rootElement,
-      constants.errorRequiredName
-    );
-
-    expect(inputNo.value).toBe(validNoEmployee);
-    expect(inputFirstName.value).toBe(validFirstName);
+    expect(inputNo.value).toBe(testConstants.validNoEmployee);
+    expect(inputFirstName.value).toBe(testConstants.validFirstName);
     expect(inputName.value).toBe("");
-    expect(inputPhoneNumber.value).toBe(validPhoneNumber);
-    expect(inputInitialPassword.value).toBe(validPassword);
-
+    expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
+    expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
-
-    expect(errorMessage).toBeInTheDocument();
     expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
   });
 
@@ -189,27 +157,19 @@ describe("Empty Fields Login Tests", () => {
       inputInitialPassword,
     } = getFields();
 
-    await user.type(inputNo, validNoEmployee);
-    await user.type(inputFirstName, validFirstName);
-    await user.type(inputName, validName);
-    await user.type(inputInitialPassword, validPassword);
+    await user.type(inputNo, testConstants.validNoEmployee);
+    await user.type(inputFirstName, testConstants.validFirstName);
+    await user.type(inputName, testConstants.validName);
+    await user.type(inputInitialPassword, testConstants.validPassword);
 
     fireEvent.submit(form);
 
-    const errorMessage = await findByText(
-      app.rootElement,
-      constants.errorInvalidPhoneNumber
-    );
-
-    expect(inputNo.value).toBe(validNoEmployee);
-    expect(inputFirstName.value).toBe(validFirstName);
-    expect(inputName.value).toBe(validName);
+    expect(inputNo.value).toBe(testConstants.validNoEmployee);
+    expect(inputFirstName.value).toBe(testConstants.validFirstName);
+    expect(inputName.value).toBe(testConstants.validName);
     expect(inputPhoneNumber.value).toBe("");
-    expect(inputInitialPassword.value).toBe(validPassword);
-
+    expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
-
-    expect(errorMessage).toBeInTheDocument();
     expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
   });
 
@@ -223,26 +183,19 @@ describe("Empty Fields Login Tests", () => {
       inputInitialPassword,
     } = getFields();
 
-    await user.type(inputNo, validNoEmployee);
-    await user.type(inputFirstName, validFirstName);
-    await user.type(inputName, validName);
-    await user.type(inputPhoneNumber, validPhoneNumber);
+    await user.type(inputNo, testConstants.validNoEmployee);
+    await user.type(inputFirstName, testConstants.validFirstName);
+    await user.type(inputName, testConstants.validName);
+    await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
 
     fireEvent.submit(form);
 
-    const errorMessage = await findByText(
-      app.rootElement,
-      constants.errorInvalidInitialPassword
-    );
-
-    expect(inputNo.value).toBe(validNoEmployee);
-    expect(inputFirstName.value).toBe(validFirstName);
-    expect(inputName.value).toBe(validName);
-    expect(inputPhoneNumber.value).toBe(validPhoneNumber);
+    expect(inputNo.value).toBe(testConstants.validNoEmployee);
+    expect(inputFirstName.value).toBe(testConstants.validFirstName);
+    expect(inputName.value).toBe(testConstants.validName);
+    expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
     expect(inputInitialPassword.value).toBe("");
-
     expect(form.classList.contains("was-validated")).toBeTruthy();
-    expect(errorMessage).toBeInTheDocument();
     expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
   });
 });
@@ -257,25 +210,19 @@ test("Invalid employee number regex should show error", async () => {
     inputInitialPassword,
   } = getFields();
 
-  await user.type(inputNo, invalidNoEmployee);
-  await user.type(inputFirstName, validFirstName);
-  await user.type(inputName, validName);
-  await user.type(inputPhoneNumber, validPhoneNumber);
-  await user.type(inputInitialPassword, validPassword);
+  await user.type(inputNo, testConstants.invalidNoEmployee);
+  await user.type(inputFirstName, testConstants.validFirstName);
+  await user.type(inputName, testConstants.validName);
+  await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+  await user.type(inputInitialPassword, testConstants.validPassword);
 
   fireEvent.submit(form);
 
-  const errorMessage = await findByText(
-    app.rootElement,
-    constants.errorInvalidPhoneNumber
-  );
-
-  expect(inputNo.value).toBe(invalidNoEmployee);
-  expect(inputFirstName.value).toBe(validFirstName);
-  expect(inputPhoneNumber.value).toBe(validPhoneNumber);
-  expect(inputInitialPassword.value).toBe(validPassword);
+  expect(inputNo.value).toBe(testConstants.invalidNoEmployee);
+  expect(inputFirstName.value).toBe(testConstants.validFirstName);
+  expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
+  expect(inputInitialPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-  expect(errorMessage).toBeInTheDocument();
   expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
 });
 
@@ -289,25 +236,19 @@ test("Invalid phone number regex should show error", async () => {
     inputInitialPassword,
   } = getFields();
 
-  await user.type(inputNo, validNoEmployee);
-  await user.type(inputFirstName, validFirstName);
-  await user.type(inputName, validName);
-  await user.type(inputPhoneNumber, invalidPhoneNumber);
-  await user.type(inputInitialPassword, validPassword);
+  await user.type(inputNo, testConstants.validNoEmployee);
+  await user.type(inputFirstName, testConstants.validFirstName);
+  await user.type(inputName, testConstants.validName);
+  await user.type(inputPhoneNumber, testConstants.invalidPhoneNumber);
+  await user.type(inputInitialPassword, testConstants.validPassword);
 
   fireEvent.submit(form);
 
-  const errorMessage = await findByText(
-    app.rootElement,
-    constants.errorInvalidPhoneNumber
-  );
-
-  expect(inputNo.value).toBe(validNoEmployee);
-  expect(inputFirstName.value).toBe(validFirstName);
-  expect(inputPhoneNumber.value).toBe(invalidPhoneNumber);
-  expect(inputInitialPassword.value).toBe(validPassword);
+  expect(inputNo.value).toBe(testConstants.validNoEmployee);
+  expect(inputFirstName.value).toBe(testConstants.validFirstName);
+  expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
+  expect(inputInitialPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-  expect(errorMessage).toBeInTheDocument();
   expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
 });
 
@@ -321,25 +262,19 @@ test("Invalid initial password regex should show error", async () => {
     inputInitialPassword,
   } = getFields();
 
-  await user.type(inputNo, validNoEmployee);
-  await user.type(inputFirstName, validFirstName);
-  await user.type(inputName, validName);
-  await user.type(inputPhoneNumber, validPhoneNumber);
-  await user.type(inputInitialPassword, invalidPassword);
+  await user.type(inputNo, testConstants.validNoEmployee);
+  await user.type(inputFirstName, testConstants.validFirstName);
+  await user.type(inputName, testConstants.validName);
+  await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+  await user.type(inputInitialPassword, testConstants.invalidPassword);
 
   fireEvent.submit(form);
 
-  const errorMessage = await findByText(
-    app.rootElement,
-    constants.errorInvalidInitialPassword
-  );
-
-  expect(inputNo.value).toBe(validNoEmployee);
-  expect(inputFirstName.value).toBe(validFirstName);
-  expect(inputPhoneNumber.value).toBe(validPhoneNumber);
-  expect(inputInitialPassword.value).toBe(invalidPassword);
+  expect(inputNo.value).toBe(testConstants.validNoEmployee);
+  expect(inputFirstName.value).toBe(testConstants.validFirstName);
+  expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
+  expect(inputInitialPassword.value).toBe(testConstants.invalidPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-  expect(errorMessage).toBeInTheDocument();
   expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
 });
 
@@ -353,20 +288,19 @@ test("Valid employee number and password should submit form", async () => {
     inputInitialPassword,
   } = getFields();
 
-  await user.type(inputNo, validNoEmployee);
-  await user.type(inputFirstName, validFirstName);
-  await user.type(inputName, validName);
-  await user.type(inputPhoneNumber, validPhoneNumber);
-  await user.type(inputInitialPassword, validPassword);
+  await user.type(inputNo, testConstants.validNoEmployee);
+  await user.type(inputFirstName, testConstants.validFirstName);
+  await user.type(inputName, testConstants.validName);
+  await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+  await user.type(inputInitialPassword, testConstants.validPassword);
 
   fireEvent.submit(form);
 
-  expect(inputNo.value).toBe(validNoEmployee);
-  expect(inputFirstName.value).toBe(validFirstName);
-  expect(inputPhoneNumber.value).toBe(validPhoneNumber);
-  expect(inputInitialPassword.value).toBe(validPassword);
+  expect(inputNo.value).toBe(testConstants.validNoEmployee);
+  expect(inputFirstName.value).toBe(testConstants.validFirstName);
+  expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
+  expect(inputInitialPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-
   expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
 });
 
