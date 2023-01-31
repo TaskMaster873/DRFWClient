@@ -28,7 +28,7 @@ export class ComponentEmployeeList extends React.Component {
           </thead>
           <tbody>
             {Array.from({ length: this.list.length }).map((_, index) => (
-              <tr key={"secondCol"}>
+              <tr key={"secondCol" + index}>
                 <td key={"no" + index}>{index}</td>
                 <td key={"firstName " + index}>
                   <a>{this.list[index].firstName}</a>
@@ -46,7 +46,9 @@ export class ComponentEmployeeList extends React.Component {
             ))}
           </tbody>
         </Table>
-        <LinkContainer to="/add-employee"><Button>Ajouter</Button></LinkContainer>
+        <LinkContainer to="/add-employee">
+          <Button>Ajouter</Button>
+        </LinkContainer>
       </div>
     );
   }
