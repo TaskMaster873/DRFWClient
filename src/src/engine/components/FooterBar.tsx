@@ -14,25 +14,32 @@ export class FooterBar extends React.Component {
 
   public render(): JSX.Element {
     return (
-      <Navbar
-        variant="dark"
-        fixed="bottom"
-        className="d-flex flex-wrap justify-content-between align-items-center"
-      >
-        <Nav className="ms-2">
-          <Navbar.Text>Équipe DRFW</Navbar.Text>
-        </Nav>
-        <LinkContainer to="/">
-          <Navbar.Brand>
-            <img className="ms-4" src={Logo} alt="Logo TaskMaster" width={50} height={60} />
-          </Navbar.Brand>
-        </LinkContainer>{" "}
-        <Nav className="me-2">
-          <LinkContainer to="/login">
-            <Nav.Link>Connexion</Nav.Link>
-          </LinkContainer>
-        </Nav>
-      </Navbar>
+      <div>
+        <div className="pt-5 pb-4"></div>
+        <Navbar variant="dark" fixed="bottom">
+          <Container className="d-flex flex-wrap justify-content-between align-items-center">
+            <Nav className="ms-2">
+              <Navbar.Text>Équipe DRFW</Navbar.Text>
+            </Nav>
+            <LinkContainer to="/">
+              <Navbar.Brand>
+                <img
+                  className="ms-4"
+                  src={Logo}
+                  alt="Logo TaskMaster"
+                  width={50}
+                  height={60}
+                />
+              </Navbar.Brand>
+            </LinkContainer>
+            <Nav className="me-2">
+              <LinkContainer to="/login">
+                <Nav.Link>Connexion</Nav.Link>
+              </LinkContainer>
+            </Nav>
+          </Container>
+        </Navbar>
+      </div>
     );
   }
 }
