@@ -5,7 +5,7 @@ import Button from "react-bootstrap/Button";
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
 import { Link } from "react-router-dom";
-import { constants } from "../Constants";
+import { constants } from "../../../Constants/Constants";
 import { LoginFormErrorType } from "../errors/LoginFormErrorType";
 
 export class ComponentLogin extends React.Component {

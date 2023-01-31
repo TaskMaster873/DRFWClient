@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { LinkContainer } from "react-router-bootstrap";
 import { LoginFormErrorType } from "../errors/LoginFormErrorType";
-import { constants } from "../Constants";
+import { constants } from "../../../Constants/Constants";
 import { Logger } from "../Logger";
 
 /**
