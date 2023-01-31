@@ -1,5 +1,6 @@
 import React from "react";
 import { Container } from "react-bootstrap";
+import { ComponentAbout } from "../components/ComponentHomePage";
 import { Logger } from "../Logger";
 
 export class Index extends React.Component {
@@ -12,7 +13,7 @@ export class Index extends React.Component {
   public render(): JSX.Element {
     return (
         <div>
-          <Container>Page d'accueil. Test release MAIN4.</Container>
+          <ComponentAbout></ComponentAbout>
         </div>
     );
   }
