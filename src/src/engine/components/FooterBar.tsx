@@ -3,7 +3,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { LinkContainer } from "react-router-bootstrap";
 import { Logger } from "../Logger";
-import Container from "react-bootstrap/esm/Container";
+import { Container } from "react-bootstrap";
 
 /* === Images === */
 // @ts-ignore
