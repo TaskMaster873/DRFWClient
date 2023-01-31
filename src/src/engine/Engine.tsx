@@ -14,6 +14,7 @@ import { AddEmployee } from "./pages/addEmployee";
 import { NavigationBar } from "./components/NavigationBar";
 import { ChangePassword } from "./pages/changePassword";
 import { FooterBar } from "./components/FooterBar";
+import { Departements } from "./pages/departements";
 
 export class Engine extends React.Component {
   public render(): JSX.Element {
@@ -25,11 +26,13 @@ export class Engine extends React.Component {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/schedule" element={<Schedule />} />
-              <Route path="/employees" element={<Employees />} />
+              <Route path="/departements" element={<Departements />} />
+              <Route path="/employees/:id" element={<Employees />} />
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/memes" element={<Memes />} />
               <Route path="/add-employee" element={<AddEmployee />} />
+              <Route path="/add-departement" element={<AddEmployee />} />
               <Route path="/changePassword" element={<ChangePassword />} />
             </Routes>
             <FooterBar />
