@@ -18,6 +18,7 @@ const validNoEmployee = "523696";
 const validFirstName = "Alfred";
 const validName = "Montmagny";
 const validPhoneNumber = "418-666-6666";
+const invalidPhoneNumber = "41-92-006";
 const validPassword = "JfihsdEEgsd";
 
 let app;
@@ -61,7 +62,6 @@ test("should render form inputs", async () => {
     inputName,
     inputPhoneNumber,
     inputInitialPassword,
-    inputRole,
   } = getFields();
 
   expect(form).not.toBeNull();
@@ -70,7 +70,6 @@ test("should render form inputs", async () => {
   expect(inputName).not.toBeNull();
   expect(inputPhoneNumber).not.toBeNull();
   expect(inputInitialPassword).not.toBeNull();
-  expect(inputRole).not.toBeNull();
   expect(inputPhoneNumber).toHaveAttribute("type", "tel");
   expect(inputInitialPassword).toHaveAttribute("type", "password");
 });
@@ -87,14 +86,12 @@ describe("Empty Fields Login Tests", () => {
       inputName,
       inputPhoneNumber,
       inputInitialPassword,
-      inputRole,
     } = getFields();
 
     await user.type(inputFirstName, validFirstName);
     await user.type(inputName, validName);
     await user.type(inputPhoneNumber, validPhoneNumber);
     await user.type(inputInitialPassword, validPassword);
-    await user.selectOptions(inputRole, inputRole.firstChild.textContent);
 
     fireEvent.submit(form);
 
@@ -107,7 +104,6 @@ describe("Empty Fields Login Tests", () => {
     expect(inputFirstName.value).toBe(validFirstName);
     expect(inputPhoneNumber.value).toBe(validPhoneNumber);
     expect(inputInitialPassword.value).toBe(validPassword);
-    expect(inputRole.value).toBe(inputRole.firstChild.textContent);
 
     expect(form.classList.contains("was-validated")).toBeTruthy();
 
@@ -126,14 +122,12 @@ describe("Empty Fields Login Tests", () => {
       inputName,
       inputPhoneNumber,
       inputInitialPassword,
-      inputRole,
     } = getFields();
 
     await user.type(inputNo, validNoEmployee);
     await user.type(inputName, validName);
     await user.type(inputPhoneNumber, validPhoneNumber);
     await user.type(inputInitialPassword, validPassword);
-    await user.selectOptions(inputRole, inputRole.firstChild.textContent);
 
     fireEvent.submit(form);
 
@@ -147,7 +141,6 @@ describe("Empty Fields Login Tests", () => {
     expect(inputName.value).toBe(validName);
     expect(inputPhoneNumber.value).toBe(validPhoneNumber);
     expect(inputInitialPassword.value).toBe(validPassword);
-    expect(inputRole.value).toBe(inputRole.firstChild.textContent);
 
     expect(form.classList.contains("was-validated")).toBeTruthy();
 
@@ -166,7 +159,6 @@ describe("Empty Fields Login Tests", () => {
       inputName,
       inputPhoneNumber,
       inputInitialPassword,
-      inputRole,
     } = getFields();
 
     await user.type(inputNo, validNoEmployee);
@@ -186,7 +178,6 @@ describe("Empty Fields Login Tests", () => {
     expect(inputName.value).toBe("");
     expect(inputPhoneNumber.value).toBe(validPhoneNumber);
     expect(inputInitialPassword.value).toBe(validPassword);
-    expect(inputRole.value).toBe(inputRole.firstChild.textContent);
 
     expect(form.classList.contains("was-validated")).toBeTruthy();
 
@@ -205,7 +196,6 @@ describe("Empty Fields Login Tests", () => {
       inputName,
       inputPhoneNumber,
       inputInitialPassword,
-      inputRole,
     } = getFields();
 
     await user.type(inputNo, validNoEmployee);
@@ -225,7 +215,6 @@ describe("Empty Fields Login Tests", () => {
     expect(inputName.value).toBe(validName);
     expect(inputPhoneNumber.value).toBe("");
     expect(inputInitialPassword.value).toBe(validPassword);
-    expect(inputRole.value).toBe(inputRole.firstChild.textContent);
 
     expect(form.classList.contains("was-validated")).toBeTruthy();
 
@@ -244,7 +233,6 @@ describe("Empty Fields Login Tests", () => {
       inputName,
       inputPhoneNumber,
       inputInitialPassword,
-      inputRole,
     } = getFields();
 
     await user.type(inputNo, validNoEmployee);
@@ -264,12 +252,41 @@ describe("Empty Fields Login Tests", () => {
     expect(inputName.value).toBe(validName);
     expect(inputPhoneNumber.value).toBe(validPhoneNumber);
     expect(inputInitialPassword.value).toBe("");
-    expect(inputRole.value).toBe(inputRole.firstChild.textContent);
 
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(errorMessage).toBeInTheDocument();
     expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
   });
+});
+
+test("Invalid phone number regex should show error", async () => {
+  await user.click(document.querySelector("a[href='/employees']"));
+  await user.click(document.querySelector("a[href='/add-employee']"));
+
+  const {
+    form,
+    inputNo,
+    inputFirstName,
+    inputName,
+    inputPhoneNumber,
+    inputInitialPassword,
+  } = getFields();
+
+  await user.type(inputNo, validNoEmployee);
+  await user.type(inputFirstName, validFirstName);
+  await user.type(inputName, validName);
+  await user.type(inputPhoneNumber, invalidPhoneNumber);
+  await user.type(inputInitialPassword, validPassword);
+
+  fireEvent.submit(form);
+
+  expect(inputNo.value).toBe(validNoEmployee);
+  expect(inputFirstName.value).toBe(validFirstName);
+  expect(inputPhoneNumber.value).toBe(invalidPhoneNumber);
+  expect(inputInitialPassword.value).toBe(validPassword);
+  expect(form.classList.contains("was-validated")).toBeTruthy();
+
+  expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
 });
 
 test("Valid employee number and password should submit form", async () => {
@@ -283,7 +300,6 @@ test("Valid employee number and password should submit form", async () => {
     inputName,
     inputPhoneNumber,
     inputInitialPassword,
-    inputRole,
   } = getFields();
 
   await user.type(inputNo, validNoEmployee);
@@ -313,7 +329,6 @@ function getFields() {
   const inputInitialPassword = document.getElementById(
     "initialPasswordAddEmployee"
   );
-  const inputRole = document.getElementById("roleAddEmployee");
   return {
     form,
     inputNo,
@@ -321,6 +336,5 @@ function getFields() {
     inputName,
     inputPhoneNumber,
     inputInitialPassword,
-    inputRole,
   };
 }
