@@ -5,14 +5,12 @@ global.IS_REACT_ACT_ENVIRONMENT = true;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const config = {
-    verbose: true,
-    automock: true,
-    setupFiles: [
-        './test_setup_files/setup.js'
-    ],
-    moduleNameMapper: {
-        "^.+\\.(css|less|scss)$": "identity-obj-proxy"
-    }
+  verbose: false,
+  automock: true,
+  setupFiles: ["./test_setup_files/setup.js"],
+  moduleNameMapper: {
+    "^.+\\.(css|less|scss)$": "identity-obj-proxy",
+  },
 };
 
 module.exports = config;

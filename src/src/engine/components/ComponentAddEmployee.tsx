@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -59,10 +59,11 @@ export class ComponentAddEmployee extends React.Component {
               required
               type="number"
               placeholder="000000"
-              pattern="^[1-9]{6}$"
+              min="100000"
+              max="999999"
             />
             <Form.Control.Feedback type="invalid">
-              {constants.errorRequiredEmployeeNo}
+              {constants.errorInvalidEmployeeNo}
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Group as={Col} md="4">
@@ -97,11 +98,11 @@ export class ComponentAddEmployee extends React.Component {
               id="phoneNumberAddEmployee"
               required
               type="tel"
-              pattern="^(+1\s)?\d{3}[\s-]?\d{3}[\s-]?\d{4}$"
-              placeholder="Tel: 000-000-0000"
+              pattern="^(\+?1 ?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$"
+              placeholder="000-000-0000"
             />
             <Form.Control.Feedback type="invalid">
-              {constants.errorRequiredPhoneNumber}
+              {constants.errorInvalidPhoneNumber}
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Group as={Col} md="6">
@@ -110,10 +111,11 @@ export class ComponentAddEmployee extends React.Component {
               id="initialPasswordAddEmployee"
               required
               type="password"
+              pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
               placeholder="Mot de passe"
             />
             <Form.Control.Feedback type="invalid">
-              {constants.errorRequiredInitialPassword}
+              {constants.errorInvalidInitialPassword}
             </Form.Control.Feedback>
           </Form.Group>
         </Row>
