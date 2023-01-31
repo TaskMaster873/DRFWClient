@@ -18,8 +18,11 @@ const validNoEmployee = "523696";
 const validFirstName = "Alfred";
 const validName = "Montmagny";
 const validPhoneNumber = "418-666-6666";
+const validPassword = "Jf3$E12";
+
+const invalidNoEmployee = "192";
 const invalidPhoneNumber = "41-92-006";
-const validPassword = "JfihsdEEgsd";
+const invalidPassword = "44ab";
 
 let app;
 beforeEach(async () => {
@@ -50,11 +53,11 @@ beforeEach(async () => {
 
     document.dispatchEvent(new Event("visibilitychange"));
   });
+  await user.click(document.querySelector("a[href='/employees']"));
+  await user.click(document.querySelector("a[href='/add-employee']"));
 });
 
 test("should render form inputs", async () => {
-  await user.click(document.querySelector("a[href='/employees']"));
-  await user.click(document.querySelector("a[href='/add-employee']"));
   const {
     form,
     inputNo,
@@ -76,9 +79,6 @@ test("should render form inputs", async () => {
 
 describe("Empty Fields Login Tests", () => {
   test("Empty employee number should show error", async () => {
-    await user.click(document.querySelector("a[href='/employees']"));
-    await user.click(document.querySelector("a[href='/add-employee']"));
-
     const {
       form,
       inputNo,
@@ -97,7 +97,7 @@ describe("Empty Fields Login Tests", () => {
 
     const errorMessage = await findByText(
       app.rootElement,
-      constants.errorRequiredEmployeeNo
+      constants.errorInvalidEmployeeNo
     );
 
     expect(inputNo.value).toBe("");
@@ -112,9 +112,6 @@ describe("Empty Fields Login Tests", () => {
   });
 
   test("Empty first name should show error", async () => {
-    await user.click(document.querySelector("a[href='/employees']"));
-    await user.click(document.querySelector("a[href='/add-employee']"));
-
     const {
       form,
       inputNo,
@@ -149,9 +146,6 @@ describe("Empty Fields Login Tests", () => {
   });
 
   test("Empty name should show error", async () => {
-    await user.click(document.querySelector("a[href='/employees']"));
-    await user.click(document.querySelector("a[href='/add-employee']"));
-
     const {
       form,
       inputNo,
@@ -186,9 +180,6 @@ describe("Empty Fields Login Tests", () => {
   });
 
   test("Empty phone number should show error", async () => {
-    await user.click(document.querySelector("a[href='/employees']"));
-    await user.click(document.querySelector("a[href='/add-employee']"));
-
     const {
       form,
       inputNo,
@@ -207,7 +198,7 @@ describe("Empty Fields Login Tests", () => {
 
     const errorMessage = await findByText(
       app.rootElement,
-      constants.errorRequiredPhoneNumber
+      constants.errorInvalidPhoneNumber
     );
 
     expect(inputNo.value).toBe(validNoEmployee);
@@ -223,9 +214,6 @@ describe("Empty Fields Login Tests", () => {
   });
 
   test("Empty initial password should show error", async () => {
-    await user.click(document.querySelector("a[href='/employees']"));
-    await user.click(document.querySelector("a[href='/add-employee']"));
-
     const {
       form,
       inputNo,
@@ -244,7 +232,7 @@ describe("Empty Fields Login Tests", () => {
 
     const errorMessage = await findByText(
       app.rootElement,
-      constants.errorRequiredInitialPassword
+      constants.errorInvalidInitialPassword
     );
 
     expect(inputNo.value).toBe(validNoEmployee);
@@ -259,10 +247,39 @@ describe("Empty Fields Login Tests", () => {
   });
 });
 
-test("Invalid phone number regex should show error", async () => {
-  await user.click(document.querySelector("a[href='/employees']"));
-  await user.click(document.querySelector("a[href='/add-employee']"));
+test("Invalid employee number regex should show error", async () => {
+  const {
+    form,
+    inputNo,
+    inputFirstName,
+    inputName,
+    inputPhoneNumber,
+    inputInitialPassword,
+  } = getFields();
 
+  await user.type(inputNo, invalidNoEmployee);
+  await user.type(inputFirstName, validFirstName);
+  await user.type(inputName, validName);
+  await user.type(inputPhoneNumber, validPhoneNumber);
+  await user.type(inputInitialPassword, validPassword);
+
+  fireEvent.submit(form);
+
+  const errorMessage = await findByText(
+    app.rootElement,
+    constants.errorInvalidPhoneNumber
+  );
+
+  expect(inputNo.value).toBe(invalidNoEmployee);
+  expect(inputFirstName.value).toBe(validFirstName);
+  expect(inputPhoneNumber.value).toBe(validPhoneNumber);
+  expect(inputInitialPassword.value).toBe(validPassword);
+  expect(form.classList.contains("was-validated")).toBeTruthy();
+  expect(errorMessage).toBeInTheDocument();
+  expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+});
+
+test("Invalid phone number regex should show error", async () => {
   const {
     form,
     inputNo,
@@ -280,19 +297,53 @@ test("Invalid phone number regex should show error", async () => {
 
   fireEvent.submit(form);
 
+  const errorMessage = await findByText(
+    app.rootElement,
+    constants.errorInvalidPhoneNumber
+  );
+
   expect(inputNo.value).toBe(validNoEmployee);
   expect(inputFirstName.value).toBe(validFirstName);
   expect(inputPhoneNumber.value).toBe(invalidPhoneNumber);
   expect(inputInitialPassword.value).toBe(validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
+  expect(errorMessage).toBeInTheDocument();
+  expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+});
 
-  expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
+test("Invalid initial password regex should show error", async () => {
+  const {
+    form,
+    inputNo,
+    inputFirstName,
+    inputName,
+    inputPhoneNumber,
+    inputInitialPassword,
+  } = getFields();
+
+  await user.type(inputNo, validNoEmployee);
+  await user.type(inputFirstName, validFirstName);
+  await user.type(inputName, validName);
+  await user.type(inputPhoneNumber, validPhoneNumber);
+  await user.type(inputInitialPassword, invalidPassword);
+
+  fireEvent.submit(form);
+
+  const errorMessage = await findByText(
+    app.rootElement,
+    constants.errorInvalidInitialPassword
+  );
+
+  expect(inputNo.value).toBe(validNoEmployee);
+  expect(inputFirstName.value).toBe(validFirstName);
+  expect(inputPhoneNumber.value).toBe(validPhoneNumber);
+  expect(inputInitialPassword.value).toBe(invalidPassword);
+  expect(form.classList.contains("was-validated")).toBeTruthy();
+  expect(errorMessage).toBeInTheDocument();
+  expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
 });
 
 test("Valid employee number and password should submit form", async () => {
-  await user.click(document.querySelector("a[href='/employees']"));
-  await user.click(document.querySelector("a[href='/add-employee']"));
-
   const {
     form,
     inputNo,
@@ -314,7 +365,6 @@ test("Valid employee number and password should submit form", async () => {
   expect(inputFirstName.value).toBe(validFirstName);
   expect(inputPhoneNumber.value).toBe(validPhoneNumber);
   expect(inputInitialPassword.value).toBe(validPassword);
-  expect(inputRole.value).toBe(inputRole.firstChild.textContent);
   expect(form.classList.contains("was-validated")).toBeTruthy();
 
   expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
