@@ -2,6 +2,7 @@ import {Logger} from "../Logger";
 import {Config} from "../config/Config";
 import { Buffer } from "buffer";
 import * as sodium from 'sodium-universal';
+import * as crypto from "crypto";
 
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';

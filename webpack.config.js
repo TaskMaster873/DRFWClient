@@ -11,6 +11,18 @@ module.exports = {
     mode: process.env.NODE_ENV || "development",
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
+        fallback: {
+            "fs": false,
+            "tls": false,
+            "net": false,
+            "path": false,
+            "zlib": false,
+            "http": false,
+            "https": false,
+            "stream": false,
+            "crypto": false,
+            "crypto-browserify": require.resolve('crypto-browserify'),
+        }
     },
     devServer: { static: path.join(__dirname, "src") },
     module: {
