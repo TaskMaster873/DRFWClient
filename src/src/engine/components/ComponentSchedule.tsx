@@ -3,7 +3,7 @@ import { EmployeeList, Employee } from "../types/Employee";
 import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 import { ResourceGroups } from "./ComponentFilterProjects";
 import { ScheduleGroups, ScheduleResource } from "../types/Schedule";
-
+import "./ComponentPopupSchedule";
 /**
  * Ceci est le composant d'horaire
  */
@@ -25,17 +25,9 @@ export class ComponentSchedule extends React.Component {
       viewType: "Resources",
       showNonBusiness: false,
       startDate: DayPilot.Date.today(),
-      columns: this.doColumns() /*[
-                { name: "Room 1", id: "R1" },
-                { name: "Room 2", id: "R2" },
-                { name: "Room 3", id: "R3" },
-                { name: "Room 4", id: "R4" },
-                { name: "Room 5", id: "R5" },
-                { name: "Room 6", id: "R6" },
-                { name: "Room 7", id: "R7" },
-            ],*/,
+      columns: this.doColumns(),
       events: this.doEvents(),
-      onHeaderClick: async (args: {
+      /*onHeaderClick: async (args: {
         column: { name: any; data: { name: any } };
       }) => {
         const modal = await DayPilot.Modal.prompt(
@@ -46,8 +38,21 @@ export class ComponentSchedule extends React.Component {
           return;
         }
         args.column.data.name = modal.result;
-        /* this.calendar.update(); */
-      },
+      },*/
+      onTimeRangeSelected: function (args) {
+        var name = prompt("New event name:", "Event");
+        DayPilot.clearSelection();
+        if (!name) return;
+        var e = new DayPilot.Event({
+            start: args.start,
+            end: args.end,
+            id: DayPilot.guid(),
+            resource: args.resource,
+            text: name
+        });
+        DayPilot.events.add(e);
+        DayPilot.message("Created");
+    },
     };
   }
 
@@ -55,7 +60,23 @@ export class ComponentSchedule extends React.Component {
     return this.calendarRef.current.control;
   } */
 
-  private loadCalendarData() {}
+  onTimeRangeSelected = function (args: { start: any; end: any; resource: any; }) {
+    var name = prompt("New event name:", "Event");
+    DayPilot.clearSelection();
+    if (!name) return;
+    var e = new DayPilot.Event({
+      start: args.start,
+      end: args.end,
+      id: DayPilot.guid(),
+      resource: args.resource,
+      text: name
+    });
+    DayPilot.events.add(e);
+    DayPilot.message("Created");
+  }
+
+
+  private loadCalendarData() { }
 
   /**
    *
@@ -71,7 +92,6 @@ export class ComponentSchedule extends React.Component {
         id: this.list[index].no.toString(),
       });
     }
-    //this.setState({ columns: listToReturn })
     return listToReturn;
   }
 
@@ -93,26 +113,10 @@ export class ComponentSchedule extends React.Component {
       resource: "1",
       barColor: "#0C2840",
     });
-    //this.setState({ events: listToReturn })
     return listToReturn;
   }
 
-  componentDidMount() {
-    this.datePicker = new DayPilot.DatePicker({
-      target: this.dateRef.current,
-      pattern: "MMMM dd, yyyy",
-      date: "2022-09-07",
-      onTimeRangeSelected: (args: { start: any }) => {
-        this.setState({
-          startDate: args.start,
-        });
-      },
-    });
-  }
-
-  private changeDate() {
-    this.datePicker.show();
-  }
+  componentDidMount() { }
 
   loadGroups() {
     let data: ScheduleGroups = {
@@ -168,15 +172,14 @@ export class ComponentSchedule extends React.Component {
       {
         id: 1,
         text: "Event 1",
-        start: "2022-11-07T10:30:00",
-        end: "2022-11-07T13:00:00",
+        start: DayPilot.Date.today(),
+        end: "2023-02-01T13:00:00",
         barColor: "#fcb711",
         resource: "R1",
       },
       // ...
     ];
     this.setState({ columns: columns, events: events });
-    /* this.calendar.update({ columns, events }); */
   }
 
   public render(): JSX.Element {
@@ -184,10 +187,6 @@ export class ComponentSchedule extends React.Component {
       return <div> Il n'y a pas d'horaire à voir</div>;
     } else
       return (
-        // <div>
-        //    <div className="toolbar">
-        //       <span ref={this.dateRef}></span> <button onClick={ev => this.changeDate()}>Change date</button>
-        //   </div>
         <div>
           <ResourceGroups
             {...{
@@ -196,10 +195,8 @@ export class ComponentSchedule extends React.Component {
               groups: this.loadGroups().groups,
             }}
           ></ResourceGroups>
-          <DayPilotCalendar {...this.state} /* ref={this.calendarRef} */ />
+          <DayPilotCalendar {...this.state} />
         </div>
-
-        // </div>
       );
   }
 }
