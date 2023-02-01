@@ -30,7 +30,7 @@ export class ComponentHomePage extends React.Component {
                     <LinkContainer to="/login">
                         <Button
                             data-testid="submitLogin"
-                            className="mt-4"
+                            className="mt-4 btn-dark"
                             variant="primary"
                             size="lg"
                             type="submit"
