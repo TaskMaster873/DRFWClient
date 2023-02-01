@@ -3,8 +3,6 @@ import {Config} from "../config/Config";
 import { Buffer } from "buffer";
 import * as sodium from 'sodium-universal';
 
-import * as TextEncoder from 'text-encoding';
-
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';
     public logColor: string = `#1af69a`;
@@ -206,7 +204,7 @@ export class Encryptem extends Logger {
     }
 
     private async generateSHA256(str: string) : Promise<string> {
-        const buffer = new TextEncoder().encode(str);
+        const buffer = Buffer.from(str);
 
         let hash = await crypto.subtle.digest('SHA-256', buffer);
         let result = '';
