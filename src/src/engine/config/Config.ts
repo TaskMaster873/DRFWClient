@@ -13,6 +13,10 @@ class Configuration {
         localStorage.removeItem('authKey');
     }
 
+    public loginWithPassword(username: string, password: string) : void {
+        throw new Error("Not implemented.");
+    }
+
     get authKey() : Buffer {
         let authKey = localStorage.getItem('authKey');
 

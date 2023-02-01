@@ -30,9 +30,15 @@ export class WebsocketManager extends Logger {
 
     private encryptionStarted: boolean = false;
 
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor
     constructor() {
         super();
+
+        Config.loginWithPassword = this.loginWithPassword.bind(this);
+    }
+
+    private async loginWithPassword(username: string, password: string) : Promise<void> {
+        await this.encryptem.generateClientCipherKeyPair(password);
+        await this.sendAuthPacket(username);
     }
 
     get isSecure() : boolean {
@@ -206,8 +212,8 @@ export class WebsocketManager extends Logger {
         }
     }
 
-    private async sendAuthPacket() : Promise<void> {
-        let authPacket = await this.packetBuilder.buildAuthenticationPacket();
+    private async sendAuthPacket(username?: string) : Promise<void> {
+        let authPacket = await this.packetBuilder.buildAuthenticationPacket(username);
 
         if(authPacket !== null && authPacket) {
             await this.sendMsg(authPacket);
@@ -262,6 +268,8 @@ export class WebsocketManager extends Logger {
         // @ts-ignore
         this.ws = null;
         setTimeout(this.connectToAPI.bind(this), 1500);
+
+        this.encryptem.reset();
     }
 
     private async connect() : Promise<void> {
