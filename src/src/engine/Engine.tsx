@@ -1,10 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes, useParams} from "react-router-dom";
 
 import "../deps/css/Engine.css";
 import "../deps/css/index.css";
 
-import { Index } from "./pages/index";
+import { Index } from "./pages";
 import { Schedule } from "./pages/schedule";
 import { Employees } from "./pages/employees";
 import { About } from "./pages/about";
@@ -15,6 +15,14 @@ import { NavigationBar } from "./components/NavigationBar";
 import { ChangePassword } from "./pages/changePassword";
 import { FooterBar } from "./components/FooterBar";
 import { Departements } from "./pages/departements";
+
+
+function EmployeeWrapper() : any {
+  let params : any = useParams();
+  return (
+      <Employees  params={...params}/>
+  );
+}
 
 export class Engine extends React.Component {
   public render(): JSX.Element {
@@ -27,7 +35,7 @@ export class Engine extends React.Component {
               <Route path="/" element={<Index />} />
               <Route path="/schedule" element={<Schedule />} />
               <Route path="/departements" element={<Departements />} />
-              <Route path="/employees/:id" element={<Employees />} />
+              <Route path="/employees/:id" element={<EmployeeWrapper />} />
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/memes" element={<Memes />} />

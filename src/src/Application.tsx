@@ -44,7 +44,7 @@ export class Application extends Logger {
   private isNode() {
     let isNode = false;
     try {
-      isNode = process != undefined;
+      isNode = process !== undefined;
     } catch (e) {}
     return isNode;
   }
