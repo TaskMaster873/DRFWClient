@@ -1,5 +1,6 @@
 import React from "react";
 import { Container } from "react-bootstrap";
+import { ComponentAbout } from "../components/ComponentAbout";
 import { Logger } from "../Logger";
 
 /**
@@ -13,6 +14,6 @@ export class About extends React.Component {
   }
 
   public render(): JSX.Element {
-    return <Container>About Page</Container>;
+    return  <ComponentAbout></ComponentAbout>;
   }
 }
