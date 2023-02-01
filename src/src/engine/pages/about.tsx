@@ -1,6 +1,6 @@
 import React from "react";
 import { Container } from "react-bootstrap";
-import { ComponentAbout } from "../components/ComponentHomePage";
+import { ComponentAbout } from "../components/ComponentAbout";
 import { Logger } from "../Logger";
 
 /**

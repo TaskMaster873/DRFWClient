@@ -1,6 +1,6 @@
 import React from "react";
 import { Container } from "react-bootstrap";
-import { ComponentAbout } from "../components/ComponentHomePage";
+import { ComponentHomePage } from "../components/ComponentHomePage";
 import { Logger } from "../Logger";
 
 export class Index extends React.Component {
@@ -13,7 +13,7 @@ export class Index extends React.Component {
   public render(): JSX.Element {
     return (
         <div>
-          <ComponentAbout></ComponentAbout>
+          <ComponentHomePage></ComponentHomePage>
         </div>
     );
   }

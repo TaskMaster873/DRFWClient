@@ -10,7 +10,7 @@ import Button from "react-bootstrap/Button";
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
 
-export class ComponentHomePage extends React.Component {
+export class ComponentAbout extends React.Component {
     private logger: Logger = new Logger(`ComponentAddEmployee`, `#20f6a4`, false);
     private isLoggedIn: boolean = false;
 
@@ -25,21 +25,16 @@ export class ComponentHomePage extends React.Component {
                     width={200}
                     height={240}
                 /></Container>
-                <Container className="text-left mt-4 mb-4">TaskMaster est un gestionnaire d'horaire pour entreprise. En tant qu'application web, TaskMaster est accessible partout et permet à une entreprise de mieux gérer ses effectifs.</Container>
-                <div className="me-4 mt-4 d-block text-center justify-content-center mx-auto">
-                    <LinkContainer to="/login">
-                        <Button
-                            data-testid="submitLogin"
-                            className="mt-4"
-                            variant="primary"
-                            size="lg"
-                            type="submit"
-                            value="Submit"
-                        >
-                            Connexion
-                        </Button>
-                    </LinkContainer>
-                </div>
+                <Container className="justify-content-left mt-4 mb-4">
+                    <div className="me-4 mt-6 d-block  mx-auto">
+                        <h2 className="text-left"> Auteurs</h2>
+                        <p className="text-left">David Lawton - Programmeur </p>
+                        <p className="text-left">Romin Martignat - Programmeur</p>
+                        <p className="text-left">Félix-Antoine Belleau - Programmeur</p>
+                        <p className="text-left">William Blanchet Lafernière - Programmeur</p>
+                        <p className="text-left">Benjamin Lemelin - Professeur en informatique</p>
+                    </div>
+                </Container>
             </div>
         );
     }
