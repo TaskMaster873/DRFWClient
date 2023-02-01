@@ -41,3 +41,7 @@ export interface EmployeeCreateDTO {
     readonly jobTitles: string[];
 }
 
+export interface EmployeeProps {
+    params : any;
+}
+

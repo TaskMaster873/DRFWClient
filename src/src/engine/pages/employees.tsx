@@ -2,11 +2,7 @@ import React from "react";
 import { Container } from "react-bootstrap";
 import { ComponentEmployeeList } from "../components/ComponentEmployeeList";
 import { Logger } from "../Logger";
-import { EmployeeList, Employee } from "../types/Employee";
-
-interface EmployeeProps {
-  params : any;
-}
+import { EmployeeList, Employee, EmployeeProps } from "../types/Employee";
 
 /**
  * Ceci est la page pour les employés
@@ -42,7 +38,6 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
 
   public componentDidMount() {
     document.title = "Employés - TaskMaster";
-    //console.log(this.props.match.params.id);
   }
 
   /**
