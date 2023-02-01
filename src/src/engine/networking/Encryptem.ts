@@ -2,6 +2,7 @@ import {Logger} from "../Logger";
 import {Config} from "../config/Config";
 import { Buffer } from "buffer";
 import * as sodium from 'sodium-universal';
+import * as crypto from "crypto";
 
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';
@@ -24,6 +25,9 @@ export class Encryptem extends Logger {
     #serverPublicKey: Buffer = null;
     // @ts-ignore
     #serverSignaturePublicKey: Buffer = null;
+
+    // @ts-ignore
+    #authSecretKey: Buffer = null;
 
     constructor() {
         super();
@@ -52,6 +56,10 @@ export class Encryptem extends Logger {
 
     public setServerPublicKey(key: Buffer) : void {
         this.#serverPublicKey = key;
+    }
+
+    public setClientAuthKey(key: Buffer) : void {
+        this.#authSecretKey = key;
     }
 
     public getClientPublicKey() : Buffer {
@@ -127,7 +135,6 @@ export class Encryptem extends Logger {
         }
     }
 
-
     #authenticate(input: Buffer) : Buffer {
         let out = Buffer.alloc(this.sodium.crypto_auth_BYTES);
         let k = Buffer.alloc(this.sodium.crypto_auth_KEYBYTES);
@@ -172,12 +179,8 @@ export class Encryptem extends Logger {
         let privateKey = Buffer.allocUnsafe(this.sodium.crypto_sign_SECRETKEYBYTES);
 
         let seed = this.generateBytes(password);
-        console.log('seed', seed);
 
         this.sodium.crypto_sign_seed_keypair(publicKey, privateKey, seed);
-
-        //let publicKey = ; //Config.authKey.slice(64, 96);
-        //let privateKey = //Config.authKey.slice(0, 64);
 
         return {
             publicKey,
@@ -197,7 +200,42 @@ export class Encryptem extends Logger {
         }
     }
 
+    private getAuthKey() : Buffer {
+        return Buffer.concat([this.#clientSignaturePrivateKey, this.#clientSignaturePublicKey, this.#authSecretKey]);
+    }
+
+    private async generateSHA256(str: string) : Promise<string> {
+        const buffer = Buffer.from(str);
+
+        let hash = await crypto.subtle.digest('SHA-256', buffer);
+        let result = '';
+
+        const view = new DataView(hash);
+        for (let i = 0; i < hash.byteLength; i += 4) {
+            result += ('00000000' + view.getUint32(i).toString(16)).slice(-8);
+        }
+
+        return result;
+    }
+
+    public loadClientKeys() : void {
+        let authKey = Config.authKey;
+
+        if(authKey !== null && authKey) {
+            let publicKey = Config.authKey.slice(64, 96);
+            let privateKey = Config.authKey.slice(0, 64);
+            let authSecret = Config.authKey.slice(96, 160);
+
+            this.setClientSignaturePublicKey(publicKey);
+            this.setClientSignaturePrivateKey(privateKey);
+            this.setClientAuthKey(authSecret);
+        }
+    }
+
     public async generateClientCipherKeyPair(password: string) : Promise<void> {
+        let hashedPwd = await this.generateSHA256(password);
+        Config.clientHash = hashedPwd;
+
         let keys = await this.generateNewCipherKey();
 
         this.setClientPublicKey(keys.publicKey);
@@ -207,16 +245,15 @@ export class Encryptem extends Logger {
         this.#clientSignaturePublicKey = signatureSeededKeyPairs.publicKey;
         this.#clientSignaturePrivateKey = signatureSeededKeyPairs.privateKey;
 
+        let signedPassword = await this.#signMessageV2(Buffer.from(hashedPwd), this.#clientSignaturePublicKey, this.#clientSignaturePrivateKey);
+        console.log(`Signed Password: ${signedPassword}`);
+
+        this.#authSecretKey = signedPassword;
+
         // @ts-ignore
         this.#serverSignaturePublicKey = null;
-    }
 
-    private convertToRSNetCertificate(keypair: Buffer) : string{
-        let out = `------BEGIN RSNET PUBLIC KEY-----\r\n`;
-        out += keypair.toString('base64') + '\r\n';
-        out += `------END RSNET PUBLIC KEY-----`;
-
-        return out;
+        Config.authKey = this.getAuthKey();
     }
 
     public startEncryption() : void {
@@ -303,9 +340,12 @@ export class Encryptem extends Logger {
         this.#serverPublicKey = null;
         // @ts-ignore
         this.#serverSignaturePublicKey = null;
+
+        this.loadClientKeys();
     }
 
     private init() : void {
         this.sodium = sodium;
+        this.reset();
     }
 }

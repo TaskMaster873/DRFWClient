@@ -37,8 +37,10 @@ export class WebsocketManager extends Logger {
     }
 
     private async loginWithPassword(username: string, password: string) : Promise<void> {
+        Config.clientId = username;
+
         await this.encryptem.generateClientCipherKeyPair(password);
-        await this.sendAuthPacket(username);
+        await this.sendAuthPacket();
     }
 
     get isSecure() : boolean {
@@ -119,12 +121,12 @@ export class WebsocketManager extends Logger {
                 }
             } else {
                 let message = authStatus.message;
-                this.error(`Failed to authenticate with RSNet -> ${message}`);
+                this.error(`Failed to authenticate -> ${message}`);
 
                 ServiceNotification.notifyClientError(`Failed to authenticate. ${authStatus.message}`);
+                await Config.resetAuthKey();
 
                 setTimeout(async () => {
-                    await Config.resetAuthKey();
                     await this.closeWs();
                 }, 6000);
             }
@@ -212,8 +214,8 @@ export class WebsocketManager extends Logger {
         }
     }
 
-    private async sendAuthPacket(username?: string) : Promise<void> {
-        let authPacket = await this.packetBuilder.buildAuthenticationPacket(username);
+    private async sendAuthPacket() : Promise<void> {
+        let authPacket = await this.packetBuilder.buildAuthenticationPacket();
 
         if(authPacket !== null && authPacket) {
             await this.sendMsg(authPacket);
