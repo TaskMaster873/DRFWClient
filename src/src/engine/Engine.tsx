@@ -18,9 +18,9 @@ import { Departements } from "./pages/departements";
 
 
 function EmployeeWrapper() : any {
-  let params : any = useParams();
+  let parameters : any = useParams();
   return (
-      <Employees  params={...params}/>
+      <Employees  {...{params: parameters}}/>
   );
 }
 

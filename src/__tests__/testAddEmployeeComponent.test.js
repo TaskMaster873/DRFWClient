@@ -2,48 +2,21 @@
  * @jest-environment jsdom
  */
 
-import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 
-import MatchMediaMock from "jest-matchmedia-mock";
-import { act } from "react-dom/test-utils";
-import { cleanup, fireEvent } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
 import testConstants from "../Constants/testConstants";
+import {beforeEachTests} from "../test_setup_files/setup"
+import {user} from "../test_setup_files/setup"
 
-let matchMedia;
-let user;
+global.window.URL.createObjectURL = jest.fn();
 
-let app;
 beforeEach(async () => {
-  user = userEvent.setup();
+  await beforeEachTests();
 
-  if (matchMedia) {
-    await matchMedia.clear();
-  }
-
-  cleanup();
-
-  if (app !== null && app) {
-    act(() => {
-      app.unmount();
-    });
-
-    document.body.innerHTML = "";
-    app = null;
-  }
-
-  matchMedia = new MatchMediaMock();
-
-  act(() => {
-    const { Application } = require("../src/Application");
-
-    app = new Application();
-    app.start();
-
-    document.dispatchEvent(new Event("visibilitychange"));
-  });
-  await user.click(document.querySelector("a[href='/employees']"));
+  await user.click(document.querySelector("a[href='/departements']"));
+  await user.click(document.querySelector("a[class='employeeNameBtn']"));
   await user.click(document.querySelector("a[href='/add-employee']"));
 });
 

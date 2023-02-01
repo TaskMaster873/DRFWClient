@@ -2,53 +2,15 @@
  * @jest-environment jsdom
  */
 
+import {beforeEachTests, user} from "../test_setup_files/setup";
 import "@testing-library/react/dist/fire-event";
-import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-
-import MatchMediaMock from "jest-matchmedia-mock";
-import { act } from "react-dom/test-utils";
-import { cleanup, fireEvent } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
 import testConstants from "../Constants/testConstants";
 
-global.console = {
-  ...console,
-  log: jest.fn(),
-  error: jest.fn(),
-};
-
-let matchMedia;
-let user;
-
-let app;
 beforeEach(async () => {
-  user = userEvent.setup();
-  if (matchMedia) {
-    await matchMedia.clear();
-  }
-
-  cleanup();
-
-  if (app !== null && app) {
-    act(() => {
-      app.unmount();
-    });
-
-    document.body.innerHTML = "";
-    app = null;
-  }
-
-  matchMedia = new MatchMediaMock();
-
-  act(() => {
-    const { Application } = require("../src/Application");
-
-    app = new Application();
-    app.start();
-
-    document.dispatchEvent(new Event("visibilitychange"));
-  });
+  await beforeEachTests();
   await user.click(document.querySelector("a[href='/login']"));
 });
 

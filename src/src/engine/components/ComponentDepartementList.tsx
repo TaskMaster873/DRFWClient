@@ -29,6 +29,7 @@ export class ComponentDepartementList extends React.Component {
                 <td key={"no" + index}>{index}</td>
                 <td key={"name " + index}>
                   <a
+                      className={"employeeNameBtn"}
                     href={"/employees/" + this.list[index].name}
                     style={{ textDecoration: "none" }}
                   >
