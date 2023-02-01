@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 
 class Configuration {
     readonly connectionURIRemote: string = '';
@@ -9,12 +10,17 @@ class Configuration {
     readonly apiPath: string = 'api/v1';
     readonly schemaAPIPath: string = `/schema`;
 
-    async resetAuthKey() {
+    public resetAuthKey() {
         localStorage.removeItem('authKey');
     }
 
     public loginWithPassword(username: string, password: string) : void {
         throw new Error("Not implemented.");
+    }
+
+    set authKey(authKey: Buffer) {
+        console.log('set auth key', authKey);
+        localStorage.setItem('authKey', authKey.toString('base64'));
     }
 
     get authKey() : Buffer {

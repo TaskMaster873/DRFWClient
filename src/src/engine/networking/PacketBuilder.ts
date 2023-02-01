@@ -131,6 +131,7 @@ export class PacketBuilder extends Logger {
     public async buildAuthenticationPacket(username?: string) : Promise<Uint8Array> {
         let packet: Uint8Array;
 
+        console.log(Config.authKey);
         if(Config.authKey !== null && Config.authKey) {
             this.log(`Authenticating with auth key.`);
 

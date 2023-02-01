@@ -119,12 +119,12 @@ export class WebsocketManager extends Logger {
                 }
             } else {
                 let message = authStatus.message;
-                this.error(`Failed to authenticate with RSNet -> ${message}`);
+                this.error(`Failed to authenticate -> ${message}`);
 
                 ServiceNotification.notifyClientError(`Failed to authenticate. ${authStatus.message}`);
+                await Config.resetAuthKey();
 
                 setTimeout(async () => {
-                    await Config.resetAuthKey();
                     await this.closeWs();
                 }, 6000);
             }

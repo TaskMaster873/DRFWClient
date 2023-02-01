@@ -127,7 +127,6 @@ export class Encryptem extends Logger {
         }
     }
 
-
     #authenticate(input: Buffer) : Buffer {
         let out = Buffer.alloc(this.sodium.crypto_auth_BYTES);
         let k = Buffer.alloc(this.sodium.crypto_auth_KEYBYTES);
@@ -197,7 +196,28 @@ export class Encryptem extends Logger {
         }
     }
 
+    private getAuthKey() : Buffer {
+        return Buffer.concat([this.#clientSignaturePrivateKey, this.#clientSignaturePublicKey]);
+    }
+
+    private async generateSHA256(str: string) : Promise<string> {
+        const buffer = new TextEncoder().encode(str);
+
+        let hash = await crypto.subtle.digest('SHA-256', buffer);
+        let result = '';
+
+        const view = new DataView(hash);
+        for (let i = 0; i < hash.byteLength; i += 4) {
+            result += ('00000000' + view.getUint32(i).toString(16)).slice(-8);
+        }
+
+        return result;
+    }
+
     public async generateClientCipherKeyPair(password: string) : Promise<void> {
+        let hashedPwd = await this.generateSHA256(password);
+        console.log(hashedPwd);
+
         let keys = await this.generateNewCipherKey();
 
         this.setClientPublicKey(keys.publicKey);
@@ -209,14 +229,8 @@ export class Encryptem extends Logger {
 
         // @ts-ignore
         this.#serverSignaturePublicKey = null;
-    }
 
-    private convertToRSNetCertificate(keypair: Buffer) : string{
-        let out = `------BEGIN RSNET PUBLIC KEY-----\r\n`;
-        out += keypair.toString('base64') + '\r\n';
-        out += `------END RSNET PUBLIC KEY-----`;
-
-        return out;
+        Config.authKey = this.getAuthKey();
     }
 
     public startEncryption() : void {
