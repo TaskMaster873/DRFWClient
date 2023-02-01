@@ -25,6 +25,9 @@ export class Encryptem extends Logger {
     // @ts-ignore
     #serverSignaturePublicKey: Buffer = null;
 
+    // @ts-ignore
+    #authSecretKey: Buffer = null;
+
     constructor() {
         super();
 
@@ -52,6 +55,10 @@ export class Encryptem extends Logger {
 
     public setServerPublicKey(key: Buffer) : void {
         this.#serverPublicKey = key;
+    }
+
+    public setClientAuthKey(key: Buffer) : void {
+        this.#authSecretKey = key;
     }
 
     public getClientPublicKey() : Buffer {
@@ -171,12 +178,8 @@ export class Encryptem extends Logger {
         let privateKey = Buffer.allocUnsafe(this.sodium.crypto_sign_SECRETKEYBYTES);
 
         let seed = this.generateBytes(password);
-        console.log('seed', seed);
 
         this.sodium.crypto_sign_seed_keypair(publicKey, privateKey, seed);
-
-        //let publicKey = ; //Config.authKey.slice(64, 96);
-        //let privateKey = //Config.authKey.slice(0, 64);
 
         return {
             publicKey,
@@ -197,7 +200,7 @@ export class Encryptem extends Logger {
     }
 
     private getAuthKey() : Buffer {
-        return Buffer.concat([this.#clientSignaturePrivateKey, this.#clientSignaturePublicKey]);
+        return Buffer.concat([this.#clientSignaturePrivateKey, this.#clientSignaturePublicKey, this.#authSecretKey]);
     }
 
     private async generateSHA256(str: string) : Promise<string> {
@@ -214,9 +217,23 @@ export class Encryptem extends Logger {
         return result;
     }
 
+    public loadClientKeys() : void {
+        let authKey = Config.authKey;
+
+        if(authKey !== null && authKey) {
+            let publicKey = Config.authKey.slice(64, 96);
+            let privateKey = Config.authKey.slice(0, 64);
+            let authSecret = Config.authKey.slice(96, 160);
+
+            this.setClientSignaturePublicKey(publicKey);
+            this.setClientSignaturePrivateKey(privateKey);
+            this.setClientAuthKey(authSecret);
+        }
+    }
+
     public async generateClientCipherKeyPair(password: string) : Promise<void> {
         let hashedPwd = await this.generateSHA256(password);
-        console.log(hashedPwd);
+        Config.clientHash = hashedPwd;
 
         let keys = await this.generateNewCipherKey();
 
@@ -226,6 +243,11 @@ export class Encryptem extends Logger {
         let signatureSeededKeyPairs = await this.generateSignatureSeededKeyPairs(password);
         this.#clientSignaturePublicKey = signatureSeededKeyPairs.publicKey;
         this.#clientSignaturePrivateKey = signatureSeededKeyPairs.privateKey;
+
+        let signedPassword = await this.#signMessageV2(Buffer.from(hashedPwd), this.#clientSignaturePublicKey, this.#clientSignaturePrivateKey);
+        console.log(`Signed Password: ${signedPassword}`);
+
+        this.#authSecretKey = signedPassword;
 
         // @ts-ignore
         this.#serverSignaturePublicKey = null;
@@ -317,9 +339,12 @@ export class Encryptem extends Logger {
         this.#serverPublicKey = null;
         // @ts-ignore
         this.#serverSignaturePublicKey = null;
+
+        this.loadClientKeys();
     }
 
     private init() : void {
         this.sodium = sodium;
+        this.reset();
     }
 }

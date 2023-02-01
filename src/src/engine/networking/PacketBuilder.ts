@@ -109,15 +109,17 @@ export class PacketBuilder extends Logger {
     }
 
     // AUTHENTICATION
-    private async buildAuthenticationPacketWithClientKey(username?: string) : Promise<Uint8Array> {
+    private async buildAuthenticationPacketWithClientKey() : Promise<Uint8Array> {
         // @ts-ignore
         let packet: Uint8Array = null;
         try {
-            let publicKey = Config.authKey.slice(64, Config.authKey.length);
+            let publicKey = Config.authKey.slice(64, 96);
             let payload: AuthenticationPacketPayload = {
                 readOnly: false,
                 clientAuthCipher: publicKey,
-                clientId: username
+                clientAuthKey: Config.getClientAuthKey,
+                clientHash: Config.clientHash,
+                clientId: Config.clientId
             };
 
             packet = await this.buildAuthPacket(payload);
@@ -128,15 +130,14 @@ export class PacketBuilder extends Logger {
         return packet;
     }
 
-    public async buildAuthenticationPacket(username?: string) : Promise<Uint8Array> {
+    public async buildAuthenticationPacket() : Promise<Uint8Array> {
         let packet: Uint8Array;
 
-        console.log(Config.authKey);
         if(Config.authKey !== null && Config.authKey) {
             this.log(`Authenticating with auth key.`);
 
             // Let's try to authenticate on the first try.
-            packet = await this.buildAuthenticationPacketWithClientKey(username);
+            packet = await this.buildAuthenticationPacketWithClientKey();
         } else {
             this.log(`Generating read-only authentication packet. Auth key is not set.`);
 
