@@ -3,7 +3,7 @@ import {Config} from "../config/Config";
 import { Buffer } from "buffer";
 import * as sodium from 'sodium-universal';
 
-import TextEncoder from 'text-encoding';
+import * as TextEncoder from 'text-encoding';
 
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';
