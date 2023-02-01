@@ -3,6 +3,8 @@ import {Config} from "../config/Config";
 import { Buffer } from "buffer";
 import * as sodium from 'sodium-universal';
 
+import TextEncoder from 'text-encoding';
+
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';
     public logColor: string = `#1af69a`;

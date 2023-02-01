@@ -38,7 +38,7 @@ export class WebsocketManager extends Logger {
 
     private async loginWithPassword(username: string, password: string) : Promise<void> {
         Config.clientId = username;
-        
+
         await this.encryptem.generateClientCipherKeyPair(password);
         await this.sendAuthPacket();
     }
