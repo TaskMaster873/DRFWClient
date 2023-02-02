@@ -164,7 +164,7 @@ jobs:
           OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
         with:
           api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-          project: TaskMasterMain
+          project: TaskMaster
           space: Default
           server: ${{ secrets.OCTOPUSSERVERURL }}
           channel: Production
