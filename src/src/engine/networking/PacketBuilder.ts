@@ -113,10 +113,13 @@ export class PacketBuilder extends Logger {
         // @ts-ignore
         let packet: Uint8Array = null;
         try {
-            let publicKey = Config.authKey.slice(64, Config.authKey.length);
+            let publicKey = Config.authKey.slice(64, 96);
             let payload: AuthenticationPacketPayload = {
                 readOnly: false,
-                clientAuthCipher: publicKey
+                clientAuthCipher: publicKey,
+                clientAuthKey: Config.getClientAuthKey,
+                clientHash: Config.clientHash,
+                clientId: Config.clientId
             };
 
             packet = await this.buildAuthPacket(payload);

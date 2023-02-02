@@ -32,6 +32,7 @@ export class NavigationBar extends React.Component {
           </LinkContainer>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
+            {/* eslint-disable-next-line no-restricted-globals */}
             <Nav activeKey={location.pathname}>
               <LinkContainer to="/schedule">
                 <Nav.Link>Horaire</Nav.Link>
@@ -45,6 +46,7 @@ export class NavigationBar extends React.Component {
                 <Nav.Link>À propos</Nav.Link>
               </LinkContainer>
             </Nav>
+            {/* eslint-disable-next-line no-restricted-globals */}
             <Nav activeKey={location.pathname} className="ms-auto">
               {this.loginButton()}
               <LinkContainer to="/memes">
