@@ -46,12 +46,8 @@ class Configuration {
 
             if(clientId !== null && clientId) {
                 return clientId;
-            } else {
-                // @ts-ignore
-                return null;
             }
         }
-
         // @ts-ignore
         return null;
     }
@@ -65,9 +61,6 @@ class Configuration {
                 buf = buf.slice(96, 160);
 
                 return buf;
-            } else {
-                // @ts-ignore
-                return null;
             }
         }
 
@@ -81,9 +74,6 @@ class Configuration {
 
             if (clientHash !== null && clientHash) {
                 return clientHash;
-            } else {
-                // @ts-ignore
-                return null;
             }
         }
 
@@ -97,9 +87,6 @@ class Configuration {
 
             if (authKey !== null && authKey) {
                 return Buffer.from(authKey, 'base64');
-            } else {
-                // @ts-ignore
-                return null;
             }
         }
 
