@@ -8,7 +8,6 @@ import { EmployeeList, Employee, EmployeeCreateDTO } from "../types/Employee";
  * Ceci est la page pour les employés
  */
 export class Employees extends React.Component {
-  private logger: Logger = new Logger(`Employees`, `#20f6a4`, false);
   private list: Employee[] = [
     new Employee({
       no: 0,

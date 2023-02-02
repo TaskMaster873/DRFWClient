@@ -10,7 +10,6 @@ import { Container } from "react-bootstrap";
 import Logo from "../../deps/images/logo.png";
 
 export class FooterBar extends React.Component {
-  private logger: Logger = new Logger(`NavigationBar`, `#20f6a4`);
   private isLoggedIn: boolean = false;
 
   /**
@@ -78,7 +77,7 @@ export class FooterBar extends React.Component {
    * Je ne sais pas si il faudrait le garder
    */
   private logOut() {
-    this.logger.log(`Logging out`);
+    console.log(`Logging out`);
   }
 }
 

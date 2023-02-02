@@ -24,3 +24,20 @@ export interface ShiftDTO {
   readonly project: Project;
   readonly employe: Employee;
 }
+
+/**
+ * Event serait les shifts avec toutes les données pour l'afficher dans l'horaire
+ * 
+ */
+export interface EventForCalendar {
+  readonly id: number; //id unique dans le tableau d'horaire
+    text: string; // le nom de l'event
+    start: string;//heure de début
+    end: string; //heure de fin
+    resource: string;//l'id de la personne qui l'a
+    barColor: string; // couleur de la barre
+}
+
+export interface EventForCalendarList {
+  Event: Event[];
+}

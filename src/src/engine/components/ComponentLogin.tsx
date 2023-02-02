@@ -10,7 +10,6 @@ import { LoginFormErrorType } from "../errors/LoginFormErrorType";
 import { Config } from "../config/Config";
 
 export class ComponentLogin extends React.Component {
-    private logger: Logger = new Logger(`ComponentLogin`, `#20f6a4`, false);
     private errorMessage = "";
     public state: {
         id: string;

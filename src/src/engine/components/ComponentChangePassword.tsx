@@ -12,11 +12,6 @@ import { Link } from "react-router-dom";
  * state : no de l'employé , son mot de passe, si c'est valide
  */
 export class ComponentChangePassword extends React.Component {
-  private logger: Logger = new Logger(
-    `ComponentChangePassword`,
-    `#20f6a4`,
-    false
-  );
   private errorMessage = "";
   public state: { no: any; password?: string; validated?: boolean };
 

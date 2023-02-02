@@ -8,7 +8,6 @@ import { RolesList } from "../types/Role";
  * Ceci est la page pour ajouter un employé
  */
 export class AddEmployee extends React.Component {
-  private logger: Logger = new Logger(`AddEmployee`, `#20f6a4`, false);
   private titles: string[] = ["Menuisier", "Plombier"];
   private roles: string[] = ["Employé", "Administrateur"];
 

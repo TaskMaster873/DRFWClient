@@ -8,7 +8,6 @@ import { EmployeeList, Employee } from "../types/Employee";
  * C'est la page qui sert à afficher les horaires
  */
 export class Schedule extends React.Component {
-  private logger: Logger = new Logger(`Schedule`, `#20f6a4`, false);
   private list: Employee[] = [ // ceci est la même liste que dans employeelist page
     new Employee({
       no: 0,

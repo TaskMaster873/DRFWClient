@@ -44,7 +44,7 @@ export class PasswordStrength extends React.Component<
       this.setState({ backgroundColor: "#DB4437" });
     }
   }
-  
+
   render() {
     console.log(this.state);
     return (

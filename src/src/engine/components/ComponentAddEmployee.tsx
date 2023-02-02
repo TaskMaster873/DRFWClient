@@ -13,7 +13,6 @@ import { Logger } from "../Logger";
  * Ceci est le composant pour ajouter les employés
  */
 export class ComponentAddEmployee extends React.Component {
-  private logger: Logger = new Logger(`ComponentAddEmployee`, `#20f6a4`, false);
   private jobTitles: string[] = [];
   private roles: string[] = [];
   private errorMessage = "";

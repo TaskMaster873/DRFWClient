@@ -1,12 +1,12 @@
 import React from "react";
 import { ScheduleGroup } from "../types/Schedule";
 
-export class ResourceGroups extends React.Component {
+export class ResourceGroups extends React.Component<{ groups: ScheduleGroup[], onChange: any }> {
   private selectRef: React.RefObject<HTMLSelectElement>;
   private groups: ScheduleGroup[];
   private onChange: any;
 
-  constructor(props: { groups: ScheduleGroup[]; onChange: any }) {
+  constructor(props: { groups: ScheduleGroup[], onChange: any }) {
     super(props);
     this.groups = props.groups;
     this.onChange = props.onChange;
