@@ -1,6 +1,3 @@
-
-
-
 export interface AuthenticationPacketPayload {
     readOnly: boolean;
     clientAuthCipher?: Uint8Array | Buffer;
