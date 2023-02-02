@@ -55,7 +55,6 @@ export class ComponentAddDepartement extends React.Component {
               required
               type="text"
               placeholder="Nom"
-              value={this.state.name}
             />
             <Form.Control.Feedback type="invalid">
               {constants.errorRequiredDepartementName}

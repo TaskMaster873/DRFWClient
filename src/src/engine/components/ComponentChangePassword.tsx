@@ -1,13 +1,14 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import {FormErrorType} from "../errors/FormErrorType";
+import {Config} from "../config/Config";
+import {constants} from "../../../Constants/Constants";
 
 /* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
-import {FormErrorType} from "../errors/FormErrorType";
-import {Config} from "../config/Config";
-import {constants} from "../../../Constants/Constants";
+
 
 /***
  * Ce composant affiche le formulaire pour changer le mot de passe
@@ -39,34 +40,37 @@ export class ComponentChangePassword extends React.Component {
                     />
                     <h4 className="text-center mt-4 mb-4">Changer de mot de passe</h4>
                 </div>
-                <Form noValidate onSubmit={this.handleSubmit} onChange={this.handleChange} data-error={this.state.error}>
-                    <Form.Label id="oldPassword" className="mt-2">Ancien mot de passe</Form.Label>
-                    <Form.Control
-                        required
-                        id="oldPassword"
-                        className="row mt-1"
-                        type="password"
-                        pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
-                        placeholder="Entrez l'ancien mot de passe"
-                        value={this.state.oldPassword}
-                    />
-                    <Form.Control.Feedback type="invalid" id="invalidOldPassword">
-                        {constants.errorRequiredEmployeeNo}
-                    </Form.Control.Feedback>
-
-                    <Form.Label id="newPassword" className="mt-4">Nouveau mot de passe </Form.Label>
-                    <Form.Control
-                        required
-                        id="newPassword"
-                        className="row mt-1"
-                        type="password"
-                        pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
-                        placeholder="Entrez le nouveau mot de passe"
-                        value={this.state.newPassword}
-                    />
-                    <Form.Control.Feedback type="invalid" id="invalidNewPassword">
-                        {constants.errorRequiredEmployeeNo}
-                    </Form.Control.Feedback>
+                <Form noValidate validated={this.state.validated} onSubmit={this.handleSubmit} onChange={this.handleChange}
+                      data-error={this.state.error}>
+                    <Form.Group>
+                        <Form.Label htmlFor="newPassword" className="mt-2">Ancien mot de passe</Form.Label>
+                        <Form.Control
+                            required
+                            name="newPassword"
+                            id="oldPassword"
+                            className="row mt-1"
+                            type="password"
+                            placeholder="Entrez l'ancien mot de passe"
+                        />
+                        <Form.Control.Feedback type="invalid" id="invalidOldPassword">
+                            {constants.errorRequiredOldPassword}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label htmlFor="newPassword" className="mt-4">Nouveau mot de passe </Form.Label>
+                        <Form.Control
+                            required
+                            name="newPassword"
+                            id="newPassword"
+                            className="row mt-1"
+                            type="password"
+                            pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
+                            placeholder="Entrez le nouveau mot de passe"
+                        />
+                        <Form.Control.Feedback type="invalid" id="invalidNewPassword">
+                            {constants.errorInvalidNewPassword}
+                        </Form.Control.Feedback>
+                    </Form.Group>
                     <Form.Text
                         className="text-muted"
                         id="loginErrorMsg"
@@ -74,7 +78,7 @@ export class ComponentChangePassword extends React.Component {
                     ></Form.Text>
                     <div className="me-4">
                         <Button
-                            id="submitLogin"
+                            id="submitChangePassword"
                             className="mt-4 d-block text-center mx-auto"
                             variant="primary"
                             size="lg"
@@ -92,14 +96,13 @@ export class ComponentChangePassword extends React.Component {
     private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
-
         let errorType = FormErrorType.NO_ERROR;
+
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
+            event.preventDefault();
+            event.stopPropagation();
         }
-
-        event.preventDefault();
-        event.stopPropagation();
 
         this.setState({
             validated: true,
@@ -112,7 +115,7 @@ export class ComponentChangePassword extends React.Component {
         }
     }
 
-    private handleChange(event: React.ChangeEvent<HTMLFormElement>): void  {
+    private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
         const name = target.id;
