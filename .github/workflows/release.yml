@@ -154,7 +154,7 @@ jobs:
           OCTOPUS_SPACE: Default
         with:
           version: ${{ steps.determine_version.outputs.semVer }}
-          packages: TaskMaster
+          packages: TaskMasterMain
           overwrite_mode: OverwriteExisting
       - name: Create Octopus Release
         id: create_release_octopus
