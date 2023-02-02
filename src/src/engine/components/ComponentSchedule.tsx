@@ -48,8 +48,8 @@ export class ComponentSchedule extends React.Component {
 
 	private doEvents(): EventForCalendar[] {
 
-		
-	 
+
+
 		this.listEvent.push({
 			id: 1,
 			text: "Il faut mettre le temps et le titre",
@@ -131,7 +131,8 @@ export class ComponentSchedule extends React.Component {
 		this.setState({ columns: columns, events: events });
 	}
 
-	eventAdd = (args: {event: EventForCalendar}) => {
+	eventAdd = (args: { event: EventForCalendar }) => {
+		console.log(args.event);
 		this.listEvent.push({
 			id: args.event.id,
 			text: args.event.text,
@@ -140,27 +141,28 @@ export class ComponentSchedule extends React.Component {
 			resource: args.event.resource,
 			barColor: args.event.barColor,
 		})
-		this.setState({  events: this.listEvent });
+		this.setState({ events: this.listEvent });
 	}
 
 	onTimeRangeSelected = (args: any) => {
-		var name = prompt("New event name:", "Event");
+		let name = prompt("New event name:", "Event");
+
 		DayPilot.Calendar.clearSelection;
-		console.log(!name);
+		console.log("agrs =",args);
 		if (!name) return;
-		var e = new DayPilot.Event({
+		this.listEvent.push({
+			id: 1,
+			text: args.text,
 			start: args.start,
 			end: args.end,
-			id: DayPilot.guid(),
 			resource: args.resource,
-			text: name
-		});
-		this.eventAdd(e);
-		DayPilot.Calendar.message("Created");
+			barColor: args.barColor,
+		})
+		this.setState({events: this.listEvent});
 	}
 
-	
-	
+
+
 	onChange = (args: { selected: { resources: ResourceGroups } }) => {
 		this.groupChanged(args.selected);
 	};
