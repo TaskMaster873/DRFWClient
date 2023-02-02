@@ -23,6 +23,10 @@ class Configuration {
         throw new Error("Not implemented.");
     }
 
+    public changePassword(oldPassword: string, newPassword: string) : void {
+        throw new Error("Not implemented.");
+    }
+
     private isNode() {
         let isNode = false;
         try {

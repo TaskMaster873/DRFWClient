@@ -5,6 +5,7 @@ import { ResourceGroups } from "./ComponentFilterProjects";
 import { ScheduleGroups, ScheduleResource } from "../types/Schedule";
 import "./ComponentPopupSchedule";
 import { EventForCalendar } from "../types/Shift";
+import { Example } from "./ComponentPopupSchedule";
 /**
  * Ceci est le composant d'horaire
  */
@@ -110,11 +111,17 @@ export class ComponentSchedule extends React.Component {
 		return data;
 	}
 
+
 	private returnEmployeeForTheGoodGroup() {
 
 	}
 
-	private groupChanged(group: { resources: ResourceGroups }) {
+
+	/**
+	 * 
+	 * @param group étant le projet qu'on veut montrer ses employés assigné
+	 */
+	private groupChanged(group: { resources: ResourceGroups }): void {
 		const columns = group.resources;
 
 		const events = [
@@ -130,7 +137,10 @@ export class ComponentSchedule extends React.Component {
 		];
 		this.setState({ columns: columns, events: events });
 	}
-
+	/**
+	 * 
+	 * @param args est le nouvel horaire à ajouter avec tout les paramètres.
+	 */
 	eventAdd = (args: { event: EventForCalendar }) => {
 		console.log(args.event);
 		this.listEvent.push({
@@ -143,26 +153,33 @@ export class ComponentSchedule extends React.Component {
 		})
 		this.setState({ events: this.listEvent });
 	}
-
+	/**
+	 * 
+	 * @param args c'est toutes les données de l'évènement
+	 * @returns rien
+	 */
 	onTimeRangeSelected = (args: any) => {
 		let name = prompt("New event name:", "Event");
-
 		DayPilot.Calendar.clearSelection;
-		console.log("agrs =",args);
+		console.log("agrs =", args);
 		if (!name) return;
 		this.listEvent.push({
 			id: 1,
-			text: args.text,
+			text: args.start.toString("  dd MMMM yyyy ", "fr-fr") + " " + args.start.toString("hh") + "h" + args.start.toString("mm") + "-" + args.end.toString("hh") + "h" + args.end.toString("mm") + " " + name ,
 			start: args.start,
 			end: args.end,
 			resource: args.resource,
 			barColor: args.barColor,
 		})
-		this.setState({events: this.listEvent});
+		this.setState({ events: this.listEvent });
 	}
 
 
-
+	/**
+	 * 
+	 * @param args le groupe sélectionné
+	 * la fonction change le groupe qui est affiché
+	 */
 	onChange = (args: { selected: { resources: ResourceGroups } }) => {
 		this.groupChanged(args.selected);
 	};
@@ -184,6 +201,7 @@ export class ComponentSchedule extends React.Component {
 						viewType={"Resources"}
 						showNonBusiness={false}
 						onTimeRangeSelected={this.onTimeRangeSelected}
+						eventDeleteHandling = {"Update"}
 						{...this.state}
 					/>
 				</div>

@@ -34,7 +34,7 @@ describe('Test TaskMaster Client Configurations', () => {
     });
 
     test('Render app without crashing', async () => {
-        const { Application } = require('../src/Application')
+        const {Application} = require('../src/Application')
 
         let app = new Application();
         app.start();
