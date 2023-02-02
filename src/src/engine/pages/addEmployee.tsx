@@ -1,7 +1,5 @@
 import React from "react";
-import { Container } from "react-bootstrap";
 import { ComponentAddEmployee } from "../components/ComponentAddEmployee";
-import { Logger } from "../Logger";
 import { RolesList } from "../types/Role";
 
 /**
@@ -15,17 +13,15 @@ export class AddEmployee extends React.Component {
     document.title = "Ajouter un Employé - TaskMaster";
   }
   /**
-   * 
+   *
    * @returns ComponentAddEmployee avec la liste de titre et celle de role
    */
   public render(): JSX.Element {
     let rolesList: RolesList = { roles: this.roles };
     return (
-      <Container className="mt-3">
-        <ComponentAddEmployee
-          {...{ roles: rolesList.roles, titles: this.titles }}
-        />
-      </Container>
+      <ComponentAddEmployee
+        {...{ roles: rolesList.roles, titles: this.titles }}
+      />
     );
   }
 }

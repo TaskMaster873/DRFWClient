@@ -53,7 +53,6 @@ avec les étapes pour le reproduire. Les captures d'écran et les vidéos sont l
 * **Romin Martignat** - *Programmeur(Front-End)*
 * **Félix-Antoine Belleau** - *Programmeur(Back-End)*
 * **William Blanchet Lafernière** - *Programmeur(Back-End)*
-* **Benjamin Lemelin** - *Professeur en informatique*
 
 ## Changelog
 

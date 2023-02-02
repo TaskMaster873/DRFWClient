@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "../deps/css/Engine.css";
 import "../deps/css/index.css";
 
-import { Index } from "./pages/index";
+import { Index } from "./pages";
 import { Schedule } from "./pages/schedule";
 import { Employees } from "./pages/employees";
 import { About } from "./pages/about";
@@ -13,14 +13,12 @@ import { Memes } from "./pages/memes";
 import { AddEmployee } from "./pages/addEmployee";
 import { NavigationBar } from "./components/NavigationBar";
 import { ChangePassword } from "./pages/changePassword";
-import { FooterBar } from "./components/FooterBar";
 
 export class Engine extends React.Component {
   public render(): JSX.Element {
     return (
       <React.StrictMode>
         <Router>
-          <div>
             <NavigationBar />
             <Routes>
               <Route path="/" element={<Index />} />
@@ -32,8 +30,6 @@ export class Engine extends React.Component {
               <Route path="/add-employee" element={<AddEmployee />} />
               <Route path="/changePassword" element={<ChangePassword />} />
             </Routes>
-            <FooterBar />
-          </div>
         </Router>
       </React.StrictMode>
     );

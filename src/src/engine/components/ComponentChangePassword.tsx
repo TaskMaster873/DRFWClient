@@ -1,10 +1,10 @@
 import React from "react";
-import { Logger } from "../Logger";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+
+/* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
-import { Link } from "react-router-dom";
 
 /***
  * La classe sert pour changer le mot de passe
@@ -19,7 +19,6 @@ export class ComponentChangePassword extends React.Component {
     super(props);
     this.state = { no: "", password: "", validated: false };
 
-    this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -82,15 +81,5 @@ export class ComponentChangePassword extends React.Component {
       event.stopPropagation();
     }
     this.setState({ validated: true });
-  }
-
-  handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
-    const name = target.name;
-
-    this.setState({
-      [name]: value,
-    });
   }
 }

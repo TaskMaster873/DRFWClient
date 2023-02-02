@@ -39,8 +39,7 @@ export class Logger {
     private lightdarkred: string = lightenColor(this.darkred, 15);
 
     private getStartPrefix() : string {
-        let startPrefix: string = '';
-        return startPrefix;
+        return '';
     }
 
     constructor(moduleName?: string, logColor?: string, hideLogs?: boolean) {
@@ -71,5 +70,9 @@ export class Logger {
 
     public warn(...args: any[]) : void {
         console.log(`%c${this.getStartPrefix()}[${this.moduleName} WARN]: %c` + args.join(' '), `color: ${this.orange}`, `color: #${this.lightOrange}`);
+    }
+
+    public info(...args: any[]) : void {
+        console.log(`%c${this.getStartPrefix()}[${this.moduleName} INFO]: %c` + args.join(' '), `color: ${this.green}`, `color: #${this.lightGreen}`);
     }
 }
