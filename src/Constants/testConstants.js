@@ -7,6 +7,7 @@ const testConstants = {
   invalidNoEmployee: "192",
   invalidPhoneNumber: "41-92-006",
   invalidPassword: "44ab",
+  validNewPassword: "U51hy&6"
 };
 
 export default testConstants;

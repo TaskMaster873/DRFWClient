@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import { constants } from "../../../Constants/Constants";
-import { LoginFormErrorType } from "../errors/LoginFormErrorType";
+import { FormErrorType } from "../errors/FormErrorType";
 import { Config } from "../config/Config";
 
 /* === Images === */
@@ -16,19 +16,20 @@ export class ComponentLogin extends React.Component {
     id: string;
     password: string;
     validated: boolean;
-    error: LoginFormErrorType;
+    error: FormErrorType;
   };
 
-  constructor(props: {} | Readonly<{}>) {
+  constructor(props) {
     super(props);
     this.state = {
       id: "",
       password: "",
       validated: false,
-      error: LoginFormErrorType.NO_ERROR,
+      error: FormErrorType.NO_ERROR,
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
 
   public render(): JSX.Element {
@@ -107,9 +108,9 @@ export class ComponentLogin extends React.Component {
     const form = event.currentTarget;
     let isValid = form.checkValidity();
 
-    let errorType = LoginFormErrorType.NO_ERROR;
+    let errorType = FormErrorType.NO_ERROR;
     if (!isValid) {
-      errorType = LoginFormErrorType.INVALID_FORM;
+      errorType = FormErrorType.INVALID_FORM;
     }
 
     event.preventDefault();
@@ -120,9 +121,23 @@ export class ComponentLogin extends React.Component {
       error: errorType,
     });
 
-    if (errorType === LoginFormErrorType.NO_ERROR) {
+    if (errorType === FormErrorType.NO_ERROR) {
       //Runs in WEBSOCKETMANAGER.ts
       Config.loginWithPassword(this.state.id, this.state.password);
     }
+  }
+
+  private handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const name = target.id;
+
+    if (!name) {
+      throw new Error("Id is undefined for element in form.");
+    }
+
+    this.setState({
+      [name]: value,
+    });
   }
 }

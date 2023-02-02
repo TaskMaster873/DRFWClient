@@ -3,9 +3,9 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { LoginFormErrorType } from "../errors/LoginFormErrorType";
-import { constants } from "../../../Constants/Constants";
-import { Logger } from "../Logger";
+import {FormErrorType} from "../errors/FormErrorType";
+import {constants} from "../../../Constants/Constants";
+import {Logger} from "../Logger";
 
 /**
  *
@@ -21,26 +21,18 @@ export class ComponentAddDepartement extends React.Component {
   private roles: string[] = [];
   private errorMessage = "";
   public state: {
-    no: number;
-    firstName?: string;
     name?: string;
-    phoneNumber?: string;
-    initialPassword?: string;
     validated?: boolean;
-    error: LoginFormErrorType;
+    error: FormErrorType;
   };
   constructor(props: { titles: string[]; roles: string[] }) {
     super(props);
     this.jobTitles = props.titles;
     this.roles = props.roles;
     this.state = {
-      no: 0,
-      firstName: "",
       name: "",
-      phoneNumber: "",
-      initialPassword: "",
       validated: false,
-      error: LoginFormErrorType.NO_ERROR,
+      error: FormErrorType.NO_ERROR
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -52,6 +44,7 @@ export class ComponentAddDepartement extends React.Component {
         noValidate
         validated={this.state.validated}
         onSubmit={this.handleSubmit}
+        onChange={this.handleChange}
         data-error={this.state.error}
       >
         <Row className="mb-3">
@@ -62,6 +55,7 @@ export class ComponentAddDepartement extends React.Component {
               required
               type="text"
               placeholder="Nom"
+              value={this.state.name}
             />
             <Form.Control.Feedback type="invalid">
               {constants.errorRequiredDepartementName}
@@ -87,12 +81,12 @@ export class ComponentAddDepartement extends React.Component {
     const form = event.currentTarget;
     let isValid = form.checkValidity();
 
-    let errorType = LoginFormErrorType.NO_ERROR;
+    let errorType = FormErrorType.NO_ERROR;
     if (!isValid) {
       event.preventDefault();
       event.stopPropagation();
 
-      errorType = LoginFormErrorType.INVALID_FORM;
+      errorType = FormErrorType.INVALID_FORM;
     }
 
     this.setState({
@@ -101,7 +95,7 @@ export class ComponentAddDepartement extends React.Component {
     });
   }
 
-  private handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+  private handleChange(event: React.ChangeEvent<HTMLFormElement>): void  {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
     const name = target.id;

@@ -1,7 +1,7 @@
 import "@testing-library/react/dist/fire-event";
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
-import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
+import { FormErrorType } from "../src/engine/errors/FormErrorType";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
@@ -25,7 +25,7 @@ test("should render form inputs", async () => {
   expect(inputPassword).toHaveAttribute("type", "password");
 });
 
-describe("Empty Fields Login Tests", () => {
+describe("Empty Fields login validation", () => {
   test("Empty employee number should show error", async () => {
     const { inputPassword, form, inputNo } = getFields();
 
@@ -36,7 +36,7 @@ describe("Empty Fields Login Tests", () => {
     expect(inputNo.value).toBe("");
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
-    expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+    expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
   });
 
   test("Empty password should show error", async () => {
@@ -49,7 +49,7 @@ describe("Empty Fields Login Tests", () => {
     expect(inputNo.value).toBe(testConstants.validNoEmployee);
     expect(inputPassword.value).toBe("");
     expect(form.classList.contains("was-validated")).toBeTruthy();
-    expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+    expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
   });
 });
 
@@ -66,7 +66,7 @@ test("Valid employee number and password should submit form", async () => {
   expect(inputNo.value).toBe(testConstants.validNoEmployee);
   expect(inputPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-  expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
+  expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
 });
 function getFields() {
   const form = document.querySelector("form");
