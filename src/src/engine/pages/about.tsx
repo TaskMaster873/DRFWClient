@@ -2,7 +2,7 @@ import React from "react";
 import { ComponentAbout } from "../components/ComponentAbout";
 
 /**
- * Ceci est la page : à propos de nous 
+ * Ceci est la page : à propos de nous
  */
 export class About extends React.Component {
   public componentDidMount() {
