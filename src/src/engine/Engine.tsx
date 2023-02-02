@@ -13,7 +13,6 @@ import { Memes } from "./pages/memes";
 import { AddEmployee } from "./pages/addEmployee";
 import { NavigationBar } from "./components/NavigationBar";
 import { ChangePassword } from "./pages/changePassword";
-import { FooterBar } from "./components/FooterBar";
 import { Departements } from "./pages/departements";
 
 
@@ -29,7 +28,6 @@ export class Engine extends React.Component {
     return (
       <React.StrictMode>
         <Router>
-          <div>
             <NavigationBar />
             <Routes>
               <Route path="/" element={<Index />} />
@@ -43,8 +41,6 @@ export class Engine extends React.Component {
               <Route path="/add-departement" element={<AddEmployee />} />
               <Route path="/changePassword" element={<ChangePassword />} />
             </Routes>
-            <FooterBar />
-          </div>
         </Router>
       </React.StrictMode>
     );

@@ -1,5 +1,6 @@
 import React from "react";
 
+/* === Images === */
 // @ts-ignore
 import Icecream from "../../deps/images/bing-chilling.jpg";
 
