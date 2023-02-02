@@ -1,8 +1,5 @@
-import { Logger } from "../Logger";
 import React from "react";
 import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
 import { LinkContainer } from "react-router-bootstrap";
 import Button from "react-bootstrap/Button";
 
@@ -11,8 +8,6 @@ import Button from "react-bootstrap/Button";
 import Logo from "../../deps/images/logo.png";
 
 export class ComponentHomePage extends React.Component {
-    private logger: Logger = new Logger(`ComponentAddEmployee`, `#20f6a4`, false);
-    private isLoggedIn: boolean = false;
 
     public render(): JSX.Element {
         return (

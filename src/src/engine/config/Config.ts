@@ -14,6 +14,11 @@ class Configuration {
         localStorage.removeItem('authKey');
     }
 
+    /**
+     * NOT USED HERE, GO TO SAME NAME METHOD IN WebSocketManager.TS
+     * @param username 
+     * @param password 
+     */
     public loginWithPassword(username: string, password: string) : void {
         throw new Error("Not implemented.");
     }
@@ -38,9 +43,6 @@ class Configuration {
 
             if (authKey !== null && authKey) {
                 return Buffer.from(authKey, 'base64');
-            } else {
-                // @ts-ignore
-                return null;
             }
         }
 
@@ -58,9 +60,6 @@ class Configuration {
 
             if (clientHash !== null && clientHash) {
                 return clientHash;
-            } else {
-                // @ts-ignore
-                return null;
             }
         }
 
@@ -78,9 +77,6 @@ class Configuration {
 
             if(clientId !== null && clientId) {
                 return clientId;
-            } else {
-                // @ts-ignore
-                return null;
             }
         }
 
@@ -97,9 +93,6 @@ class Configuration {
                 buf = buf.slice(96, 160);
 
                 return buf;
-            } else {
-                // @ts-ignore
-                return null;
             }
         }
 
