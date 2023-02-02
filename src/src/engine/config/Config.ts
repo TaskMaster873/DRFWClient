@@ -32,8 +32,40 @@ class Configuration {
         }
     }
 
+    get authKey() : Buffer {
+        if(!this.isNode()) {
+            let authKey = localStorage.getItem('authKey');
+
+            if (authKey !== null && authKey) {
+                return Buffer.from(authKey, 'base64');
+            } else {
+                // @ts-ignore
+                return null;
+            }
+        }
+
+        // @ts-ignore
+        return null;
+    }
+
     set clientHash(clientHash: string) {
         if(!this.isNode()) window.localStorage.setItem('clientHash', clientHash);
+    }
+
+    get clientHash() : string {
+        if(!this.isNode()) {
+            let clientHash = localStorage.getItem('clientHash');
+
+            if (clientHash !== null && clientHash) {
+                return clientHash;
+            } else {
+                // @ts-ignore
+                return null;
+            }
+        }
+
+        // @ts-ignore
+        return null;
     }
 
     set clientId(clientId: string) {
@@ -72,38 +104,6 @@ class Configuration {
         }
 
         //@ts-ignore
-        return null;
-    }
-
-    get clientHash() : string {
-        if(!this.isNode()) {
-            let clientHash = localStorage.getItem('clientHash');
-
-            if (clientHash !== null && clientHash) {
-                return clientHash;
-            } else {
-                // @ts-ignore
-                return null;
-            }
-        }
-
-        // @ts-ignore
-        return null;
-    }
-
-    get authKey() : Buffer {
-        if(!this.isNode()) {
-            let authKey = localStorage.getItem('authKey');
-
-            if (authKey !== null && authKey) {
-                return Buffer.from(authKey, 'base64');
-            } else {
-                // @ts-ignore
-                return null;
-            }
-        }
-
-        // @ts-ignore
         return null;
     }
 }

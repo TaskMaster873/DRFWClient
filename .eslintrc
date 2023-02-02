@@ -1,0 +1,32 @@
+{
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2022
+  },
+  "env": {
+    "es2021": true,
+    "browser": true,
+    "node": true
+  },
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "testing-library/no-dom-import": "off",
+    "testing-library/no-node-access": "off",
+    "testing-library/no-container": "off",
+    "testing-library/no-debug": "off",
+    "prefer-const": "off",
+    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-var-requires": "off"
+  }
+}

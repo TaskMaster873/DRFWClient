@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "../deps/css/Engine.css";
 import "../deps/css/index.css";
 
-import { Index } from "./pages/index";
+import { Index } from "./pages";
 import { Schedule } from "./pages/schedule";
 import { Employees } from "./pages/employees";
 import { About } from "./pages/about";
