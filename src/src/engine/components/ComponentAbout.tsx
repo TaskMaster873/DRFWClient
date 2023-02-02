@@ -1,10 +1,5 @@
-import { Logger } from "../Logger";
 import React from "react";
 import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import { LinkContainer } from "react-router-bootstrap";
-import Button from "react-bootstrap/Button";
 
 /* === Images === */
 // @ts-ignore
@@ -16,7 +11,7 @@ export class ComponentAbout extends React.Component {
     public render(): JSX.Element {
         return (
             <div className=" justify-content-left">
-                <Container className="mt-4 mb-4 d-flex justify-content-center"> <h1> TaskMaster </h1> </Container>
+                <Container className="mt-4 mb-4 d-flex justify-content-center"><h1> TaskMaster </h1></Container>
                 <Container className="mt-6 mb-4 d-flex justify-content-center"><img
                     className="me-3"
                     src={Logo}
