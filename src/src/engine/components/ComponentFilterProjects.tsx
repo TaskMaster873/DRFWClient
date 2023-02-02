@@ -1,6 +1,9 @@
 import React from "react";
 import { ScheduleGroup } from "../types/Schedule";
-
+/**
+ * 
+ * Classe qui permet de faire afficher les employé selon les bons groupes (projets)
+ */
 export class ResourceGroups extends React.Component<{ groups: ScheduleGroup[], onChange: any }> {
   private selectRef: React.RefObject<HTMLSelectElement>;
   private groups: ScheduleGroup[];
