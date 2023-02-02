@@ -1,30 +1,37 @@
 import React from "react";
 import { Container } from "react-bootstrap";
 import { ComponentEmployeeList } from "../components/ComponentEmployeeList";
-import { EmployeeList, Employee, EmployeeCreateDTO } from "../types/Employee";
+import { EmployeeList, Employee, EmployeeProps } from "../types/Employee";
 
 /**
  * Ceci est la page pour les employés
  */
-export class Employees extends React.Component {
-    private list: Employee[] = [
-        new Employee({
-            no: 0,
-            name: "Blanchet",
-            firstName: "Stéphane",
-            phoneNumber: "581-555-5555",
-            manager: 0,
-            jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-        }),
-        new Employee({
-            no: 1,
-            name: "Blanchette",
-            firstName: "Roger",
-            phoneNumber: "581-555-2312",
-            manager: 0,
-            jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-        }),
-    ];
+
+export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
+  private department_id : string = "";
+  constructor(props: EmployeeProps) {
+    super(props);
+    console.log(this.props.params);
+  }
+
+  private list: Employee[] = [
+    new Employee({
+      no: 0,
+      name: "Blanchet",
+      firstName: "Stéphane",
+      phoneNumber: "581-555-5555",
+      manager: 0,
+      jobTitles: ["Gestionnaire de projet", "Directeur de production"],
+    }),
+    new Employee({
+      no: 1,
+      name: "Blanchette",
+      firstName: "Roger",
+      phoneNumber: "581-555-2312",
+      manager: 0,
+      jobTitles: ["Gestionnaire de projet", "Directeur de production"],
+    }),
+  ];
 
     public componentDidMount() {
         document.title = "Employés - TaskMaster";
