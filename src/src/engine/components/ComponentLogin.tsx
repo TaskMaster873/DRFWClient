@@ -19,7 +19,7 @@ export class ComponentLogin extends React.Component {
     error: LoginFormErrorType;
   };
 
-  constructor(props: {} | Readonly<{}>) {
+  constructor(props: any | Readonly<any>) {
     super(props);
     this.state = {
       id: "",
@@ -28,7 +28,8 @@ export class ComponentLogin extends React.Component {
       error: LoginFormErrorType.NO_ERROR,
     };
 
-    this.handleSubmit = this.handleSubmit.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
+      this.handleChange = this.handleChange.bind(this);
   }
 
   public render(): JSX.Element {
@@ -59,6 +60,7 @@ export class ComponentLogin extends React.Component {
               className="row mt-1"
               type="number"
               placeholder="Entrez le numéro d'employé"
+              onChange={this.handleChange}
             />
             <Form.Control.Feedback type="invalid" id="invalidLoginNoEmployee">
               {constants.errorRequiredEmployeeNo}
@@ -73,6 +75,7 @@ export class ComponentLogin extends React.Component {
               className="row mt-1"
               type="password"
               placeholder="Entrez votre mot de passe"
+              onChange={this.handleChange}
             />
             <Form.Control.Feedback type="invalid" id="invalidLoginPassword">
               {constants.errorRequiredPassword}
@@ -122,7 +125,22 @@ export class ComponentLogin extends React.Component {
 
     if (errorType === LoginFormErrorType.NO_ERROR) {
       //Runs in WEBSOCKETMANAGER.ts
+      console.log(this.state);
       Config.loginWithPassword(this.state.id, this.state.password);
     }
+  }
+
+  private handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+    const target = event.target;
+    const value = target.value;
+    const name = target.name;
+
+    if (!name) {
+      throw new Error("Id is undefined for element in form.");
+    }
+
+    this.setState({
+      [name]: value,
+    });
   }
 }
