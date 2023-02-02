@@ -37,6 +37,14 @@ export class WebsocketManager extends Logger {
     }
 
     private async loginWithPassword(username: string, password: string) : Promise<void> {
+        if(username === null || !username) {
+            throw new Error('Username is null or empty');
+        }
+
+        if(password === null || !password) {
+            throw new Error('Password is null or empty');
+        }
+
         Config.clientId = username;
 
         await this.encryptem.generateClientCipherKeyPair(password);

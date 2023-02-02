@@ -28,8 +28,8 @@ export class ComponentLogin extends React.Component {
       error: FormErrorType.NO_ERROR,
     };
 
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+      this.handleSubmit = this.handleSubmit.bind(this);
+      this.handleChange = this.handleChange.bind(this);
   }
 
   public render(): JSX.Element {
@@ -60,6 +60,7 @@ export class ComponentLogin extends React.Component {
               className="row mt-1"
               type="number"
               placeholder="Entrez le numéro d'employé"
+              onChange={this.handleChange}
             />
             <Form.Control.Feedback type="invalid" id="invalidLoginNoEmployee">
               {constants.errorRequiredEmployeeNo}
@@ -74,6 +75,7 @@ export class ComponentLogin extends React.Component {
               className="row mt-1"
               type="password"
               placeholder="Entrez votre mot de passe"
+              onChange={this.handleChange}
             />
             <Form.Control.Feedback type="invalid" id="invalidLoginPassword">
               {constants.errorRequiredPassword}
@@ -123,6 +125,7 @@ export class ComponentLogin extends React.Component {
 
     if (errorType === FormErrorType.NO_ERROR) {
       //Runs in WEBSOCKETMANAGER.ts
+      console.log(this.state);
       Config.loginWithPassword(this.state.id, this.state.password);
     }
   }
