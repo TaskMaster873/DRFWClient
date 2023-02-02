@@ -6,6 +6,8 @@ import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {Login} from "../src/engine/pages/login";
+import {Config} from "../src/engine/config/Config";
+
 
 let user;
 beforeEach(async () => {
@@ -52,6 +54,7 @@ describe("Empty Fields Login Tests", () => {
 });
 
 test("Valid employee number and password should submit form", async () => {
+  Config.loginWithPassword = jest.fn();
   const { inputPassword, form, inputNo } = getFields();
 
   await user.type(inputNo, testConstants.validNoEmployee);
@@ -59,6 +62,7 @@ test("Valid employee number and password should submit form", async () => {
 
   fireEvent.submit(form);
 
+  expect(Config.loginWithPassword).toBeCalled();
   expect(inputNo.value).toBe(testConstants.validNoEmployee);
   expect(inputPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();

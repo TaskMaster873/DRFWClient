@@ -3,7 +3,6 @@
  */
 
 import "@testing-library/jest-dom";
-
 import {fireEvent, render} from "@testing-library/react";
 import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
 import testConstants from "../Constants/testConstants";
@@ -12,6 +11,9 @@ import {MemoryRouter} from "react-router-dom";
 import {AddEmployee} from "../src/engine/pages/addEmployee";
 
 let user;
+
+
+
 beforeEach(async () => {
   user = userEvent.setup();
   render(<MemoryRouter><AddEmployee /></MemoryRouter>);
@@ -272,6 +274,7 @@ test("Valid employee number and password should submit form", async () => {
   expect(inputInitialPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
   expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
+  expect()
 });
 
 function getFields() {
