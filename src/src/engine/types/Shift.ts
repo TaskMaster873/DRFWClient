@@ -1,10 +1,43 @@
+import { Employee } from "./Employee";
 import { Project } from "./Project";
 
 export interface ShiftsList {
-    shifts: Shift[];
+  shifts: Shift[];
 }
 
 export interface Shift {
-    start: string;
-    project: Project;
+  project: Project;
+  text: string;
+  resource: string;
+  start: string;
+  end: number;
+  employe: Employee;
+  readonly id: string;
+}
+
+export interface ShiftDTO {
+  readonly text: string;
+  readonly resource: string;
+  readonly start: string;
+  readonly end: number;
+  readonly id: string;
+  readonly project: Project;
+  readonly employe: Employee;
+}
+
+/**
+ * Event serait les shifts avec toutes les données pour l'afficher dans l'horaire
+ * 
+ */
+export interface EventForCalendar {
+  readonly id: number; //id unique dans le tableau d'horaire
+    text: string; // le nom de l'event
+    start: string;//heure de début
+    end: string; //heure de fin
+    resource: string;//l'id de la personne qui l'a
+    barColor: string; // couleur de la barre
+}
+
+export interface EventForCalendarList {
+  Event: Event[];
 }

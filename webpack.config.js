@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
     entry: "./src/index.ts",
-    output: { 
+    output: {
 		path: path.join(__dirname, "build"),
 		filename: "index.bundle.js",
 		publicPath: "/"
@@ -11,9 +11,22 @@ module.exports = {
     mode: process.env.NODE_ENV || "development",
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
+        fallback: {
+            "fs": false,
+            "tls": false,
+            "net": false,
+            "path": false,
+            "zlib": false,
+            "http": false,
+            "https": false,
+            "stream": false,
+            "crypto": false,
+            "crypto-browserify": require.resolve('crypto-browserify'),
+        }
     },
     devServer: { static: path.join(__dirname, "src") },
     module: {
+        unknownContextCritical: false,
         rules: [
             {
                 test: /\.(js|jsx)$/,
@@ -42,5 +55,5 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, "src/html", "index.html"),
         }),
-    ],
+    ]
 };

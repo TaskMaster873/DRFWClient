@@ -21,6 +21,7 @@ export class Employee {
     role: string = "user";
 
     constructor(employee: EmployeeCreateDTO) {
+        this.no = employee.no;
 		this.name = employee.name;
 		this.firstName = employee.firstName;
 		this.phoneNumber = employee.phoneNumber;
@@ -32,10 +33,15 @@ export class Employee {
  * Contient tout les renseignements pour créer un nouveau employé dans la bd
  */
 export interface EmployeeCreateDTO {
+    readonly no: number;
 	readonly name: string;
 	readonly firstName: string;
 	readonly phoneNumber: string;
 	readonly manager: number;
     readonly jobTitles: string[];
+}
+
+export interface EmployeeProps {
+    params : any;
 }
 
