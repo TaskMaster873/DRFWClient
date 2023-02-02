@@ -4,7 +4,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { LinkContainer } from "react-router-bootstrap";
-import { LoginFormErrorType } from "../errors/LoginFormErrorType";
+import { FormErrorType } from "../errors/FormErrorType";
 import { constants } from "../../../Constants/Constants";
 import { Container } from "react-bootstrap";
 
@@ -23,7 +23,7 @@ export class ComponentAddEmployee extends React.Component {
     phoneNumber?: string;
     initialPassword?: string;
     validated?: boolean;
-    error: LoginFormErrorType;
+    error: FormErrorType;
   };
   constructor(props: { titles: string[]; roles: string[] }) {
     super(props);
@@ -36,10 +36,11 @@ export class ComponentAddEmployee extends React.Component {
       phoneNumber: "",
       initialPassword: "",
       validated: false,
-      error: LoginFormErrorType.NO_ERROR,
+      error: FormErrorType.NO_ERROR,
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
   public render(): JSX.Element {
     return (
@@ -48,6 +49,7 @@ export class ComponentAddEmployee extends React.Component {
           noValidate
           validated={this.state.validated}
           onSubmit={this.handleSubmit}
+          onChange={this.handleChange}
           data-error={this.state.error}
         >
           <Row className="mb-3 mt-3">
@@ -166,17 +168,31 @@ export class ComponentAddEmployee extends React.Component {
     const form = event.currentTarget;
     let isValid = form.checkValidity();
 
-    let errorType = LoginFormErrorType.NO_ERROR;
+    let errorType = FormErrorType.NO_ERROR;
     if (!isValid) {
       event.preventDefault();
       event.stopPropagation();
 
-      errorType = LoginFormErrorType.INVALID_FORM;
+      errorType = FormErrorType.INVALID_FORM;
     }
 
     this.setState({
       validated: true,
       error: errorType,
+    });
+  }
+
+  private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const name = target.id;
+
+    if (!name) {
+      throw new Error("Id is undefined for element in form.");
+    }
+
+    this.setState({
+      [name]: value,
     });
   }
 }

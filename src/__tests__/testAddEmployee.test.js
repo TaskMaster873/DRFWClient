@@ -4,7 +4,7 @@
 
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
-import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
+import { FormErrorType } from "../src/engine/errors/FormErrorType";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
@@ -64,7 +64,7 @@ describe("Empty Fields Login Tests", () => {
 
     expect(form.classList.contains("was-validated")).toBeTruthy();
 
-    expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+    expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
   });
 
   test("Empty first name should show error", async () => {
@@ -90,7 +90,7 @@ describe("Empty Fields Login Tests", () => {
     expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
     expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
-    expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+    expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
   });
 
   test("Empty name should show error", async () => {
@@ -116,7 +116,7 @@ describe("Empty Fields Login Tests", () => {
     expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
     expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
-    expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+    expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
   });
 
   test("Empty phone number should show error", async () => {
@@ -142,7 +142,7 @@ describe("Empty Fields Login Tests", () => {
     expect(inputPhoneNumber.value).toBe("");
     expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
-    expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+    expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
   });
 
   test("Empty initial password should show error", async () => {
@@ -168,7 +168,7 @@ describe("Empty Fields Login Tests", () => {
     expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
     expect(inputInitialPassword.value).toBe("");
     expect(form.classList.contains("was-validated")).toBeTruthy();
-    expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+    expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
   });
 });
 
@@ -195,7 +195,7 @@ test("Invalid employee number regex should show error", async () => {
   expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
   expect(inputInitialPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-  expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+  expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
 });
 
 test("Invalid phone number regex should show error", async () => {
@@ -221,7 +221,7 @@ test("Invalid phone number regex should show error", async () => {
   expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
   expect(inputInitialPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-  expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+  expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
 });
 
 test("Invalid initial password regex should show error", async () => {
@@ -247,7 +247,7 @@ test("Invalid initial password regex should show error", async () => {
   expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
   expect(inputInitialPassword.value).toBe(testConstants.invalidPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-  expect(form.dataset.error).toBe(LoginFormErrorType.INVALID_FORM);
+  expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
 });
 
 test("Valid employee number and password should submit form", async () => {
@@ -273,7 +273,7 @@ test("Valid employee number and password should submit form", async () => {
   expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
   expect(inputInitialPassword.value).toBe(testConstants.validPassword);
   expect(form.classList.contains("was-validated")).toBeTruthy();
-  expect(form.dataset.error).toBe(LoginFormErrorType.NO_ERROR);
+  expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
   expect()
 });
 
