@@ -111,10 +111,16 @@ export class ComponentSchedule extends React.Component {
 		return data;
 	}
 
+
 	private returnEmployeeForTheGoodGroup() {
 
 	}
 
+
+	/**
+	 * 
+	 * @param group étant le projet qu'on veut montrer ses employés assigné
+	 */
 	private groupChanged(group: { resources: ResourceGroups }): void {
 		const columns = group.resources;
 
@@ -131,7 +137,10 @@ export class ComponentSchedule extends React.Component {
 		];
 		this.setState({ columns: columns, events: events });
 	}
-
+	/**
+	 * 
+	 * @param args est le nouvel horaire à ajouter avec tout les paramètres.
+	 */
 	eventAdd = (args: { event: EventForCalendar }) => {
 		console.log(args.event);
 		this.listEvent.push({
@@ -144,7 +153,11 @@ export class ComponentSchedule extends React.Component {
 		})
 		this.setState({ events: this.listEvent });
 	}
-
+	/**
+	 * 
+	 * @param args c'est toutes les données de l'évènement
+	 * @returns rien
+	 */
 	onTimeRangeSelected = (args: any) => {
 		let name = prompt("New event name:", "Event");
 		DayPilot.Calendar.clearSelection;
@@ -162,7 +175,11 @@ export class ComponentSchedule extends React.Component {
 	}
 
 
-
+	/**
+	 * 
+	 * @param args le groupe sélectionné
+	 * la fonction change le groupe qui est affiché
+	 */
 	onChange = (args: { selected: { resources: ResourceGroups } }) => {
 		this.groupChanged(args.selected);
 	};
