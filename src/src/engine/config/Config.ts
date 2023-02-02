@@ -14,6 +14,11 @@ class Configuration {
         localStorage.removeItem('authKey');
     }
 
+    /**
+     * NOT USED HERE, BOUND IN ENCRYPTEM.TS
+     * @param username 
+     * @param password 
+     */
     public loginWithPassword(username: string, password: string) : void {
         throw new Error("Not implemented.");
     }
