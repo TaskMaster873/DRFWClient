@@ -4,20 +4,17 @@
 
 import "@testing-library/jest-dom";
 
-import { fireEvent, screen } from "@testing-library/react";
+import {fireEvent, render} from "@testing-library/react";
 import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
 import testConstants from "../Constants/testConstants";
-import {beforeEachTests} from "../test_setup_files/setup"
-import {user} from "../test_setup_files/setup"
+import userEvent from "@testing-library/user-event";
+import {MemoryRouter} from "react-router-dom";
+import {AddEmployee} from "../src/engine/pages/addEmployee";
 
-global.window.URL.createObjectURL = jest.fn();
-
+let user;
 beforeEach(async () => {
-  await beforeEachTests();
-
-  await user.click(document.querySelector("a[href='/departements']"));
-  await user.click(document.querySelector("a[class='employeeNameBtn']"));
-  await user.click(document.querySelector("a[href='/add-employee']"));
+  user = userEvent.setup();
+  render(<MemoryRouter><AddEmployee /></MemoryRouter>);
 });
 
 test("should render form inputs", async () => {

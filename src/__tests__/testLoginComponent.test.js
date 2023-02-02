@@ -1,17 +1,16 @@
-/**
- * @jest-environment jsdom
- */
-
-import {beforeEachTests, user} from "../test_setup_files/setup";
 import "@testing-library/react/dist/fire-event";
 import "@testing-library/jest-dom";
-import { fireEvent } from "@testing-library/react";
+import {fireEvent, render} from "@testing-library/react";
 import { LoginFormErrorType } from "../src/engine/errors/LoginFormErrorType";
 import testConstants from "../Constants/testConstants";
+import userEvent from "@testing-library/user-event";
+import {MemoryRouter} from "react-router-dom";
+import {Login} from "../src/engine/pages/login";
 
+let user;
 beforeEach(async () => {
-  await beforeEachTests();
-  await user.click(document.querySelector("a[href='/login']"));
+  user = userEvent.setup();
+  render(<MemoryRouter><Login /></MemoryRouter>);
 });
 
 test("should render form inputs", async () => {

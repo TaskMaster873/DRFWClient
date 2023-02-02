@@ -1,4 +1,4 @@
-import { cleanup } from "@testing-library/react";
+import {cleanup, fireEvent} from "@testing-library/react";
 import MatchMediaMock from "jest-matchmedia-mock";
 import { act } from "react-dom/test-utils";
 import userEvent from "@testing-library/user-event";
