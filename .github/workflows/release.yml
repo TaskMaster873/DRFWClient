@@ -137,31 +137,49 @@ jobs:
           asset_path: TaskMasterMain.${{ steps.determine_version.outputs.semVer }}.zip
           asset_name: TaskMasterMain.${{ steps.determine_version.outputs.semVer }}.zip
           asset_content_type: application/octet-stream
-      - name: Push packages to Octopus Release
-        uses: OctopusDeploy/push-package-action@v2
+      - name: Push packages to Octopus Deploy
+        uses: OctopusDeploy/push-package-action@v3.0.2
         env:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-          OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
+          OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
+          OCTOPUS_SPACE: Default
         with:
           packages: TaskMasterMain.${{ steps.determine_version.outputs.semVer }}.zip
           overwrite_mode: OverwriteExisting
       - name: Generate Octopus Deploy build information
-        uses: OctopusDeploy/push-build-information-action@v1
+        uses: OctopusDeploy/push-build-information-action@v3.0.1
         env:
           OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-          OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
+          OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
+          OCTOPUS_SPACE: Default
         with:
           version: ${{ steps.determine_version.outputs.semVer }}
           packages: TaskMasterMain
           overwrite_mode: OverwriteExisting
       - name: Create Octopus Release
-        uses: OctopusDeploy/create-release-action@v1
+        id: create_release_octopus
+        uses: OctopusDeploy/create-release-action@v3.0.1
+        env:
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
         with:
           api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
           project: TaskMaster
+          space: Default
           server: ${{ secrets.OCTOPUSSERVERURL }}
-          deploy_to: Production
+          channel: Production
           packages: TaskMasterMain:${{ steps.determine_version.outputs.semVer }}
+      - name: Deploy to Development
+        uses: OctopusDeploy/deploy-release-action@v3.0.1
+        env:
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY  }}
+          OCTOPUS_URL: ${{ secrets.OCTOPUSSERVERURL }}
+          OCTOPUS_SPACE: Default
+        with:
+          project: TaskMaster
+          release_number: ${{ steps.create_release_octopus.outputs.release_number }}
+          environments: |
+            Development
 permissions:
   contents: write
   issues: write
