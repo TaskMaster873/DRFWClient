@@ -15,12 +15,12 @@ jobs:
         with:
           node-version: lts/*
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.14
+        uses: gittools/actions/gitversion/setup@v0.9.15
         with:
           versionSpec: 5.x
       - id: determine_version
         name: Determine Version
-        uses: gittools/actions/gitversion/execute@v0.9.14
+        uses: gittools/actions/gitversion/execute@v0.9.15
         with:
           additionalArguments: /overrideconfig mode=Mainline
           includePrerelease: true
@@ -154,7 +154,7 @@ jobs:
           OCTOPUS_SPACE: Default
         with:
           version: ${{ steps.determine_version.outputs.semVer }}
-          packages: TaskMaster
+          packages: TaskMasterMain
           overwrite_mode: OverwriteExisting
       - name: Create Octopus Release
         id: create_release_octopus
