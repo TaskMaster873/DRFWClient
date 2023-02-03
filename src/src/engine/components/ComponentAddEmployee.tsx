@@ -3,7 +3,6 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {LinkContainer} from "react-router-bootstrap";
 import {FormErrorType} from "../errors/FormErrorType";
 import {constants} from "../../../Constants/Constants";
 import {Container} from "react-bootstrap";
@@ -152,11 +151,9 @@ export class ComponentAddEmployee extends React.Component {
                             id="loginErrorMsg"
                             aria-errormessage={this.errorMessage}
                         ></Form.Text>
-                        <LinkContainer to="/employees">
-                            <Button className="mb-3 me-4 btn-lg" variant="secondary">
-                                Retour
-                            </Button>
-                        </LinkContainer>
+                        <Button onClick={() => history.back()} className="mb-3 me-4 btn-lg" variant="secondary">
+                            Retour
+                        </Button>
                         <Button className="mb-3 btn-lg" variant="primary" type="submit">
                             Créer
                         </Button>
