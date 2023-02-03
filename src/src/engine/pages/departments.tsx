@@ -1,20 +1,20 @@
 import React from "react";
 import { Container } from "react-bootstrap";
-import { ComponentDepartementList } from "../components/ComponentDepartementList";
+import { ComponentDepartmentList } from "../components/ComponentDepartmentList";
 import { Logger } from "../Logger";
-import { DepartementList, Departement } from "../types/Departement";
+import { DepartmentList, Department } from "../types/Department";
 
 /**
  * Ceci est la page pour les employés
  */
-export class Departements extends React.Component {
-  private logger: Logger = new Logger(`Departements`, `#20f6a4`, false);
-  private list: Departement[] = [
-    new Departement({
+export class Departments extends React.Component {
+  private logger: Logger = new Logger(`Departments`, `#20f6a4`, false);
+  private list: Department[] = [
+    new Department({
       no: 0,
       name: "Informatique",
     }),
-    new Departement({
+    new Department({
       no: 1,
       name: "Construction",
     }),
@@ -29,10 +29,10 @@ export class Departements extends React.Component {
    * @returns La liste des employés
    */
   public render(): JSX.Element {
-    let listData: DepartementList = { list: this.list };
+    let listData: DepartmentList = { list: this.list };
     return (
       <Container>
-        <ComponentDepartementList {...listData} />
+        <ComponentDepartmentList {...listData} />
       </Container>
     );
   }

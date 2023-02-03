@@ -1,27 +1,25 @@
 import React from "react";
 import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {RolesList} from "../types/Role";
+import {Availability} from "../types/Availability";
 
 /**
  * Ceci est la page pour ajouter un employé
  */
-export class AddEmployee extends React.Component {
-    private titles: string[] = ["Menuisier", "Plombier"];
-    private roles: string[] = ["Employé", "Administrateur"];
+export class Availabilities extends React.Component {
+    private availabilities : Availability[] = [];
 
     public componentDidMount() {
-        document.title = "Ajouter un Employé - TaskMaster";
+        document.title = "Disponibilitées - TaskMaster";
     }
+
     /**
      *
      * @returns ComponentAddEmployee avec la liste de titre et celle de role
      */
     public render(): JSX.Element {
-        let rolesList: RolesList = {roles: this.roles};
         return (
-            <ComponentAddEmployee
-                {...{roles: rolesList.roles, titles: this.titles}}
-            />
+            <ComponentAddEmployee {...{availabilities: this.availabilities}}/>
         );
     }
 }

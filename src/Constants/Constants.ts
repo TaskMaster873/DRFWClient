@@ -11,4 +11,5 @@ export const constants = {
     errorInvalidInitialPassword: "Le mot de passe initial doit contenir un minimum de 6 caractères, une minuscule, une majuscule et un caractère spécial",
     errorInvalidNewPassword: "Le nouveau mot de passe doit contenir un minimum de 6 caractères, une minuscule, une majuscule et un caractère spécial",
     errorInvalidLogin: "Le numéro d'employé ou le mot de passe spécifié est invalide",
+    messageScheduleUnavailable: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard"
 }
