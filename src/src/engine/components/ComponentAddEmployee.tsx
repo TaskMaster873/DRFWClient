@@ -167,6 +167,7 @@ export class ComponentAddEmployee extends React.Component {
     }
 
     private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+        console.log("cela submit");
         const form = event.currentTarget;
         let isValid = form.checkValidity();
 

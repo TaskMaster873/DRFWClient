@@ -173,7 +173,7 @@ export class ComponentSchedule extends React.Component {
 		DayPilot.Calendar.clearSelection;
 		console.log("agrs =", args);
 		//if (!name) return;
-		this.listEvent.push({
+		/*this.listEvent.push({
 			id: 1,
 			text: args.start.toString("  dd MMMM yyyy ", "fr-fr") + " " + args.start.toString("hh") + "h" + args.start.toString("mm") + "-" + args.end.toString("hh") + "h" + args.end.toString("mm") + " " + name,
 			start: args.start,
@@ -181,7 +181,7 @@ export class ComponentSchedule extends React.Component {
 			resource: args.resource,
 			barColor: args.barColor,
 		})
-		this.setState({ events: this.listEvent });
+		this.setState({ events: this.listEvent });*/
 	}
 
 
@@ -214,7 +214,7 @@ export class ComponentSchedule extends React.Component {
 						eventDeleteHandling={"Update"}
 						{...this.state}
 					/>
-					<ComponentPopupSchedule ref={this.child}></ComponentPopupSchedule>
+					<ComponentPopupSchedule ref={this.child} isShowing={false}></ComponentPopupSchedule>
 				</div>
 			);
 	}
