@@ -280,12 +280,12 @@ test("Valid employee number and password should submit form", async () => {
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputNo = document.getElementById("noAddEmployee");
-    const inputFirstName = document.getElementById("firstNameAddEmployee");
-    const inputName = document.getElementById("nameAddEmployee");
-    const inputPhoneNumber = document.getElementById("phoneNumberAddEmployee");
+    const inputNo = document.getElementById("clientId");
+    const inputFirstName = document.getElementById("firstName");
+    const inputName = document.getElementById("lastName");
+    const inputPhoneNumber = document.getElementById("phoneNumber");
     const inputInitialPassword = document.getElementById(
-        "initialPasswordAddEmployee"
+        "password"
     );
     return {
         form,
