@@ -10,24 +10,31 @@ import { ComponentPopupSchedule } from "./ComponentPopupSchedule";
  * Ceci est le composant d'horaire
  */
 export class ComponentSchedule extends React.Component {
+
 	private list: Employee[] = [];
-	private datePicker: DayPilot.DatePicker;
+	//private datePicker: DayPilot.DatePicker;
 	private listEvent: EventForCalendar[] = [];
-	private dateRef: React.RefObject<unknown> /*= React.createRef()*/;
+	//private dateRef: React.RefObject<unknown> /*= React.createRef()*/;
+	private isClicked: boolean;
+	child: React.RefObject<ComponentPopupSchedule>;
 	constructor(props: EmployeeList) {
 		super(props);
 		this.list = props.list;
-		this.dateRef = React.createRef(); //DayPilot.Date.today();
+		this.isClicked = false;
+		this.child = React.createRef();
+		//this.dateRef = React.createRef(); //DayPilot.Date.today();
 		this.state = {
 			startDate: DayPilot.Date.today(),
 			columns: this.doColumns(),
 			events: this.doEvents(),
 		};
+
 	}
 
 	/*   get calendar() {
 		return this.calendarRef.current.control;
 	} */
+
 
 
 	/**
@@ -160,13 +167,15 @@ export class ComponentSchedule extends React.Component {
 	 * @returns rien
 	 */
 	onTimeRangeSelected = (args: any) => {
-		let name = prompt("New event name:", "Event");
+		this.child.current?.onChange();
+		console.log("isClicked:", this.isClicked);
+		//let name = prompt("New event name:", "Event");
 		DayPilot.Calendar.clearSelection;
 		console.log("agrs =", args);
-		if (!name) return;
+		//if (!name) return;
 		this.listEvent.push({
 			id: 1,
-			text: args.start.toString("  dd MMMM yyyy ", "fr-fr") + " " + args.start.toString("hh") + "h" + args.start.toString("mm") + "-" + args.end.toString("hh") + "h" + args.end.toString("mm") + " " + name ,
+			text: args.start.toString("  dd MMMM yyyy ", "fr-fr") + " " + args.start.toString("hh") + "h" + args.start.toString("mm") + "-" + args.end.toString("hh") + "h" + args.end.toString("mm") + " " + name,
 			start: args.start,
 			end: args.end,
 			resource: args.resource,
@@ -202,10 +211,10 @@ export class ComponentSchedule extends React.Component {
 						viewType={"Resources"}
 						showNonBusiness={false}
 						onTimeRangeSelected={this.onTimeRangeSelected}
-						eventDeleteHandling = {"Update"}
+						eventDeleteHandling={"Update"}
 						{...this.state}
 					/>
-					<ComponentPopupSchedule></ComponentPopupSchedule>
+					<ComponentPopupSchedule ref={this.child}></ComponentPopupSchedule>
 				</div>
 			);
 	}

@@ -11,7 +11,7 @@ export class ComponentPopupSchedule extends React.Component {
 		nameOfEvent: string
 	};
 
-	constructor(props) {
+	constructor(props: { isShowing: boolean }) {
 		super(props);
 		this.state = {
 			isShowed: false,
@@ -19,19 +19,12 @@ export class ComponentPopupSchedule extends React.Component {
 
 		};
 		this.onChange = this.onChange.bind(this);
+
 	}
 
-	onChange = () => {
-		if (this.state.isShowed === false) {
-			let show = true;
-			this.setState({ isShowed: show });
-			console.log(this.state.isShowed);
-		} else {
-			this.setState({ isShowed: false });
-			console.log(this.state.isShowed);
-		}
-
-
+	public onChange = () => {
+		this.setState({ isShowed: !this.state.isShowed });
+		console.log(this.state.isShowed);
 	};
 
 	public render(): JSX.Element {
@@ -67,23 +60,23 @@ export class ComponentPopupSchedule extends React.Component {
 							</Form.Group>
 							<Form.Group className="mb-3" controlId="exampleColorInput">
 								<Form.Label >Color picker</Form.Label>
-							<Form.Control
-								type="color"
-								defaultValue="#563d7c"
-								title="Choose your color"
-							/>
-						</Form.Group>
-					</Form>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" onClick={this.onChange} >
-						Close
-					</Button>
-					<Button variant="primary" onClick={this.onChange}>
-						Save Changes
-					</Button>
-				</Modal.Footer>
-			</Modal>
+								<Form.Control
+									type="color"
+									defaultValue="#563d7c"
+									title="Choose your color"
+								/>
+							</Form.Group>
+						</Form>
+					</Modal.Body>
+					<Modal.Footer>
+						<Button variant="secondary" onClick={this.onChange} >
+							Fermer
+						</Button>
+						<Button variant="primary" onClick={this.onChange}>
+							Sauvegarder
+						</Button>
+					</Modal.Footer>
+				</Modal>
 			</>
 		);
 	}
