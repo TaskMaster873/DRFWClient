@@ -11,3 +11,14 @@ export interface ServerKeyCipherExchange {
     serverSigningCipher: Uint8Array | Buffer;
     encryptionEnabled: boolean;
 }
+
+export interface EmployePayload {
+    clientId?: string;
+    firstName?: string;
+    lastName?: string;
+    isAdmin?: boolean;
+    phoneNumber?: string;
+    clientAuthCipher?: Uint8Array | Buffer;
+    clientAuthKey?: Uint8Array | Buffer;
+    clientHash?: string;
+}
