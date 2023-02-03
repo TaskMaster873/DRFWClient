@@ -3,6 +3,11 @@ import { Table, Button } from "react-bootstrap";
 import { EmployeeList, Employee } from "../types/Employee";
 import { LinkContainer } from "react-router-bootstrap";
 
+/***
+ * Ce composant affiche la liste de tous les employés d'un département
+ *
+ * state : ancien mot de passe, nouveau mot de passe, validation requis et regex de mot de passe
+ */
 export class ComponentEmployeeList extends React.Component {
   private list: Employee[] = [];
   constructor(props: EmployeeList) {
