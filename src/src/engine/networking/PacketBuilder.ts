@@ -4,11 +4,11 @@ import protobuf from 'protobufjs';
 
 import * as sodium from 'sodium-universal';
 import { Buffer } from 'buffer';
-import {AuthenticationStatus} from "./types/AuthenticationStatus";
+import { AuthenticationStatus } from "./types/AuthenticationStatus";
 import Long from 'long';
-import {Opcodes} from "./opcodes/Opcodes";
-import {Config} from "../config/Config";
-import {AuthenticationPacketPayload, ServerKeyCipherExchange} from "./types/Packets";
+import { Opcodes } from "./opcodes/Opcodes";
+import { Config } from "../config/Config";
+import { AuthenticationPacketPayload, EmployePayload, ServerKeyCipherExchange } from "./types/Packets";
 
 protobuf.util.Long = Long;
 protobuf.configure();
@@ -38,7 +38,7 @@ export class PacketBuilder extends Logger {
     }
 
     // POST AUTHENTICATION
-    private async buildReadOnlyAuthenticationPacket() : Promise<Uint8Array> {
+    private async buildReadOnlyAuthenticationPacket(): Promise<Uint8Array> {
         // @ts-ignore
         let packet: Uint8Array = null;
 
@@ -48,14 +48,14 @@ export class PacketBuilder extends Logger {
             };
 
             packet = await this.buildAuthPacket(payload);
-        } catch(e: any) {
+        } catch (e: any) {
             this.error(`Failed to build auth (readonly) packet. ${e.stack}`);
         }
 
         return packet;
     }
 
-    public async parseKeyCipherExchangeServerPacket(packet: Uint8Array) : Promise<ServerKeyCipherExchange> {
+    public async parseKeyCipherExchangeServerPacket(packet: Uint8Array): Promise<ServerKeyCipherExchange> {
         // @ts-ignore
         let serverKeyCipherExchange: ServerKeyCipherExchange = null;
         try {
@@ -71,33 +71,33 @@ export class PacketBuilder extends Logger {
                 objects: true,
                 oneofs: true
             }) as ServerKeyCipherExchange;
-        } catch(e: any) {
+        } catch (e: any) {
             this.error(`Failed to parse server cipher key exchange packet. ${e.stack}`);
         }
 
         return serverKeyCipherExchange;
     }
 
-    private startPingInterval() : void {
+    private startPingInterval(): void {
 
     }
 
-    private onPing() : void {
+    private onPing(): void {
 
     }
 
-    private clearIntervals() : void {
+    private clearIntervals(): void {
 
     }
 
-    private async buildAuthPacket(payload: AuthenticationPacketPayload) : Promise<Uint8Array> {
+    private async buildAuthPacket(payload: AuthenticationPacketPayload): Promise<Uint8Array> {
         // @ts-ignore
         let packet: Uint8Array = null;
 
         let authenticationPacket = this.packetBuilderRoot.lookupType('TaskMaster.Authentication');
         let verificationError = authenticationPacket.verify(payload);
-        if(verificationError) {
-            this.error(`Something went wrong while building the ping packet. ${verificationError}`);
+        if (verificationError) {
+            this.error(`Something went wrong while building the auth packet. ${verificationError}`);
         } else {
             let msg = authenticationPacket.create(payload);
             packet = authenticationPacket.encode(msg).finish();
@@ -108,8 +108,67 @@ export class PacketBuilder extends Logger {
         return packet;
     }
 
+    /**
+     * Packages the packet for sending, end of chain. Packet is ready to send
+     * @param payload 
+     * @returns 
+     */
+    private async buildEmployeePacket(payload: EmployePayload): Promise<Uint8Array> {
+        // @ts-ignore
+        let packet: Uint8Array = null;
+
+        let employeePacket = this.packetBuilderRoot.lookupType('TaskMaster.Employee');
+        let verificationError = employeePacket.verify(payload);
+        if (verificationError) {
+            this.error(`Something went wrong while building the employee packet. ${verificationError}`)
+        } else {
+            let msg = employeePacket.create(payload);
+            packet = employeePacket.encode(msg).finish();
+
+            packet = new Uint8Array([Opcodes.OutBound.CREATE_EMPLOYE, ...packet]);
+        }
+
+        return packet;
+    }
+
+    /**
+     * Builds the Employee Packet with auths
+     * @param clientId 
+     * @param firstName 
+     * @param lastName 
+     * @param phoneNumber 
+     * @param isAdmin 
+     * @returns 
+     */
+    public async buildEmployeePacketWithClientKey(clientId: string, firstName: string, lastName: string, phoneNumber: string, isAdmin: boolean): Promise<Uint8Array> {
+        // @ts-ignore
+        let packet: Uint8Array = null;
+        try {
+            if (Config.authKey === null || !Config.authKey) {
+                this.error(`Missing employee auth key for some reason`);
+            }
+            let publicKey = Config.authKey.slice(64, 96);
+            let payload: EmployePayload = {
+                clientId: clientId,
+                firstName: firstName,
+                lastName: lastName,
+                isAdmin: isAdmin,
+                phoneNumber: phoneNumber,
+                clientAuthCipher: publicKey,
+                clientAuthKey: Config.getClientAuthKey,
+                clientHash: Config.clientHash
+            };
+
+            packet = await this.buildEmployeePacket(payload);
+        } catch (e: any) {
+            this.error(`Failed to build employee (with key) packet. ${e.stack}`);
+        }
+
+        return packet;
+    }
+
     // AUTHENTICATION
-    private async buildAuthenticationPacketWithClientKey() : Promise<Uint8Array> {
+    private async buildAuthenticationPacketWithClientKey(): Promise<Uint8Array> {
         // @ts-ignore
         let packet: Uint8Array = null;
         try {
@@ -123,17 +182,17 @@ export class PacketBuilder extends Logger {
             };
 
             packet = await this.buildAuthPacket(payload);
-        } catch(e: any) {
+        } catch (e: any) {
             this.error(`Failed to build auth (with key) packet. ${e.stack}`);
         }
 
         return packet;
     }
 
-    public async buildAuthenticationPacket() : Promise<Uint8Array> {
+    public async buildAuthenticationPacket(): Promise<Uint8Array> {
         let packet: Uint8Array;
 
-        if(Config.authKey !== null && Config.authKey) {
+        if (Config.authKey !== null && Config.authKey) {
             this.log(`Authenticating with auth key.`);
 
             // Let's try to authenticate on the first try.
@@ -147,24 +206,24 @@ export class PacketBuilder extends Logger {
         return packet;
     }
 
-    public reset() : void {
+    public reset(): void {
         // @ts-ignore
         this.rndSalt = null;
     }
 
-    public async encryptMessage(msg: Uint8Array) : Promise<Uint8Array> {
+    public async encryptMessage(msg: Uint8Array): Promise<Uint8Array> {
         return msg;
     }
 
-    private init() : void {
+    private init(): void {
         this.log(`PacketBuilder initialized.`);
     }
 
-    public setRootSchema(root: protobuf.Root) : void {
+    public setRootSchema(root: protobuf.Root): void {
         this.packetBuilderRoot = root;
     }
 
-    public getSodium() : void {
+    public getSodium(): void {
         let rnd = Buffer.allocUnsafe(12);
         sodium.randombytes_buf(rnd);
 
@@ -175,7 +234,7 @@ export class PacketBuilder extends Logger {
         return this.rndSalt !== null;
     }
 
-    public getUtcTime() : number {
+    public getUtcTime(): number {
         let d = new Date();
         let localTime = d.getTime();
 
@@ -184,12 +243,12 @@ export class PacketBuilder extends Logger {
         return utc;
     }
 
-    public async parseAuthenticationStatus(authType: number, packet: Uint8Array) : Promise<AuthenticationStatus> {
+    public async parseAuthenticationStatus(authType: number, packet: Uint8Array): Promise<AuthenticationStatus> {
         let status: any = null;
 
         try {
             let type = `TaskMaster.ReadOnlyAuthenticationStatus`;
-            if(authType === 1) {
+            if (authType === 1) {
                 type = `TaskMaster.FullAuthenticationStatus`;
             }
 
@@ -204,14 +263,14 @@ export class PacketBuilder extends Logger {
                 objects: true,
                 oneofs: true
             });
-        } catch(e: any) {
+        } catch (e: any) {
             this.error(`Failed to parse authentication status. ${e.message}`);
         }
 
         return status;
     }
 
-    public async buildPingPacket() : Promise<Uint8Array> {
+    public async buildPingPacket(): Promise<Uint8Array> {
         // @ts-ignore
         let packet: Uint8Array = null;
         try {
@@ -226,7 +285,7 @@ export class PacketBuilder extends Logger {
             };
 
             let verificationError = pingPacketSchema.verify(payload);
-            if(verificationError) {
+            if (verificationError) {
                 this.error(`Something went wrong while building the ping packet. ${verificationError}`);
             } else {
                 let msg = pingPacketSchema.create(payload);
@@ -234,7 +293,7 @@ export class PacketBuilder extends Logger {
 
                 packet = new Uint8Array([Opcodes.OutBound.PING, ...packet]);
             }
-        } catch(e: any) {
+        } catch (e: any) {
             this.error(`Failed to build ping packet. ${e.stack}`);
         }
 
