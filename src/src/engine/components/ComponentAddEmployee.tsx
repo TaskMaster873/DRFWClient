@@ -6,35 +6,37 @@ import Col from "react-bootstrap/Col";
 import {FormErrorType} from "../errors/FormErrorType";
 import {constants} from "../../../Constants/Constants";
 import {Container} from "react-bootstrap";
+import { Config } from "../config/Config";
 
+type Props = { titles: string[]; roles: string[] };
 /**
  *
  * Ceci est le composant pour ajouter les employés
  */
-export class ComponentAddEmployee extends React.Component {
+export class ComponentAddEmployee extends React.Component <Props>{
     private jobTitles: string[] = [];
     private roles: string[] = [];
     private errorMessage = "";
     public state: {
-        no: number;
-        firstName?: string;
-        name?: string;
-        phoneNumber?: string;
-        initialPassword?: string;
+        clientId: string;
+        firstName: string;
+        lastName: string;
+        phoneNumber: string;
+        password: string;
         validated?: boolean;
         error: FormErrorType;
     };
 
-    constructor(props: { titles: string[]; roles: string[] }) {
+    constructor(props: Props) {
         super(props);
         this.jobTitles = props.titles;
         this.roles = props.roles;
         this.state = {
-            no: 0,
+            clientId: "",
             firstName: "",
-            name: "",
+            lastName: "",
             phoneNumber: "",
-            initialPassword: "",
+            password: "",
             validated: false,
             error: FormErrorType.NO_ERROR,
         };
@@ -57,7 +59,7 @@ export class ComponentAddEmployee extends React.Component {
                         <Form.Group as={Col} md="4">
                             <Form.Label>Numéro d'employé</Form.Label>
                             <Form.Control
-                                id="noAddEmployee"
+                                id="clientId"
                                 required
                                 type="number"
                                 placeholder="000000"
@@ -71,7 +73,7 @@ export class ComponentAddEmployee extends React.Component {
                         <Form.Group as={Col} md="4">
                             <Form.Label>Prénom</Form.Label>
                             <Form.Control
-                                id="firstNameAddEmployee"
+                                id="firstName"
                                 required
                                 type="text"
                                 placeholder="Prénom"
@@ -83,7 +85,7 @@ export class ComponentAddEmployee extends React.Component {
                         <Form.Group as={Col} md="4">
                             <Form.Label>Nom</Form.Label>
                             <Form.Control
-                                id="nameAddEmployee"
+                                id="lastName"
                                 required
                                 type="text"
                                 placeholder="Nom"
@@ -97,7 +99,7 @@ export class ComponentAddEmployee extends React.Component {
                         <Form.Group as={Col} md="6">
                             <Form.Label>Numéro de téléphone</Form.Label>
                             <Form.Control
-                                id="phoneNumberAddEmployee"
+                                id="phoneNumber"
                                 required
                                 type="tel"
                                 pattern="^(\+?1 ?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$"
@@ -110,7 +112,7 @@ export class ComponentAddEmployee extends React.Component {
                         <Form.Group as={Col} md="6">
                             <Form.Label>Mot de passe initial</Form.Label>
                             <Form.Control
-                                id="initialPasswordAddEmployee"
+                                id="password"
                                 required
                                 type="password"
                                 pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
@@ -179,6 +181,9 @@ export class ComponentAddEmployee extends React.Component {
             validated: true,
             error: errorType,
         });
+
+        console.log(this.state)
+        Config.createEmployee(this.state.clientId, this.state.firstName, this.state.lastName, this.state.phoneNumber, this.state.password)
     }
 
     private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {

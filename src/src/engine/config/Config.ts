@@ -27,6 +27,10 @@ class Configuration {
         throw new Error("Not implemented.");
     }
 
+    public createEmployee(clientId: string, firstName: string, lastName: string, phoneNumber: string, password: string) : void {
+        throw new Error("Not implemented.")
+    }
+
     private isNode() {
         let isNode = false;
         try {
