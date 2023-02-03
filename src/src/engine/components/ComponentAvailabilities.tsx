@@ -1,6 +1,5 @@
 import React from "react";
 import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
-import {ScheduleGroups} from "../types/Schedule";
 import "./ComponentPopupSchedule";
 import {EventForCalendar} from "../types/Shift";
 import {Availability, AvailabilityList} from "../types/Availability";
@@ -20,65 +19,11 @@ export class ComponentAvailabilities extends React.Component {
         this.list = props.list;
         this.dateRef = React.createRef(); //DayPilot.Date.today();
         this.state = {
-            timeHeaders: [{"groupBy": "Month"}, {"groupBy": "Day", "format": "d"}],
+            timeHeaders: [{"groupBy": "Day", "format": "dddd"}],
             startDate: DayPilot.Date.today(),
-            events: this.doEvents(),
+            days: 7,
+            //events: this.doEvents(),
         };
-    }
-
-    /*   get calendar() {
-        return this.calendarRef.current.control;
-    } */
-
-    private doEvents(): EventForCalendar[] {
-
-
-        this.listEvent.push({
-            id: 1,
-            text: "Il faut mettre le temps et le titre",
-            start: DayPilot.Date.today(),
-            end: DayPilot.Date.now(),
-            resource: "1",
-            barColor: "#0C2840",
-        });
-        return this.listEvent;
-    }
-
-    componentDidMount() {
-    }
-
-    loadGroups() {
-        let data: ScheduleGroups = {
-            groups: [
-                {
-                    name: "Locations",
-                    id: "locations",
-                    resources: [
-                        {name: "Room 1", id: "R1"},
-                        {name: "Room 2", id: "R2"},
-                        {name: "Room 3", id: "R3"},
-                        {name: "Room 4", id: "R4"},
-                        {name: "Room 5", id: "R5"},
-                        {name: "Room 6", id: "R6"},
-                        {name: "Room 7", id: "R7"},
-                    ],
-                }
-            ],
-        };
-        return data;
-    }
-
-    eventAdd = (args: { event: EventForCalendar }) => {
-        console.log(args.event);
-        this.listEvent.push({
-            id: args.event.id,
-            text: args.event.text,
-            start: args.event.start,
-            end: args.event.end,
-            resource: args.event.resource,
-            barColor: args.event.barColor,
-        })
-        this.setState({events: this.listEvent});
     }
 
     onTimeRangeSelected = (args: any) => {

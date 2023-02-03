@@ -1,13 +1,19 @@
 import React from "react";
-import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
-import {RolesList} from "../types/Role";
-import {Availability} from "../types/Availability";
+import {Availability, AvailabilityList} from "../types/Availability";
+import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
 
 /**
  * Ceci est la page pour ajouter un employé
  */
 export class Availabilities extends React.Component {
-    private availabilities : Availability[] = [];
+    private availabilities : Availability[] = [
+        new Availability(
+            {
+                begin: new Date(Date.now()),
+                end: new Date(Date.now())
+            }
+        )
+    ];
 
     public componentDidMount() {
         document.title = "Disponibilitées - TaskMaster";
@@ -18,8 +24,9 @@ export class Availabilities extends React.Component {
      * @returns ComponentAddEmployee avec la liste de titre et celle de role
      */
     public render(): JSX.Element {
+        let listData: AvailabilityList = { list: this.availabilities };
         return (
-            <ComponentAddEmployee {...{availabilities: this.availabilities}}/>
+            <ComponentAvailabilities {...{availabilities: listData}}/>
         );
     }
 }

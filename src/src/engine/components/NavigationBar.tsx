@@ -37,11 +37,12 @@ export class NavigationBar extends React.Component {
               <LinkContainer to="/schedule">
                 <Nav.Link>Mon horaire</Nav.Link>
               </LinkContainer>
+
               <LinkContainer to="/availabilities">
                 <Nav.Link>Mes disponibilités</Nav.Link>
               </LinkContainer>
 
-              <LinkContainer to="/departements">
+              <LinkContainer to="/departments">
                 <Nav.Link>Départements</Nav.Link>
               </LinkContainer>
 
