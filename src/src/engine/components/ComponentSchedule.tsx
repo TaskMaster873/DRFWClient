@@ -40,7 +40,7 @@ export class ComponentSchedule extends React.Component {
 		for (let index = 0; index < this.list.length; index++) {
 			listToReturn.push({
 				name: this.list[index].firstName + " " + this.list[index].name,
-				id: this.list[index].no.toString(),
+				id: this.list[index].id.toString(),
 			});
 		}
 		return listToReturn;

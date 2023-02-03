@@ -16,7 +16,7 @@ export class ComponentAddEmployee extends React.Component {
     private roles: string[] = [];
     private errorMessage = "";
     public state: {
-        no: number;
+        id: number;
         firstName?: string;
         name?: string;
         phoneNumber?: string;
@@ -30,7 +30,7 @@ export class ComponentAddEmployee extends React.Component {
         this.jobTitles = props.titles;
         this.roles = props.roles;
         this.state = {
-            no: 0,
+            id: 0,
             firstName: "",
             name: "",
             phoneNumber: "",
@@ -57,7 +57,7 @@ export class ComponentAddEmployee extends React.Component {
                         <Form.Group as={Col} md="4">
                             <Form.Label>Numéro d'employé</Form.Label>
                             <Form.Control
-                                id="noAddEmployee"
+                                id="idAddEmployee"
                                 required
                                 type="number"
                                 placeholder="000000"
@@ -65,7 +65,7 @@ export class ComponentAddEmployee extends React.Component {
                                 max="999999"
                             />
                             <Form.Control.Feedback type="invalid">
-                                {constants.errorInvalidEmployeeNo}
+                                {constants.errorInvalidEmployeeId}
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group as={Col} md="4">
@@ -74,7 +74,7 @@ export class ComponentAddEmployee extends React.Component {
                                 id="firstNameAddEmployee"
                                 required
                                 type="text"
-                                placeholder="Prénom"
+                                placeholder="Préidm"
                             />
                             <Form.Control.Feedback type="invalid">
                                 {constants.errorRequiredFirstName}
