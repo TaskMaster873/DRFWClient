@@ -1,6 +1,6 @@
 
 /**
- * Liste d'employé, comme dit dans le nom
+ * Liste d'employé, comme dit dans le idm
  */
 export interface EmployeeList {
     list : Employee[];
@@ -10,7 +10,7 @@ export interface EmployeeList {
  * Contient tout les renseignements des employés de l'application web
  */
 export class Employee {
-    no: number = 0;
+    id: number = 0;
     name: string =  "";
     firstName: string = "";
     phoneNumber: string = "";
@@ -21,7 +21,7 @@ export class Employee {
     role: string = "user";
 
     constructor(employee: EmployeeCreateDTO) {
-        this.no = employee.no;
+        this.id = employee.id;
 		this.name = employee.name;
 		this.firstName = employee.firstName;
 		this.phoneNumber = employee.phoneNumber;
@@ -30,10 +30,10 @@ export class Employee {
 	}
 }
 /**
- * Contient tout les renseignements pour créer un nouveau employé dans la bd
+ * Contient tout les renseignements pour créer un iduveau employé dans la bd
  */
 export interface EmployeeCreateDTO {
-    readonly no: number;
+    readonly id: number;
 	readonly name: string;
 	readonly firstName: string;
 	readonly phoneNumber: string;
@@ -42,6 +42,5 @@ export interface EmployeeCreateDTO {
 }
 
 export interface EmployeeProps {
-    params : any;
+    params;
 }
-

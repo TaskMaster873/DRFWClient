@@ -67,7 +67,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 max="999999"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorInvalidEmployeeNo}
+                {constants.errorInvalidEmployeeId}
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} md="4">

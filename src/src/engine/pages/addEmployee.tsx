@@ -12,7 +12,6 @@ export class AddEmployee extends React.Component {
     public componentDidMount() {
         document.title = "Ajouter un Employé - TaskMaster";
     }
-
     /**
      *
      * @returns ComponentAddEmployee avec la liste de titre et celle de role

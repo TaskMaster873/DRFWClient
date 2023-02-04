@@ -62,8 +62,8 @@ export class ComponentLogin extends React.Component {
                             type="number"
                             placeholder="Entrez le numéro d'employé"
                         />
-                        <Form.Control.Feedback type="invalid" id="invalidLoginNoEmployee">
-                            {constants.errorRequiredEmployeeNo}
+                        <Form.Control.Feedback type="invalid" id="invalidLoginIdEmployee">
+                            {constants.errorRequiredEmployeeId}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>

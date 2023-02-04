@@ -13,7 +13,8 @@ import { Memes } from "./pages/memes";
 import { AddEmployee } from "./pages/addEmployee";
 import { NavigationBar } from "./components/NavigationBar";
 import { ChangePassword } from "./pages/changePassword";
-import { Departements } from "./pages/departements";
+import { Departments } from "./pages/departments";
+import {Availabilities} from "./pages/availabilities";
 
 
 function EmployeeWrapper() : any {
@@ -32,13 +33,13 @@ export class Engine extends React.Component {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/schedule" element={<Schedule />} />
-              <Route path="/departements" element={<Departements />} />
+              <Route path="/departments" element={<Departments />} />
               <Route path="/employees/:id" element={<EmployeeWrapper />} />
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/memes" element={<Memes />} />
               <Route path="/add-employee" element={<AddEmployee />} />
-              <Route path="/add-departement" element={<AddEmployee />} />
+              <Route path="/availabilities" element={<Availabilities />} />
               <Route path="/changePassword" element={<ChangePassword />} />
             </Routes>
         </Router>
