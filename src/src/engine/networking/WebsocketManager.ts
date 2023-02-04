@@ -6,12 +6,13 @@ import { PacketBuilder } from "./PacketBuilder";
 
 import protobuf from 'protobufjs';
 import {Opcodes} from "./opcodes/Opcodes";
-import {AuthenticationStatus, AuthenticationStatusType} from "./types/AuthenticationStatus";
+import {AuthenticationStatus, AuthenticationStatusType, AuthKey, EmployeeData, SessionKey} from "./types/AuthenticationStatus";
 import ServiceNotification from "../services/ServiceNotification";
 import {Encryptem} from "./Encryptem";
 import {ServerKeyCipherExchange} from "./types/Packets";
+import { Employee } from "../types/Employee";
 
-export class WebsocketManager extends Logger {
+class WebsocketManager extends Logger {
     public moduleName: string = 'WebsocketManager';
     public logColor: string = '#9370db';
 
@@ -32,12 +33,9 @@ export class WebsocketManager extends Logger {
 
     constructor() {
         super();
-
-        Config.createEmployee = this.createEmploye.bind(this);
-        Config.loginWithPassword = this.loginWithPassword.bind(this);
     }
 
-    private async loginWithPassword(username: string, password: string) : Promise<void> {
+    public async loginWithPassword(username: string, password: string) : Promise<void> {
         if(username === null || !username) {
             throw new Error('Username is null or empty');
         }
@@ -45,10 +43,16 @@ export class WebsocketManager extends Logger {
         if(password === null || !password) {
             throw new Error('Password is null or empty');
         }
-
-        Config.clientId = username;
-
-        await this.encryptem.generateClientCipherKeyPair(password);
+        //Get AuthKey
+        let authKey = await this.encryptem.generateClientCipherKeyPair(password);
+        //Save Session to local storage
+        Config.sessionKey = {
+            clientId: username,
+            clientAuthCipher: authKey.clientAuthCipher,
+            clientAuthKey: authKey.clientAuthKey,
+            clientHash: authKey.clientHash
+        }
+        //Send SessionKey to backend for verification
         await this.sendAuthPacket();
     }
 
@@ -60,25 +64,9 @@ export class WebsocketManager extends Logger {
      * @param phoneNumber 
      * @param password 
      */
-    private async createEmploye(clientId: string, firstName: string, lastName: string, phoneNumber:string, password: string) : Promise<void> {
-        if(clientId === null || !clientId) {
-            throw new Error('Username is null or empty');
-        }
-        if(password === null || !password) {
-            throw new Error('Password is null or empty');
-        }
-        if(firstName === null || !firstName) {
-            throw new Error('First Name is null or empty');
-        }
-        if(lastName === null || !lastName) {
-            throw new Error('Last Name is null or empty');
-        }
-        if(phoneNumber === null || !phoneNumber) {
-            throw new Error('Phone Number is null or empty');
-        }
-
-        await this.encryptem.generateClientCipherKeyPair(password);
-        await this.sendEmployeePacket(clientId, firstName, lastName, phoneNumber, false);
+    public async createEmployee(employeeData: EmployeeData) : Promise<void> {
+        let authKey = await this.encryptem.generateClientCipherKeyPair(employeeData.password);
+        await this.sendEmployeePacket(employeeData, authKey);
     }
 
     get isSecure() : boolean {
@@ -162,7 +150,7 @@ export class WebsocketManager extends Logger {
                 this.error(`Failed to authenticate -> ${message}`);
 
                 ServiceNotification.notifyClientError(`Failed to authenticate. ${authStatus.message}`);
-                await Config.resetAuthKey();
+                await Config.resetSession();
 
                 setTimeout(async () => {
                     await this.closeWs();
@@ -260,8 +248,8 @@ export class WebsocketManager extends Logger {
         }
     }
 
-    private async sendEmployeePacket(clientId: string, firstName: string, lastName: string, phoneNumber: string, isAdmin: boolean) : Promise<void> {
-        let employeePacket = await this.packetBuilder.buildEmployeePacketWithClientKey(clientId, firstName, lastName, phoneNumber, isAdmin);
+    private async sendEmployeePacket(employeeData: EmployeeData, authKey: AuthKey) : Promise<void> {
+        let employeePacket = await this.packetBuilder.buildEmployeePacketWithAuthKey(employeeData, authKey);
 
         if(employeePacket !== null && employeePacket) {
             await this.sendMsg(employeePacket);
@@ -417,3 +405,6 @@ export class WebsocketManager extends Logger {
         this.log(`Latency changed to ${newLatency}ms.`);
     }
 }
+
+const SocketManager = new WebsocketManager();
+export { SocketManager };

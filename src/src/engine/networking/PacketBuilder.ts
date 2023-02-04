@@ -4,7 +4,7 @@ import protobuf from 'protobufjs';
 
 import * as sodium from 'sodium-universal';
 import { Buffer } from 'buffer';
-import { AuthenticationStatus } from "./types/AuthenticationStatus";
+import { AuthenticationStatus, AuthKey, EmployeeData, SessionKey } from "./types/AuthenticationStatus";
 import Long from 'long';
 import { Opcodes } from "./opcodes/Opcodes";
 import { Config } from "../config/Config";
@@ -96,6 +96,7 @@ export class PacketBuilder extends Logger {
 
         let authenticationPacket = this.packetBuilderRoot.lookupType('TaskMaster.Authentication');
         let verificationError = authenticationPacket.verify(payload);
+        console.log(payload)
         if (verificationError) {
             this.error(`Something went wrong while building the auth packet. ${verificationError}`);
         } else {
@@ -140,23 +141,19 @@ export class PacketBuilder extends Logger {
      * @param isAdmin 
      * @returns 
      */
-    public async buildEmployeePacketWithClientKey(clientId: string, firstName: string, lastName: string, phoneNumber: string, isAdmin: boolean): Promise<Uint8Array> {
+    public async buildEmployeePacketWithAuthKey(employeeData: EmployeeData, authKey: AuthKey): Promise<Uint8Array> {
         // @ts-ignore
         let packet: Uint8Array = null;
         try {
-            if (Config.authKey === null || !Config.authKey) {
-                this.error(`Missing employee auth key for some reason`);
-            }
-            let publicKey = Config.authKey.slice(64, 96);
             let payload: EmployePayload = {
-                clientId: clientId,
-                firstName: firstName,
-                lastName: lastName,
-                isAdmin: isAdmin,
-                phoneNumber: phoneNumber,
-                clientAuthCipher: publicKey,
-                clientAuthKey: Config.getClientAuthKey,
-                clientHash: Config.clientHash
+                clientId: employeeData.clientId,
+                firstName: employeeData.firstName,
+                lastName: employeeData.lastName,
+                isAdmin: employeeData.isAdmin,
+                phoneNumber: employeeData.phoneNumber,
+                clientAuthCipher: authKey.clientAuthCipher,
+                clientAuthKey: authKey.clientAuthKey,
+                clientHash: authKey.clientHash
             };
 
             packet = await this.buildEmployeePacket(payload);
@@ -172,13 +169,13 @@ export class PacketBuilder extends Logger {
         // @ts-ignore
         let packet: Uint8Array = null;
         try {
-            let publicKey = Config.authKey.slice(64, 96);
+            let sessionKey: SessionKey = Config.sessionKey;
             let payload: AuthenticationPacketPayload = {
                 readOnly: false,
-                clientAuthCipher: publicKey,
-                clientAuthKey: Config.getClientAuthKey,
-                clientHash: Config.clientHash,
-                clientId: Config.clientId
+                clientId: sessionKey.clientId,
+                clientAuthCipher: Buffer.from(sessionKey.clientAuthCipher),
+                clientAuthKey: Buffer.from(sessionKey.clientAuthKey),
+                clientHash: sessionKey.clientHash,
             };
 
             packet = await this.buildAuthPacket(payload);
@@ -192,7 +189,7 @@ export class PacketBuilder extends Logger {
     public async buildAuthenticationPacket(): Promise<Uint8Array> {
         let packet: Uint8Array;
 
-        if (Config.authKey !== null && Config.authKey) {
+        if (Config.sessionKey !== null && Config.sessionKey) {
             this.log(`Authenticating with auth key.`);
 
             // Let's try to authenticate on the first try.
