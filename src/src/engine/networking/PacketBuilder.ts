@@ -96,7 +96,6 @@ export class PacketBuilder extends Logger {
 
         let authenticationPacket = this.packetBuilderRoot.lookupType('TaskMaster.Authentication');
         let verificationError = authenticationPacket.verify(payload);
-        console.log(payload)
         if (verificationError) {
             this.error(`Something went wrong while building the auth packet. ${verificationError}`);
         } else {

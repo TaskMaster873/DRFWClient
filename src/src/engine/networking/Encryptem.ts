@@ -253,7 +253,7 @@ export class Encryptem extends Logger {
         // @ts-ignore
         this.#serverSignaturePublicKey = null;
 
-        return { clientAuthKey: this.#clientSignaturePrivateKey, clientAuthCipher: this.#clientSignaturePublicKey, clientHash: Buffer.from(this.#authSecretKey).toString('base64') };
+        return { clientAuthCipher: this.#clientSignaturePublicKey, clientAuthKey: this.#authSecretKey, clientHash: hashedPwd };
     }
 
     public startEncryption(): void {
