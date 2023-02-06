@@ -2,14 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import { Engine } from "./engine/Engine";
+import { SocketManager } from "./engine/networking/WebsocketManager";
 
-import { WebsocketManager } from "./engine/networking/WebsocketManager";
 
 export class Application {
     private rootElem: HTMLElement | null = null;
     private root: ReactDOM.Root | null = null;
-
-    private websocketManager: WebsocketManager = new WebsocketManager();
 
     constructor() {
 
@@ -27,7 +25,7 @@ export class Application {
     private registerEvents() {
         this.renderCore();
         if (!this.isNode()) {
-            this.websocketManager.init();
+            SocketManager.init();
         }
     }
 

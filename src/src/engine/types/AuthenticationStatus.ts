@@ -7,3 +7,4 @@ export interface AuthenticationStatus {
     status: AuthenticationStatusType;
     message: string;
 }
+

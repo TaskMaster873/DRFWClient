@@ -11,11 +11,11 @@ export class Departments extends React.Component {
   private logger: Logger = new Logger(`Departments`, `#20f6a4`, false);
   private list: Department[] = [
     new Department({
-      no: 0,
+      id: "",
       name: "Informatique",
     }),
     new Department({
-      no: 1,
+      id: "",
       name: "Construction",
     }),
   ];

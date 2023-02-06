@@ -1,14 +1,12 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {FormErrorType} from "../errors/FormErrorType";
-import {Config} from "../config/Config";
-import {constants} from "../../../Constants/Constants";
+import {FormErrorType, constants} from "../messages/FormMessages";
+import { SocketManager } from "../networking/WebsocketManager";
 
 /* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
-
 
 /***
  * Ce composant affiche le formulaire pour changer le mot de passe
@@ -114,8 +112,7 @@ export class ComponentChangePassword extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            //Runs in WEBSOCKETMANAGER.ts
-            Config.changePassword(this.state.oldPassword, this.state.newPassword);
+            SocketManager.changePassword(this.state.oldPassword, this.state.newPassword);
         }
     }
 
