@@ -60,10 +60,9 @@ export class ComponentAddEmployee extends React.Component<Props> {
               <Form.Control
                 id="clientId"
                 required
-                type="number"
+                type="text"
                 placeholder="000000"
-                min="100000"
-                max="999999"
+                pattern="^\d{6}$"
               />
               <Form.Control.Feedback type="invalid">
                 {constants.errorInvalidEmployeeId}
