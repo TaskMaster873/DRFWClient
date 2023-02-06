@@ -1,0 +1,79 @@
+/* 
+DayPilot Navigator Theme 
+https://themes.daypilot.org/navigator/theme/zdmr6d
+Theme Designer Version: 2021.09.25.67272
+*/
+.navigator_default_main {
+  border-left: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+}
+.navigator_default_main *,
+.navigator_default_main *:before,
+.navigator_default_main *:after {
+  box-sizing: border-box;
+}
+.navigator_default_line {
+  border-bottom: 1px solid #c0c0c0;
+}
+/* month header */
+.navigator_default_title,
+.navigator_default_titleleft,
+.navigator_default_titleright {
+  border-top: 1px solid #c0c0c0;
+  color: #333333;
+  background: #f3f3f3;
+}
+.navigator_default_title {
+  text-align: center;
+}
+.navigator_default_titleleft,
+.navigator_default_titleright {
+  text-align: center;
+}
+/* day headers */
+.navigator_default_dayheader {
+  color: #333333;
+  background: #ffffff;
+  padding: 0px;
+  text-align: center;
+}
+/* day cells */
+.navigator_default_cell {
+  color: #000000;
+  background: #ffffff;
+  text-align: center;
+}
+.navigator_default_cell_text {
+  padding: 0px;
+}
+.navigator_default_weeknumber {
+  color: #000000;
+  background: #ffffff;
+  text-align: center;
+  padding: 0px;
+}
+.navigator_default_weekend {
+  color: #000000;
+  background: #f0f0f0;
+  text-align: center;
+  padding: 0px;
+}
+.navigator_default_dayother {
+  color: gray;
+}
+.navigator_default_todaybox {
+  border: 1px solid red;
+}
+.navigator_default_busy.navigator_default_cell {
+	background-color: #ee4f2e;
+	border-radius: 15px;
+	color: white;
+  }
+.navigator_default_select .navigator_default_cell_box {
+  background-color: #ffe794;
+  opacity: 0.5;
+}

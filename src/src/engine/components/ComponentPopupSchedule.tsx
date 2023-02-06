@@ -117,6 +117,10 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 		console.log("la state après:", this.state.start);
 		this.onChange();
 	}
+	/**
+	 * 
+	 * @param event qui est le formulaire à envoyer
+	 */
 	private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
 		const form = event.currentTarget;
 		let isValid = form.checkValidity();

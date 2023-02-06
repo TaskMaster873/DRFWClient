@@ -26,7 +26,7 @@ export class Availabilities extends React.Component {
     public render(): JSX.Element {
         let listData: AvailabilityList = { list: this.availabilities };
         return (
-            <ComponentAvailabilities {...{availabilities: listData}}/>
+            <ComponentAvailabilities /*{...{availabilities: listData}}*//>
         );
     }
 }
