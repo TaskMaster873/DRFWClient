@@ -1,12 +1,11 @@
 import React from "react";
-import { Table, Button } from "react-bootstrap";
-import { Departement, DepartementList } from "../types/Departement";
-import { LinkContainer } from "react-router-bootstrap";
+import { Table } from "react-bootstrap";
+import { Department, DepartmentList } from "../types/Department";
 import { ComponentAddDepartement } from "./ComponentAddDepartement";
 
-export class ComponentDepartementList extends React.Component {
-  private list: Departement[] = [];
-  constructor(props: DepartementList) {
+export class ComponentDepartmentList extends React.Component {
+  private list: Department[] = [];
+  constructor(props: DepartmentList) {
     super(props);
     this.list = props.list;
   }

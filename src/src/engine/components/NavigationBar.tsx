@@ -18,7 +18,7 @@ export class NavigationBar extends React.Component {
 
   public render(): JSX.Element {
     return (
-      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{ fontSize: 15 }}>
         <Container>
           <img
             className="me-3"
@@ -35,10 +35,14 @@ export class NavigationBar extends React.Component {
             {/* eslint-disable-next-line no-restricted-globals */}
             <Nav activeKey={location.pathname}>
               <LinkContainer to="/schedule">
-                <Nav.Link>Horaire</Nav.Link>
+                <Nav.Link>Mon horaire</Nav.Link>
               </LinkContainer>
 
-              <LinkContainer to="/departements">
+              <LinkContainer to="/availabilities">
+                <Nav.Link>Mes disponibilités</Nav.Link>
+              </LinkContainer>
+
+              <LinkContainer to="/departments">
                 <Nav.Link>Départements</Nav.Link>
               </LinkContainer>
 

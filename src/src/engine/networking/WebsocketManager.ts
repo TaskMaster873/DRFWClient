@@ -33,6 +33,7 @@ export class WebsocketManager extends Logger {
     constructor() {
         super();
 
+        Config.createEmployee = this.createEmploye.bind(this);
         Config.loginWithPassword = this.loginWithPassword.bind(this);
     }
 
@@ -49,6 +50,35 @@ export class WebsocketManager extends Logger {
 
         await this.encryptem.generateClientCipherKeyPair(password);
         await this.sendAuthPacket();
+    }
+
+    /**
+     * Generates the password cipher and sends the employee packet to backend
+     * @param clientId 
+     * @param firstName 
+     * @param lastName 
+     * @param phoneNumber 
+     * @param password 
+     */
+    private async createEmploye(clientId: string, firstName: string, lastName: string, phoneNumber:string, password: string) : Promise<void> {
+        if(clientId === null || !clientId) {
+            throw new Error('Username is null or empty');
+        }
+        if(password === null || !password) {
+            throw new Error('Password is null or empty');
+        }
+        if(firstName === null || !firstName) {
+            throw new Error('First Name is null or empty');
+        }
+        if(lastName === null || !lastName) {
+            throw new Error('Last Name is null or empty');
+        }
+        if(phoneNumber === null || !phoneNumber) {
+            throw new Error('Phone Number is null or empty');
+        }
+
+        await this.encryptem.generateClientCipherKeyPair(password);
+        await this.sendEmployeePacket(clientId, firstName, lastName, phoneNumber, false);
     }
 
     get isSecure() : boolean {
@@ -227,6 +257,14 @@ export class WebsocketManager extends Logger {
 
         if(authPacket !== null && authPacket) {
             await this.sendMsg(authPacket);
+        }
+    }
+
+    private async sendEmployeePacket(clientId: string, firstName: string, lastName: string, phoneNumber: string, isAdmin: boolean) : Promise<void> {
+        let employeePacket = await this.packetBuilder.buildEmployeePacketWithClientKey(clientId, firstName, lastName, phoneNumber, isAdmin);
+
+        if(employeePacket !== null && employeePacket) {
+            await this.sendMsg(employeePacket);
         }
     }
 
