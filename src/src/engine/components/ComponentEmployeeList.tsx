@@ -3,6 +3,11 @@ import { Table, Button } from "react-bootstrap";
 import { EmployeeList, Employee } from "../types/Employee";
 import { LinkContainer } from "react-router-bootstrap";
 
+/***
+ * Ce composant affiche la liste de tous les employés d'un département
+ *
+ * state : ancien mot de passe, nouveau mot de passe, validation requis et regex de mot de passe
+ */
 export class ComponentEmployeeList extends React.Component {
   private list: Employee[] = [];
   constructor(props: EmployeeList) {
@@ -17,7 +22,7 @@ export class ComponentEmployeeList extends React.Component {
         <Table responsive bordered hover>
           <thead>
             <tr key={"firstCol"}>
-              <th key={"no"}>#</th>
+              <th key={"id"}>#</th>
               <th key={"firstName"}>Prénom</th>
               <th key={"name"}>Nom</th>
               <th key={"phoneNumber"}>Tel</th>
@@ -29,7 +34,7 @@ export class ComponentEmployeeList extends React.Component {
           <tbody>
             {Array.from({ length: this.list.length }).map((_, index) => (
               <tr key={"secondCol" + index}>
-                <td key={"no" + index}>{index}</td>
+                <td key={"id" + index}>{this.list[index].id}</td>
                 <td key={"firstName " + index}>
                   <a>{this.list[index].firstName}</a>
                 </td>

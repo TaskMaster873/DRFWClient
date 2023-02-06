@@ -31,10 +31,20 @@ export class ComponentSchedule extends React.Component {
 
 	}
 
-	/*   get calendar() {
-		return this.calendarRef.current.control;
-	} */
+  constructor(props: EmployeeList) {
+    super(props);
+    this.list = props.list;
+    this.dateRef = React.createRef(); //DayPilot.Date.today();
+    this.state = {
+      startDate: DayPilot.Date.today(),
+      columns: this.doColumns(),
+      events: this.doEvents(),
+    };
+  }
 
+  /*   get calendar() {
+        return this.calendarRef.current.control;
+    } */
 
 
 	/**
@@ -54,78 +64,139 @@ export class ComponentSchedule extends React.Component {
 		return listToReturn;
 	}
 
-	private doEvents(): EventForCalendar[] {
+  private doEvents(): EventForCalendar[] {
+    this.listEvent.push({
+      id: 1,
+      text: "Il faut mettre le temps et le titre",
+      start: DayPilot.Date.today(),
+      end: DayPilot.Date.now(),
+      resource: "1",
+      barColor: "#0C2840",
+    });
+    return this.listEvent;
+  }
 
+  loadGroups() {
+    let data: ScheduleGroups = {
+      groups: [
+        {
+          name: "Locations",
+          id: "locations",
+          resources: [
+            { name: "Room 1", id: "R1" },
+            { name: "Room 2", id: "R2" },
+            { name: "Room 3", id: "R3" },
+            { name: "Room 4", id: "R4" },
+            { name: "Room 5", id: "R5" },
+            { name: "Room 6", id: "R6" },
+            { name: "Room 7", id: "R7" },
+          ],
+        },
+        {
+          name: "People",
+          id: "people",
+          resources: [
+            { name: "Person 1", id: "P1" },
+            { name: "Person 2", id: "P2" },
+            { name: "Person 3", id: "P3" },
+            { name: "Person 4", id: "P4" },
+            { name: "Person 5", id: "P5" },
+            { name: "Person 6", id: "P6" },
+            { name: "Person 7", id: "P7" },
+          ],
+        },
+        {
+          name: "Tools",
+          id: "tools",
+          resources: [
+            { name: "Tool 1", id: "T1" },
+            { name: "Tool 2", id: "T2" },
+            { name: "Tool 3", id: "T3" },
+            { name: "Tool 4", id: "T4" },
+            { name: "Tool 5", id: "T5" },
+            { name: "Tool 6", id: "T6" },
+            { name: "Tool 7", id: "T7" },
+          ],
+        },
+      ],
+    };
+    return data;
+  }
 
+  /**
+   *
+   * @param group étant le projet qu'on veut montrer ses employés assigné
+   */
+  private groupChanged(group: { resources: ResourceGroups }) {
+    const columns = group.resources;
 
-		this.listEvent.push({
-			id: 1,
-			text: "Il faut mettre le temps et le titre",
-			start: DayPilot.Date.today(),
-			end: DayPilot.Date.now(),
-			resource: "1",
-			barColor: "#0C2840",
-		});
-		return this.listEvent;
-	}
+    const events = [
+      {
+        id: 1,
+        text: "Event 1",
+        start: DayPilot.Date.today(),
+        end: "2023-02-01T13:00:00",
+        barColor: "#fcb711",
+        resource: "R1",
+      },
+      // ...
+    ];
+    this.setState({ columns: columns, events: events });
+  }
 
-	componentDidMount() { }
+  /**
+   *
+   * @param args est le nouvel horaire à ajouter avec tout les paramètres.
+   */
+  eventAdd = (args: { event: EventForCalendar }) => {
+    console.log(args.event);
+    this.listEvent.push({
+      id: args.event.id,
+      text: args.event.text,
+      start: args.event.start,
+      end: args.event.end,
+      resource: args.event.resource,
+      barColor: args.event.barColor,
+    });
+    this.setState({ events: this.listEvent });
+  };
 
-	loadGroups() {
-		let data: ScheduleGroups = {
-			groups: [
-				{
-					name: "Locations",
-					id: "locations",
-					resources: [
-						{ name: "Room 1", id: "R1" },
-						{ name: "Room 2", id: "R2" },
-						{ name: "Room 3", id: "R3" },
-						{ name: "Room 4", id: "R4" },
-						{ name: "Room 5", id: "R5" },
-						{ name: "Room 6", id: "R6" },
-						{ name: "Room 7", id: "R7" },
-					],
-				},
-				{
-					name: "People",
-					id: "people",
-					resources: [
-						{ name: "Person 1", id: "P1" },
-						{ name: "Person 2", id: "P2" },
-						{ name: "Person 3", id: "P3" },
-						{ name: "Person 4", id: "P4" },
-						{ name: "Person 5", id: "P5" },
-						{ name: "Person 6", id: "P6" },
-						{ name: "Person 7", id: "P7" },
-					],
-				},
-				{
-					name: "Tools",
-					id: "tools",
-					resources: [
-						{ name: "Tool 1", id: "T1" },
-						{ name: "Tool 2", id: "T2" },
-						{ name: "Tool 3", id: "T3" },
-						{ name: "Tool 4", id: "T4" },
-						{ name: "Tool 5", id: "T5" },
-						{ name: "Tool 6", id: "T6" },
-						{ name: "Tool 7", id: "T7" },
-					],
-				},
-			],
-		};
-		return data;
-	}
+  /**
+   *
+   * @param args c'est toutes les données de l'évènement
+   * @returns rien
+   */
+  onTimeRangeSelected = (args: any) => {
+    let name = prompt("New event name:", "Event");
 
+    DayPilot.Calendar.clearSelection;
+    console.log("agrs =", args);
+    if (!name) return;
+    this.listEvent.push({
+      id: 1,
+      text: args.text,
+      start: args.start,
+      end: args.end,
+      resource: args.resource,
+      barColor: args.barColor,
+    });
+    this.setState({ events: this.listEvent });
+  };
 
-	private returnEmployeeForTheGoodGroup() {
+  /**
+   *
+   * @param args le groupe sélectionné
+   * la fonction change le groupe qui est affiché
+   */
+  onChange = (args: { selected: { resources: ResourceGroups } }) => {
+    this.groupChanged(args.selected);
+  };
 
 	}
 
 
 	/**
-	 * 
+	 *
 	 * @param group étant le projet qu'on veut montrer ses employés assigné
 	 */
 	private groupChanged(group: { resources: ResourceGroups }): void {
@@ -146,7 +217,7 @@ export class ComponentSchedule extends React.Component {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param args est le nouvel horaire à ajouter avec tout les paramètres.
 	 */
 	eventAdd = (args: { event: EventForCalendar }) => {
@@ -162,7 +233,7 @@ export class ComponentSchedule extends React.Component {
 		this.setState({ events: this.listEvent });
 	}
 	/**
-	 * 
+	 *
 	 * @param args c'est toutes les données de l'évènement
 	 * @returns rien
 	 */
@@ -186,7 +257,7 @@ export class ComponentSchedule extends React.Component {
 
 
 	/**
-	 * 
+	 *
 	 * @param args le groupe sélectionné
 	 * la fonction change le groupe qui est affiché
 	 */

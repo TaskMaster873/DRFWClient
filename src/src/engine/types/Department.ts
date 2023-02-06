@@ -2,14 +2,14 @@
 /**
  * Liste d'employé, comme dit dans le nom
  */
-export interface DepartementList {
-    list : Departement[];
+export interface DepartmentList {
+    list : Department[];
 }
 
 /**
  * Contient tout les renseignements des employés de l'application web
  */
-export class Departement {
+export class Department {
     no: number = 0;
     name: string =  "";
 

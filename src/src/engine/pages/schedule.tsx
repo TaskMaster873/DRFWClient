@@ -9,7 +9,7 @@ import { EmployeeList, Employee } from "../types/Employee";
 export class Schedule extends React.Component {
     private list: Employee[] = [ // ceci est la même liste que dans employeelist page
         new Employee({
-            no: 0,
+            id: 0,
             name: "Blanchet",
             firstName: "Stéphane",
             phoneNumber: "581-555-5555",
@@ -17,7 +17,7 @@ export class Schedule extends React.Component {
             jobTitles: ["Gestionnaire de projet", "Directeur de production"],
         }),
         new Employee({
-            no: 1,
+            id: 1,
             name: "Blanchette",
             firstName: "Roger",
             phoneNumber: "581-555-2312",
