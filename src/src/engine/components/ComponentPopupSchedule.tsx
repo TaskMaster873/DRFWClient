@@ -3,12 +3,12 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
+import { EventForCalendar } from "../types/Shift";
 
-type Props = { isShowing: boolean };
+type Props = { isShowing: boolean, eventAdd: Function };
 type State = { isShowed?: boolean, nameOfEvent?: string, colorOfEvent?: string, start?: DayPilot.Date, end?: DayPilot.Date, resource?: string }
 
 export class ComponentPopupSchedule extends React.Component<Props, State> {
-
 
 	constructor(props: Props) {
 		super(props);
@@ -22,14 +22,33 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 		};
 		this.onChange = this.onChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
+		this.returnToTheCalendar = this.returnToTheCalendar.bind(this);
 	}
+
 
 	public onChange = () => {
 		this.setState({ isShowed: !this.state.isShowed });
-		console.log("la state = ",this.state);
+		console.log("la state = ", this.state);
 	};
 
-	public saveContent = (event: React.FormEvent<HTMLFormElement>) => {
+	private returnToTheCalendar = () => {
+		let eventToReturn: EventForCalendar = {
+			id: 1,
+			text: this.state.nameOfEvent,
+			start: this.state.start,
+			end: this.state.end,
+			resource: this.state.resource,
+			barColor: this.state.colorOfEvent,
+		};
+		console.log("eventCréé =", eventToReturn)
+		this.props.eventAdd(eventToReturn);
+		this.onChange();
+	}
+
+	public saveContent = (startTime: DayPilot.Date, endTime: DayPilot.Date, resourceId: string) => {
+		console.log("le state doit avoir les 3 non null:", startTime, endTime, resourceId);
+		this.setState({ start: startTime, end: endTime, resource: resourceId });
+		console.log("la state après:", this.state.start);
 		this.onChange();
 	}
 	private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
@@ -43,10 +62,6 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 			event.stopPropagation();
 			console.log(event.target[0].value);
 			this.onChange();
-			//console.log(event.target.elements.username.value)
-			//console.log(event.target.username.value)
-			//console.log(this.inputNode.value)
-			// errorType = FormErrorType.INVALID_FORM;
 		}
 
 		/* this.setState({
@@ -55,7 +70,8 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 		 });*/
 	}
 
-	 handleChange = (event: React.ChangeEvent<HTMLFormElement>) => {
+	handleChange = (event: React.ChangeEvent<HTMLFormElement>) => {
+
 		console.log("cela change", event.target.id, event.target.value)
 		const target = event.target;
 		const value = target.value;
@@ -65,7 +81,6 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 			throw new Error("Id is undefined for element in form.");
 
 		}
-		
 		this.setState({
 			[name]: value,
 		});
@@ -91,16 +106,6 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 									placeholder="corps de travail"
 									autoFocus />
 							</Form.Group>
-							<Form.Group
-								className="mb-3"
-								controlId="exampleForm.ControlTextarea1"
-							>
-								<Form.Label>input que je ne sais pas si on en aura besoin</Form.Label>
-								<Form.Control
-									type="text"
-									placeholder=""
-									autoFocus />
-							</Form.Group>
 							<Form.Group className="mb-3" controlId="colorOfEvent">
 								<Form.Label >Color picker</Form.Label>
 								<Form.Control
@@ -114,7 +119,7 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 							<Button variant="secondary" onClick={this.onChange} >
 								Annuler
 							</Button>
-							<Button variant="primary" onClick={this.onChange} >
+							<Button variant="primary" onClick={this.returnToTheCalendar} >
 								Sauvegarder
 							</Button>
 						</Modal.Footer>
