@@ -1,12 +1,12 @@
 import "@testing-library/react/dist/fire-event";
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
-import {FormErrorType} from "../src/engine/errors/FormErrorType";
+import {FormErrorType} from "../src/engine/messages/FormMessages";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {Config} from "../src/engine/config/Config";
 import {ChangePassword} from "../src/engine/pages/changePassword";
+import { SocketManager } from "../src/engine/networking/WebsocketManager";
 
 
 let user;
@@ -54,7 +54,7 @@ describe("Empty Fields change password validation", () => {
 });
 
 test("Valid old and new password should submit form", async () => {
-    Config.changePassword = jest.fn();
+    SocketManager.changePassword = jest.fn();
     const {inputOldPassword, form, inputNewPassword} = getFields();
 
     await user.type(inputOldPassword, testConstants.validPassword);
@@ -62,7 +62,7 @@ test("Valid old and new password should submit form", async () => {
 
     fireEvent.submit(form);
 
-    expect(Config.changePassword).toBeCalled();
+    expect(SocketManager.changePassword).toBeCalled();
     expect(inputOldPassword.value).toBe(testConstants.validPassword);
     expect(inputNewPassword.value).toBe(testConstants.validNewPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();

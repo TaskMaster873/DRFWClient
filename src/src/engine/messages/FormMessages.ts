@@ -1,3 +1,8 @@
+export enum FormErrorType {
+    NO_ERROR = '0',
+    INVALID_FORM = '1'
+}
+
 export const constants = {
     errorRequiredEmployeeId: "Le numéro d'employé est requis",
     errorRequiredFirstName: "Le prénom est requis",

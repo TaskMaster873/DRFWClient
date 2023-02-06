@@ -3,10 +3,9 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { FormErrorType } from "../errors/FormErrorType";
-import { constants } from "../../../Constants/Constants";
+import { FormErrorType, constants } from "../messages/FormMessages";
 import { Container } from "react-bootstrap";
-import { Config } from "../config/Config";
+import { SocketManager } from "../networking/WebsocketManager";
 
 type Props = { titles: string[]; roles: string[] };
 /**
@@ -61,10 +60,9 @@ export class ComponentAddEmployee extends React.Component<Props> {
               <Form.Control
                 id="clientId"
                 required
-                type="number"
+                type="text"
                 placeholder="000000"
-                min="100000"
-                max="999999"
+                pattern="^\d{6}$"
               />
               <Form.Control.Feedback type="invalid">
                 {constants.errorInvalidEmployeeId}
@@ -187,12 +185,16 @@ export class ComponentAddEmployee extends React.Component<Props> {
     });
 
     if (errorType === FormErrorType.NO_ERROR) {
-      Config.createEmployee(
-        this.state.clientId,
-        this.state.firstName,
-        this.state.lastName,
-        this.state.phoneNumber,
-        this.state.password
+      SocketManager.createEmployee(
+        {
+          id: this.state.clientId,
+          firstName: this.state.firstName,
+          lastName: this.state.lastName,
+          phoneNumber: this.state.phoneNumber,
+          password: this.state.password,
+          departmentId: "1",
+          jobTitles: []
+        }
       );
     }
   }

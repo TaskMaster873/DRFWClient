@@ -5,7 +5,8 @@ import { ResourceGroups } from "./ComponentFilterProjects";
 import { ScheduleGroups, ScheduleResource } from "../types/Schedule";
 import "./ComponentPopupSchedule";
 import { EventForCalendar } from "../types/Shift";
-import { ComponentPopupSchedule } from "./ComponentPopupSchedule";
+import { constants } from "../messages/FormMessages";
+import { Example } from "./ComponentPopupSchedule";
 /**
  * Ceci est le composant d'horaire
  */
@@ -157,7 +158,7 @@ export class ComponentSchedule extends React.Component {
 		];
 		this.setState({ columns: columns, events: events });
 	}
-	
+
 	/**
 	 *
 	 * @param args c'est toutes les données de l'évènement

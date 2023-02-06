@@ -4,11 +4,13 @@ import protobuf from 'protobufjs';
 
 import * as sodium from 'sodium-universal';
 import { Buffer } from 'buffer';
-import { AuthenticationStatus } from "./types/AuthenticationStatus";
+import { AuthenticationStatus } from "../types/AuthenticationStatus";
+import { AuthData, SessionKey } from "../types/AuthData";
 import Long from 'long';
-import { Opcodes } from "./opcodes/Opcodes";
-import { Config } from "../config/Config";
-import { AuthenticationPacketPayload, EmployePayload, ServerKeyCipherExchange } from "./types/Packets";
+import { Opcodes } from "../types/Opcodes";
+import { Config } from "../Config";
+import { AuthenticationPacketPayload, EmployeCreatePayload, PacketPayload, ServerKeyCipherExchange } from "../types/Packets";
+import { EmployeeCreateDTO } from "../types/Employee";
 
 protobuf.util.Long = Long;
 protobuf.configure();
@@ -37,7 +39,27 @@ export class PacketBuilder extends Logger {
         this.init();
     }
 
-    // POST AUTHENTICATION
+    /*
+     * ---------------------------------------------Packet Builders------------------------------------------------
+     */
+
+    public async buildAuthenticationPacket(): Promise<Uint8Array> {
+        let packet: Uint8Array;
+
+        if (Config.sessionKey !== null && Config.sessionKey) {
+            this.log(`Authenticating with auth key.`);
+
+            // Let's try to authenticate on the first try.
+            packet = await this.buildAuthenticationPacketWithClientKey();
+        } else {
+            this.log(`Generating read-only authentication packet. Auth key is not set.`);
+
+            packet = await this.buildReadOnlyAuthenticationPacket();
+        }
+
+        return packet;
+    }
+
     private async buildReadOnlyAuthenticationPacket(): Promise<Uint8Array> {
         // @ts-ignore
         let packet: Uint8Array = null;
@@ -47,13 +69,110 @@ export class PacketBuilder extends Logger {
                 readOnly: true
             };
 
-            packet = await this.buildAuthPacket(payload);
+            packet = await this.buildPacket(Opcodes.OutBound.AUTHENTICATION, 'TaskMaster.Authentication', payload);
         } catch (e: any) {
             this.error(`Failed to build auth (readonly) packet. ${e.stack}`);
         }
 
         return packet;
     }
+
+    private async buildAuthenticationPacketWithClientKey(): Promise<Uint8Array> {
+        // @ts-ignore
+        let packet: Uint8Array = null;
+        try {
+            let sessionKey: SessionKey = Config.sessionKey;
+            let payload: AuthenticationPacketPayload = {
+                readOnly: false,
+                clientId: sessionKey.clientId,
+                clientPubKey: Buffer.from(sessionKey.clientPubKey),
+                clientAuthKey: Buffer.from(sessionKey.clientAuthKey),
+                clientHash: sessionKey.clientHash,
+            };
+
+            packet = await this.buildPacket(Opcodes.OutBound.AUTHENTICATION, 'TaskMaster.Authentication', payload);
+        } catch (e: any) {
+            this.error(`Failed to build auth (with key) packet. ${e.stack}`);
+        }
+
+        return packet;
+    }
+
+    /**
+     * Builds the EmployeeCreateDTO Packet with auths
+     * @param employeeDTO 
+     * @param authData 
+     * @returns 
+     */
+    public async buildEmployeeCreatePacket(employeeDTO: EmployeeCreateDTO, authData: AuthData): Promise<Uint8Array> {
+        // @ts-ignore
+        let packet: Uint8Array = null;
+        try {
+            let payload: EmployeCreatePayload = {
+                id: employeeDTO.id,
+                firstName: employeeDTO.firstName,
+                lastName: employeeDTO.lastName,
+                phoneNumber: employeeDTO.phoneNumber,
+                clientPubKey: authData.clientPubKey,
+                clientAuthKey: authData.clientAuthKey,
+                clientHash: authData.clientHash
+            };
+
+            packet = await this.buildPacket(Opcodes.OutBound.CREATE_EMPLOYEE, 'TaskMaster.EmployeeCreate', payload);
+        } catch (e: any) {
+            this.error(`Failed to build employee create packet. ${e.stack}`);
+        }
+
+        return packet;
+    }
+
+    public async buildPingPacket(): Promise<Uint8Array> {
+        // @ts-ignore
+        let packet: Uint8Array = null;
+        try {
+            this.lastPingTimeStamp = this.currentPingTimeStamp || 0n;
+            this.currentPingTimeStamp = BigInt(this.getUtcTime());
+
+            let payload = {
+                timestamp: Long.fromString(this.currentPingTimeStamp.toString()),
+                lastPing: Long.fromString(this.lastPingTimeStamp.toString())
+            };
+            packet = await this.buildPacket(Opcodes.OutBound.PING, 'TaskMaster.Ping', payload)
+        } catch (e: any) {
+            this.error(`Failed to build ping packet. ${e.stack}`);
+        }
+
+        return packet;
+    }
+
+    /**
+    * Generalised packet builder
+    * @param opcode A number represented in Opcodes.ts
+    * @param protoType A string path found in the server file .proto
+    * @param payload The payload to send
+    * @returns A nicely packaged packet ready to send
+    */
+    private async buildPacket(opcode: number, protoType: string, payload: PacketPayload): Promise<Uint8Array> {
+        // @ts-ignore
+        let packet: Uint8Array = null;
+
+        let basePacket = this.packetBuilderRoot.lookupType(protoType);
+        let verificationError = basePacket.verify(payload);
+        if (verificationError) {
+            this.error(`Something went wrong while building the ${protoType} packet. ${verificationError}`);
+        } else {
+            let msg = basePacket.create(payload);
+            packet = basePacket.encode(msg).finish();
+
+            packet = new Uint8Array([opcode, ...packet]);
+        }
+
+        return packet;
+    }
+
+    /*
+     * ---------------------------------------------Packet Parsers------------------------------------------------
+     */
 
     public async parseKeyCipherExchangeServerPacket(packet: Uint8Array): Promise<ServerKeyCipherExchange> {
         // @ts-ignore
@@ -78,133 +197,36 @@ export class PacketBuilder extends Logger {
         return serverKeyCipherExchange;
     }
 
-    private startPingInterval(): void {
+    public async parseAuthenticationStatus(authType: number, packet: Uint8Array): Promise<AuthenticationStatus> {
+        let status: any = null;
 
-    }
-
-    private onPing(): void {
-
-    }
-
-    private clearIntervals(): void {
-
-    }
-
-    private async buildAuthPacket(payload: AuthenticationPacketPayload): Promise<Uint8Array> {
-        // @ts-ignore
-        let packet: Uint8Array = null;
-
-        let authenticationPacket = this.packetBuilderRoot.lookupType('TaskMaster.Authentication');
-        let verificationError = authenticationPacket.verify(payload);
-        if (verificationError) {
-            this.error(`Something went wrong while building the auth packet. ${verificationError}`);
-        } else {
-            let msg = authenticationPacket.create(payload);
-            packet = authenticationPacket.encode(msg).finish();
-
-            packet = new Uint8Array([Opcodes.OutBound.AUTHENTICATION, ...packet]);
-        }
-
-        return packet;
-    }
-
-    /**
-     * Packages the packet for sending, end of chain. Packet is ready to send
-     * @param payload 
-     * @returns 
-     */
-    private async buildEmployeePacket(payload: EmployePayload): Promise<Uint8Array> {
-        // @ts-ignore
-        let packet: Uint8Array = null;
-
-        let employeePacket = this.packetBuilderRoot.lookupType('TaskMaster.Employee');
-        let verificationError = employeePacket.verify(payload);
-        if (verificationError) {
-            this.error(`Something went wrong while building the employee packet. ${verificationError}`)
-        } else {
-            let msg = employeePacket.create(payload);
-            packet = employeePacket.encode(msg).finish();
-
-            packet = new Uint8Array([Opcodes.OutBound.CREATE_EMPLOYE, ...packet]);
-        }
-
-        return packet;
-    }
-
-    /**
-     * Builds the Employee Packet with auths
-     * @param clientId 
-     * @param firstName 
-     * @param lastName 
-     * @param phoneNumber 
-     * @param isAdmin 
-     * @returns 
-     */
-    public async buildEmployeePacketWithClientKey(clientId: string, firstName: string, lastName: string, phoneNumber: string, isAdmin: boolean): Promise<Uint8Array> {
-        // @ts-ignore
-        let packet: Uint8Array = null;
         try {
-            if (Config.authKey === null || !Config.authKey) {
-                this.error(`Missing employee auth key for some reason`);
+            let type = `TaskMaster.ReadOnlyAuthenticationStatus`;
+            if (authType === 1) {
+                type = `TaskMaster.FullAuthenticationStatus`;
             }
-            let publicKey = Config.authKey.slice(64, 96);
-            let payload: EmployePayload = {
-                clientId: clientId,
-                firstName: firstName,
-                lastName: lastName,
-                isAdmin: isAdmin,
-                phoneNumber: phoneNumber,
-                clientAuthCipher: publicKey,
-                clientAuthKey: Config.getClientAuthKey,
-                clientHash: Config.clientHash
-            };
 
-            packet = await this.buildEmployeePacket(payload);
+            let authStatusSchema = this.packetBuilderRoot.lookupType(type);
+            let decoded = authStatusSchema.decode(packet);
+            status = authStatusSchema.toObject(decoded, {
+                longs: Long,
+                enums: String,
+                bytes: Uint8Array,
+                defaults: true,
+                arrays: true,
+                objects: true,
+                oneofs: true
+            });
         } catch (e: any) {
-            this.error(`Failed to build employee (with key) packet. ${e.stack}`);
+            this.error(`Failed to parse authentication status. ${e.message}`);
         }
 
-        return packet;
+        return status;
     }
 
-    // AUTHENTICATION
-    private async buildAuthenticationPacketWithClientKey(): Promise<Uint8Array> {
-        // @ts-ignore
-        let packet: Uint8Array = null;
-        try {
-            let publicKey = Config.authKey.slice(64, 96);
-            let payload: AuthenticationPacketPayload = {
-                readOnly: false,
-                clientAuthCipher: publicKey,
-                clientAuthKey: Config.getClientAuthKey,
-                clientHash: Config.clientHash,
-                clientId: Config.clientId
-            };
-
-            packet = await this.buildAuthPacket(payload);
-        } catch (e: any) {
-            this.error(`Failed to build auth (with key) packet. ${e.stack}`);
-        }
-
-        return packet;
-    }
-
-    public async buildAuthenticationPacket(): Promise<Uint8Array> {
-        let packet: Uint8Array;
-
-        if (Config.authKey !== null && Config.authKey) {
-            this.log(`Authenticating with auth key.`);
-
-            // Let's try to authenticate on the first try.
-            packet = await this.buildAuthenticationPacketWithClientKey();
-        } else {
-            this.log(`Generating read-only authentication packet. Auth key is not set.`);
-
-            packet = await this.buildReadOnlyAuthenticationPacket();
-        }
-
-        return packet;
-    }
+    /*
+     * ---------------------------------------------Other------------------------------------------------
+     */
 
     public reset(): void {
         // @ts-ignore
@@ -241,62 +263,5 @@ export class PacketBuilder extends Logger {
         let utc = localTime;
 
         return utc;
-    }
-
-    public async parseAuthenticationStatus(authType: number, packet: Uint8Array): Promise<AuthenticationStatus> {
-        let status: any = null;
-
-        try {
-            let type = `TaskMaster.ReadOnlyAuthenticationStatus`;
-            if (authType === 1) {
-                type = `TaskMaster.FullAuthenticationStatus`;
-            }
-
-            let authStatusSchema = this.packetBuilderRoot.lookupType(type);
-            let decoded = authStatusSchema.decode(packet);
-            status = authStatusSchema.toObject(decoded, {
-                longs: Long,
-                enums: String,
-                bytes: Uint8Array,
-                defaults: true,
-                arrays: true,
-                objects: true,
-                oneofs: true
-            });
-        } catch (e: any) {
-            this.error(`Failed to parse authentication status. ${e.message}`);
-        }
-
-        return status;
-    }
-
-    public async buildPingPacket(): Promise<Uint8Array> {
-        // @ts-ignore
-        let packet: Uint8Array = null;
-        try {
-            let pingPacketSchema = this.packetBuilderRoot.lookupType(`TaskMaster.Ping`);
-
-            this.lastPingTimeStamp = this.currentPingTimeStamp || 0n;
-            this.currentPingTimeStamp = BigInt(this.getUtcTime());
-
-            let payload = {
-                timestamp: Long.fromString(this.currentPingTimeStamp.toString()),
-                lastPing: Long.fromString(this.lastPingTimeStamp.toString())
-            };
-
-            let verificationError = pingPacketSchema.verify(payload);
-            if (verificationError) {
-                this.error(`Something went wrong while building the ping packet. ${verificationError}`);
-            } else {
-                let msg = pingPacketSchema.create(payload);
-                packet = pingPacketSchema.encode(msg).finish();
-
-                packet = new Uint8Array([Opcodes.OutBound.PING, ...packet]);
-            }
-        } catch (e: any) {
-            this.error(`Failed to build ping packet. ${e.stack}`);
-        }
-
-        return packet;
     }
 }

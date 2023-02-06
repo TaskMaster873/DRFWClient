@@ -26,7 +26,7 @@ export class ComponentEmployeeList extends React.Component {
               <th key={"firstName"}>Prénom</th>
               <th key={"name"}>Nom</th>
               <th key={"phoneNumber"}>Tel</th>
-              <th key={"manager"}>Gestionnaire</th>
+              <th key={"departmentId"}>Département</th>
               <th key={"jobTitles"}>Role(s)</th>
               <th key={"skills"}>Compétences</th>
             </tr>
@@ -38,11 +38,11 @@ export class ComponentEmployeeList extends React.Component {
                 <td key={"firstName " + index}>
                   <a>{this.list[index].firstName}</a>
                 </td>
-                <td key={"name " + index}>{this.list[index].name}</td>
+                <td key={"name " + index}>{this.list[index].lastName}</td>
                 <td key={"phoneNumber " + index}>
                   {this.list[index].phoneNumber}
                 </td>
-                <td key={"manager " + index}>{this.list[index].manager}</td>
+                <td key={"departmentId " + index}>{this.list[index].departmentId}</td>
                 <td key={"jobTitles " + index}>
                   {this.list[index].jobTitles.join(", ")}
                 </td>

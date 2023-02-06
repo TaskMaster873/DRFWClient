@@ -1,7 +1,8 @@
-import {Logger} from "../Logger";
-import {Config} from "../config/Config";
+import { Logger } from "../Logger";
+import { Config } from "../Config";
 import { Buffer } from "buffer";
 import * as sodium from 'sodium-universal';
+import { AuthData } from "../types/AuthData";
 
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';
@@ -34,60 +35,60 @@ export class Encryptem extends Logger {
         this.init();
     }
 
-    public setClientSecretKey(key: Buffer) : void {
+    public setClientSecretKey(key: Buffer): void {
         this.#clientSecretKey = key;
     }
 
-    public setClientPublicKey(key: Buffer) : void {
+    public setClientPublicKey(key: Buffer): void {
         this.#clientPublicKey = key;
     }
 
-    public setClientSignaturePublicKey(key: Buffer) : void {
+    public setClientSignaturePublicKey(key: Buffer): void {
         this.#clientSignaturePublicKey = key;
     }
 
-    public setClientSignaturePrivateKey(key: Buffer) : void {
+    public setClientSignaturePrivateKey(key: Buffer): void {
         this.#clientSignaturePrivateKey = key;
     }
-    public setServerSignaturePublicKey(key: Buffer) : void {
+    public setServerSignaturePublicKey(key: Buffer): void {
         this.#serverSignaturePublicKey = key;
     }
 
-    public setServerPublicKey(key: Buffer) : void {
+    public setServerPublicKey(key: Buffer): void {
         this.#serverPublicKey = key;
     }
 
-    public setClientAuthKey(key: Buffer) : void {
+    public setClientAuthKey(key: Buffer): void {
         this.#authSecretKey = key;
     }
 
-    public getClientPublicKey() : Buffer {
+    public getClientPublicKey(): Buffer {
         return this.#clientPublicKey;
     }
 
-    public getClientSignaturePublicKey() : Buffer {
+    public getClientSignaturePublicKey(): Buffer {
         return this.#clientSignaturePublicKey;
     }
 
-    public getServerPublicKey() : Buffer {
+    public getServerPublicKey(): Buffer {
         return this.#serverPublicKey;
     }
 
-    public getServerSignaturePublicKey() : Buffer {
+    public getServerSignaturePublicKey(): Buffer {
         return this.#serverSignaturePublicKey;
     }
 
-    public setSodium(sodium: any) : void {
+    public setSodium(sodium: any): void {
         this.sodium = sodium;
     }
 
-    private generateNonce() : Buffer {
+    private generateNonce(): Buffer {
         let keyBuf = Buffer.alloc(this.sodium.crypto_box_NONCEBYTES);
         this.sodium.randombytes_buf(keyBuf);
         return keyBuf;
     }
 
-    #encrypt(m: Buffer, receiverPublicKey: Buffer, senderPrivateKey: Buffer, senderPublicKey: Buffer, senderSigningPrivateKey: Buffer) : Uint8Array {
+    #encrypt(m: Buffer, receiverPublicKey: Buffer, senderPrivateKey: Buffer, senderPublicKey: Buffer, senderSigningPrivateKey: Buffer): Uint8Array {
         try {
             let nonce = this.generateNonce();
             let cipherMsg = Buffer.alloc(m.length + this.sodium.crypto_box_MACBYTES);
@@ -96,7 +97,7 @@ export class Encryptem extends Logger {
 
             let finalMsg = Buffer.concat([nonce, cipherMsg]);
             let signedMessage = this.#signMessageV2(cipherMsg, senderPublicKey, senderSigningPrivateKey);
-            if(signedMessage === null) {
+            if (signedMessage === null) {
                 throw new Error(`Failed to sign message.`);
                 // @ts-ignore
                 return null;
@@ -106,7 +107,7 @@ export class Encryptem extends Logger {
             let finalMessageBuffer = Buffer.concat([auth, signedMessage, finalMsg]);
 
             return new Uint8Array(finalMessageBuffer);
-        } catch(e: any) {
+        } catch (e: any) {
             console.error(e.stack);
         }
 
@@ -114,7 +115,7 @@ export class Encryptem extends Logger {
         return null;
     }
 
-    #decrypt(msg: Buffer, senderPublicKey: Buffer, receiverPrivateKey: Buffer, signature: Buffer, senderSigningPublicKey: Buffer) : Buffer {
+    #decrypt(msg: Buffer, senderPublicKey: Buffer, receiverPrivateKey: Buffer, signature: Buffer, senderSigningPublicKey: Buffer): Buffer {
         if (msg.length < this.sodium.crypto_box_NONCEBYTES + this.sodium.crypto_box_MACBYTES) {
             throw "Short message";
         }
@@ -126,7 +127,7 @@ export class Encryptem extends Logger {
         this.sodium.crypto_box_open_easy(decryptedMessage, cipher, nonce, senderPublicKey, receiverPrivateKey);
 
         let verified = this.#verifySignature(cipher, signature, senderSigningPublicKey);
-        if(verified) {
+        if (verified) {
             return decryptedMessage;
         } else {
             // @ts-ignore
@@ -134,7 +135,7 @@ export class Encryptem extends Logger {
         }
     }
 
-    #authenticate(input: Buffer) : Buffer {
+    #authenticate(input: Buffer): Buffer {
         let out = Buffer.alloc(this.sodium.crypto_auth_BYTES);
         let k = Buffer.alloc(this.sodium.crypto_auth_KEYBYTES);
         this.sodium.randombytes_buf(k);
@@ -144,13 +145,13 @@ export class Encryptem extends Logger {
         return out;
     }
 
-    #verifySignature(m: Buffer, signature: Buffer, publicKey: Buffer) : boolean {
-        if(m !== null && m) {
+    #verifySignature(m: Buffer, signature: Buffer, publicKey: Buffer): boolean {
+        if (m !== null && m) {
             try {
                 let signed = this.sodium.crypto_sign_verify_detached(signature, m, publicKey); //this.sodium.crypto_sign_open(m, signature, publicKey);
 
                 return signed;
-            } catch(e) {
+            } catch (e) {
                 return false;
             }
         } else {
@@ -158,14 +159,14 @@ export class Encryptem extends Logger {
         }
     }
 
-    #signMessageV2(m: Buffer, publicSignKey: Buffer, privateKey: Buffer) : Buffer {
+    #signMessageV2(m: Buffer, publicSignKey: Buffer, privateKey: Buffer): Buffer {
         let signedLength = this.sodium.crypto_sign_BYTES;
         let signedMessageBuffer = Buffer.alloc(signedLength);
 
         this.sodium.crypto_sign_detached(signedMessageBuffer, m, privateKey);
 
         let signed: boolean = this.#verifySignature(m, signedMessageBuffer, publicSignKey);
-        if(!signed) {
+        if (!signed) {
             // @ts-ignore
             return null;
         }
@@ -173,7 +174,7 @@ export class Encryptem extends Logger {
         return signedMessageBuffer;
     }
 
-    private async generateSignatureSeededKeyPairs(password: string) : Promise<{publicKey: Buffer, privateKey: Buffer}> {
+    private async generateSignatureSeededKeyPairs(password: string): Promise<{ publicKey: Buffer, privateKey: Buffer }> {
         let publicKey = Buffer.allocUnsafe(this.sodium.crypto_sign_PUBLICKEYBYTES);
         let privateKey = Buffer.allocUnsafe(this.sodium.crypto_sign_SECRETKEYBYTES);
 
@@ -187,7 +188,7 @@ export class Encryptem extends Logger {
         };
     }
 
-    private async generateNewCipherKey() : Promise<{publicKey: Buffer, privateKey: Buffer}> {
+    private async generateNewCipherKey(): Promise<{ publicKey: Buffer, privateKey: Buffer }> {
         let publicKey = Buffer.alloc(this.sodium.crypto_box_PUBLICKEYBYTES);
         let privateKey = Buffer.alloc(this.sodium.crypto_box_PUBLICKEYBYTES);
 
@@ -199,11 +200,7 @@ export class Encryptem extends Logger {
         }
     }
 
-    private getAuthKey() : Buffer {
-        return Buffer.concat([this.#clientSignaturePrivateKey, this.#clientSignaturePublicKey, this.#authSecretKey]);
-    }
-
-    private async generateSHA256(str: string) : Promise<string> {
+    private async generateSHA256(str: string): Promise<string> {
         const buffer = Buffer.from(str);
 
         let hash = await crypto.subtle.digest('SHA-256', buffer);
@@ -217,23 +214,27 @@ export class Encryptem extends Logger {
         return result;
     }
 
-    public loadClientKeys() : void {
-        let authKey = Config.authKey;
+    public loadClientKeys(): void {
+        let authKey = Config.sessionKey;
 
-        if(authKey !== null && authKey) {
-            let publicKey = Config.authKey.slice(64, 96);
-            let privateKey = Config.authKey.slice(0, 64);
-            let authSecret = Config.authKey.slice(96, 160);
+        if (authKey !== null && authKey) {
+            let publicKey = Config.sessionKey.clientPubKey;
+            let privateKey = Config.sessionKey.clientAuthKey;
+            let authSecret = Config.sessionKey.clientHash;
 
             this.setClientSignaturePublicKey(publicKey);
             this.setClientSignaturePrivateKey(privateKey);
-            this.setClientAuthKey(authSecret);
+            this.setClientAuthKey(Buffer.from(authSecret, "utf-8"));
         }
     }
 
-    public async generateClientCipherKeyPair(password: string) : Promise<void> {
+    /**
+     * Create an AuthData from a password
+     * @param password The password the AuthKey.clientHash is based on
+     * @returns the AuthKey generated 
+     */
+    public async generateClientCipherKeyPair(password: string): Promise<AuthData> {
         let hashedPwd = await this.generateSHA256(password);
-        Config.clientHash = hashedPwd;
 
         let keys = await this.generateNewCipherKey();
 
@@ -245,28 +246,37 @@ export class Encryptem extends Logger {
         this.#clientSignaturePrivateKey = signatureSeededKeyPairs.privateKey;
 
         let signedPassword = await this.#signMessageV2(Buffer.from(hashedPwd), this.#clientSignaturePublicKey, this.#clientSignaturePrivateKey);
-        console.log(`Signed Password: ${signedPassword}`);
 
         this.#authSecretKey = signedPassword;
 
         // @ts-ignore
         this.#serverSignaturePublicKey = null;
 
-        Config.authKey = this.getAuthKey();
+        return { clientPubKey: this.#clientSignaturePublicKey, clientAuthKey: this.#authSecretKey, clientHash: hashedPwd };
     }
 
-    public startEncryption() : void {
+    public async generateAuthData(password: string): Promise<AuthData> {
+        let hashedPwd = await this.generateSHA256(password);
+
+        let signatureSeededKeyPairs = await this.generateSignatureSeededKeyPairs(password);
+
+        let signedPassword = await this.#signMessageV2(Buffer.from(hashedPwd), signatureSeededKeyPairs.publicKey, signatureSeededKeyPairs.privateKey);
+
+        return { clientPubKey: signatureSeededKeyPairs.publicKey, clientAuthKey: signedPassword, clientHash: hashedPwd };
+    }
+
+    public startEncryption(): void {
         this.started = true;
 
         this.log(`!! -- Encryption started. Handshake completed successfully. -- !!`);
     }
 
-    public encrypt(msg: Uint8Array) : Uint8Array {
-        if(!this.started) {
+    public encrypt(msg: Uint8Array): Uint8Array {
+        if (!this.started) {
             return msg;
         } else {
             let encryptedBuffer = this.#encrypt(Buffer.from(msg), this.#serverPublicKey, this.#clientSecretKey, this.#clientSignaturePublicKey, this.#clientSignaturePrivateKey);
-            if(encryptedBuffer !== null) {
+            if (encryptedBuffer !== null) {
                 return encryptedBuffer;
             } else {
                 throw new Error("Encryption failed.");
@@ -274,7 +284,7 @@ export class Encryptem extends Logger {
         }
     }
 
-    public stringHash(str: string) : number {
+    public stringHash(str: string): number {
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
             hash = (hash << 5) - hash + str.charCodeAt(i);
@@ -300,20 +310,20 @@ export class Encryptem extends Logger {
         return result;
     }
 
-    public decrypt(msg: Uint8Array) : Uint8Array {
-        if(!this.started) {
+    public decrypt(msg: Uint8Array): Uint8Array {
+        if (!this.started) {
             return msg;
         } else {
             let auth = Buffer.from(msg.slice(0, this.sodium.crypto_auth_BYTES));
-            let signature = Buffer.from(msg.slice(auth.length, auth.length+64));
-            let data = Buffer.from(msg.slice(auth.length+64, msg.length));
+            let signature = Buffer.from(msg.slice(auth.length, auth.length + 64));
+            let data = Buffer.from(msg.slice(auth.length + 64, msg.length));
 
             try {
                 let decryptedBuffer = this.#decrypt(data, this.#serverPublicKey, this.#clientSecretKey, signature, this.#serverSignaturePublicKey);
-                if(decryptedBuffer !== null) {
+                if (decryptedBuffer !== null) {
                     msg = decryptedBuffer;
                 }
-            } catch(e: any) {
+            } catch (e: any) {
                 this.error(`Decryption failed.`);
                 console.log(e.stack);
             }
@@ -322,7 +332,7 @@ export class Encryptem extends Logger {
         }
     }
 
-    public reset() : void {
+    public reset(): void {
         this.started = false;
 
         // @ts-ignore
@@ -343,7 +353,7 @@ export class Encryptem extends Logger {
         this.loadClientKeys();
     }
 
-    private init() : void {
+    private init(): void {
         this.sodium = sodium;
         this.reset();
     }

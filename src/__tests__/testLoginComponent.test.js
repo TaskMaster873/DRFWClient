@@ -1,16 +1,16 @@
 import "@testing-library/react/dist/fire-event";
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
-import {FormErrorType} from "../src/engine/errors/FormErrorType";
+import {FormErrorType} from "../src/engine/messages/FormMessages";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {Login} from "../src/engine/pages/login";
-import {Config} from "../src/engine/config/Config";
-
+import { SocketManager } from "../src/engine/networking/WebsocketManager";
 
 let user;
 beforeEach(async () => {
+    if (!("crypto" in globalThis)) globalThis.crypto = require("crypto");
     user = userEvent.setup();
     render(<MemoryRouter><Login/></MemoryRouter>);
 });
@@ -54,7 +54,7 @@ describe("Empty Fields login validation", () => {
 });
 
 test("Valid employee number and password should submit form", async () => {
-    Config.loginWithPassword = jest.fn();
+    SocketManager.loginWithPassword = jest.fn();
     const {inputPassword, form, inputId} = getFields();
 
     await user.type(inputId, testConstants.validIdEmployee);
@@ -62,7 +62,7 @@ test("Valid employee number and password should submit form", async () => {
 
     fireEvent.submit(form);
 
-    expect(Config.loginWithPassword).toBeCalled();
+    expect(SocketManager.loginWithPassword).toBeCalled();
     expect(inputId.value).toBe(testConstants.validIdEmployee);
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();

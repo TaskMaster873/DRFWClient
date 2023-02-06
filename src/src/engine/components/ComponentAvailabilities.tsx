@@ -3,7 +3,7 @@ import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
 import "./ComponentPopupSchedule";
 import {EventForCalendar} from "../types/Shift";
 import {Availability, AvailabilityList} from "../types/Availability";
-import {constants} from "../../../Constants/Constants";
+import { constants } from "../messages/FormMessages";
 
 /**
  * Ceci est le composant de disponibilitées
