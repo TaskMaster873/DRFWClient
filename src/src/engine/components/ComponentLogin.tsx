@@ -2,8 +2,7 @@ import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
-import { constants } from "../../../Constants/Constants";
-import { FormErrorType } from "../errors/FormErrorType";
+import { FormErrorType, constants } from "../messages/FormMessages";
 import { SocketManager } from "../networking/WebsocketManager";
 
 /* === Images === */

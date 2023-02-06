@@ -1,8 +1,8 @@
 import { Logger } from "../Logger";
-import { Config } from "../config/Config";
+import { Config } from "../Config";
 import { Buffer } from "buffer";
 import * as sodium from 'sodium-universal';
-import { AuthKey } from "./types/AuthenticationStatus";
+import { AuthData } from "../types/AuthData";
 
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';
@@ -218,7 +218,7 @@ export class Encryptem extends Logger {
         let authKey = Config.sessionKey;
 
         if (authKey !== null && authKey) {
-            let publicKey = Config.sessionKey.clientAuthCipher;
+            let publicKey = Config.sessionKey.clientPubKey;
             let privateKey = Config.sessionKey.clientAuthKey;
             let authSecret = Config.sessionKey.clientHash;
 
@@ -229,11 +229,11 @@ export class Encryptem extends Logger {
     }
 
     /**
-     * From a password create an AuthKey
+     * Create an AuthData from a password
      * @param password The password the AuthKey.clientHash is based on
      * @returns the AuthKey generated 
      */
-    public async generateClientCipherKeyPair(password: string): Promise<AuthKey> {
+    public async generateClientCipherKeyPair(password: string): Promise<AuthData> {
         let hashedPwd = await this.generateSHA256(password);
 
         let keys = await this.generateNewCipherKey();
@@ -246,14 +246,23 @@ export class Encryptem extends Logger {
         this.#clientSignaturePrivateKey = signatureSeededKeyPairs.privateKey;
 
         let signedPassword = await this.#signMessageV2(Buffer.from(hashedPwd), this.#clientSignaturePublicKey, this.#clientSignaturePrivateKey);
-        console.log(`Signed Password: ${signedPassword}`);
 
         this.#authSecretKey = signedPassword;
 
         // @ts-ignore
         this.#serverSignaturePublicKey = null;
 
-        return { clientAuthCipher: this.#clientSignaturePublicKey, clientAuthKey: this.#authSecretKey, clientHash: hashedPwd };
+        return { clientPubKey: this.#clientSignaturePublicKey, clientAuthKey: this.#authSecretKey, clientHash: hashedPwd };
+    }
+
+    public async generateAuthData(password: string): Promise<AuthData> {
+        let hashedPwd = await this.generateSHA256(password);
+
+        let signatureSeededKeyPairs = await this.generateSignatureSeededKeyPairs(password);
+
+        let signedPassword = await this.#signMessageV2(Buffer.from(hashedPwd), signatureSeededKeyPairs.publicKey, signatureSeededKeyPairs.privateKey);
+
+        return { clientPubKey: signatureSeededKeyPairs.publicKey, clientAuthKey: signedPassword, clientHash: hashedPwd };
     }
 
     public startEncryption(): void {

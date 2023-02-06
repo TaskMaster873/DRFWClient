@@ -5,7 +5,7 @@ import { ResourceGroups } from "./ComponentFilterProjects";
 import { ScheduleGroups, ScheduleResource } from "../types/Schedule";
 import "./ComponentPopupSchedule";
 import { EventForCalendar } from "../types/Shift";
-import { constants } from "../../../Constants/Constants";
+import { constants } from "../messages/FormMessages";
 import { Example } from "./ComponentPopupSchedule";
 /**
  * Ceci est le composant d'horaire
@@ -41,7 +41,7 @@ export class ComponentSchedule extends React.Component {
     listToReturn = [];
     for (let index = 0; index < this.list.length; index++) {
       listToReturn.push({
-        name: this.list[index].firstName + " " + this.list[index].name,
+        name: this.list[index].firstName + " " + this.list[index].lastName,
         id: this.list[index].id.toString(),
       });
     }

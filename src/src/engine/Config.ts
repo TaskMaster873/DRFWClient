@@ -1,4 +1,4 @@
-import { SessionKey } from '../networking/types/AuthenticationStatus';
+import { SessionKey } from "./types/AuthData";
 
 class Configuration {
     readonly connectionURIRemote: string = '';
@@ -12,10 +12,6 @@ class Configuration {
 
     public resetSession() {
         localStorage.removeItem('sessionKey');
-    }
-
-    public changePassword(oldPassword: string, newPassword: string) : void {
-        throw new Error("Not implemented.");
     }
 
     private isNode() {

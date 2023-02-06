@@ -1,12 +1,12 @@
 import "@testing-library/react/dist/fire-event";
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
-import {FormErrorType} from "../src/engine/errors/FormErrorType";
+import {FormErrorType} from "../src/engine/messages/FormMessages";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {Login} from "../src/engine/pages/login";
-import {Config} from "../src/engine/config/Config";
+import {Config} from "../src/engine/Config";
 
 
 let user;
