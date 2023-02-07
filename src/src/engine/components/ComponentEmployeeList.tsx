@@ -5,7 +5,7 @@ import { LinkContainer } from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 
 /***
- * Ce composant affiche la state.liste de tous les employés d'un département
+ * Ce composant affiche la liste de tous les employés d'un département
  *
  * state : liste d'employés
  */
@@ -28,7 +28,7 @@ export class ComponentEmployeeList extends React.Component {
       <div className="mt-5">
           <Row>
             <Col><h3>Liste des employés</h3></Col>
-            <Col xs={6}></Col>
+            <Col xs={4}></Col>
             <Col><ComponentSearchBar {...searchProps} /></Col>
           </Row>
         <Table responsive bordered hover>

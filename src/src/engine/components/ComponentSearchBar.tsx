@@ -1,43 +1,47 @@
 import React from "react";
-import {Form} from "react-bootstrap";
+import {Col, Form} from "react-bootstrap";
 import {Employee} from "../types/Employee";
 
-export class ComponentSearchBar extends React.Component<{list: Employee[], filterList: (filteredList: Employee[]) => void}> {
-    public state: { searchTerm: string, list: Employee[]};
-    constructor(props: {list: Employee[], filterList: (filteredList: Employee[]) => void}) {
+export class ComponentSearchBar extends React.Component<{ list: any, filterList: (filteredList: any) => void }> {
+    public state: { list: any };
+
+    constructor(props: { list: any, filterList: (filteredList: Employee[]) => void }) {
         super(props);
         this.state = {
-            searchTerm: "",
             list: props.list
         };
     }
 
-    handleChange = (event) => {
-        this.setState({ searchTerm: event.target.value });
-        this.filterList();
+    handleSearchChange = (event) => {
+        this.filterList(event.target.value);
     };
 
-    filterList = () => {
-        const filteredList = this.state.list.filter((item) =>
-            item.firstName.toLowerCase().includes(this.state.searchTerm.toLowerCase())
-        );
-        this.props.filterList(filteredList);
+    filterList = (searchTerm) => {
+        let filteredList: any = [];
+        if (searchTerm != "") {
+            filteredList = this.state.list.filter((item) => item.firstName.toLowerCase().includes(searchTerm.toLowerCase()));
+            this.props.filterList(filteredList);
+        } else {
+            this.props.filterList(this.state.list);
+        }
     }
 
 
     render() {
-        return (
-            <Form>
-                <Form.Group>
-                    <Form.Control
-                        type="text"
-                        className=""
-                        placeholder="Search"
-                        value={this.state.searchTerm}
-                        onChange={this.handleChange}
-                    />
-                </Form.Group>
-            </Form>
-        );
+        return (<Form.Group>
+            <Col xs={6}>
+                <Form.Select
+                    onChange={this.handleSearchChange}>
+                    <option>Par Nom</option>
+                </Form.Select>
+            </Col>
+            <Col xs={6}>
+                <Form.Control
+                    type="text"
+                    placeholder="Search"
+                    onChange={this.handleSearchChange}
+                />
+            </Col>
+        </Form.Group>);
     }
 }
