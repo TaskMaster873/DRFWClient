@@ -37,6 +37,7 @@ export interface EventForCalendar {
     end: DayPilot.date; //heure de fin
     resource?: string;//l'id de la personne qui l'a
     barColor?: string; // couleur de la barre
+    backColor?: string
 }
 
 export interface EventForCalendarList {
