@@ -2,10 +2,9 @@ import React from "react";
 import { EmployeeList, Employee } from "../types/Employee";
 import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
 import { ResourceGroups } from "./ComponentFilterProjects";
-import { ScheduleGroups, ScheduleResource } from "../types/Schedule";
+import { ScheduleGroups } from "../types/Schedule";
 import "./ComponentPopupSchedule";
 import { EventForCalendar } from "../types/Shift";
-import { constants } from "../messages/FormMessages";
 import { ComponentPopupSchedule } from "./ComponentPopupSchedule";
 /**
  * Ceci est le composant d'horaire

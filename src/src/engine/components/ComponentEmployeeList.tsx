@@ -1,24 +1,31 @@
 import React from "react";
-import { Table, Button } from "react-bootstrap";
+import {Col, Row, Table, Button} from "react-bootstrap";
 import { EmployeeList, Employee } from "../types/Employee";
 import { LinkContainer } from "react-router-bootstrap";
+import {ComponentSearchBar} from "./ComponentSearchBar";
 
 /***
- * Ce composant affiche la liste de tous les employés d'un département
+ * Ce composant affiche la state.liste de tous les employés d'un département
  *
  * state : ancien mot de passe, nouveau mot de passe, validation requis et regex de mot de passe
  */
 export class ComponentEmployeeList extends React.Component {
-  private list: Employee[] = [];
+  public state: { list: Employee[]};
   constructor(props: EmployeeList) {
     super(props);
-    this.list = props.list;
+    this.state = {
+      list: props.list
+    };
   }
 
   public render(): JSX.Element {
     return (
       <div className="mt-5">
-        <h3>Liste des employés</h3>
+          <Row>
+            <Col><h3>Liste des employés</h3></Col>
+            <Col xs={6}></Col>
+            <Col><ComponentSearchBar {...{list: this.state.list}} /></Col>
+          </Row>
         <Table responsive bordered hover>
           <thead>
             <tr key={"firstCol"}>
@@ -32,21 +39,21 @@ export class ComponentEmployeeList extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: this.list.length }).map((_, index) => (
+            {this.state.list.map((_, index) => (
               <tr key={"secondCol" + index}>
-                <td key={"id" + index}>{this.list[index].id}</td>
+                <td key={"id" + index}>{this.state.list[index].id}</td>
                 <td key={"firstName " + index}>
-                  <a>{this.list[index].firstName}</a>
+                  <a>{this.state.list[index].firstName}</a>
                 </td>
-                <td key={"name " + index}>{this.list[index].lastName}</td>
+                <td key={"name " + index}>{this.state.list[index].lastName}</td>
                 <td key={"phoneNumber " + index}>
-                  {this.list[index].phoneNumber}
+                  {this.state.list[index].phoneNumber}
                 </td>
-                <td key={"departmentId " + index}>{this.list[index].departmentId}</td>
+                <td key={"departmentId " + index}>{this.state.list[index].departmentId}</td>
                 <td key={"jobTitles " + index}>
-                  {this.list[index].jobTitles.join(", ")}
+                  {this.state.list[index].jobTitles.join(", ")}
                 </td>
-                <td key={"skills " + index}>{this.list[index].skills}</td>
+                <td key={"skills " + index}>{this.state.list[index].skills}</td>
               </tr>
             ))}
           </tbody>

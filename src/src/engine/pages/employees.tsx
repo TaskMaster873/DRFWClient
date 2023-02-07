@@ -11,7 +11,6 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
   private department_id : string = "";
   constructor(props: EmployeeProps) {
     super(props);
-    console.log(this.props.params);
   }
 
   private list: Employee[] = [
