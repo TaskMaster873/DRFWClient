@@ -19,6 +19,8 @@ const styles = {
     },
 };
 
+type Props = { events: {id: number, text: string, start: DayPilot.Date, end: DayPilot.Date}}; // props quand on aura la bd
+
 export class ComponentAvailabilities extends Component {
     calendarRef: React.RefObject<any>;
     datePickerRef: React.RefObject<any>;
@@ -68,6 +70,11 @@ export class ComponentAvailabilities extends Component {
         );
     }
 
+    /**
+     * 
+     * @param args 
+     * @returns si c'est mauvais
+     */
     onEventClick = async (args: any) => { // TODO changer ce que la méthode fait
         const dp = this.calendar;
         const form = [
@@ -116,6 +123,11 @@ export class ComponentAvailabilities extends Component {
         dp.events.update(e);
     };
 
+    /**
+     * 
+     * @param colorInRGB = à une string en non rgb
+     * @returns une string qui est la valeur rgb de la couleur choisie
+     */
     private colorRGBHandling(colorInRGB: string): string {
         if (colorInRGB.startsWith("r")) {
             console.log("okokdfok")
