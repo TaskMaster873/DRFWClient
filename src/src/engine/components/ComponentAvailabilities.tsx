@@ -161,6 +161,13 @@ export class ComponentAvailabilities extends Component {
                 end: "2023-03-06T14:30:00",
                 backColor: "#cc4125"
             },
+            {
+                id: 5,
+                text: "Event 5",
+                start: "2023-03-11T11:30:00",
+                end: "2023-03-12T14:30:00",
+                backColor: "#eeaabb"
+            },
         ];
 
         const startDate = "2023-03-07";
