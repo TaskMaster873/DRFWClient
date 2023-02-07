@@ -7,24 +7,29 @@ import {ComponentSearchBar} from "./ComponentSearchBar";
 /***
  * Ce composant affiche la state.liste de tous les employés d'un département
  *
- * state : ancien mot de passe, nouveau mot de passe, validation requis et regex de mot de passe
+ * state : liste d'employés
  */
 export class ComponentEmployeeList extends React.Component {
   public state: { list: Employee[]};
-  constructor(props: EmployeeList) {
+  constructor(props: { list: Employee[] }) {
     super(props);
     this.state = {
       list: props.list
     };
   }
 
+  updateList = (filteredList: Employee[]) => {
+    this.setState({list: filteredList});
+  }
+
   public render(): JSX.Element {
+    let searchProps = {list: this.state.list, filterList: this.updateList};
     return (
       <div className="mt-5">
           <Row>
             <Col><h3>Liste des employés</h3></Col>
             <Col xs={6}></Col>
-            <Col><ComponentSearchBar {...{list: this.state.list}} /></Col>
+            <Col><ComponentSearchBar {...searchProps} /></Col>
           </Row>
         <Table responsive bordered hover>
           <thead>

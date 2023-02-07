@@ -1,10 +1,10 @@
 import React from "react";
 import {Form} from "react-bootstrap";
-import {Employee, EmployeeList} from "../types/Employee";
+import {Employee} from "../types/Employee";
 
-export class ComponentSearchBar extends React.Component {
+export class ComponentSearchBar extends React.Component<{list: Employee[], filterList: (filteredList: Employee[]) => void}> {
     public state: { searchTerm: string, list: Employee[]};
-    constructor(props: EmployeeList) {
+    constructor(props: {list: Employee[], filterList: (filteredList: Employee[]) => void}) {
         super(props);
         this.state = {
             searchTerm: "",
@@ -14,13 +14,14 @@ export class ComponentSearchBar extends React.Component {
 
     handleChange = (event) => {
         this.setState({ searchTerm: event.target.value });
-        this.filterItems();
+        this.filterList();
     };
 
-    filterItems = () => {
-        this.state.list.filter((item) =>
+    filterList = () => {
+        const filteredList = this.state.list.filter((item) =>
             item.firstName.toLowerCase().includes(this.state.searchTerm.toLowerCase())
         );
+        this.props.filterList(filteredList);
     }
 
 
