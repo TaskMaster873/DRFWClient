@@ -14,8 +14,8 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 		super(props);
 		this.state = {
 			isShowed: props.isShowing,
-			nameOfEvent: "",
-			colorOfEvent: "#FFFFFF",
+			nameOfEvent: "event",
+			colorOfEvent: "#000000",
 			start: DayPilot.Date.today(),
 			end: DayPilot.Date.now(),
 
@@ -23,68 +23,6 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 		this.onChange = this.onChange.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.returnToTheCalendar = this.returnToTheCalendar.bind(this);
-	}
-
-
-	public onChange = () => {
-		this.setState({ isShowed: !this.state.isShowed });
-		console.log("la state = ", this.state);
-	};
-
-	private returnToTheCalendar = () => {
-		let eventToReturn: EventForCalendar = {
-			id: 1,
-			text: this.state.nameOfEvent,
-			start: this.state.start,
-			end: this.state.end,
-			resource: this.state.resource,
-			barColor: this.state.colorOfEvent,
-		};
-		console.log("eventCréé =", eventToReturn)
-		this.props.eventAdd(eventToReturn);
-		this.onChange();
-	}
-
-	public saveContent = (startTime: DayPilot.Date, endTime: DayPilot.Date, resourceId: string) => {
-		console.log("le state doit avoir les 3 non null:", startTime, endTime, resourceId);
-		this.setState({ start: startTime, end: endTime, resource: resourceId });
-		console.log("la state après:", this.state.start);
-		this.onChange();
-	}
-	private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
-		console.log("tu rentre dedans")
-		const form = event.currentTarget;
-		let isValid = form.checkValidity();
-		console.log(event);
-		//let errorType = FormErrorType.NO_ERROR;
-		if (!isValid) {
-			event.preventDefault();
-			event.stopPropagation();
-			console.log(event.target[0].value);
-			this.onChange();
-		}
-
-		/* this.setState({
-			 validated: true,
-			 error: errorType,
-		 });*/
-	}
-
-	handleChange = (event: React.ChangeEvent<HTMLFormElement>) => {
-
-		console.log("cela change", event.target.id, event.target.value)
-		const target = event.target;
-		const value = target.value;
-		const name = target.id;
-
-		if (!name) {
-			throw new Error("Id is undefined for element in form.");
-
-		}
-		this.setState({
-			[name]: value,
-		});
-		console.log(this.state);
 	}
 
 	public render(): JSX.Element {
@@ -110,7 +48,7 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 								<Form.Label >Color picker</Form.Label>
 								<Form.Control
 									type="color"
-									defaultValue="#563d7c"
+									defaultValue="#000000"
 									title="Choose your color"
 								/>
 							</Form.Group>
@@ -127,5 +65,89 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 				</Modal>
 			</>
 		);
+	}
+
+	/**
+	 * Cette méthode sert quand pour faire afficher ou non le popup
+	 *
+	 */
+	public onChange = () => {
+		this.setState({ isShowed: !this.state.isShowed });
+		this.resetState();
+		console.log("la state = ", this.state);
+	};
+	/**
+	 * Remet les valeur par défaut
+	 */
+	private resetState() {
+		this.setState({
+			nameOfEvent: "event",
+			colorOfEvent: "#000000"
+		});
+	}
+	/**
+	 * 
+	 * Appelle le parent et envoie le corps de travail avec toutes les données en Event
+	 * @returns EventForCalendar
+	 */
+	private returnToTheCalendar = () => {
+		let eventToReturn: EventForCalendar = {
+			id: 1,
+			text: this.state.nameOfEvent,
+			start: this.state.start,
+			end: this.state.end,
+			resource: this.state.resource,
+			barColor: this.state.colorOfEvent,
+		};
+		console.log("eventCréé =", eventToReturn)
+		this.props.eventAdd(eventToReturn);
+		this.onChange();
+	}
+
+	/***
+	 * Enregistre dans le state les données du parent
+	 * @param startTime: la date en format DayPilot.Date du début du corps de travail.
+	 * @param endTime: la date en format DayPilot.Date de la fin du corps de travail.
+	 * @param resourceId: l'id de la rangée où le corps sera.
+	 * 
+	 */
+	public saveContent = (startTime: DayPilot.Date, endTime: DayPilot.Date, resourceId: string) => {
+		console.log("le state doit avoir les 3 non null:", startTime, endTime, resourceId);
+		this.setState({ start: startTime, end: endTime, resource: resourceId });
+		console.log("la state après:", this.state.start);
+		this.onChange();
+	}
+	/**
+	 * 
+	 * @param event qui est le formulaire à envoyer
+	 */
+	private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+		const form = event.currentTarget;
+		let isValid = form.checkValidity();
+		if (!isValid) {
+			event.preventDefault();
+			event.stopPropagation();
+			console.log(event.target[0].value);
+			this.onChange();
+		}
+	}
+
+	/**
+	 * @param event élément html du formulaire qui a un changement
+	 * @returns void
+	 */
+	handleChange = (event: React.ChangeEvent<HTMLFormElement>) => {
+		//console.log("cela change", event.target.id, event.target.value)
+		const target = event.target;
+		const value = target.value;
+		const name = target.id;
+
+		if (!name) {
+			throw new Error("Id is undefined for element in form.");
+
+		}
+		this.setState({
+			[name]: value, // [name] = au nom de l'élémentHtml (même nom que l'élement dans le state)
+		});
 	}
 }

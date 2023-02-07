@@ -1,62 +1,191 @@
-import React from "react";
-import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
-import "./ComponentPopupSchedule";
-import {EventForCalendar} from "../types/Shift";
-import {Availability, AvailabilityList} from "../types/Availability";
-import { constants } from "../messages/FormMessages";
 
 /**
- * Ceci est le composant de disponibilitées
+ * Ceci est du code qui a été cherché en partie sur https://code.daypilot.org/42221/react-weekly-calendar-tutorial,  la documentation de la librairie daypilot
  */
-export class ComponentAvailabilities extends React.Component {
-    private list: Availability[] = [];
-    private datePicker: DayPilot.DatePicker;
-    private listEvent: EventForCalendar[] = [];
-    private dateRef: React.RefObject<unknown> /*= React.createRef()*/;
+import React, { Component } from 'react';
+import { colorRGB } from '../messages/ColorForAvailability'
+import { DayPilot, DayPilotCalendar, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
+import "../../deps/css/navigator_default.css";
 
-    constructor(props: AvailabilityList) {
+const styles = {
+    wrap: {
+        display: "flex"
+    },
+    left: {
+        marginRight: "10px"
+    },
+    main: {
+        flexGrow: "1"
+    },
+};
+
+type Props = { events: {id: number, text: string, start: DayPilot.Date, end: DayPilot.Date}}; // props quand on aura la bd
+
+export class ComponentAvailabilities extends Component {
+    calendarRef: React.RefObject<any>;
+    datePickerRef: React.RefObject<any>;
+
+    constructor(props) {
         super(props);
-        this.list = props.list;
-        this.dateRef = React.createRef(); //DayPilot.Date.today();
+        this.calendarRef = React.createRef();
+        this.datePickerRef = React.createRef();
         this.state = {
-            timeHeaders: [{"groupBy": "Day", "format": "dddd"}],
-            startDate: DayPilot.Date.today(),
-            days: 7,
-            //events: this.doEvents(),
+            headerDateFormat: "dddd",
+            viewType: "Week",
+            eventResizeHandling: "Disabled",
+            eventMoveHandling: "Disabled",
+            durationBarVisible: false,
+            timeRangeSelectedHandling: "Disabled",
+            eventDeleteHandling: "Disabled",
+            onEventClick: this.onEventClick
         };
     }
 
-    onTimeRangeSelected = (args: any) => {
-        DayPilot.Calendar.clearSelection;
-        this.listEvent.push({
-            id: 1,
-            text: args.text,
-            start: args.start,
-            end: args.end,
-            resource: args.resource,
-            barColor: args.barColor,
-        })
-        this.setState({events: this.listEvent});
-    }
-
-    public render(): JSX.Element {
-        if (this.list === undefined || this.list.length == 0) {
-            return <div> { constants.messageScheduleUnavailable }</div>;
-        } else
-            return (
-                <div>
-                    <DayPilotCalendar
-                        businessBeginsHour={8}
-                        businessEndsHour={20}
-                        heightSpec={"Full"}
-                        height={2000}
-                        cellHeight={20}
-                        cellDuration={5}
-                        showNonBusiness={false}
-                        onTimeRangeSelected={this.onTimeRangeSelected}
-                        {...this.state}
+    render() {
+        return (
+            <div style={styles.wrap}>
+                <div style={styles.left}>
+                    <DayPilotNavigator
+                       // theme={"navigator_default.css"}
+                        selectMode={"week"}
+                        showMonths={3}
+                        skipMonths={3}
+                        startDate={"2023-03-07"}
+                        selectionDay={"2023-03-07"}
+                        onTimeRangeSelected={args => {
+                            this.calendar.update({
+                                startDate: args.day,
+                            });
+                        }}
+                        ref={this.datePickerRef}
                     />
                 </div>
-            );
+                <div style={styles.main}>
+                    <DayPilotCalendar
+                        {...this.state}
+                        ref={this.calendarRef}
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    /**
+     * 
+     * @param args 
+     * @returns si c'est mauvais
+     */
+    onEventClick = async (args: any) => { // TODO changer ce que la méthode fait
+        const dp = this.calendar;
+        const form = [
+            {
+                type: 'searchable',
+                id: 'searchable1',
+                name: 'Searchable 1',
+                options: [
+                    {
+                        name: 'Rouge',
+                        id: 'rouge',
+                    },
+                    {
+                        name: 'Vert',
+                        id: 'vert',
+                    },
+                    {
+                        name: 'Bleu',
+                        id: 'bleu',
+                    },
+                    {
+                        name: 'Mauve',
+                        id: 'mauve',
+                    },
+                    {
+                        name: 'Jaune',
+                        id: 'jaune',
+                    },
+                    {
+                        name: 'Orange',
+                        id: 'orange',
+                    },
+                ],
+            },
+        ];
+        const data = {};
+
+        const modal = await DayPilot.Modal.form(form, data);
+        console.log(modal.result.searchable1);
+
+        //const modal = await DayPilot.Modal.prompt("Update event text:", args.e.text());
+        if (!modal.result) { return; }
+        let rgb = this.colorRGBHandling(modal.result.searchable1);
+        const e = args.e;
+        e.data.backColor = rgb;
+        dp.events.update(e);
+    };
+
+    /**
+     * 
+     * @param colorInRGB = à une string en non rgb
+     * @returns une string qui est la valeur rgb de la couleur choisie
+     */
+    private colorRGBHandling(colorInRGB: string): string {
+        if (colorInRGB.startsWith("r")) {
+            console.log("okokdfok")
+            return colorRGB.redRGB;
+        }
+        return "";
+    }
+    get calendar() {
+        return this.calendarRef.current.control;
+    }
+
+    get datePicker() {
+        return this.datePickerRef.current.control;
+    }
+
+    componentDidMount() {
+
+        const events = [
+            {
+                id: 1,
+                text: "Event 1",
+                start: "2023-03-07T10:30:00",
+                end: "2023-03-07T13:00:00"
+            },
+            {
+                id: 2,
+                text: "Event 2",
+                start: "2023-03-08T09:30:00",
+                end: "2023-03-08T11:30:00",
+                backColor: "#6aa84f"
+            },
+            {
+                id: 3,
+                text: "Event 3",
+                start: "2023-03-08T12:00:00",
+                end: "2023-03-08T15:00:00",
+                backColor: "#f1c232"
+            },
+            {
+                id: 4,
+                text: "Event 4",
+                start: "2023-03-06T11:30:00",
+                end: "2023-03-06T14:30:00",
+                backColor: "#cc4125"
+            },
+            {
+                id: 5,
+                text: "Event 5",
+                start: "2023-03-11T11:30:00",
+                end: "2023-03-12T14:30:00",
+                backColor: "#eeaabb"
+            },
+        ];
+
+        const startDate = "2023-03-07";
+
+        this.calendar.update({ startDate, events });
+        this.datePicker.update({ events: events });
+
     }
 }

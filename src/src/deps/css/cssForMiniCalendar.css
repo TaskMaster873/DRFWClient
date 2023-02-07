@@ -1,0 +1,79 @@
+/* 
+DayPilot Navigator Theme 
+https://themes.daypilot.org/navigator/theme/bqfdus
+Theme Designer Version: 2021.09.25.67272
+*/
+.testcss_main {
+  border-left: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+  border-bottom: 1px solid #c0c0c0;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+}
+.testcss_main *,
+.testcss_main *:before,
+.testcss_main *:after {
+  box-sizing: border-box;
+}
+.testcss_line {
+  border-bottom: 1px solid #c0c0c0;
+}
+/* month header */
+.testcss_title,
+.testcss_titleleft,
+.testcss_titleright {
+  border-top: 1px solid #c0c0c0;
+  color: #333333;
+  background: #ffffff;
+}
+.testcss_title {
+  text-align: center;
+}
+.testcss_titleleft,
+.testcss_titleright {
+  text-align: center;
+}
+/* day headers */
+.testcss_dayheader {
+  color: #333333;
+  background: #ffffff;
+  padding: 0px;
+  text-align: center;
+}
+/* day cells */
+.testcss_cell {
+  color: #000000;
+  background: #ffffff;
+  text-align: center;
+}
+.testcss_cell_text {
+  padding: 0px;
+}
+.testcss_weeknumber {
+  color: #b8b6b8;
+  background: #ffffff;
+  text-align: center;
+  padding: 0px;
+}
+.testcss_weekend {
+  color: #000000;
+  background: #f0f0f0;
+  text-align: center;
+  padding: 0px;
+}
+.testcss_dayother {
+  color: gray;
+}
+.testcss_todaybox {
+  border: 1px solid red;
+}
+.testcss_busy {
+  background-color: #ee4f2e;
+  border-radius: 15px;
+  color: white;
+}
+.testcss_select .testcss_cell_box {
+  background-color: #d6aa09;
+  opacity: 0.5;
+}
