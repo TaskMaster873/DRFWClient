@@ -70,7 +70,7 @@ jobs:
       run: npm run build
       shell: bash
     - name: Install Octopus Deploy CLI
-      uses: OctopusDeploy/install-octopus-cli-action@v1
+      uses: OctopusDeploy/install-octopus-cli-action@v3.0.0
       with:
         version: latest
     - name: Package
