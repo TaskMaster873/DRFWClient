@@ -1,16 +1,21 @@
-import { Logger } from "../Logger";
+import {Logger} from "../Logger";
 
 import protobuf from 'protobufjs';
 
 import * as sodium from 'sodium-universal';
-import { Buffer } from 'buffer';
-import { AuthenticationStatus } from "../types/AuthenticationStatus";
-import { AuthData, SessionKey } from "../types/AuthData";
+import {Buffer} from 'buffer';
+import {AuthenticationStatus} from "../types/AuthenticationStatus";
+import {AuthData, SessionKey} from "../types/AuthData";
 import Long from 'long';
-import { Opcodes } from "../types/Opcodes";
-import { Config } from "../Config";
-import { AuthenticationPacketPayload, EmployeCreatePayload, PacketPayload, ServerKeyCipherExchange } from "../types/Packets";
-import { EmployeeCreateDTO } from "../types/Employee";
+import {Opcodes} from "../types/Opcodes";
+import {Config} from "../Config";
+import {
+    AuthenticationPacketPayload,
+    EmployeCreatePayload,
+    PacketPayload,
+    ServerKeyCipherExchange
+} from "../types/Packets";
+import {EmployeeCreateDTO} from "../types/Employee";
 
 protobuf.util.Long = Long;
 protobuf.configure();

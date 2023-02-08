@@ -1,7 +1,7 @@
 import React from "react";
-import { Table } from "react-bootstrap";
-import { Department, DepartmentList } from "../types/Department";
-import { ComponentAddDepartement } from "./ComponentAddDepartement";
+import {Table} from "react-bootstrap";
+import {Department, DepartmentList} from "../types/Department";
+import {ComponentAddDepartement} from "./ComponentAddDepartement";
 
 export class ComponentDepartmentList extends React.Component {
   private list: Department[] = [];

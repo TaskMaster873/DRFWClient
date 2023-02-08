@@ -1,8 +1,8 @@
-import { Logger } from "../Logger";
-import { Config } from "../Config";
-import { Buffer } from "buffer";
+import {Logger} from "../Logger";
+import {Config} from "../Config";
+import {Buffer} from "buffer";
 import * as sodium from 'sodium-universal';
-import { AuthData } from "../types/AuthData";
+import {AuthData} from "../types/AuthData";
 
 export class Encryptem extends Logger {
     public moduleName: string = 'Encryptem';

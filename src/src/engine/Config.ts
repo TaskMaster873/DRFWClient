@@ -1,4 +1,4 @@
-import { SessionKey } from "./types/AuthData";
+import {SessionKey} from "./types/AuthData";
 
 class Configuration {
     readonly connectionURIRemote: string = '';

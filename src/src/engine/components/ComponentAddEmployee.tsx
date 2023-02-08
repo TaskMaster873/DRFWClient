@@ -3,9 +3,9 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { FormErrorType, constants } from "../messages/FormMessages";
-import { Container } from "react-bootstrap";
-import { SocketManager } from "../networking/WebsocketManager";
+import {errors, FormErrorType} from "../messages/FormMessages";
+import {Container} from "react-bootstrap";
+import {SocketManager} from "../networking/WebsocketManager";
 
 type Props = { titles: string[]; roles: string[] };
 /**
@@ -20,6 +20,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
     clientId: string;
     firstName: string;
     lastName: string;
+    email: string;
     phoneNumber: string;
     password: string;
     validated?: boolean;
@@ -34,6 +35,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
       clientId: "",
       firstName: "",
       lastName: "",
+      email: "",
       phoneNumber: "",
       password: "",
       validated: false,
@@ -55,19 +57,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
           data-error={this.state.error}
         >
           <Row className="mb-3 mt-3">
-            <Form.Group as={Col} md="4">
-              <Form.Label>Numéro d'employé</Form.Label>
-              <Form.Control
-                id="clientId"
-                required
-                type="text"
-                placeholder="000000"
-                pattern="^\d{6}$"
-              />
-              <Form.Control.Feedback type="invalid">
-                {constants.errorInvalidEmployeeId}
-              </Form.Control.Feedback>
-            </Form.Group>
+
             <Form.Group as={Col} md="4">
               <Form.Label>Prénom</Form.Label>
               <Form.Control
@@ -77,7 +67,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 placeholder="Prénom"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorRequiredFirstName}
+                {errors.errorRequiredFirstName}
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} md="4">
@@ -89,9 +79,23 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 placeholder="Nom"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorRequiredName}
+                {errors.errorRequiredName}
               </Form.Control.Feedback>
             </Form.Group>
+            <Form.Group as={Col} md="4">
+              <Form.Label></Form.Label>
+              <Form.Control
+                  id="email"
+                  required
+                  type="email"
+                  pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+                  placeholder="exemple@exemple.com"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.errorInvalidEmail}
+              </Form.Control.Feedback>
+            </Form.Group>
+
           </Row>
           <Row className="mb-3">
             <Form.Group as={Col} md="6">
@@ -104,7 +108,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 placeholder="000-000-0000"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorInvalidPhoneNumber}
+                {errors.errorInvalidPhoneNumber}
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} md="6">
@@ -117,7 +121,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 placeholder="Mot de passe"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorInvalidInitialPassword}
+                {errors.errorInvalidInitialPassword}
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
@@ -141,7 +145,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 ))}
               </Form.Select>
               <Form.Control.Feedback type="invalid">
-                {constants.errorRequiredRole}
+                {errors.errorRequiredRole}
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
@@ -190,6 +194,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
           id: this.state.clientId,
           firstName: this.state.firstName,
           lastName: this.state.lastName,
+          email: this.state.email,
           phoneNumber: this.state.phoneNumber,
           password: this.state.password,
           departmentId: "1",

@@ -1,9 +1,9 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { Link } from "react-router-dom";
-import { FormErrorType, constants } from "../messages/FormMessages";
-import { SocketManager } from "../networking/WebsocketManager";
+import {Link} from "react-router-dom";
+import {errors, FormErrorType} from "../messages/FormMessages";
+import {SocketManager} from "../networking/WebsocketManager";
 
 /* === Images === */
 // @ts-ignore
@@ -12,7 +12,7 @@ import Logo from "../../deps/images/logo.png";
 export class ComponentLogin extends React.Component {
   private errorMessage = "";
   public state: {
-    noLogin: string;
+    emailLogin: string;
     passwordLogin: string;
     validated: boolean;
     error: FormErrorType;
@@ -21,7 +21,7 @@ export class ComponentLogin extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      noLogin: "",
+      emailLogin: "",
       passwordLogin: "",
       validated: false,
       error: FormErrorType.NO_ERROR,
@@ -57,13 +57,15 @@ export class ComponentLogin extends React.Component {
             </Form.Label>
             <Form.Control
               required
-              id="noLogin"
+              name="emailLogin"
+              id="emailLogin"
               className="row mt-1"
-              type="number"
-              placeholder="Entrez le numéro d'employé"
+              type="email"
+              pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+              placeholder="Entrez votre adresse courriel"
             />
             <Form.Control.Feedback type="invalid" id="invalidLoginIdEmployee">
-              {constants.errorRequiredEmployeeId}
+              {errors.errorInvalidEmail}
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Group>
@@ -72,13 +74,14 @@ export class ComponentLogin extends React.Component {
             </Form.Label>
             <Form.Control
               required
+              name="passwordLogin"
               id="passwordLogin"
               className="row mt-1"
               type="password"
               placeholder="Entrez votre mot de passe"
             />
             <Form.Control.Feedback type="invalid" id="invalidLoginPassword">
-              {constants.errorRequiredPassword}
+              {errors.errorRequiredPassword}
             </Form.Control.Feedback>
           </Form.Group>
           <Form.Text
@@ -87,7 +90,7 @@ export class ComponentLogin extends React.Component {
             aria-errormessage={this.errorMessage}
           ></Form.Text>
           <div className="me-4 mt-4 d-block text-center mx-auto">
-            <Link className="d-block" to="/changePassword">
+            <Link className="d-block" to="/resetPassword">
               Mot de passe oublié ?
             </Link>
             <Button
@@ -123,7 +126,7 @@ export class ComponentLogin extends React.Component {
     });
 
     if (errorType === FormErrorType.NO_ERROR) {
-      SocketManager.loginWithPassword(this.state.noLogin, this.state.passwordLogin);
+      SocketManager.loginWithPassword(this.state.emailLogin, this.state.passwordLogin);
     }
   }
 

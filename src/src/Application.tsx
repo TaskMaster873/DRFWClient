@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import { Engine } from "./engine/Engine";
-import { SocketManager } from "./engine/networking/WebsocketManager";
+import {Engine} from "./engine/Engine";
+import {SocketManager} from "./engine/networking/WebsocketManager";
 
 
 export class Application {

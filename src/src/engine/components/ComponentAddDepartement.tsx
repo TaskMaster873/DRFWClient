@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {FormErrorType, constants} from "../messages/FormMessages";
+import {errors, FormErrorType} from "../messages/FormMessages";
 import {Logger} from "../Logger";
 
 /**
@@ -58,7 +58,7 @@ export class ComponentAddDepartement extends React.Component {
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {constants.errorRequiredDepartementName}
+                            {errors.errorRequiredDepartementName}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>

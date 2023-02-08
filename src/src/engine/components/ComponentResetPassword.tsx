@@ -1,7 +1,7 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {errors, FormErrorType} from "../messages/FormMessages";
+import {errors, FormErrorType, success} from "../messages/FormMessages";
 import {SocketManager} from "../networking/WebsocketManager";
 
 /* === Images === */
@@ -13,13 +13,13 @@ import Logo from "../../deps/images/logo.png";
  *
  * state : ancien mot de passe, nouveau mot de passe, validation requis et regex de mot de passe
  */
-export class ComponentChangePassword extends React.Component {
+export class ComponentResetPassword extends React.Component {
     private errorMessage = "";
-    public state: { oldPassword: string; newPassword: string; validated: boolean, error: FormErrorType };
+    public state: { email: string; validated: boolean, error: FormErrorType };
 
     constructor(props) {
         super(props);
-        this.state = {oldPassword: "", newPassword: "", validated: false, error: FormErrorType.NO_ERROR};
+        this.state = {email: "", validated: false, error: FormErrorType.NO_ERROR};
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -36,43 +36,32 @@ export class ComponentChangePassword extends React.Component {
                         width={50}
                         height={60}
                     />
-                    <h4 className="text-center mt-4 mb-4">Changer de mot de passe</h4>
+                    <h4 className="text-center mt-4 mb-4">Réinitialisation de mot de passe</h4>
                 </div>
                 <Form noValidate validated={this.state.validated} onSubmit={this.handleSubmit}
                       onChange={this.handleChange}
                       data-error={this.state.error}>
                     <Form.Group>
-                        <Form.Label htmlFor="newPassword" className="mt-2">Ancien mot de passe</Form.Label>
+                        <Form.Label htmlFor="email" className="mt-2">Adresse courriel</Form.Label>
                         <Form.Control
                             required
-                            name="newPassword"
-                            id="oldPassword"
+                            id="email"
+                            name="email"
                             className="row mt-1"
-                            type="password"
-                            placeholder="Entrez l'ancien mot de passe"
+                            type="email"
+                            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+                            placeholder="Entrez votre adresse courriel"
                         />
-                        <Form.Control.Feedback type="invalid" id="invalidOldPassword">
-                            {errors.errorRequiredOldPassword}
+                        <Form.Control.Feedback type="invalid" id="invalidEmail">
+                            {errors.errorInvalidEmail}
                         </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label htmlFor="newPassword" className="mt-4">Nouveau mot de passe </Form.Label>
-                        <Form.Control
-                            required
-                            name="newPassword"
-                            id="newPassword"
-                            className="row mt-1"
-                            type="password"
-                            pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
-                            placeholder="Entrez le nouveau mot de passe"
-                        />
-                        <Form.Control.Feedback type="invalid" id="invalidNewPassword">
-                            {errors.errorInvalidNewPassword}
+                        <Form.Control.Feedback type="valid" id="validEmail">
+                            {success.emailSent}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Text
                         className="text-muted"
-                        id="loginErrorMsg"
+                        id="resetPasswordErrorMsg"
                         aria-errormessage={this.errorMessage}
                     ></Form.Text>
                     <div className="mt-4 me-4 d-block text-center mx-auto">
@@ -112,7 +101,7 @@ export class ComponentChangePassword extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            SocketManager.changePassword(this.state.oldPassword, this.state.newPassword);
+            SocketManager.resetPassword(this.state.email);
         }
     }
 

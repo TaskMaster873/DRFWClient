@@ -1,5 +1,5 @@
 import React from "react";
-import { ComponentAbout } from "../components/ComponentAbout";
+import {ComponentAbout} from "../components/ComponentAbout";
 
 /**
  * Ceci est la page : à propos de nous

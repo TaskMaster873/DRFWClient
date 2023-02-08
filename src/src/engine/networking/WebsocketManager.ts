@@ -1,17 +1,16 @@
-import { Logger } from "../Logger";
-import { StatusMessage } from "../messages/StatusMessage";
+import {Logger} from "../Logger";
+import {StatusMessage} from "../messages/StatusMessage";
 
-import { Config } from "../Config";
-import { PacketBuilder } from "./PacketBuilder";
+import {Config} from "../Config";
+import {PacketBuilder} from "./PacketBuilder";
 
 import protobuf from 'protobufjs';
 import {Opcodes} from "../types/Opcodes";
 import {AuthenticationStatus, AuthenticationStatusType} from "../types/AuthenticationStatus";
-import { AuthData, SessionKey } from "../types/AuthData";
 import ServiceNotification from "../services/ServiceNotification";
 import {Encryptem} from "./Encryptem";
 import {ServerKeyCipherExchange} from "../types/Packets";
-import { EmployeeCreateDTO } from "../types/Employee";
+import {EmployeeCreateDTO} from "../types/Employee";
 
 class WebsocketManager extends Logger {
     public moduleName: string = 'WebsocketManager';
@@ -60,6 +59,16 @@ class WebsocketManager extends Logger {
         //TODO
         //throw new Error("Not Implemented");
     }
+
+    public async resetPassword(email: string) : Promise<void> {
+        //TODO
+        //throw new Error("Not Implemented");
+    }
+
+    public async sendResetPasswordEmail(email: string) : Promise<void> {
+
+    }
+
 
     /**
      * Attempts logging in with provided username and password
