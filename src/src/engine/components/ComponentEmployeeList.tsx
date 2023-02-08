@@ -1,7 +1,7 @@
 import React from "react";
-import {Col, Row, Table, Button} from "react-bootstrap";
-import { Employee } from "../types/Employee";
-import { LinkContainer } from "react-router-bootstrap";
+import {Button, Col, Row, Table} from "react-bootstrap";
+import {Employee} from "../types/Employee";
+import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 
 /***

@@ -1,7 +1,7 @@
 import React from "react";
-import { Container } from "react-bootstrap";
-import { ComponentSchedule } from "../components/ComponentSchedule";
-import { EmployeeList, Employee } from "../types/Employee";
+import {Container} from "react-bootstrap";
+import {ComponentSchedule} from "../components/ComponentSchedule";
+import {Employee, EmployeeList} from "../types/Employee";
 
 /**
  * C'est la page qui sert à afficher les horaires

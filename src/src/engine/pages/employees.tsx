@@ -1,7 +1,7 @@
 import React from "react";
-import { Container } from "react-bootstrap";
-import { ComponentEmployeeList } from "../components/ComponentEmployeeList";
-import { EmployeeList, Employee, EmployeeProps } from "../types/Employee";
+import {Container} from "react-bootstrap";
+import {ComponentEmployeeList} from "../components/ComponentEmployeeList";
+import {Employee, EmployeeList, EmployeeProps} from "../types/Employee";
 
 /**
  * Ceci est la page pour les employés
