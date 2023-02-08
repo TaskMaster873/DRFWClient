@@ -5,8 +5,8 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {SocketManager} from "../src/engine/networking/WebsocketManager";
 import {ResetPassword} from "../src/engine/pages/resetPassword";
+import {API} from "../src/engine/api/APIManager";
 
 let user;
 beforeEach(async () => {
@@ -47,7 +47,7 @@ describe("Reset password validation", () => {
 });
 
 test("Valid email password should submit form", async () => {
-    SocketManager.resetPassword = jest.fn();
+    API.resetPassword = jest.fn();
     const {inputEmail, form} = getFields();
 
     await user.type(inputEmail, testConstants.validEmail);
@@ -57,7 +57,7 @@ test("Valid email password should submit form", async () => {
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect(SocketManager.resetPassword).toBeCalled();
+    expect(API.resetPassword).toBeCalled();
 });
 
 function getFields() {

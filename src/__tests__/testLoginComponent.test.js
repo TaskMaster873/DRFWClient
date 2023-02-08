@@ -7,6 +7,7 @@ import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {Login} from "../src/engine/pages/login";
 import {SocketManager} from "../src/engine/networking/WebsocketManager";
+import {API} from "../src/engine/api/APIManager";
 
 let user;
 beforeEach(async () => {
@@ -53,7 +54,7 @@ describe("Empty Fields login validation", () => {
 });
 
 test("Valid email and password should submit form", async () => {
-    SocketManager.loginWithPassword = jest.fn();
+    API.loginWithPassword = jest.fn();
     const {inputPassword, form, inputEmail} = getFields();
 
     await user.type(inputEmail, testConstants.validEmail);
@@ -65,7 +66,7 @@ test("Valid email and password should submit form", async () => {
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect(SocketManager.loginWithPassword).toBeCalled();
+    expect(API.loginWithPassword).toBeCalled();
 });
 
 function getFields() {
