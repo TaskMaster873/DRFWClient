@@ -29,22 +29,11 @@ export class ComponentSearchBar extends React.Component<{ list: any, filterList:
 
     render() {
         return (<Form.Group>
-            <Col xs={6}>
-                <Form.Select
-                    onChange={this.handleSearchChange}>
-                    <option value="email">Par Adresse courriel</option>
-                    <option value="firstName">Par Prénom</option>
-                    <option value="name">Par Nom</option>
-                    <option>Par Nom</option>
-                </Form.Select>
-            </Col>
-            <Col xs={6}>
                 <Form.Control
                     type="text"
                     placeholder="Search"
                     onChange={this.handleSearchChange}
                 />
-            </Col>
         </Form.Group>);
     }
 }
