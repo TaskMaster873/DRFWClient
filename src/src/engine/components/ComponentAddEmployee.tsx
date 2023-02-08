@@ -91,7 +91,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                   placeholder="exemple@exemple.com"
               />
               <Form.Control.Feedback type="invalid">
-                {errors.errorRequiredEmail}
+                {errors.errorInvalidEmail}
               </Form.Control.Feedback>
             </Form.Group>
 
