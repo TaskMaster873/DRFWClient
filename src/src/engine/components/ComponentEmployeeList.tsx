@@ -52,6 +52,7 @@ export class ComponentEmployeeList extends React.Component {
                   <a>{this.state.list[index].firstName}</a>
                 </td>
                 <td key={"name " + index}>{this.state.list[index].lastName}</td>
+                <td key={"email " + index}>{this.state.list[index].email}</td>
                 <td key={"phoneNumber " + index}>
                   {this.state.list[index].phoneNumber}
                 </td>
