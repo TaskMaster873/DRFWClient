@@ -172,7 +172,7 @@ describe("Empty Fields Login Tests", () => {
 });
 
 describe("Regex Validation AddEmployee Tests", () => {
-    test("Invalid employee number regex should show error", async () => {
+    test("Invalid email regex should show error", async () => {
         const {
             form,
             inputEmail,

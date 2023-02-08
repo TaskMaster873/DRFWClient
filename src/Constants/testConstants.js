@@ -1,5 +1,5 @@
 const testConstants = {
-    validEmail: "maxime_labbé@outlook.com",
+    validEmail: "maxime_labbe@outlook.com",
     validFirstName: "Alfred",
     validName: "Montmagny",
     validPhoneNumber: "418-666-6666",

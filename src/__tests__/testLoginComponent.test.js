@@ -10,7 +10,6 @@ import {SocketManager} from "../src/engine/networking/WebsocketManager";
 
 let user;
 beforeEach(async () => {
-    if (!("crypto" in globalThis)) globalThis.crypto = require("crypto");
     user = userEvent.setup();
     render(<MemoryRouter><Login/></MemoryRouter>);
 });
@@ -53,7 +52,7 @@ describe("Empty Fields login validation", () => {
     });
 });
 
-test("Valid employee number and password should submit form", async () => {
+test("Valid email and password should submit form", async () => {
     SocketManager.loginWithPassword = jest.fn();
     const {inputPassword, form, inputEmail} = getFields();
 
@@ -62,11 +61,11 @@ test("Valid employee number and password should submit form", async () => {
 
     fireEvent.submit(form);
 
-    expect(SocketManager.loginWithPassword).toBeCalled();
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    expect(SocketManager.loginWithPassword).toBeCalled();
 });
 
 function getFields() {

@@ -45,10 +45,11 @@ export class ComponentResetPassword extends React.Component {
                         <Form.Label htmlFor="email" className="mt-2">Adresse courriel</Form.Label>
                         <Form.Control
                             required
+                            id="email"
                             name="email"
                             className="row mt-1"
                             type="email"
-                            pattern="^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$"
+                            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
                             placeholder="Entrez votre adresse courriel"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidEmail">
@@ -100,7 +101,7 @@ export class ComponentResetPassword extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            SocketManager.sendResetPasswordEmail(this.state.email);
+            SocketManager.resetPassword(this.state.email);
         }
     }
 

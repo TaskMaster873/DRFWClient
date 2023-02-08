@@ -61,6 +61,7 @@ export class ComponentLogin extends React.Component {
               id="emailLogin"
               className="row mt-1"
               type="email"
+              pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
               placeholder="Entrez votre adresse courriel"
             />
             <Form.Control.Feedback type="invalid" id="invalidLoginIdEmployee">
@@ -125,7 +126,7 @@ export class ComponentLogin extends React.Component {
     });
 
     if (errorType === FormErrorType.NO_ERROR) {
-      SocketManager.logInWithPassword(this.state.emailLogin, this.state.passwordLogin);
+      SocketManager.loginWithPassword(this.state.emailLogin, this.state.passwordLogin);
     }
   }
 

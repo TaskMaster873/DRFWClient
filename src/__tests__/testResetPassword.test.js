@@ -47,17 +47,17 @@ describe("Reset password validation", () => {
 });
 
 test("Valid email password should submit form", async () => {
-    SocketManager.changePassword = jest.fn();
+    SocketManager.resetPassword = jest.fn();
     const {inputEmail, form} = getFields();
 
     await user.type(inputEmail, testConstants.validEmail);
 
     fireEvent.submit(form);
 
-    expect(SocketManager.changePassword).toBeCalled();
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    expect(SocketManager.resetPassword).toBeCalled();
 });
 
 function getFields() {

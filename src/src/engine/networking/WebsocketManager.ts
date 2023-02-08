@@ -60,16 +60,22 @@ class WebsocketManager extends Logger {
         //throw new Error("Not Implemented");
     }
 
+    public async resetPassword(email: string) : Promise<void> {
+        //TODO
+        //throw new Error("Not Implemented");
+    }
+
     public async sendResetPasswordEmail(email: string) : Promise<void> {
 
     }
+
 
     /**
      * Attempts logging in with provided username and password
      * @param username 
      * @param password 
      */
-    public async logInWithPassword(username: string, password: string) : Promise<void> {
+    public async loginWithPassword(username: string, password: string) : Promise<void> {
         if(username === null || !username) {
             throw new Error('Username is null or empty');
         }
