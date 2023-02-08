@@ -2,11 +2,13 @@ import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {errors, FormErrorType, success} from "../messages/FormMessages";
-import {SocketManager} from "../networking/WebsocketManager";
+
+import {NotificationManager} from 'react-notifications';
 
 /* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
+import {API} from "../api/APIManager";
 
 /***
  * Ce composant affiche le formulaire pour changer le mot de passe
@@ -84,16 +86,17 @@ export class ComponentResetPassword extends React.Component {
         );
     }
 
-    private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
         let errorType = FormErrorType.NO_ERROR;
 
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
-            event.preventDefault();
-            event.stopPropagation();
         }
+
+        event.preventDefault();
+        event.stopPropagation();
 
         this.setState({
             validated: true,
@@ -101,7 +104,13 @@ export class ComponentResetPassword extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            SocketManager.resetPassword(this.state.email);
+            let success = await API.resetPassword(this.state.email);
+
+            if(success) {
+                NotificationManager.info('Réinitialisation du mots de passe', 'Un courriel a bien été envoyé à votre adresse courriel.');
+            } else {
+                NotificationManager.error('Erreur', 'Une erreur est survenue lors de la réinitialisation de votre mot de passe.');
+            }
         }
     }
 
