@@ -16,20 +16,22 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
 
   private list: Employee[] = [
     new Employee({
-      no: 0,
-      name: "Blanchet",
+      id: "",
+      lastName: "Blanchet",
       firstName: "Stéphane",
       phoneNumber: "581-555-5555",
-      manager: 0,
+      departmentId: this.department_id,
       jobTitles: ["Gestionnaire de projet", "Directeur de production"],
+      password: ""
     }),
     new Employee({
-      no: 1,
-      name: "Blanchette",
+      id: "",
+      lastName: "Blanchette",
       firstName: "Roger",
       phoneNumber: "581-555-2312",
-      manager: 0,
+      departmentId: this.department_id,
       jobTitles: ["Gestionnaire de projet", "Directeur de production"],
+      password: ""
     }),
   ];
 

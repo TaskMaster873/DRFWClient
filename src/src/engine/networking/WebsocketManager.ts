@@ -1,17 +1,19 @@
 import { Logger } from "../Logger";
-import { StatusMessage } from "./types/StatusMessage";
+import { StatusMessage } from "../messages/StatusMessage";
 
-import { Config } from "../config/Config";
+import { Config } from "../Config";
 import { PacketBuilder } from "./PacketBuilder";
 
 import protobuf from 'protobufjs';
-import {Opcodes} from "./opcodes/Opcodes";
-import {AuthenticationStatus, AuthenticationStatusType} from "./types/AuthenticationStatus";
+import {Opcodes} from "../types/Opcodes";
+import {AuthenticationStatus, AuthenticationStatusType} from "../types/AuthenticationStatus";
+import { AuthData, SessionKey } from "../types/AuthData";
 import ServiceNotification from "../services/ServiceNotification";
 import {Encryptem} from "./Encryptem";
-import {ServerKeyCipherExchange} from "./types/Packets";
+import {ServerKeyCipherExchange} from "../types/Packets";
+import { EmployeeCreateDTO } from "../types/Employee";
 
-export class WebsocketManager extends Logger {
+class WebsocketManager extends Logger {
     public moduleName: string = 'WebsocketManager';
     public logColor: string = '#9370db';
 
@@ -32,23 +34,6 @@ export class WebsocketManager extends Logger {
 
     constructor() {
         super();
-
-        Config.loginWithPassword = this.loginWithPassword.bind(this);
-    }
-
-    private async loginWithPassword(username: string, password: string) : Promise<void> {
-        if(username === null || !username) {
-            throw new Error('Username is null or empty');
-        }
-
-        if(password === null || !password) {
-            throw new Error('Password is null or empty');
-        }
-
-        Config.clientId = username;
-
-        await this.encryptem.generateClientCipherKeyPair(password);
-        await this.sendAuthPacket();
     }
 
     get isSecure() : boolean {
@@ -67,38 +52,86 @@ export class WebsocketManager extends Logger {
         return useRemote;
     }
 
-    private getConnectionUri() : string {
-        if(this.shouldUseRemote) {
-            return Config.connectionURIRemote;
-        } else {
-            return Config.connectionURILocal;
+    /*
+     * ---------------------------------------------User Actions------------------------------------------------
+     */
+
+    public async changePassword(oldPassword: string, newPassword: string) : Promise<void> {
+        //TODO
+        //throw new Error("Not Implemented");
+    }
+
+    /**
+     * Attempts logging in with provided username and password
+     * @param username 
+     * @param password 
+     */
+    public async loginWithPassword(username: string, password: string) : Promise<void> {
+        if(username === null || !username) {
+            throw new Error('Username is null or empty');
+        }
+
+        if(password === null || !password) {
+            throw new Error('Password is null or empty');
+        }
+        //Get AuthKey
+        let authKey = await this.encryptem.generateClientCipherKeyPair(password);
+        //Save Session to local storage
+        Config.sessionKey = {
+            clientId: username,
+            clientPubKey: authKey.clientPubKey,
+            clientAuthKey: authKey.clientAuthKey,
+            clientHash: authKey.clientHash
+        }
+        //Send SessionKey to backend for verification
+        await this.sendAuthPacket();
+    }
+
+    /**
+     * Builds the Create Employee packet ands sends it to backend
+     * @param employeeDTO 
+     */
+    public async createEmployee(employeeDTO: EmployeeCreateDTO) : Promise<void> {
+        let authData = await this.encryptem.generateAuthData(employeeDTO.password);
+        let employeeCreatePacket = await this.packetBuilder.buildEmployeeCreatePacket(employeeDTO, authData);
+
+        if(employeeCreatePacket !== null && employeeCreatePacket) {
+            await this.sendMsg(employeeCreatePacket);
         }
     }
 
-    private async onFullAuth(authStatus: AuthenticationStatus) : Promise<void> {
+    /*
+     * ---------------------------------------------Routers------------------------------------------------
+     */
 
+    private async readOnlyPacketHandler(opcode: number, message: Uint8Array) : Promise<void> {
+        switch(opcode) {
+            case Opcodes.InBound.AUTHENTICATION_STATUS: {
+                await this.onAuthenticationStatus(message);
+                break;
+            }
+            case Opcodes.InBound.PONG: {
+                await this.onPong(message);
+                break;
+            }
+            case Opcodes.InBound.SERVER_CIPHER_EXCHANGE: {
+                await this.parseKeyCipherExchangeServerPacket(message);
+                break;
+            }
+            default: {
+                this.warn(`Unhandled packet opcode: ${opcode}`);
+            }
+        }
     }
 
-    private clearIntervals() : void {
-        clearInterval(this.pingInterval);
-    }
+    /*
+     * ---------------------------------------------Route Methods------------------------------------------------
+     */
 
     private async onPing() : Promise<void> {
         let pingPacket = await this.packetBuilder.buildPingPacket();
         if(pingPacket !== null && pingPacket) {
             await this.sendMsg(pingPacket);
-        }
-    }
-
-    private startPingInterval() : void {
-        this.pingInterval = setInterval(async () => {
-            await this.onPing();
-        }, 1000 * 0.5);
-    }
-
-    private closeWs() : void {
-        if(this.ws.readyState === WebSocket.OPEN) {
-            this.ws.close();
         }
     }
 
@@ -132,7 +165,7 @@ export class WebsocketManager extends Logger {
                 this.error(`Failed to authenticate -> ${message}`);
 
                 ServiceNotification.notifyClientError(`Failed to authenticate. ${authStatus.message}`);
-                await Config.resetAuthKey();
+                await Config.resetSession();
 
                 setTimeout(async () => {
                     await this.closeWs();
@@ -154,14 +187,6 @@ export class WebsocketManager extends Logger {
         this.onLatencyChange(latency);
 
         await this.responsePong2();
-    }
-
-    private convertToCertificate(keypair: Buffer) : string{
-        let out = `------BEGIN PUBLIC KEY-----\r\n`;
-        out += keypair.toString('base64') + '\r\n';
-        out += `------END PUBLIC KEY-----`;
-
-        return out;
     }
 
     private async parseKeyCipherExchangeServerPacket(packet: Uint8Array) : Promise<void> {
@@ -188,24 +213,46 @@ export class WebsocketManager extends Logger {
         }
     }
 
-    private async readOnlyPacketHandler(opcode: number, message: Uint8Array) : Promise<void> {
-        switch(opcode) {
-            case Opcodes.InBound.AUTHENTICATION_STATUS: {
-                await this.onAuthenticationStatus(message);
-                break;
-            }
-            case Opcodes.InBound.PONG: {
-                await this.onPong(message);
-                break;
-            }
-            case Opcodes.InBound.SERVER_CIPHER_EXCHANGE: {
-                await this.parseKeyCipherExchangeServerPacket(message);
-                break;
-            }
-            default: {
-                this.warn(`Unhandled packet opcode: ${opcode}`);
-            }
+    /*
+     * ---------------------------------------------Other------------------------------------------------
+     */
+
+    private getConnectionUri() : string {
+        if(this.shouldUseRemote) {
+            return Config.connectionURIRemote;
+        } else {
+            return Config.connectionURILocal;
         }
+    }
+
+    private async onFullAuth(authStatus: AuthenticationStatus) : Promise<void> {
+
+    }
+
+    private clearIntervals() : void {
+        clearInterval(this.pingInterval);
+    }
+
+    
+
+    private startPingInterval() : void {
+        this.pingInterval = setInterval(async () => {
+            await this.onPing();
+        }, 1000 * 0.5);
+    }
+
+    private closeWs() : void {
+        if(this.ws.readyState === WebSocket.OPEN) {
+            this.ws.close();
+        }
+    }
+
+    private convertToCertificate(keypair: Buffer) : string{
+        let out = `------BEGIN PUBLIC KEY-----\r\n`;
+        out += keypair.toString('base64') + '\r\n';
+        out += `------END PUBLIC KEY-----`;
+
+        return out;
     }
 
     private async sendMsg(msg: Uint8Array) : Promise<void> {
@@ -379,3 +426,6 @@ export class WebsocketManager extends Logger {
         this.log(`Latency changed to ${newLatency}ms.`);
     }
 }
+
+const SocketManager = new WebsocketManager();
+export { SocketManager };

@@ -8,22 +8,24 @@ import { EmployeeList, Employee } from "../types/Employee";
  */
 export class Schedule extends React.Component {
     private list: Employee[] = [ // ceci est la même liste que dans employeelist page
-        new Employee({
-            no: 0,
-            name: "Blanchet",
-            firstName: "Stéphane",
-            phoneNumber: "581-555-5555",
-            manager: 0,
-            jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-        }),
-        new Employee({
-            no: 1,
-            name: "Blanchette",
-            firstName: "Roger",
-            phoneNumber: "581-555-2312",
-            manager: 0,
-            jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-        }),
+    new Employee({
+        id: "",
+        lastName: "Blanchet",
+        firstName: "Stéphane",
+        phoneNumber: "581-555-5555",
+        departmentId: "",
+        jobTitles: ["Gestionnaire de projet", "Directeur de production"],
+        password: ""
+      }),
+      new Employee({
+        id: "",
+        lastName: "Blanchette",
+        firstName: "Roger",
+        phoneNumber: "581-555-2312",
+        departmentId: "",
+        jobTitles: ["Gestionnaire de projet", "Directeur de production"],
+        password: ""
+      }),
     ];
     public componentDidMount() {
         document.title = "Horaire - TaskMaster";

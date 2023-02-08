@@ -5,52 +5,77 @@ import { ResourceGroups } from "./ComponentFilterProjects";
 import { ScheduleGroups, ScheduleResource } from "../types/Schedule";
 import "./ComponentPopupSchedule";
 import { EventForCalendar } from "../types/Shift";
-import { Example } from "./ComponentPopupSchedule";
+import { constants } from "../messages/FormMessages";
+import { ComponentPopupSchedule } from "./ComponentPopupSchedule";
 /**
  * Ceci est le composant d'horaire
  */
 export class ComponentSchedule extends React.Component {
+
 	private list: Employee[] = [];
-	private datePicker: DayPilot.DatePicker;
 	private listEvent: EventForCalendar[] = [];
-	private dateRef: React.RefObject<unknown> /*= React.createRef()*/;
+	child: React.RefObject<ComponentPopupSchedule>;
 	constructor(props: EmployeeList) {
 		super(props);
 		this.list = props.list;
-		this.dateRef = React.createRef(); //DayPilot.Date.today();
+		this.child = React.createRef();
+		//this.dateRef = React.createRef(); //DayPilot.Date.today();
 		this.state = {
 			startDate: DayPilot.Date.today(),
 			columns: this.doColumns(),
 			events: this.doEvents(),
 		};
+
 	}
 
-	/*   get calendar() {
-		return this.calendarRef.current.control;
-	} */
-
+	public render(): JSX.Element {
+		if (this.list === undefined || this.list.length == 0) {
+			return <div> Il n'y a pas d'horaire à voir</div>;
+		} else
+			return (
+				<div>
+					<ResourceGroups groups={this.loadGroups().groups} onChange={this.onChange} />
+					<DayPilotCalendar
+						businessBeginsHour={8}
+						businessEndsHour={20}
+						heightSpec={"Full"}
+						height={2000}
+						cellHeight={20}
+						cellDuration={5}
+						viewType={"Resources"}
+						showNonBusiness={false}
+						onTimeRangeSelected={this.onTimeRangeSelected}
+						eventDeleteHandling={"Update"}
+						{...this.state}
+					/>
+					<ComponentPopupSchedule ref={this.child} isShowing={false} eventAdd={this.eventAdd}></ComponentPopupSchedule>
+				</div>
+			);
+	}
 
 	/**
 	 *
-	 * @returns la liste des nom d'employé formatté pour columns de DayPilotCalendar
+	 * @returns la liste des nom d'employé formatté pour columns de DayPilotCalendar qui existe déjà
 	 *
 	 */
-	private doColumns() {
+	private doColumns(): Array<{ name: string; id: string }> {
 		let listToReturn: Array<{ name: string; id: string }>;
 		listToReturn = [];
 		for (let index = 0; index < this.list.length; index++) {
 			listToReturn.push({
-				name: this.list[index].firstName + " " + this.list[index].name,
-				id: this.list[index].no.toString(),
+				name: this.list[index].firstName + " " + this.list[index].firstName,
+				id: this.list[index].id.toString(),
 			});
 		}
 		return listToReturn;
 	}
 
+	/**
+	 * 
+	 * charge toutes les corps de travail qui existe
+	 * @returns Liste de EventForCalendar qui est une liste de coprs de travail
+	 */
 	private doEvents(): EventForCalendar[] {
-
-
-
 		this.listEvent.push({
 			id: 1,
 			text: "Il faut mettre le temps et le titre",
@@ -61,8 +86,6 @@ export class ComponentSchedule extends React.Component {
 		});
 		return this.listEvent;
 	}
-
-	componentDidMount() { }
 
 	loadGroups() {
 		let data: ScheduleGroups = {
@@ -110,15 +133,34 @@ export class ComponentSchedule extends React.Component {
 		};
 		return data;
 	}
-
-
-	private returnEmployeeForTheGoodGroup() {
-
-	}
-
+	/**
+	  *
+	  * @param args est le nouvel horaire à ajouter avec tout les paramètres.
+	  */
+	eventAdd = (event: EventForCalendar) => {
+		console.log(event);
+		this.listEvent.push({
+			id: 1,
+			text: event.start.toString("dd MMMM yyyy ", "fr-fr") + " " + event.start.toString("hh") + "h" + event.start.toString("mm") + "-" + event.end.toString("hh") + "h" + event.end.toString("mm") + " " + event.text,
+			start: event.start,
+			end: event.end,
+			resource: event.resource,
+			barColor: event.barColor,
+		});
+		this.setState({ events: this.listEvent });
+	};
 
 	/**
-	 * 
+	 *
+	 * @param args le groupe sélectionné
+	 * la fonction change le groupe qui est affiché
+	 */
+	onChange = (args: { selected: { resources: ResourceGroups } }) => {
+		this.groupChanged(args.selected);
+	};
+
+	/**
+	 *
 	 * @param group étant le projet qu'on veut montrer ses employés assigné
 	 */
 	private groupChanged(group: { resources: ResourceGroups }): void {
@@ -137,74 +179,25 @@ export class ComponentSchedule extends React.Component {
 		];
 		this.setState({ columns: columns, events: events });
 	}
+
 	/**
-	 * 
-	 * @param args est le nouvel horaire à ajouter avec tout les paramètres.
-	 */
-	eventAdd = (args: { event: EventForCalendar }) => {
-		console.log(args.event);
-		this.listEvent.push({
-			id: args.event.id,
-			text: args.event.text,
-			start: args.event.start,
-			end: args.event.end,
-			resource: args.event.resource,
-			barColor: args.event.barColor,
-		})
-		this.setState({ events: this.listEvent });
-	}
-	/**
-	 * 
+	 *
 	 * @param args c'est toutes les données de l'évènement
 	 * @returns rien
 	 */
 	onTimeRangeSelected = (args: any) => {
-		let name = prompt("New event name:", "Event");
+		this.child.current?.saveContent(args.start, args.end, args.resource);
+		//let name = prompt("New event name:", "Event");
 		DayPilot.Calendar.clearSelection;
-		console.log("agrs =", args);
-		if (!name) return;
-		this.listEvent.push({
+		//if (!name) return;
+		/*this.listEvent.push({
 			id: 1,
-			text: args.start.toString("  dd MMMM yyyy ", "fr-fr") + " " + args.start.toString("hh") + "h" + args.start.toString("mm") + "-" + args.end.toString("hh") + "h" + args.end.toString("mm") + " " + name ,
+			text: args.start.toString("  dd MMMM yyyy ", "fr-fr") + " " + args.start.toString("hh") + "h" + args.start.toString("mm") + "-" + args.end.toString("hh") + "h" + args.end.toString("mm") + " " + name,
 			start: args.start,
 			end: args.end,
 			resource: args.resource,
 			barColor: args.barColor,
 		})
-		this.setState({ events: this.listEvent });
-	}
-
-
-	/**
-	 * 
-	 * @param args le groupe sélectionné
-	 * la fonction change le groupe qui est affiché
-	 */
-	onChange = (args: { selected: { resources: ResourceGroups } }) => {
-		this.groupChanged(args.selected);
-	};
-
-	public render(): JSX.Element {
-		if (this.list === undefined || this.list.length == 0) {
-			return <div> Il n'y a pas d'horaire à voir</div>;
-		} else
-			return (
-				<div>
-					<ResourceGroups groups={this.loadGroups().groups} onChange={this.onChange} />
-					<DayPilotCalendar
-						businessBeginsHour={8}
-						businessEndsHour={20}
-						heightSpec={"Full"}
-						height={2000}
-						cellHeight={20}
-						cellDuration={5}
-						viewType={"Resources"}
-						showNonBusiness={false}
-						onTimeRangeSelected={this.onTimeRangeSelected}
-						eventDeleteHandling = {"Update"}
-						{...this.state}
-					/>
-				</div>
-			);
+		this.setState({ events: this.listEvent });*/
 	}
 }
