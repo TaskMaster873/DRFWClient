@@ -1,17 +1,16 @@
-import { Logger } from "../Logger";
-import { StatusMessage } from "../messages/StatusMessage";
+import {Logger} from "../Logger";
+import {StatusMessage} from "../messages/StatusMessage";
 
-import { Config } from "../Config";
-import { PacketBuilder } from "./PacketBuilder";
+import {Config} from "../Config";
+import {PacketBuilder} from "./PacketBuilder";
 
 import protobuf from 'protobufjs';
 import {Opcodes} from "../types/Opcodes";
 import {AuthenticationStatus, AuthenticationStatusType} from "../types/AuthenticationStatus";
-import { AuthData, SessionKey } from "../types/AuthData";
 import ServiceNotification from "../services/ServiceNotification";
 import {Encryptem} from "./Encryptem";
 import {ServerKeyCipherExchange} from "../types/Packets";
-import { EmployeeCreateDTO } from "../types/Employee";
+import {EmployeeCreateDTO} from "../types/Employee";
 
 class WebsocketManager extends Logger {
     public moduleName: string = 'WebsocketManager';
@@ -61,12 +60,16 @@ class WebsocketManager extends Logger {
         //throw new Error("Not Implemented");
     }
 
+    public async sendResetPasswordEmail(email: string) : Promise<void> {
+
+    }
+
     /**
      * Attempts logging in with provided username and password
      * @param username 
      * @param password 
      */
-    public async loginWithPassword(username: string, password: string) : Promise<void> {
+    public async logInWithPassword(username: string, password: string) : Promise<void> {
         if(username === null || !username) {
             throw new Error('Username is null or empty');
         }
