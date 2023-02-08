@@ -1,5 +1,5 @@
 import React from "react";
-import { PasswordStrengthType } from "../types/PasswordStrengthTypes";
+import {PasswordStrengthType} from "../types/PasswordStrengthTypes";
 import * as Regex from "../utils/RegexValidator";
 
 /**

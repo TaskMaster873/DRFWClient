@@ -1,6 +1,6 @@
-import { Employee } from "./Employee";
-import { Project } from "./Project";
-import { DayPilot } from "@daypilot/daypilot-lite-react";
+import {Employee} from "./Employee";
+import {Project} from "./Project";
+import {DayPilot} from "@daypilot/daypilot-lite-react";
 
 export interface ShiftsList {
   shifts: Shift[];

@@ -3,9 +3,12 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { FormErrorType, constants } from "../messages/FormMessages";
+import { FormErrorType, errors } from "../messages/FormMessages";
 import { Container } from "react-bootstrap";
-import { SocketManager } from "../networking/WebsocketManager";
+import { API } from "../api/APIManager";
+import {Employee} from "../types/Employee";
+import {NotificationManager} from 'react-notifications';
+
 
 type Props = { titles: string[]; roles: string[] };
 /**
@@ -13,6 +16,7 @@ type Props = { titles: string[]; roles: string[] };
  * Ceci est le composant pour ajouter les employés
  */
 export class ComponentAddEmployee extends React.Component<Props> {
+
   private jobTitles: string[] = [];
   private roles: string[] = [];
   private errorMessage = "";
@@ -20,6 +24,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
     clientId: string;
     firstName: string;
     lastName: string;
+    email: string;
     phoneNumber: string;
     password: string;
     validated?: boolean;
@@ -27,21 +32,21 @@ export class ComponentAddEmployee extends React.Component<Props> {
   };
 
   constructor(props: Props) {
-    super(props);
-    this.jobTitles = props.titles;
-    this.roles = props.roles;
-    this.state = {
-      clientId: "",
-      firstName: "",
-      lastName: "",
-      phoneNumber: "",
-      password: "",
-      validated: false,
-      error: FormErrorType.NO_ERROR,
-    };
-
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+      super(props);
+      this.jobTitles = props.titles;
+      this.roles = props.roles;
+      this.state = {
+          clientId: "",
+          firstName: "",
+          lastName: "",
+          email: "",
+          phoneNumber: "",
+          password: "",
+          validated: false,
+          error: FormErrorType.NO_ERROR,
+      };
+      this.handleSubmit = this.handleSubmit.bind(this);
+      this.handleChange = this.handleChange.bind(this);
   }
 
   public render(): JSX.Element {
@@ -55,19 +60,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
           data-error={this.state.error}
         >
           <Row className="mb-3 mt-3">
-            <Form.Group as={Col} md="4">
-              <Form.Label>Numéro d'employé</Form.Label>
-              <Form.Control
-                id="clientId"
-                required
-                type="text"
-                placeholder="000000"
-                pattern="^\d{6}$"
-              />
-              <Form.Control.Feedback type="invalid">
-                {constants.errorInvalidEmployeeId}
-              </Form.Control.Feedback>
-            </Form.Group>
+
             <Form.Group as={Col} md="4">
               <Form.Label>Prénom</Form.Label>
               <Form.Control
@@ -77,7 +70,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 placeholder="Prénom"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorRequiredFirstName}
+                {errors.errorRequiredFirstName}
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} md="4">
@@ -89,9 +82,23 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 placeholder="Nom"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorRequiredName}
+                {errors.errorRequiredName}
               </Form.Control.Feedback>
             </Form.Group>
+            <Form.Group as={Col} md="4">
+              <Form.Label></Form.Label>
+              <Form.Control
+                  id="email"
+                  required
+                  type="email"
+                  pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+                  placeholder="exemple@exemple.com"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.errorInvalidEmail}
+              </Form.Control.Feedback>
+            </Form.Group>
+
           </Row>
           <Row className="mb-3">
             <Form.Group as={Col} md="6">
@@ -104,7 +111,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 placeholder="000-000-0000"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorInvalidPhoneNumber}
+                {errors.errorInvalidPhoneNumber}
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group as={Col} md="6">
@@ -117,7 +124,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 placeholder="Mot de passe"
               />
               <Form.Control.Feedback type="invalid">
-                {constants.errorInvalidInitialPassword}
+                {errors.errorInvalidInitialPassword}
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
@@ -141,7 +148,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 ))}
               </Form.Select>
               <Form.Control.Feedback type="invalid">
-                {constants.errorRequiredRole}
+                {errors.errorRequiredRole}
               </Form.Control.Feedback>
             </Form.Group>
           </Row>
@@ -167,49 +174,63 @@ export class ComponentAddEmployee extends React.Component<Props> {
     );
   }
 
-  private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
-    const form = event.currentTarget;
-    let isValid = form.checkValidity();
+    /**
+     * TODO
+     * Generate automatically a password for new employee and ask them to change it on the first login.
+     */
+    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+        const form = event.currentTarget;
+        let isValid = form.checkValidity();
 
-    let errorType = FormErrorType.NO_ERROR;
-    if (!isValid) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      errorType = FormErrorType.INVALID_FORM;
-    }
-
-    this.setState({
-      validated: true,
-      error: errorType,
-    });
-
-    if (errorType === FormErrorType.NO_ERROR) {
-      SocketManager.createEmployee(
-        {
-          id: this.state.clientId,
-          firstName: this.state.firstName,
-          lastName: this.state.lastName,
-          phoneNumber: this.state.phoneNumber,
-          password: this.state.password,
-          departmentId: "1",
-          jobTitles: []
+        let errorType = FormErrorType.NO_ERROR;
+        if (!isValid) {
+            errorType = FormErrorType.INVALID_FORM;
         }
-      );
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (errorType === FormErrorType.NO_ERROR) {
+            this.setState({
+                validated: true,
+                error: errorType,
+            });
+
+            if (errorType === FormErrorType.NO_ERROR) {
+                let employeeData: Employee = {
+                    email: this.state.email,
+                    isActive: false,
+                    role: "",
+                    skills: [],
+                    id: this.state.clientId,
+                    firstName: this.state.firstName,
+                    lastName: this.state.lastName,
+                    phoneNumber: this.state.phoneNumber,
+                    departmentId: "1",
+                    jobTitles: []
+                };
+
+                let created = await API.createEmployee(this.state.email, this.state.password, employeeData);
+                if (created) {
+                    NotificationManager.success('Déconnection réussi', 'Vous êtes maitenant déconnecté.');
+                } else {
+                    NotificationManager.error('Déconnection réussi', 'Vous êtes maitenant déconnecté.');
+                }
+            }
+        }
     }
-  }
 
-  private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
-    const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
-    const name = target.id;
+    private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
+        const target = event.target;
+        const value = target.type === "checkbox" ? target.checked : target.value;
+        const name = target.id;
 
-    if (!name) {
-      throw new Error("Id is undefined for element in form.");
+        if (!name) {
+            throw new Error("Id is undefined for element in form.");
+        }
+
+        this.setState({
+            [name]: value,
+        });
     }
-
-    this.setState({
-      [name]: value,
-    });
-  }
 }

@@ -1,8 +1,8 @@
 import React from "react";
-import { Container } from "react-bootstrap";
-import { ComponentDepartmentList } from "../components/ComponentDepartmentList";
-import { Logger } from "../Logger";
-import { DepartmentList, Department } from "../types/Department";
+import {Container} from "react-bootstrap";
+import {ComponentDepartmentList} from "../components/ComponentDepartmentList";
+import {Logger} from "../Logger";
+import {Department, DepartmentList} from "../types/Department";
 
 /**
  * Ceci est la page pour les employés

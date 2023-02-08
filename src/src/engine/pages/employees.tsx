@@ -1,7 +1,7 @@
 import React from "react";
-import { Container } from "react-bootstrap";
-import { ComponentEmployeeList } from "../components/ComponentEmployeeList";
-import { EmployeeList, Employee, EmployeeProps } from "../types/Employee";
+import {Container} from "react-bootstrap";
+import {ComponentEmployeeList} from "../components/ComponentEmployeeList";
+import {Employee, EmployeeList, EmployeeProps} from "../types/Employee";
 
 /**
  * Ceci est la page pour les employés
@@ -11,7 +11,6 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
   private department_id : string = "";
   constructor(props: EmployeeProps) {
     super(props);
-    console.log(this.props.params);
   }
 
   private list: Employee[] = [
@@ -19,6 +18,7 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
       id: "",
       lastName: "Blanchet",
       firstName: "Stéphane",
+      email: "stéphane.blanchet@outlook.com",
       phoneNumber: "581-555-5555",
       departmentId: this.department_id,
       jobTitles: ["Gestionnaire de projet", "Directeur de production"],
@@ -29,6 +29,7 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
       lastName: "Blanchette",
       firstName: "Roger",
       phoneNumber: "581-555-2312",
+      email: "rogBlanchette23@gmail.com",
       departmentId: this.department_id,
       jobTitles: ["Gestionnaire de projet", "Directeur de production"],
       password: ""
