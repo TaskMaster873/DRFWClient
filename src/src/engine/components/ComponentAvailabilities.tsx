@@ -1,10 +1,9 @@
-
 /**
  * Ceci est du code qui a été cherché en partie sur https://code.daypilot.org/42221/react-weekly-calendar-tutorial,  la documentation de la librairie daypilot
  */
-import React, { Component } from 'react';
-import { colorRGB } from '../messages/ColorForAvailability'
-import { DayPilot, DayPilotCalendar, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
+import React, {Component} from 'react';
+import {colorRGB} from '../messages/ColorForAvailability'
+import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
 import "../../deps/css/navigator_default.css";
 
 const styles = {

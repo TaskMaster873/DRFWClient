@@ -1,18 +1,19 @@
 
 /**
- * Liste d'employé, comme dit dans le idm
+ * Liste d'employé
  */
 export interface EmployeeList {
     list : Employee[];
 }
 
 /**
- * Contient tout les renseignements des employés de l'application web
+ * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
     id: string = "";
     lastName: string =  "";
     firstName: string = "";
+    email: string = "";
     phoneNumber: string = "";
     isActive: boolean = true;
     departmentId: string = "";
@@ -25,17 +26,19 @@ export class Employee {
 		this.firstName = employee.firstName;
         this.lastName = employee.lastName;
 		this.phoneNumber = employee.phoneNumber;
+        this.email = employee.email;
         this.departmentId = employee.departmentId;
         this.jobTitles = employee.jobTitles;
 	}
 }
 /**
- * Contient tout les renseignements pour créer un iduveau employé dans la bd
+ * Contient tous les renseignements pour créer un iduveau employé dans la bd
  */
 export interface EmployeeCreateDTO {
     readonly id: string;
 	readonly firstName: string;
     readonly lastName: string;
+    readonly email: string;
     readonly password: string;
 	readonly phoneNumber: string;
 	readonly departmentId: string;

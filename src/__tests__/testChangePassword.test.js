@@ -6,8 +6,7 @@ import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ChangePassword} from "../src/engine/pages/changePassword";
-import { SocketManager } from "../src/engine/networking/WebsocketManager";
-
+import {SocketManager} from "../src/engine/networking/WebsocketManager";
 
 let user;
 beforeEach(async () => {

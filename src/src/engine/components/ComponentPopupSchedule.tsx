@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
-import { EventForCalendar } from "../types/Shift";
+import {DayPilot} from "@daypilot/daypilot-lite-react";
+import {EventForCalendar} from "../types/Shift";
 
 type Props = { isShowing: boolean, eventAdd: Function };
 type State = { isShowed?: boolean, nameOfEvent?: string, colorOfEvent?: string, start?: DayPilot.Date, end?: DayPilot.Date, resource?: string }

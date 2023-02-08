@@ -16,6 +16,7 @@ import {ChangePassword} from "./pages/changePassword";
 import {Departments} from "./pages/departments";
 import {Availabilities} from "./pages/availabilities";
 import {API} from "./api/APIManager";
+import {ResetPassword} from "./pages/resetPassword";
 
 function EmployeeWrapper(): any {
     let parameters: any = useParams();
@@ -24,8 +25,8 @@ function EmployeeWrapper(): any {
     );
 }
 
-import { BeatLoader } from "react-spinners";
-import { NotificationContainer } from 'react-notifications';
+import {BeatLoader} from "react-spinners";
+import {NotificationContainer} from 'react-notifications';
 
 const override: CSSProperties = {
     display: 'flex',
@@ -52,19 +53,20 @@ export class Engine extends React.Component {
         }
     }
 
+
     public render(): JSX.Element {
         if (this.showSpinner) {
             return (<React.StrictMode>
-               <div style={{height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                   <BeatLoader
-                       color={"#A020F0"}
-                       loading={true}
-                       size={25}
-                       cssOverride={override}
-                       aria-label="Loading Spinner"
-                       data-testid="loader"
-                   />
-               </div>
+                <div style={{height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <BeatLoader
+                        color={"#A020F0"}
+                        loading={true}
+                        size={25}
+                        cssOverride={override}
+                        aria-label="Loading Spinner"
+                        data-testid="loader"
+                    />
+                </div>
             </React.StrictMode>);
         } else {
             return (
@@ -82,6 +84,7 @@ export class Engine extends React.Component {
                             <Route path="/memes" element={<Memes/>}/>
                             <Route path="/add-employee" element={<AddEmployee/>}/>
                             <Route path="/availabilities" element={<Availabilities/>}/>
+                            <Route path="/resetPassword" element={<ResetPassword/>}/>
                             <Route path="/changePassword" element={<ChangePassword/>}/>
                         </Routes>
                     </Router>

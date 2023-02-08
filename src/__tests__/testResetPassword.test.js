@@ -5,72 +5,63 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {Login} from "../src/engine/pages/login";
 import {SocketManager} from "../src/engine/networking/WebsocketManager";
+import {ResetPassword} from "../src/engine/pages/resetPassword";
 
 let user;
 beforeEach(async () => {
     user = userEvent.setup();
-    render(<MemoryRouter><Login/></MemoryRouter>);
+    render(<MemoryRouter><ResetPassword/></MemoryRouter>);
 });
 
 test("should render form inputs", async () => {
-    const {inputPassword, form, inputEmail} = getFields();
+    const {inputEmail, form} = getFields();
 
     expect(form).not.toBeNull();
     expect(inputEmail).not.toBeNull();
-    expect(inputPassword).not.toBeNull();
     expect(inputEmail).toHaveAttribute("type", "email");
-    expect(inputPassword).toHaveAttribute("type", "password");
 });
 
-describe("Empty Fields login validation", () => {
-    test("Empty employee number should show error", async () => {
-        const {inputPassword, form, inputEmail} = getFields();
-
-        await user.type(inputPassword, testConstants.validPassword);
+describe("Reset password validation", () => {
+    test("Empty old password should show error", async () => {
+        const {inputEmail, form} = getFields();
 
         fireEvent.submit(form);
 
         expect(inputEmail.value).toBe("");
-        expect(inputPassword.value).toBe(testConstants.validPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
     });
 
-    test("Empty password should show error", async () => {
-        const {inputPassword, form, inputEmail} = getFields();
+    test("Invalid email should show error", async () => {
+        const {inputEmail, form} = getFields();
 
-        await user.type(inputEmail, testConstants.validEmail);
+        await user.type(inputEmail, testConstants.invalidEmail);
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.validEmail);
-        expect(inputPassword.value).toBe("");
+        expect(inputEmail.value).toBe(testConstants.invalidEmail);
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
     });
 });
 
-test("Valid email and password should submit form", async () => {
-    SocketManager.loginWithPassword = jest.fn();
-    const {inputPassword, form, inputEmail} = getFields();
+test("Valid email password should submit form", async () => {
+    SocketManager.resetPassword = jest.fn();
+    const {inputEmail, form} = getFields();
 
     await user.type(inputEmail, testConstants.validEmail);
-    await user.type(inputPassword, testConstants.validPassword);
 
     fireEvent.submit(form);
 
     expect(inputEmail.value).toBe(testConstants.validEmail);
-    expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect(SocketManager.loginWithPassword).toBeCalled();
+    expect(SocketManager.resetPassword).toBeCalled();
 });
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputEmail = document.getElementById("emailLogin");
-    const inputPassword = document.getElementById("passwordLogin");
-    return {inputPassword, form, inputEmail};
+    const inputEmail = document.getElementById("email");
+    return {form, inputEmail};
 }

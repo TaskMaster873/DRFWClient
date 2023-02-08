@@ -21,7 +21,7 @@ beforeEach(async () => {
 test("should render form inputs", async () => {
     const {
         form,
-        inputId,
+        inputEmail,
         inputFirstName,
         inputName,
         inputPhoneNumber,
@@ -29,7 +29,7 @@ test("should render form inputs", async () => {
     } = getFields();
 
     expect(form).not.toBeNull();
-    expect(inputId).not.toBeNull();
+    expect(inputEmail).not.toBeNull();
     expect(inputFirstName).not.toBeNull();
     expect(inputName).not.toBeNull();
     expect(inputPhoneNumber).not.toBeNull();
@@ -42,7 +42,7 @@ describe("Empty Fields Login Tests", () => {
     test("Empty employee number should show error", async () => {
         const {
             form,
-            inputId,
+            inputEmail,
             inputFirstName,
             inputName,
             inputPhoneNumber,
@@ -56,7 +56,7 @@ describe("Empty Fields Login Tests", () => {
 
         fireEvent.submit(form);
 
-        expect(inputId.value).toBe("");
+        expect(inputEmail.value).toBe("");
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
@@ -69,21 +69,21 @@ describe("Empty Fields Login Tests", () => {
     test("Empty first name should show error", async () => {
         const {
             form,
-            inputId,
+            inputEmail,
             inputFirstName,
             inputName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputId, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
         fireEvent.submit(form);
 
-        expect(inputId.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe("");
         expect(inputName.value).toBe(testConstants.validName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
@@ -95,21 +95,21 @@ describe("Empty Fields Login Tests", () => {
     test("Empty name should show error", async () => {
         const {
             form,
-            inputId,
+            inputEmail,
             inputFirstName,
             inputName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputId, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
         fireEvent.submit(form);
 
-        expect(inputId.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputName.value).toBe("");
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
@@ -121,21 +121,21 @@ describe("Empty Fields Login Tests", () => {
     test("Empty phone number should show error", async () => {
         const {
             form,
-            inputId,
+            inputEmail,
             inputFirstName,
             inputName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputId, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
         fireEvent.submit(form);
 
-        expect(inputId.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputName.value).toBe(testConstants.validName);
         expect(inputPhoneNumber.value).toBe("");
@@ -147,21 +147,21 @@ describe("Empty Fields Login Tests", () => {
     test("Empty initial password should show error", async () => {
         const {
             form,
-            inputId,
+            inputEmail,
             inputFirstName,
             inputName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputId, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
 
         fireEvent.submit(form);
 
-        expect(inputId.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputName.value).toBe(testConstants.validName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
@@ -172,17 +172,17 @@ describe("Empty Fields Login Tests", () => {
 });
 
 describe("Regex Validation AddEmployee Tests", () => {
-    test("Invalid employee number regex should show error", async () => {
+    test("Invalid email regex should show error", async () => {
         const {
             form,
-            inputId,
+            inputEmail,
             inputFirstName,
             inputName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputId, testConstants.invalidIdEmployee);
+        await user.type(inputEmail, testConstants.invalidEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
@@ -190,7 +190,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         fireEvent.submit(form);
 
-        expect(inputId.value).toBe(testConstants.invalidIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.invalidEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
@@ -201,14 +201,14 @@ describe("Regex Validation AddEmployee Tests", () => {
     test("Invalid phone number regex should show error", async () => {
         const {
             form,
-            inputId,
+            inputEmail,
             inputFirstName,
             inputName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputId, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.invalidPhoneNumber);
@@ -216,7 +216,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         fireEvent.submit(form);
 
-        expect(inputId.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
@@ -227,14 +227,14 @@ describe("Regex Validation AddEmployee Tests", () => {
     test("Invalid initial password regex should show error", async () => {
         const {
             form,
-            inputId,
+            inputEmail,
             inputFirstName,
             inputName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputId, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
@@ -242,7 +242,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         fireEvent.submit(form);
 
-        expect(inputId.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.invalidPassword);
@@ -254,14 +254,14 @@ describe("Regex Validation AddEmployee Tests", () => {
 test("Valid employee number and password should submit form", async () => {
     const {
         form,
-        inputId,
+        inputEmail,
         inputFirstName,
         inputName,
         inputPhoneNumber,
         inputInitialPassword,
     } = getFields();
 
-    await user.type(inputId, testConstants.validIdEmployee);
+    await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputFirstName, testConstants.validFirstName);
     await user.type(inputName, testConstants.validName);
     await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
@@ -269,7 +269,7 @@ test("Valid employee number and password should submit form", async () => {
 
     fireEvent.submit(form);
 
-    expect(inputId.value).toBe(testConstants.validIdEmployee);
+    expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputFirstName.value).toBe(testConstants.validFirstName);
     expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
     expect(inputInitialPassword.value).toBe(testConstants.validPassword);
@@ -281,16 +281,16 @@ test("Valid employee number and password should submit form", async () => {
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputId = document.getElementById("clientId");
     const inputFirstName = document.getElementById("firstName");
     const inputName = document.getElementById("lastName");
+    const inputEmail = document.getElementById("email");
     const inputPhoneNumber = document.getElementById("phoneNumber");
     const inputInitialPassword = document.getElementById(
         "password"
     );
     return {
         form,
-        inputId,
+        inputEmail,
         inputFirstName,
         inputName,
         inputPhoneNumber,

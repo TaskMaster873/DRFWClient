@@ -1,5 +1,6 @@
 import React from "react";
-import { ScheduleGroup } from "../types/Schedule";
+import {ScheduleGroup} from "../types/Schedule";
+
 /**
  * 
  * Classe qui permet de faire afficher les employé selon les bons groupes (projets)
