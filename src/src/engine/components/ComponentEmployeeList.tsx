@@ -1,6 +1,6 @@
 import React from "react";
 import {Col, Row, Table, Button} from "react-bootstrap";
-import { EmployeeList, Employee } from "../types/Employee";
+import { Employee } from "../types/Employee";
 import { LinkContainer } from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 
@@ -37,6 +37,7 @@ export class ComponentEmployeeList extends React.Component {
               <th key={"id"}>#</th>
               <th key={"firstName"}>Prénom</th>
               <th key={"name"}>Nom</th>
+              <th key={"email"}>Adresse courriel</th>
               <th key={"phoneNumber"}>Tel</th>
               <th key={"departmentId"}>Département</th>
               <th key={"jobTitles"}>Role(s)</th>

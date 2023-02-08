@@ -18,6 +18,7 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
       id: "",
       lastName: "Blanchet",
       firstName: "Stéphane",
+      email: "stéphane.blanchet@outlook.com",
       phoneNumber: "581-555-5555",
       departmentId: this.department_id,
       jobTitles: ["Gestionnaire de projet", "Directeur de production"],
@@ -28,6 +29,7 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
       lastName: "Blanchette",
       firstName: "Roger",
       phoneNumber: "581-555-2312",
+      email: "rogBlanchette23@gmail.com",
       departmentId: this.department_id,
       jobTitles: ["Gestionnaire de projet", "Directeur de production"],
       password: ""
