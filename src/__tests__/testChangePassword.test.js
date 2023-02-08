@@ -8,7 +8,6 @@ import {MemoryRouter} from "react-router-dom";
 import {ChangePassword} from "../src/engine/pages/changePassword";
 import {SocketManager} from "../src/engine/networking/WebsocketManager";
 
-
 let user;
 beforeEach(async () => {
     user = userEvent.setup();

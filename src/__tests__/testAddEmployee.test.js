@@ -76,14 +76,14 @@ describe("Empty Fields Login Tests", () => {
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputEmail, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe("");
         expect(inputName.value).toBe(testConstants.validName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
@@ -102,14 +102,14 @@ describe("Empty Fields Login Tests", () => {
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputEmail, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputName.value).toBe("");
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
@@ -128,14 +128,14 @@ describe("Empty Fields Login Tests", () => {
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputEmail, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputName.value).toBe(testConstants.validName);
         expect(inputPhoneNumber.value).toBe("");
@@ -154,14 +154,14 @@ describe("Empty Fields Login Tests", () => {
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputEmail, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputName.value).toBe(testConstants.validName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
@@ -182,7 +182,7 @@ describe("Regex Validation AddEmployee Tests", () => {
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputEmail, testConstants.invalidIdEmployee);
+        await user.type(inputEmail, testConstants.invalidEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
@@ -190,7 +190,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.invalidIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.invalidEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
@@ -208,7 +208,7 @@ describe("Regex Validation AddEmployee Tests", () => {
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputEmail, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.invalidPhoneNumber);
@@ -216,7 +216,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
@@ -234,7 +234,7 @@ describe("Regex Validation AddEmployee Tests", () => {
             inputInitialPassword,
         } = getFields();
 
-        await user.type(inputEmail, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
@@ -242,7 +242,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.invalidPassword);
@@ -261,7 +261,7 @@ test("Valid employee number and password should submit form", async () => {
         inputInitialPassword,
     } = getFields();
 
-    await user.type(inputEmail, testConstants.validIdEmployee);
+    await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputFirstName, testConstants.validFirstName);
     await user.type(inputName, testConstants.validName);
     await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
@@ -269,7 +269,7 @@ test("Valid employee number and password should submit form", async () => {
 
     fireEvent.submit(form);
 
-    expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+    expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputFirstName.value).toBe(testConstants.validFirstName);
     expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
     expect(inputInitialPassword.value).toBe(testConstants.validPassword);

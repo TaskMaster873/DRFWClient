@@ -21,7 +21,7 @@ test("should render form inputs", async () => {
     expect(form).not.toBeNull();
     expect(inputEmail).not.toBeNull();
     expect(inputPassword).not.toBeNull();
-    expect(inputEmail).toHaveAttribute("type", "number");
+    expect(inputEmail).toHaveAttribute("type", "email");
     expect(inputPassword).toHaveAttribute("type", "password");
 });
 
@@ -42,11 +42,11 @@ describe("Empty Fields login validation", () => {
     test("Empty password should show error", async () => {
         const {inputPassword, form, inputEmail} = getFields();
 
-        await user.type(inputEmail, testConstants.validIdEmployee);
+        await user.type(inputEmail, testConstants.validEmail);
 
         fireEvent.submit(form);
 
-        expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+        expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputPassword.value).toBe("");
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
@@ -57,13 +57,13 @@ test("Valid employee number and password should submit form", async () => {
     SocketManager.loginWithPassword = jest.fn();
     const {inputPassword, form, inputEmail} = getFields();
 
-    await user.type(inputEmail, testConstants.validIdEmployee);
+    await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputPassword, testConstants.validPassword);
 
     fireEvent.submit(form);
 
     expect(SocketManager.loginWithPassword).toBeCalled();
-    expect(inputEmail.value).toBe(testConstants.validIdEmployee);
+    expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);

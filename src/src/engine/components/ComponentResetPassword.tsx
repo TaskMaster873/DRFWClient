@@ -36,18 +36,19 @@ export class ComponentResetPassword extends React.Component {
                         width={50}
                         height={60}
                     />
-                    <h4 className="text-center mt-4 mb-4">Réinitialiser de mot de passe</h4>
+                    <h4 className="text-center mt-4 mb-4">Réinitialisation de mot de passe</h4>
                 </div>
                 <Form noValidate validated={this.state.validated} onSubmit={this.handleSubmit}
                       onChange={this.handleChange}
                       data-error={this.state.error}>
                     <Form.Group>
-                        <Form.Label htmlFor="email" className="mt-2">Ancien mot de passe</Form.Label>
+                        <Form.Label htmlFor="email" className="mt-2">Adresse courriel</Form.Label>
                         <Form.Control
                             required
                             name="email"
                             className="row mt-1"
                             type="email"
+                            pattern="^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*@[a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*$"
                             placeholder="Entrez votre adresse courriel"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidEmail">
