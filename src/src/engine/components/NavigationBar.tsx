@@ -1,20 +1,29 @@
-import {Logger} from "../Logger";
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import {LinkContainer} from "react-router-bootstrap";
+import {NotificationManager} from 'react-notifications';
 
 /* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
+import {API} from "../api/APIManager";
 
 /**
  * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
  */
 export class NavigationBar extends React.Component {
-    private logger: Logger = new Logger(`NavigationBar`, `#20f6a4`);
-    private isLoggedIn: boolean = false;
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent(): Promise<void> {
+        this.forceUpdate();
+    }
+
     public render(): JSX.Element {
         return (
             <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{fontSize: 15}}>
@@ -67,8 +76,8 @@ export class NavigationBar extends React.Component {
      *
      * @returns se déconnecter si la personne est connectée
      */
-    private loginButton() {
-        if (this.isLoggedIn) {
+    private loginButton() : JSX.Element {
+        if (API.isAuth()) {
             return <Nav.Link onClick={this.logOut}>Se déconnecter</Nav.Link>;
         } else {
             return (
@@ -82,7 +91,12 @@ export class NavigationBar extends React.Component {
     /**
      * Je ne sais pas si il faudrait le garder
      */
-    private logOut() {
-        this.logger.log(`Logging out`);
+    private async logOut() : Promise<void> {
+        let success = await API.logout();
+        if (success) {
+            NotificationManager.success('Déconnection réussi', 'Vous êtes maitenant déconnecté.');
+        } else {
+            NotificationManager.error('Erreur lors de la déconnection', 'Veuillez réessayer plus tard.');
+        }
     }
 }

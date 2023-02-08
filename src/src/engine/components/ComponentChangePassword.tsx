@@ -2,7 +2,7 @@ import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {FormErrorType, constants} from "../messages/FormMessages";
-import { SocketManager } from "../networking/WebsocketManager";
+import { API } from "../api/APIManager";
 
 /* === Images === */
 // @ts-ignore
@@ -112,7 +112,7 @@ export class ComponentChangePassword extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            SocketManager.changePassword(this.state.oldPassword, this.state.newPassword);
+            API.changePassword(this.state.oldPassword, this.state.newPassword);
         }
     }
 
