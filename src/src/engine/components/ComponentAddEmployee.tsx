@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {errors, FormErrorType} from "../messages/FormMessages";
+import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
 import {API} from "../api/APIManager";
 import {Employee} from "../types/Employee";
@@ -77,7 +77,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                 placeholder="Prénom"
                             />
                             <Form.Control.Feedback type="invalid">
-                                {errors.errorRequiredFirstName}
+                                {errors.requiredFirstName}
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group as={Col} md="4">
@@ -89,7 +89,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                 placeholder="Nom"
                             />
                             <Form.Control.Feedback type="invalid">
-                                {errors.errorRequiredName}
+                                {errors.requiredName}
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group as={Col} md="4">
@@ -102,7 +102,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                 placeholder="exemple@exemple.com"
                             />
                             <Form.Control.Feedback type="invalid">
-                                {errors.errorInvalidEmail}
+                                {errors.invalidEmail}
                             </Form.Control.Feedback>
                         </Form.Group>
 
@@ -118,7 +118,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                 placeholder="000-000-0000"
                             />
                             <Form.Control.Feedback type="invalid">
-                                {errors.errorInvalidPhoneNumber}
+                                {errors.invalidPhoneNumber}
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group as={Col} md="6">
@@ -131,7 +131,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                 placeholder="Mot de passe"
                             />
                             <Form.Control.Feedback type="invalid">
-                                {errors.errorInvalidInitialPassword}
+                                {errors.invalidInitialPassword}
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Row>
@@ -155,7 +155,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                 ))}
                             </Form.Select>
                             <Form.Control.Feedback type="invalid">
-                                {errors.errorRequiredRole}
+                                {errors.requiredRole}
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Row>
@@ -200,7 +200,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
             validated: true,
             error: errorType,
         });
-        if(errorType === FormErrorType.NO_ERROR) {
+        if (errorType === FormErrorType.NO_ERROR) {
             let created = await API.createEmployee(this.state.email, this.state.password, new Employee({
                     firstName: this.state.firstName,
                     lastName: this.state.lastName,
@@ -212,9 +212,9 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 }
             ));
             if (created) {
-                NotificationManager.success("Création de l'employé réussi");
+                NotificationManager.success(successes.success ,successes.employeeCreated);
             } else {
-                NotificationManager.error('Déconnection réussi', 'Vous êtes maintenant déconnecté.');
+                NotificationManager.error(errors.error, errors.serverError);
             }
         }
     }
