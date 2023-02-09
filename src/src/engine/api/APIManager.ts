@@ -1,7 +1,7 @@
 import {Logger} from "../Logger";
 
 import {FirebaseApp, initializeApp } from "firebase/app";
-import {Analytics, getAnalytics } from "firebase/analytics";
+import { isSupported, Analytics, getAnalytics } from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
 import {FirebasePerformance, getPerformance } from "firebase/performance";
@@ -159,12 +159,17 @@ class APIManager extends Logger {
 
     private async loadFirebase() : Promise<void> {
         this.#app = initializeApp(firebaseConfig);
-        this.#analytics = getAnalytics(this.#app);
+
         this.#auth = FirebaseAuth.getAuth(this.#app);
         this.#performance = getPerformance(this.#app);
         this.#db = getFirestore(this.#app);
 
         await this.listenEvents();
+
+        let isAnalyticsSupported = await isSupported();
+        if(isAnalyticsSupported) {
+            this.#analytics = getAnalytics(this.#app);
+        }
 
         this.log("Firebase loaded");
     }
