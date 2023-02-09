@@ -56,29 +56,33 @@ class APIManager extends Logger {
         return this.isAuthenticated;
     }
 
-    public async loginWithPassword(email: string, password: string): Promise<FirebaseAuth.UserCredential> {
+    public async loginWithPassword(email: string, password: string): Promise<FirebaseAuth.UserCredential | null> {
         await API.awaitLogin;
 
-        return new Promise(async (resolve, reject) => {
-            let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((e) => {
-                this.error(`Error while logging in: ${e}`);
-            });
+        if(FirebaseAuth !== null && FirebaseAuth) {
+            return new Promise(async (resolve, reject) => {
+                let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((e) => {
+                    this.error(`Error while logging in: ${e}`);
+                });
 
-            if (userCredentials !== null && userCredentials) {
-                console.log('credentials', userCredentials);
+                if (userCredentials !== null && userCredentials) {
+                    console.log('credentials', userCredentials);
 
-                if (userCredentials.user !== null && userCredentials.user) {
-                    this.#user = userCredentials.user;
+                    if (userCredentials.user !== null && userCredentials.user) {
+                        this.#user = userCredentials.user;
+                    }
+
+                    this.isAuthenticated = true;
+                    resolve(userCredentials);
+                } else {
+                    reject(Errors.USER_NOT_FOUND);
                 }
 
-                this.isAuthenticated = true;
-                resolve(userCredentials);
-            } else {
-                reject(Errors.USER_NOT_FOUND);
-            }
-
-            this.onEvent();
-        });
+                this.onEvent();
+            });
+        } else {
+            return null;
+        }
     }
 
     public async resetPassword(email: string): Promise<boolean> {

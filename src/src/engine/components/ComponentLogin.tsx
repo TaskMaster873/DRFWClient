@@ -10,6 +10,8 @@ import {API} from "../api/APIManager";
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
 import {Routes} from "../api/routes/Routes";
+import {NotificationManager} from 'react-notifications';
+
 
 export class ComponentLogin extends React.Component {
     private errorMessage = "";
@@ -147,18 +149,17 @@ export class ComponentLogin extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
+            let rejected = false;
             let isLoggedIn = await API.loginWithPassword(this.state.emailLogin, this.state.passwordLogin).catch((error) => {
-                /**
-                 * TODO: Display error message
-                 */
+                NotificationManager.error('Oops!', error);
+                rejected = true;
             });
 
-            if (isLoggedIn) {
-                console.log('logged in');
+            if (isLoggedIn !== null && isLoggedIn) {
                 this.state.isLoggedIn = true;
                 this.forceUpdate();
-            } else {
-                console.log("Login failed");
+            } else if(!rejected) {
+                NotificationManager.error('Oops!', 'Something went wrong.');
             }
         }
     }
