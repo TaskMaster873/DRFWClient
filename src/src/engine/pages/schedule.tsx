@@ -1,6 +1,7 @@
 import React from "react";
 import {Container} from "react-bootstrap";
 import {ComponentSchedule} from "../components/ComponentSchedule";
+import {ComponentEmployeScheduleView} from "../components/ComponentEmployeScheduleView";
 import {Employee, EmployeeList} from "../types/Employee";
 
 /**
@@ -19,8 +20,18 @@ export class Schedule extends React.Component {
      */
     public render(): JSX.Element {
         let listData: EmployeeList = {list: this.list};
-        return (<Container className="mt-5 mb-5">
-                <ComponentSchedule {...listData} />
-            </Container>);
+        if(true) {
+            return (<ComponentEmployeScheduleView>
+                </ComponentEmployeScheduleView>);
+        } else {
+            return (<Container className="mt-5 mb-5">
+
+            <ComponentEmployeScheduleView>
+            </ComponentEmployeScheduleView>
+
+            <ComponentSchedule {...listData} />
+        </Container>);
+        }
+       
     }
 }

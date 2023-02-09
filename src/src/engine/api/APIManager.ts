@@ -226,7 +226,7 @@ class APIManager extends Logger {
                         created = false;
                     })
                 }
-            }).catch((e) => {
+            }).catch((e : FirebaseAuth.AuthError) => {
                 this.error(e);
                 created = false;
             });

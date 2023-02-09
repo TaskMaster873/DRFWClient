@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ChangeEvent} from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -8,6 +8,7 @@ import {Container} from "react-bootstrap";
 import {API} from "../api/APIManager";
 import {Employee} from "../types/Employee";
 import {NotificationManager} from 'react-notifications';
+import {forEach} from "react-bootstrap/ElementChildren";
 
 
 type Props = { titles: string[]; roles: string[] };
@@ -28,7 +29,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
         email: string;
         phoneNumber: string;
         password: string;
-        role: string;
+        role: number;
         jobTitles: string[];
         skills: string[];
         validated?: boolean;
@@ -46,7 +47,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
             email: "",
             phoneNumber: "",
             password: "",
-            role: "",
+            role: 0,
             jobTitles: [],
             skills: [],
             validated: false,
@@ -54,6 +55,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.handleSelect = this.handleSelect.bind(this);
     }
 
     public render(): JSX.Element {
@@ -143,16 +145,19 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                     key={`${corps}`}
                                     type="checkbox"
                                     id={`${corps}`}
+                                    className="jobTitles"
                                     label={`${corps}`}
                                 />
                             ))}
                         </Form.Group>
                         <Form.Group as={Col} md="6">
                             <Form.Label>Rôle de l'employé</Form.Label>
-                            <Form.Select required id="roleAddEmployee">
-                                {this.roles.map((role) => (
-                                    <option key={`${role}`} value={`${role}`}>{`${role}`}</option>
-                                ))}
+                            <Form.Select required id="role" value={this.state.role} onChange={this.handleSelect}>
+                                {
+                                    this.roles.map((role, index) => (
+                                        <option key={`${index}`} value={`${index}`}>{`${role}`}</option>
+                                    ))
+                                }
                             </Form.Select>
                             <Form.Control.Feedback type="invalid">
                                 {errors.requiredRole}
@@ -221,9 +226,13 @@ export class ComponentAddEmployee extends React.Component<Props> {
 
     private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
         const target = event.target;
-        const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
-
+        let name = target.id;
+        let value;
+        if (target.type === "checkbox") {
+            value = target.checked;
+        } else {
+            value = target.value;
+        }
         if (!name) {
             throw new Error("Id is undefined for element in form.");
         }
@@ -231,5 +240,11 @@ export class ComponentAddEmployee extends React.Component<Props> {
         this.setState({
             [name]: value,
         });
+    }
+
+    private handleSelect(event: ChangeEvent<HTMLSelectElement>) {
+        const target = event.target;
+        this.setState({[target.id]: target.value});
+        console.log(this.state.role)
     }
 }
