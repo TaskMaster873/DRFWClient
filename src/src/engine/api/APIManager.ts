@@ -219,9 +219,10 @@ class APIManager extends Logger {
                 if (this.#auth.currentUser) {
                     await setDoc(doc(this.#db, `employees`, this.#auth.currentUser.uid), {...employee}).catch((e) => {
                         this.error(e);
+                        userCreated = false;
                     })
                 }
-            }).catch((e) => {
+            }).catch((e : FirebaseAuth.AuthError) => {
                 this.error(e);
                 userCreated = false;
             });

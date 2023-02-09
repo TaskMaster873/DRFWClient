@@ -47,7 +47,7 @@ export class ComponentEmployeeList extends React.Component {
           <tbody>
             {this.state.list.map((_, index) => (
               <tr key={"secondCol" + index}>
-                <td key={"id" + index}>{/*{this.state.list[index].id}*/}</td>
+                <td key={"id" + index}>{index + 1}</td>
                 <td key={"firstName " + index}>
                   <a>{this.state.list[index].firstName}</a>
                 </td>
