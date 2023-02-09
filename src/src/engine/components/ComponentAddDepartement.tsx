@@ -58,7 +58,7 @@ export class ComponentAddDepartement extends React.Component {
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.errorRequiredDepartementName}
+                            {errors.errorRequiredDepartmentName}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
