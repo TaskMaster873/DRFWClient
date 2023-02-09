@@ -10,10 +10,8 @@ export interface EmployeeList {
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
-    id: string = "";
     lastName: string =  "";
     firstName: string = "";
-    email: string = "";
     phoneNumber: string = "";
     isActive: boolean = true;
     departmentId: string = "";

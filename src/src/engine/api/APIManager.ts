@@ -4,7 +4,7 @@ import {FirebaseApp, initializeApp} from "firebase/app";
 import {Analytics, getAnalytics} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {addDoc, collection, Firestore, getFirestore} from "firebase/firestore";
+import {addDoc, doc, Firestore, getFirestore, setDoc} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig} from "./config/FirebaseConfig";
 import {EmployeeCreateDTO} from "../types/Employee";
@@ -210,7 +210,7 @@ class APIManager extends Logger {
             let userCreated = true;
             let userCredentials: void | FirebaseAuth.UserCredential = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, email, password).then(async () => {
                 if (this.#auth.currentUser) {
-                    await addDoc(collection(this.#db, `employees`, this.#auth.currentUser.uid), {...employee}).catch((e) => {
+                    await setDoc(doc(this.#db, `employees`, this.#auth.currentUser.uid), {...employee}).catch((e) => {
                         this.error(e);
                     })
                 }
