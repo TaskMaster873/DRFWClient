@@ -1,3 +1,19 @@
+.calendar_default_cell_inner {
+  background-color: white;
+}
+
+.calendar_default_cell {
+  background-color: white !important;
+}
+
+.calendar_default_cell_business {
+  background-color: white;
+}
+
+.calendar_default_cell.calendar_default_cell_business {
+  background-color: white !important;
+}
+
 .navigator_default_main {
   border-left: 1px solid #c0c0c0;
   border-right: 1px solid #c0c0c0;

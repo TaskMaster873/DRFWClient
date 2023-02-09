@@ -56,6 +56,7 @@ describe("Empty Fields Login Tests", () => {
 
         fireEvent.submit(form);
 
+
         expect(inputEmail.value).toBe("");
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);

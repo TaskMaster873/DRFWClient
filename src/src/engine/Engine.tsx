@@ -24,7 +24,6 @@ function EmployeeWrapper(): any {
         <Employees  {...{params: parameters}}/>
     );
 }
-
 import {BeatLoader} from "react-spinners";
 import {NotificationContainer} from 'react-notifications';
 
@@ -41,6 +40,9 @@ export class Engine extends React.Component {
 
     constructor(props) {
         super(props);
+    }
+
+    public componentDidMount(): void {
         this.verifyLogin();
     }
 
@@ -48,11 +50,11 @@ export class Engine extends React.Component {
         if (API.awaitLogin) {
             API.awaitLogin.then(() => {
                 this.showSpinner = false;
+
                 this.forceUpdate();
             });
         }
     }
-
 
     public render(): JSX.Element {
         if (this.showSpinner) {

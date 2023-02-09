@@ -10,16 +10,14 @@ export interface EmployeeList {
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
-    id: string = "";
     lastName: string =  "";
     firstName: string = "";
-    email: string = "";
     phoneNumber: string = "";
     isActive: boolean = true;
     departmentId: string = "";
     jobTitles: string[] = [];
     skills: string[] = [];
-    role: string = "user";
+    role: number = 0;
 
     constructor(employee: EmployeeCreateDTO) {
 		this.firstName = employee.firstName;
@@ -41,7 +39,7 @@ export interface EmployeeCreateDTO {
 	readonly departmentId: string;
     readonly jobTitles: string[];
     readonly skills: string[];
-    readonly role: string;
+    readonly role: number;
 }
 
 export interface EmployeeProps {
