@@ -1,10 +1,11 @@
 /**
  * Ceci est du code qui a été cherché en partie sur https://code.daypilot.org/42221/react-weekly-calendar-tutorial,  la documentation de la librairie daypilot
  */
-import React, {Component} from 'react';
-import {colorRGB} from '../messages/ColorForAvailability'
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
+import React, { Component } from 'react';
+import { colorRGB } from '../messages/ColorForAvailability'
+import { DayPilot, DayPilotCalendar, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
 import "../../deps/css/navigator_default.css";
+
 
 const styles = {
     wrap: {
@@ -18,7 +19,7 @@ const styles = {
     },
 };
 
-type Props = { events: {id: number, text: string, start: DayPilot.Date, end: DayPilot.Date}}; // props quand on aura la bd
+type Props = { events: { id: number, text: string, start: DayPilot.Date, end: DayPilot.Date } }; // props quand on aura la bd
 
 export class ComponentAvailabilities extends Component {
     calendarRef: React.RefObject<any>;
@@ -29,14 +30,16 @@ export class ComponentAvailabilities extends Component {
         this.calendarRef = React.createRef();
         this.datePickerRef = React.createRef();
         this.state = {
-            headerDateFormat: "dddd",
-            viewType: "Week",
-            eventResizeHandling: "Disabled",
-            eventMoveHandling: "Disabled",
+            //eventResizeHandling: "Disabled",
+            //eventMoveHandling: "Disabled",
+            /*businessBeginsHour: 0,
+            businessEndsHour: 24,
+            businessWeekends: true,
             durationBarVisible: false,
-            timeRangeSelectedHandling: "Disabled",
-            eventDeleteHandling: "Disabled",
-            onEventClick: this.onEventClick
+            showNonBusiness: true,*/
+            //timeRangeSelectedHandling: "Disabled",
+            // eventDeleteHandling: "Disabled",
+           // onEventClick: this.onEventClick
         };
     }
 
@@ -45,7 +48,6 @@ export class ComponentAvailabilities extends Component {
             <div style={styles.wrap}>
                 <div style={styles.left}>
                     <DayPilotNavigator
-                       // theme={"navigator_default.css"}
                         selectMode={"week"}
                         showMonths={3}
                         skipMonths={3}
@@ -62,6 +64,16 @@ export class ComponentAvailabilities extends Component {
                 <div style={styles.main}>
                     <DayPilotCalendar
                         {...this.state}
+                        cellsMarkBusiness= {false}
+                        businessWeekends= {true}
+                        headerDateFormat= {"dddd"}
+                        viewType= {"Week"}
+                        businessBeginsHour= {0}
+                        businessEndsHour= {24}
+                        onTimeRangeSelected= {this.onTimeRangeSelected}
+                        eventDeleteHandling= {"Update"}
+                        allowEventOverlap= {false}
+                        durationBarVisible= {false}
                         ref={this.calendarRef}
                     />
                 </div>
@@ -147,34 +159,29 @@ export class ComponentAvailabilities extends Component {
         const events = [
             {
                 id: 1,
-                text: "Event 1",
                 start: "2023-03-07T10:30:00",
                 end: "2023-03-07T13:00:00"
             },
             {
                 id: 2,
-                text: "Event 2",
                 start: "2023-03-08T09:30:00",
                 end: "2023-03-08T11:30:00",
                 backColor: "#6aa84f"
             },
             {
                 id: 3,
-                text: "Event 3",
                 start: "2023-03-08T12:00:00",
                 end: "2023-03-08T15:00:00",
                 backColor: "#f1c232"
             },
             {
                 id: 4,
-                text: "Event 4",
                 start: "2023-03-06T11:30:00",
                 end: "2023-03-06T14:30:00",
                 backColor: "#cc4125"
             },
             {
                 id: 5,
-                text: "Event 5",
                 start: "2023-03-11T11:30:00",
                 end: "2023-03-12T14:30:00",
                 backColor: "#eeaabb"
@@ -187,4 +194,28 @@ export class ComponentAvailabilities extends Component {
         this.datePicker.update({ events: events });
 
     }
+
+    onTimeRangeSelected = (args: any) => {
+        let event = this.calendar.events.list;
+        console.log("les events",event)
+        const eventToAdd = 
+            {
+                start: args.start,
+                end: args.end
+            };
+
+          event.push(eventToAdd);
+          console.log("event après", event) ;
+        //this.calendar.events.add(eventToAdd)
+        this.datePicker.update({events: event});
+        this.calendar.update();
+        console.log("yo, tu es call");
+        this.changeColorToGray(args);
+    }
+
+    changeColorToGray = (args: any) => {
+
+    }
 }
+
+    
