@@ -7,25 +7,7 @@ import {Employee, EmployeeList} from "../types/Employee";
  * Page qui affiche l'horaire des employés
  */
 export class Schedule extends React.Component {
-    private list: Employee[] = [ // Même liste que dans employeelist page
-        new Employee({
-            lastName: "Blanchet",
-            firstName: "Stéphane",
-            phoneNumber: "581-555-5555",
-            departmentId: "",
-            jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-            skills: [],
-            role: "Employee"
-        }), new Employee({
-            lastName: "Blanchette",
-            firstName: "Roger",
-            phoneNumber: "581-555-2312",
-            departmentId: "",
-            jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-            skills: [],
-            role: "Employee"
-        }),];
-
+    private list: Employee[] = [];
     public componentDidMount() {
         document.title = "Horaire - TaskMaster";
     }

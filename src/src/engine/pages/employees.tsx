@@ -8,31 +8,12 @@ import {Employee, EmployeeList, EmployeeProps} from "../types/Employee";
  */
 
 export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
-  private department_id : string = "";
-  constructor(props: EmployeeProps) {
-    super(props);
-  }
+    private department_id: string = "";
+    private list: Employee[] = [];
 
-  private list: Employee[] = [
-    new Employee({
-      lastName: "Blanchet",
-      firstName: "Stéphane",
-      phoneNumber: "581-555-5555",
-      departmentId: this.department_id,
-      jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-      skills: [],
-      role: "Employee"
-    }),
-    new Employee({
-      lastName: "Blanchette",
-      firstName: "Roger",
-      phoneNumber: "581-555-2312",
-      departmentId: this.department_id,
-      jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-      skills: [],
-      role: "Employee"
-    }),
-  ];
+    constructor(props: EmployeeProps) {
+        super(props);
+    }
 
     public componentDidMount() {
         document.title = "Employés - TaskMaster";
@@ -43,11 +24,9 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
      * @returns La liste des employés
      */
     public render(): JSX.Element {
-        let listData: EmployeeList = { list: this.list };
-        return (
-            <Container>
+        let listData: EmployeeList = {list: this.list};
+        return (<Container>
                 <ComponentEmployeeList {...listData} />
-            </Container>
-        );
+            </Container>);
     }
 }
