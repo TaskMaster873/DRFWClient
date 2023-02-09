@@ -24,7 +24,6 @@ function EmployeeWrapper(): any {
         <Employees  {...{params: parameters}}/>
     );
 }
-
 import {BeatLoader} from "react-spinners";
 import {NotificationContainer} from 'react-notifications';
 
