@@ -212,7 +212,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                 }
             ));
             if (created) {
-                NotificationManager.success('Déconnection réussi', 'Vous êtes maintenant déconnecté.');
+                NotificationManager.success("Création de l'employé réussi");
             } else {
                 NotificationManager.error('Déconnection réussi', 'Vous êtes maintenant déconnecté.');
             }

@@ -1,10 +1,10 @@
 import {Logger} from "../Logger";
 
-import {FirebaseApp, initializeApp} from "firebase/app";
-import {Analytics, getAnalytics} from "firebase/analytics";
+import {FirebaseApp, initializeApp } from "firebase/app";
+import { isSupported, Analytics, getAnalytics } from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {addDoc, collection, Firestore, getFirestore} from "firebase/firestore";
+import {addDoc, doc, Firestore, getFirestore, setDoc} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig} from "./config/FirebaseConfig";
 import {EmployeeCreateDTO} from "../types/Employee";
@@ -56,29 +56,33 @@ class APIManager extends Logger {
         return this.isAuthenticated;
     }
 
-    public async loginWithPassword(email: string, password: string): Promise<FirebaseAuth.UserCredential> {
+    public async loginWithPassword(email: string, password: string): Promise<FirebaseAuth.UserCredential | null> {
         await API.awaitLogin;
 
-        return new Promise(async (resolve, reject) => {
-            let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((e) => {
-                this.error(`Error while logging in: ${e}`);
-            });
+        if(FirebaseAuth !== null && FirebaseAuth) {
+            return new Promise(async (resolve, reject) => {
+                let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((e) => {
+                    this.error(`Error while logging in: ${e}`);
+                });
 
-            if (userCredentials !== null && userCredentials) {
-                console.log('credentials', userCredentials);
+                if (userCredentials !== null && userCredentials) {
+                    console.log('credentials', userCredentials);
 
-                if (userCredentials.user !== null && userCredentials.user) {
-                    this.#user = userCredentials.user;
+                    if (userCredentials.user !== null && userCredentials.user) {
+                        this.#user = userCredentials.user;
+                    }
+
+                    this.isAuthenticated = true;
+                    resolve(userCredentials);
+                } else {
+                    reject(Errors.USER_NOT_FOUND);
                 }
 
-                this.isAuthenticated = true;
-                resolve(userCredentials);
-            } else {
-                reject(Errors.USER_NOT_FOUND);
-            }
-
-            this.onEvent();
-        });
+                this.onEvent();
+            });
+        } else {
+            return null;
+        }
     }
 
     public async resetPassword(email: string): Promise<boolean> {
@@ -158,12 +162,19 @@ class APIManager extends Logger {
 
     private async loadFirebase(): Promise<void> {
         this.#app = initializeApp(firebaseConfig);
-        this.#analytics = getAnalytics(this.#app);
+
         this.#auth = FirebaseAuth.getAuth(this.#app);
         this.#performance = getPerformance(this.#app);
         this.#db = getFirestore(this.#app);
 
         await this.listenEvents();
+
+        let isAnalyticsSupported = await isSupported();
+        if(isAnalyticsSupported) {
+            this.#analytics = getAnalytics(this.#app);
+        }
+
+        this.log("Firebase loaded");
     }
 
     private elementExist(element: any): boolean {
@@ -210,7 +221,7 @@ class APIManager extends Logger {
             let userCreated = true;
             let userCredentials: void | FirebaseAuth.UserCredential = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, email, password).then(async () => {
                 if (this.#auth.currentUser) {
-                    await addDoc(collection(this.#db, `employees`, this.#auth.currentUser.uid), {...employee}).catch((e) => {
+                    await setDoc(doc(this.#db, `employees`, this.#auth.currentUser.uid), {...employee}).catch((e) => {
                         this.error(e);
                     })
                 }
