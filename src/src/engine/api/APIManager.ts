@@ -4,10 +4,10 @@ import {FirebaseApp, initializeApp } from "firebase/app";
 import { isSupported, Analytics, getAnalytics } from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {FirebasePerformance, getPerformance } from "firebase/performance";
+import {addDoc, doc, Firestore, getFirestore, setDoc} from "firebase/firestore";
+import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig} from "./config/FirebaseConfig";
-import {Employee} from "../types/Employee";
-import {Firestore, getFirestore } from "firebase/firestore";
+import {EmployeeCreateDTO} from "../types/Employee";
 import {Errors} from "./errors/Errors";
 
 class APIManager extends Logger {
@@ -24,7 +24,6 @@ class APIManager extends Logger {
     #performance: FirebasePerformance;
     // @ts-ignore
     #db: Firestore;
-
     #userInfo: FirebaseAuth.UserCredential | null = null;
     #user: FirebaseAuth.User | null = null;
 
@@ -39,25 +38,25 @@ class APIManager extends Logger {
         this.loadFirebase();
     }
 
-    public getEmployeeName() : string {
+    public getEmployeeName(): string {
         return this.#user?.displayName || this.#user?.email || "Unknown";
     }
 
-    private onEvent() : void {
-        for(let subscriber of this.subscribers) {
+    private onEvent(): void {
+        for (let subscriber of this.subscribers) {
             subscriber();
         }
     }
 
-    public subscribeToEvent(subscriber: () => void) : void {
+    public subscribeToEvent(subscriber: () => void): void {
         this.subscribers.push(subscriber);
     }
 
-    public isAuth() : boolean {
+    public isAuth(): boolean {
         return this.isAuthenticated;
     }
 
-    public async loginWithPassword(email: string, password: string) : Promise<FirebaseAuth.UserCredential> {
+    public async loginWithPassword(email: string, password: string): Promise<FirebaseAuth.UserCredential> {
         await API.awaitLogin;
 
         return new Promise(async (resolve, reject) => {
@@ -65,10 +64,10 @@ class APIManager extends Logger {
                 this.error(`Error while logging in: ${e}`);
             });
 
-            if(userCredentials !== null && userCredentials) {
+            if (userCredentials !== null && userCredentials) {
                 console.log('credentials', userCredentials);
 
-                if(userCredentials.user !== null && userCredentials.user) {
+                if (userCredentials.user !== null && userCredentials.user) {
                     this.#user = userCredentials.user;
                 }
 
@@ -82,7 +81,7 @@ class APIManager extends Logger {
         });
     }
 
-    public async resetPassword(email: string) : Promise<boolean> {
+    public async resetPassword(email: string): Promise<boolean> {
         let sentWithoutErrors = true;
         await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch((e) => {
             this.error(e);
@@ -93,8 +92,8 @@ class APIManager extends Logger {
         return sentWithoutErrors;
     }
 
-    public async logout() : Promise<boolean> {
-        if(this.isAuthenticated) {
+    public async logout(): Promise<boolean> {
+        if (this.isAuthenticated) {
             this.log('Logging out...');
 
             let exitWithoutErrors = true;
@@ -104,7 +103,7 @@ class APIManager extends Logger {
                 exitWithoutErrors = false;
             });
 
-            if(exitWithoutErrors) this.onEvent();
+            if (exitWithoutErrors) this.onEvent();
 
             return exitWithoutErrors;
         } else {
@@ -112,7 +111,7 @@ class APIManager extends Logger {
         }
     }
 
-    private async verifyEmailAddress(user: FirebaseAuth.User) : Promise<boolean> {
+    private async verifyEmailAddress(user: FirebaseAuth.User): Promise<boolean> {
         let sentWithoutErrors = true;
         await FirebaseAuth.sendEmailVerification(user).catch((e) => {
             this.error(e);
@@ -123,14 +122,14 @@ class APIManager extends Logger {
         return sentWithoutErrors;
     }
 
-    private async listenEvents() : Promise<void> {
+    private async listenEvents(): Promise<void> {
         let resolved = false;
 
         this.awaitLogin = new Promise(async (resolve, reject) => {
             FirebaseAuth.onAuthStateChanged(this.#auth, (user) => {
                 this.log('Auth state changed!');
 
-                if(user === null || !user) {
+                if (user === null || !user) {
                     this.isAuthenticated = false;
                 } else {
                     this.isAuthenticated = true;
@@ -139,7 +138,7 @@ class APIManager extends Logger {
                     console.log('user', user);
                 }
 
-                if(!resolved) {
+                if (!resolved) {
                     resolved = true;
                     resolve();
                 }
@@ -157,7 +156,7 @@ class APIManager extends Logger {
         await this.awaitLogin;
     }
 
-    private async loadFirebase() : Promise<void> {
+    private async loadFirebase(): Promise<void> {
         this.#app = initializeApp(firebaseConfig);
 
         this.#auth = FirebaseAuth.getAuth(this.#app);
@@ -174,22 +173,19 @@ class APIManager extends Logger {
         this.log("Firebase loaded");
     }
 
-    private elementExist(element: any) : boolean {
+    private elementExist(element: any): boolean {
         return element !== undefined && element !== null;
     }
 
-    public async changePassword(oldPassword: string, newPassword: string) : Promise<void> {
+    public async changePassword(oldPassword: string, newPassword: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const user = this.#auth.currentUser;
 
-            if(user !== null && user) {
-                if(this.elementExist(user.email)) {
+            if (user !== null && user) {
+                if (this.elementExist(user.email)) {
                     let email = user.email || '';
 
-                    const credential = FirebaseAuth.EmailAuthProvider.credential(
-                        email,
-                        oldPassword
-                    );
+                    const credential = FirebaseAuth.EmailAuthProvider.credential(email, oldPassword);
 
                     let isOk = await FirebaseAuth.updatePassword(user, newPassword).catch((e) => {
                         this.error(e);
@@ -216,20 +212,20 @@ class APIManager extends Logger {
         });
     }
 
-    public async createEmployee(email: string, password: string, employee: Employee) : Promise<boolean> {
-        return new Promise(async (resolve, reject) => {
+    public async createEmployee(email: string, password: string, employee: EmployeeCreateDTO): Promise<boolean> {
+        return new Promise(async (resolve) => {
             let userCreated = true;
-            let userCredentials = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, email, password).catch((e) => {
+            let userCredentials: void | FirebaseAuth.UserCredential = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, email, password).then(async () => {
+                if (this.#auth.currentUser) {
+                    await setDoc(doc(this.#db, `employees`, this.#auth.currentUser.uid), {...employee}).catch((e) => {
+                        this.error(e);
+                    })
+                }
+            }).catch((e) => {
                 this.error(e);
-
                 userCreated = false;
             });
 
-            if(userCreated) {
-                console.log('credentials create employee', userCredentials);
-
-
-            }
 
             /*this.#db.createUser({
                 email: 'user@example.com',

@@ -6,7 +6,6 @@ import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {Login} from "../src/engine/pages/login";
-import {SocketManager} from "../src/engine/networking/WebsocketManager";
 import {API} from "../src/engine/api/APIManager";
 
 let user;

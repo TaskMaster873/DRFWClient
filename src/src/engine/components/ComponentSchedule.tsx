@@ -55,7 +55,7 @@ export class ComponentSchedule extends React.Component {
 
 	/**
 	 *
-	 * @returns la liste des nom d'employé formatté pour columns de DayPilotCalendar qui existe déjà
+	 * @returns la liste des noms d'employé formattés pour columns de DayPilotCalendar qui existe déjà
 	 *
 	 */
 	private doColumns(): Array<{ name: string; id: string }> {
@@ -64,7 +64,7 @@ export class ComponentSchedule extends React.Component {
 		for (let index = 0; index < this.list.length; index++) {
 			listToReturn.push({
 				name: this.list[index].firstName + " " + this.list[index].firstName,
-				id: this.list[index].id.toString(),
+				id: "0", /*this.list[index].id.toString()*/
 			});
 		}
 		return listToReturn;
@@ -72,7 +72,7 @@ export class ComponentSchedule extends React.Component {
 
 	/**
 	 * 
-	 * charge toutes les corps de travail qui existe
+	 * charge tous les corps de travail qui existe
 	 * @returns Liste de EventForCalendar qui est une liste de coprs de travail
 	 */
 	private doEvents(): EventForCalendar[] {
