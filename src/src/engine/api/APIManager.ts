@@ -9,6 +9,7 @@ import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig} from "./config/FirebaseConfig";
 import {EmployeeCreateDTO} from "../types/Employee";
 import {Errors} from "./errors/Errors";
+import {Department} from "../types/Department";
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
@@ -250,6 +251,22 @@ class APIManager extends Logger {
                 created = false;
             })
             resolve(created);
+        });
+    }
+
+    public async getDepartments(): Promise<Department[]> {
+        let departments: Department[] = []
+        return new Promise(async (resolve) => {
+            let queryDepartment = query(collection(this.#db, `departments`));
+            await getDocs(queryDepartment).then((snaps) => {
+                snaps.docs.forEach((doc) => {
+                    console.log(doc.data())
+                    departments.push(new Department({name: doc.data().name}))
+                })
+            }).catch((e) => {
+                this.error(e);
+            })
+            resolve(departments);
         });
     }
 }
