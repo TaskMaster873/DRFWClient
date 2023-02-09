@@ -240,16 +240,15 @@ class APIManager extends Logger {
             let queryDepartment = query(collection(this.#db, `departments`), where("name", "==", name));
             let exists = false;
             await getDocs(queryDepartment).then((snaps) => {
-                if(snaps.docs.length > 0) {
+                if (snaps.docs.length > 0) {
                     resolve(false);
+                    return;
                 }
             })
-            if(!exists) {
-                await addDoc(collection(this.#db, `departments`), {name: name}).catch((e) => {
-                    this.error(e);
-                    created = false;
-                })
-            }
+            await addDoc(collection(this.#db, `departments`), {name: name}).catch((e) => {
+                this.error(e);
+                created = false;
+            })
             resolve(created);
         });
     }

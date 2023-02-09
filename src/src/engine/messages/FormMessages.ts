@@ -24,6 +24,6 @@ export const errors = {
 export const successes = {
     success: "Succès !",
     emailSent: "Un courriel a bien été envoyé",
-    employeeCreated: "Un nouvel employé ajouté avec succès !",
-    departmentCreated: "Un nouvel département ajouté avec succès !"
+    employeeCreated: "Un nouvel employé a été ajouté avec succès !",
+    departmentCreated: "Un nouveau département a été ajouté avec succès !"
 }
