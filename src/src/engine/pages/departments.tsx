@@ -9,16 +9,7 @@ import {Department, DepartmentList} from "../types/Department";
  */
 export class Departments extends React.Component {
   private logger: Logger = new Logger(`Departments`, `#20f6a4`, false);
-  private list: Department[] = [
-    new Department({
-      id: "",
-      name: "Informatique",
-    }),
-    new Department({
-      id: "",
-      name: "Construction",
-    }),
-  ];
+  private list: Department[] = [];
 
   public componentDidMount() {
     document.title = "Employés - TaskMaster";
