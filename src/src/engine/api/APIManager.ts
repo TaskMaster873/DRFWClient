@@ -239,17 +239,17 @@ class APIManager extends Logger {
         return new Promise(async (resolve) => {
             let created = true;
             let queryDepartment = query(collection(this.#db, `departments`), where("name", "==", name));
-            let exists = false;
             await getDocs(queryDepartment).then((snaps) => {
                 if (snaps.docs.length > 0) {
-                    resolve(false);
-                    return;
+                    created = false;
                 }
             })
-            await addDoc(collection(this.#db, `departments`), {name: name}).catch((e) => {
-                this.error(e);
-                created = false;
-            })
+            if (created) {
+                await addDoc(collection(this.#db, `departments`), {name: name}).catch((e) => {
+                    this.error(e);
+                    created = false;
+                })
+            }
             resolve(created);
         });
     }
@@ -260,7 +260,6 @@ class APIManager extends Logger {
             let queryDepartment = query(collection(this.#db, `departments`));
             await getDocs(queryDepartment).then((snaps) => {
                 snaps.docs.forEach((doc) => {
-                    console.log(doc.data())
                     departments.push(new Department({name: doc.data().name}))
                 })
             }).catch((e) => {
