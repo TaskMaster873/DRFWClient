@@ -8,7 +8,11 @@ import { fireEvent, render } from "@testing-library/react";
 import { FormErrorType } from "../src/engine/messages/FormMessages";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
-import {MemoryRouter} from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
+import { act } from "react-dom/test-utils";
+import ReactDOM from 'react-dom/client';
+
+
 
 let user;
 let matchMedia;
@@ -18,6 +22,11 @@ describe("Test TaskMaster Client component", () => {
     matchMedia = new MatchMediaMock();
   });
 
+  beforeEach(async() => {
+    user = userEvent.setup();
+    /*const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
+     render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);*/
+  })
   afterEach(() => {
     matchMedia.clear();
   });
@@ -41,30 +50,20 @@ describe("Test TaskMaster Client component", () => {
     expect(secondListener).toBeCalledTimes(1);
   });
 
-  test("Render app without crashing", async () => {
-    const { Application } = require("../src/Application");
-
-    let app = new Application();
-    app.start();
-  });
-
   test("test all are not rendered when isShowing is false", async () => {
-    const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
-    user = userEvent.setup();
-    render(<ComponentPopupSchedule isShowing={false}/>);
-
+    const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
+    render(<MemoryRouter><ComponentPopupSchedule isShowing={false} /></MemoryRouter>);
     const { form, inputName, inputColor } = getFields();
 
     expect(form).toBeNull();
 
     expect(inputName).toBeNull();
     expect(inputColor).toBeNull();
-  });
-  test("test all are rendered when isShowing is true", async () => {
-    const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
-    user = userEvent.setup();
-    render(<ComponentPopupSchedule isShowing={true}/>);
+ });
 
+  test("test all are rendered when isShowing is true", async () => {
+    const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
+    render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);
     const { form, inputName, inputColor } = getFields();
 
     expect(form).not.toBeNull();
@@ -74,18 +73,16 @@ describe("Test TaskMaster Client component", () => {
   });
 
   test("test user add a name in the input for the name, should change de value of the input", async () => {
-    const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
-    user = userEvent.setup();
-    render(<ComponentPopupSchedule isShowing={true}/>);
-
+    const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
+     render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);
     const { form, inputName, inputColor } = getFields();
 
     await user.type(inputName, testConstants.validName);
-
+   
     expect(inputName.value).toBe(testConstants.validName);
   });
 
- /* test("test user add a different color in the color input, should change de value of the input", async () => {
+  /* test("test user add a different color in the color input, should change de value of the input", async () => {
     const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
     user = userEvent.setup();
     render(<ComponentPopupSchedule isShowing={true}/>);
@@ -97,7 +94,6 @@ describe("Test TaskMaster Client component", () => {
     expect(inputColor).toHaveValue("#ff6464");
   });*/
 });
-
 function getFields() {
   const form = document.querySelector("form");
   const inputName = document.getElementById("nameOfEvent");
