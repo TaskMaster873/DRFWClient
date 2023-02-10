@@ -5,9 +5,8 @@ import {Employee, EmployeeList, EmployeeProps} from "../types/Employee";
 import {API} from "../api/APIManager";
 
 /**
- * Ceci est la page pour les employés
+ * Page de liste les employés
  */
-
 export class Employees extends React.Component<EmployeeProps> {
     public state = {
         list: []
@@ -18,9 +17,9 @@ export class Employees extends React.Component<EmployeeProps> {
     }
 
     public async componentDidMount() {
-        let employees = await API.getEmployees();
+        let employees = await API.getEmployeesByDepartment(this.props.params.id);
         this.setState({list: employees})
-        document.title = "Employés -" + this.props.params.departement + "TaskMaster";
+        document.title = "Employés " + this.props.params.id + " - TaskMaster";
     }
 
     /**
@@ -29,7 +28,7 @@ export class Employees extends React.Component<EmployeeProps> {
      */
     public render(): JSX.Element {
         return (<Container>
-                <ComponentEmployeeList list={this.state.list} />
+                <ComponentEmployeeList list={this.state.list} department={this.props.params.id} />
             </Container>);
     }
 }

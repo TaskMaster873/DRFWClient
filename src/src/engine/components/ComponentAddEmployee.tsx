@@ -6,22 +6,14 @@ import Col from "react-bootstrap/Col";
 import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
 import {API} from "../api/APIManager";
-import {Employee} from "../types/Employee";
+import {AddEmployeeProps, Employee} from "../types/Employee";
 import {NotificationManager} from 'react-notifications';
-import {forEach} from "react-bootstrap/ElementChildren";
-
-
-type Props = { titles: string[]; roles: string[] };
 
 /**
  *
  * Ceci est le composant pour ajouter les employés
  */
-export class ComponentAddEmployee extends React.Component<Props> {
-
-    private jobTitles: string[] = [];
-    private roles: string[] = [];
-    private errorMessage = "";
+export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
     public state: {
         clientId: string;
         firstName: string;
@@ -30,16 +22,16 @@ export class ComponentAddEmployee extends React.Component<Props> {
         phoneNumber: string;
         password: string;
         role: number;
+        department: string;
         jobTitles: string[];
         skills: string[];
         validated?: boolean;
         error: FormErrorType;
     };
+    private errorMessage = "";
 
-    constructor(props: Props) {
+    constructor(props: AddEmployeeProps) {
         super(props);
-        this.jobTitles = props.titles;
-        this.roles = props.roles;
         this.state = {
             clientId: "",
             firstName: "",
@@ -48,6 +40,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
             phoneNumber: "",
             password: "",
             role: 0,
+            department: "",
             jobTitles: [],
             skills: [],
             validated: false,
@@ -58,9 +51,16 @@ export class ComponentAddEmployee extends React.Component<Props> {
         this.handleSelect = this.handleSelect.bind(this);
     }
 
+    componentDidUpdate(prevProps: AddEmployeeProps) {
+        if (prevProps.departments !== this.props.departments && this.props.departments.length > 0) {
+            this.setState({
+                department: this.props.departments[0].name
+            });
+        }
+    }
+
     public render(): JSX.Element {
-        return (
-            <Container>
+        return (<Container>
                 <Form
                     noValidate
                     validated={this.state.validated}
@@ -110,7 +110,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
 
                     </Row>
                     <Row className="mb-3">
-                        <Form.Group as={Col} md="6">
+                        <Form.Group as={Col} md="4">
                             <Form.Label>Numéro de téléphone</Form.Label>
                             <Form.Control
                                 id="phoneNumber"
@@ -123,7 +123,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                 {errors.invalidPhoneNumber}
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group as={Col} md="6">
+                        <Form.Group as={Col} md="4">
                             <Form.Label>Mot de passe initial</Form.Label>
                             <Form.Control
                                 id="password"
@@ -136,28 +136,33 @@ export class ComponentAddEmployee extends React.Component<Props> {
                                 {errors.invalidInitialPassword}
                             </Form.Control.Feedback>
                         </Form.Group>
+                        <Form.Group as={Col} md="4">
+                            <Form.Label>Département</Form.Label>
+                            <Form.Select required id="department" value={this.state.department} onChange={this.handleSelect}>
+                                {this.props.departments.map((department, index) => (
+                                    <option key={`${index}`} value={`${department.name}`}>{`${department.name}`}</option>))}
+                            </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                                {errors.requiredDepartmentName}
+                            </Form.Control.Feedback>
+                        </Form.Group>
                     </Row>
                     <Row className="mb-3">
                         <Form.Group as={Col} md="6">
                             <Form.Label>Corps d'emploi</Form.Label>
-                            {this.jobTitles.map((corps) => (
-                                <Form.Check
+                            {this.props.jobTitles.map((corps) => (<Form.Check
                                     key={`${corps}`}
                                     type="checkbox"
                                     id={`${corps}`}
                                     className="jobTitles"
                                     label={`${corps}`}
-                                />
-                            ))}
+                                />))}
                         </Form.Group>
                         <Form.Group as={Col} md="6">
                             <Form.Label>Rôle de l'employé</Form.Label>
                             <Form.Select required id="role" value={this.state.role} onChange={this.handleSelect}>
-                                {
-                                    this.roles.map((role, index) => (
-                                        <option key={`${index}`} value={`${index}`}>{`${role}`}</option>
-                                    ))
-                                }
+                                {this.props.roles.map((role, index) => (
+                                    <option key={`${index}`} value={`${index}`}>{`${role}`}</option>))}
                             </Form.Select>
                             <Form.Control.Feedback type="invalid">
                                 {errors.requiredRole}
@@ -182,8 +187,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                         </Button>
                     </div>
                 </Form>
-            </Container>
-        );
+            </Container>);
     }
 
     /**
@@ -202,23 +206,21 @@ export class ComponentAddEmployee extends React.Component<Props> {
             errorType = FormErrorType.INVALID_FORM;
         }
         this.setState({
-            validated: true,
-            error: errorType,
+            validated: true, error: errorType,
         });
         if (errorType === FormErrorType.NO_ERROR) {
             let created = await API.createEmployee(this.state.password, new Employee({
-                    firstName: this.state.firstName,
-                    lastName: this.state.lastName,
-                    email: this.state.email,
-                    phoneNumber: this.state.phoneNumber,
-                    department: "1",
-                    jobTitles: this.state.jobTitles,
-                    skills: this.state.skills,
-                    role: this.state.role
-                }
-            ));
+                firstName: this.state.firstName,
+                lastName: this.state.lastName,
+                email: this.state.email,
+                phoneNumber: this.state.phoneNumber,
+                department: this.state.department,
+                jobTitles: this.state.jobTitles,
+                skills: this.state.skills,
+                role: this.state.role
+            }));
             if (created) {
-                NotificationManager.success(successes.success ,successes.employeeCreated);
+                NotificationManager.success(successes.success, successes.employeeCreated);
             } else {
                 NotificationManager.error(errors.error, errors.serverError);
             }

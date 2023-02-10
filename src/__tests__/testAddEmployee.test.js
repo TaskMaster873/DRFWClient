@@ -8,14 +8,18 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {AddEmployee} from "../src/engine/pages/addEmployee";
-
+import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
+jest.mock("../src/engine/api/APIManager");
+const {API} = require("../src/engine/api/APIManager");
 let user;
 
+let departments = [{name: "Informatique"}];
+let roles = ["Employé"];
+let jobTitles = ["Anglophone"];
 
 beforeEach(async () => {
     user = userEvent.setup();
-    render(<MemoryRouter><AddEmployee/></MemoryRouter>);
+    render(<MemoryRouter><ComponentAddEmployee departments={departments} roles={roles} jobTitles={jobTitles} /></MemoryRouter>);
 });
 
 test("should render form inputs", async () => {

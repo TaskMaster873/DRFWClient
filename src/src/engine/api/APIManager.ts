@@ -130,7 +130,7 @@ class APIManager extends Logger {
     private async listenEvents(): Promise<void> {
         let resolved = false;
 
-        this.awaitLogin = new Promise(async (resolve, reject) => {
+        this.awaitLogin = new Promise(async (resolve) => {
             FirebaseAuth.onAuthStateChanged(this.#auth, (user) => {
                 this.log('Auth state changed!');
 
@@ -225,6 +225,9 @@ class APIManager extends Logger {
                     await addDoc(collection(this.#db, `employees`), {...employee}).catch((e) => {
                         this.error(e);
                         created = false;
+                        if (this.#auth.currentUser) {
+                            FirebaseAuth.deleteUser(this.#auth.currentUser)
+                        }
                     })
                 }
             }).catch((e: FirebaseAuth.AuthError) => {
@@ -239,11 +242,12 @@ class APIManager extends Logger {
         return new Promise(async (resolve) => {
             let created = true;
             let queryDepartment = query(collection(this.#db, `departments`), where("name", "==", name));
-            await getDocs(queryDepartment).then((snaps) => {
-                if (snaps.docs.length > 0) {
-                    created = false;
-                }
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
             })
+            if (snaps && snaps.docs.length > 0) {
+                created = false;
+            }
             if (created) {
                 await addDoc(collection(this.#db, `departments`), {name: name}).catch((e) => {
                     this.error(e);
@@ -254,11 +258,14 @@ class APIManager extends Logger {
         });
     }
 
-    public async getEmployees(): Promise<Employee[]> {
+    public async getEmployeesByDepartment(department: string): Promise<Employee[]> {
         let employees: Employee[] = []
         return new Promise(async (resolve) => {
-            let queryDepartment = query(collection(this.#db, `departments`));
-            await getDocs(queryDepartment).then((snaps) => {
+            let queryDepartment = query(collection(this.#db, `employees`), where("department", "==", department));
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
+            })
+            if(snaps) {
                 snaps.docs.forEach((doc) => {
                     let data = doc.data();
                     employees.push(new Employee({
@@ -272,9 +279,8 @@ class APIManager extends Logger {
                         role: data.role
                     }))
                 })
-            }).catch((e) => {
-                this.error(e);
-            })
+            }
+
             resolve(employees);
         });
     }
@@ -283,14 +289,47 @@ class APIManager extends Logger {
         let departments: Department[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `departments`));
-            await getDocs(queryDepartment).then((snaps) => {
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
+            })
+            if(snaps) {
                 snaps.docs.forEach((doc) => {
                     departments.push(new Department({name: doc.data().name}))
                 })
-            }).catch((e) => {
+            }
+            resolve(departments);
+        });
+    }
+
+    public async getRoles(): Promise<string[]> {
+        let roles: string[] = []
+        return new Promise(async (resolve) => {
+            let queryDepartment = query(collection(this.#db, `roles`));
+            let snaps = await getDocs(queryDepartment).catch((e) => {
                 this.error(e);
             })
-            resolve(departments);
+            if(snaps) {
+                snaps.docs.forEach((doc) => {
+                    roles.push(doc.data().name)
+                })
+            }
+            resolve(roles);
+        });
+    }
+
+    public async getJobTitles(): Promise<string[]> {
+        let jobTitles: string[] = []
+        return new Promise(async (resolve) => {
+            let queryDepartment = query(collection(this.#db, `jobTitles`));
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
+            })
+            if(snaps) {
+                snaps.docs.forEach((doc) => {
+                    jobTitles.push(doc.data().name)
+                })
+            }
+            resolve(jobTitles);
         });
     }
 }
@@ -299,4 +338,3 @@ export const API = new APIManager;
 
 // @ts-ignore
 window.API = API;
-
