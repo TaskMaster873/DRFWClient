@@ -1,15 +1,22 @@
 import React from "react";
 import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
-import {RolesList} from "../types/Role";
+import {API} from "../api/APIManager";
 
 /**
  * Ceci est la page pour ajouter un employé
  */
 export class AddEmployee extends React.Component {
-    private titles: string[] = ["Menuisier", "Plombier"];
-    private roles: string[] = ["Employé", "Gestionnaire","Administrateur"];
 
-    public componentDidMount() {
+    public state = {
+        departments: [],
+        roles: [],
+        titles: [],
+    }
+    public async componentDidMount() {
+        let departments = await API.getDepartments();
+        let roles = await API.getRoles();
+        let titles = await API.getJobTitles();
+        this.setState({departments: departments, roles: roles, titles: titles})
         document.title = "Ajouter un Employé - TaskMaster";
     }
     /**
@@ -17,10 +24,11 @@ export class AddEmployee extends React.Component {
      * @returns ComponentAddEmployee avec la liste de titre et celle de role
      */
     public render(): JSX.Element {
-        let rolesList: RolesList = {roles: this.roles};
         return (
             <ComponentAddEmployee
-                {...{roles: rolesList.roles, titles: this.titles}}
+                departments={this.state.departments}
+                roles={this.state.roles}
+                jobTitles={this.state.titles}
             />
         );
     }

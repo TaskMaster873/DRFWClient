@@ -6,22 +6,16 @@ import Col from "react-bootstrap/Col";
 import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
 import {API} from "../api/APIManager";
-import {Employee} from "../types/Employee";
+import {AddEmployeeProps, Employee} from "../types/Employee";
 import {NotificationManager} from 'react-notifications';
-import {forEach} from "react-bootstrap/ElementChildren";
-
-
-type Props = { titles: string[]; roles: string[] };
 
 /**
  *
  * Ceci est le composant pour ajouter les employés
  */
-export class ComponentAddEmployee extends React.Component<Props> {
-
-    private jobTitles: string[] = [];
-    private roles: string[] = [];
+export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
     private errorMessage = "";
+
     public state: {
         clientId: string;
         firstName: string;
@@ -36,10 +30,8 @@ export class ComponentAddEmployee extends React.Component<Props> {
         error: FormErrorType;
     };
 
-    constructor(props: Props) {
+    constructor(props: AddEmployeeProps) {
         super(props);
-        this.jobTitles = props.titles;
-        this.roles = props.roles;
         this.state = {
             clientId: "",
             firstName: "",
@@ -57,6 +49,8 @@ export class ComponentAddEmployee extends React.Component<Props> {
         this.handleChange = this.handleChange.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
     }
+
+
 
     public render(): JSX.Element {
         return (
@@ -140,7 +134,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                     <Row className="mb-3">
                         <Form.Group as={Col} md="6">
                             <Form.Label>Corps d'emploi</Form.Label>
-                            {this.jobTitles.map((corps) => (
+                            {this.props.jobTitles.map((corps) => (
                                 <Form.Check
                                     key={`${corps}`}
                                     type="checkbox"
@@ -154,7 +148,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                             <Form.Label>Rôle de l'employé</Form.Label>
                             <Form.Select required id="role" value={this.state.role} onChange={this.handleSelect}>
                                 {
-                                    this.roles.map((role, index) => (
+                                    this.props.roles.map((role, index) => (
                                         <option key={`${index}`} value={`${index}`}>{`${role}`}</option>
                                     ))
                                 }

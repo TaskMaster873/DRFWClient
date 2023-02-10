@@ -254,10 +254,10 @@ class APIManager extends Logger {
         });
     }
 
-    public async getEmployees(): Promise<Employee[]> {
+    public async getEmployeesByDepartment(department: string): Promise<Employee[]> {
         let employees: Employee[] = []
         return new Promise(async (resolve) => {
-            let queryDepartment = query(collection(this.#db, `departments`));
+            let queryDepartment = query(collection(this.#db, `departments`), where("department", "==", department));
             await getDocs(queryDepartment).then((snaps) => {
                 snaps.docs.forEach((doc) => {
                     let data = doc.data();
@@ -291,6 +291,36 @@ class APIManager extends Logger {
                 this.error(e);
             })
             resolve(departments);
+        });
+    }
+
+    async getRoles() {
+        let roles: string[] = []
+        return new Promise(async (resolve) => {
+            let queryDepartment = query(collection(this.#db, `roles`));
+            await getDocs(queryDepartment).then((snaps) => {
+                snaps.docs.forEach((doc) => {
+                    roles.push(doc.data().name)
+                })
+            }).catch((e) => {
+                this.error(e);
+            })
+            resolve(roles);
+        });
+    }
+
+    async getJobTitles() {
+        let jobTitles: string[] = []
+        return new Promise(async (resolve) => {
+            let queryDepartment = query(collection(this.#db, `jobTitles`));
+            await getDocs(queryDepartment).then((snaps) => {
+                snaps.docs.forEach((doc) => {
+                    jobTitles.push(doc.data().name)
+                })
+            }).catch((e) => {
+                this.error(e);
+            })
+            resolve(jobTitles);
         });
     }
 }
