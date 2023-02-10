@@ -77,7 +77,7 @@ export class ComponentLogin extends React.Component {
                                 placeholder="Entrez votre adresse courriel"
                             />
                             <Form.Control.Feedback type="invalid" id="invalidLoginIdEmployee">
-                                {errors.errorInvalidEmail}
+                                {errors.invalidEmail}
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
@@ -93,7 +93,7 @@ export class ComponentLogin extends React.Component {
                                 placeholder="Entrez votre mot de passe"
                             />
                             <Form.Control.Feedback type="invalid" id="invalidLoginPassword">
-                                {errors.errorRequiredPassword}
+                                {errors.requiredPassword}
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Text
