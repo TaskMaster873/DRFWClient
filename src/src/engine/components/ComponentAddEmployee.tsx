@@ -206,11 +206,12 @@ export class ComponentAddEmployee extends React.Component<Props> {
             error: errorType,
         });
         if (errorType === FormErrorType.NO_ERROR) {
-            let created = await API.createEmployee(this.state.email, this.state.password, new Employee({
+            let created = await API.createEmployee(this.state.password, new Employee({
                     firstName: this.state.firstName,
                     lastName: this.state.lastName,
+                    email: this.state.email,
                     phoneNumber: this.state.phoneNumber,
-                    departmentId: "1",
+                    department: "1",
                     jobTitles: this.state.jobTitles,
                     skills: this.state.skills,
                     role: this.state.role
@@ -245,6 +246,5 @@ export class ComponentAddEmployee extends React.Component<Props> {
     private handleSelect(event: ChangeEvent<HTMLSelectElement>) {
         const target = event.target;
         this.setState({[target.id]: target.value});
-        console.log(this.state.role)
     }
 }
