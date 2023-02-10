@@ -94,6 +94,7 @@ jobs:
            --format zip \
            --overwrite \
            --include '**/*.html' \
+           --include '**/*.ico' \
            --include '**/*.htm' \
            --include '**/*.css' \
            --include '**/*.js' \

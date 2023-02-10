@@ -90,6 +90,7 @@ jobs:
          --overwrite \
          --include '**/*.html' \
          --include '**/*.sh' \
+         --include '**/*.ico' \
          --include '**/*.htm' \
          --include '**/*.css' \
          --include '**/*.js' \
