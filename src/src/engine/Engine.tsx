@@ -1,4 +1,4 @@
-import React, {CSSProperties} from "react";
+import React from "react";
 import {BrowserRouter as Router, Route, Routes, useParams} from "react-router-dom";
 
 import "../deps/css/Engine.css";
@@ -17,6 +17,10 @@ import {Departments} from "./pages/departments";
 import {Availabilities} from "./pages/availabilities";
 import {API} from "./api/APIManager";
 import {ResetPassword} from "./pages/resetPassword";
+import {NotificationContainer} from 'react-notifications';
+import { ComponentLoading } from "./components/ComponentLoading";
+import { ForgotPassword } from "./pages/forgotPassword";
+import 'react-notifications/lib/notifications.css';
 
 function EmployeeWrapper(): any {
     let parameters: any = useParams();
@@ -24,16 +28,6 @@ function EmployeeWrapper(): any {
         <Employees  {...{params: parameters}}/>
     );
 }
-import {BeatLoader} from "react-spinners";
-import {NotificationContainer} from 'react-notifications';
-
-const override: CSSProperties = {
-    display: 'flex',
-    alignSelf: 'center',
-    margin: '0 auto',
-};
-
-import 'react-notifications/lib/notifications.css';
 
 export class Engine extends React.Component {
     private showSpinner: boolean = true;
@@ -59,16 +53,7 @@ export class Engine extends React.Component {
     public render(): JSX.Element {
         if (this.showSpinner) {
             return (<React.StrictMode>
-                <div style={{height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                    <BeatLoader
-                        color={"#A020F0"}
-                        loading={true}
-                        size={25}
-                        cssOverride={override}
-                        aria-label="Loading Spinner"
-                        data-testid="loader"
-                    />
-                </div>
+                <ComponentLoading/>
             </React.StrictMode>);
         } else {
             return (
@@ -86,8 +71,9 @@ export class Engine extends React.Component {
                             <Route path="/memes" element={<Memes/>}/>
                             <Route path="/add-employee" element={<AddEmployee/>}/>
                             <Route path="/availabilities" element={<Availabilities/>}/>
-                            <Route path="/resetPassword" element={<ResetPassword/>}/>
-                            <Route path="/changePassword" element={<ChangePassword/>}/>
+                            <Route path="/forgot-password" element={<ForgotPassword/>}/>
+                            <Route path="/reset-password" element={<ResetPassword/>}/>
+                            <Route path="/change-password" element={<ChangePassword/>}/>
                         </Routes>
                     </Router>
                 </React.StrictMode>

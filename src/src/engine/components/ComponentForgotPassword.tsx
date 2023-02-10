@@ -1,28 +1,21 @@
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { errors, FormErrorType } from "../messages/FormMessages";
+import { errors, FormErrorType, successes } from "../messages/FormMessages";
 import { API } from "../api/APIManager";
 import { NotificationManager } from "react-notifications";
-import { useNavigate } from "react-router-dom";
 
 /* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
 
-type Props = {
-    actionCode: string,
-    email: string
-}
-
 /***
- * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un nouveau
+ * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un courriel
  */
-export function ComponentResetPassword(props: Props) {
+export function ComponentForgotPassword(props) {
   const errorMessage = "";
-  const navigate = useNavigate();
-  const [newPassword, setNewPassword] = useState("");
-  const [validated, setValdiated] = useState(false);
+  const [email, setEmail] = useState("");
+  const [validated, setValidated] = useState(false);
   const [error, setError] = useState(FormErrorType.NO_ERROR);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -37,16 +30,15 @@ export function ComponentResetPassword(props: Props) {
     event.preventDefault();
     event.stopPropagation();
 
-    setValdiated(true);
+    setValidated(true);
     setError(errorType);
 
     if (errorType === FormErrorType.NO_ERROR) {
-      let success = await API.applyResetPassword(props.actionCode, newPassword);
-
+      let success = await API.sendResetPassword(email);
       if (success) {
         NotificationManager.info(
           "Réinitialisation du mot de passe",
-          "Votre mot de passe a été mis à jour."
+          "Un courriel a été envoyé à votre adresse courriel."
         );
       } else {
         NotificationManager.error(
@@ -54,9 +46,9 @@ export function ComponentResetPassword(props: Props) {
           "Une erreur est survenue lors de la réinitialisation de votre mot de passe."
         );
       }
-      navigate("/login")
     }
   };
+
   return (
     <div className="auth-form">
       <div className="me-4">
@@ -67,9 +59,7 @@ export function ComponentResetPassword(props: Props) {
           width={50}
           height={60}
         />
-        <h4 id="email" className="text-center mt-4 mb-4">
-          Réinitialisation de mot de passe pour {props.email}
-        </h4>
+        <h4 className="text-center mt-4 mb-4">Mot de passe oublié</h4>
       </div>
       <Form
         noValidate
@@ -78,23 +68,23 @@ export function ComponentResetPassword(props: Props) {
         data-error={error}
       >
         <Form.Group>
-          <Form.Label htmlFor="password" className="mt-2">
-            Nouveau mot de passe
+          <Form.Label htmlFor="email" className="mt-2">
+            Adresse courriel
           </Form.Label>
           <Form.Control
             required
-            id="newPassword"
-            name="newPassword"
+            id="email"
+            name="email"
             className="row mt-1"
-            type="password"
-            pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
-            placeholder="Entrez votre nouveau mot de passe"
+            type="email"
+            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+            placeholder="Entrez votre adresse courriel"
             onChange={(e) => {
-              setNewPassword(e.target.value);
+              setEmail(e.target.value);
             }}
           />
-          <Form.Control.Feedback type="invalid" id="invalidPassword">
-            {errors.invalidNewPassword}
+          <Form.Control.Feedback type="invalid" id="invalidEmail">
+            {errors.invalidEmail}
           </Form.Control.Feedback>
         </Form.Group>
         <Form.Text
@@ -112,7 +102,7 @@ export function ComponentResetPassword(props: Props) {
             Retour
           </Button>
           <Button
-            id="submitResetPassword"
+            id="submitForgotPassword"
             className="mt-4"
             size="lg"
             variant="primary"
