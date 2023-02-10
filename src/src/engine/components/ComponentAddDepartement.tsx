@@ -13,11 +13,7 @@ import {NotificationManager} from 'react-notifications';
  * Ceci est le composant pour ajouter les employés
  */
 export class ComponentAddDepartement extends React.Component {
-    private logger: Logger = new Logger(
-        `ComponentAddDepartement`,
-        `#20f6a4`,
-        false
-    );
+
     private errorMessage = "";
     public state: {
         name: string;

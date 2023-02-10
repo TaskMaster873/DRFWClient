@@ -211,7 +211,7 @@ export class ComponentAddEmployee extends React.Component<Props> {
                     lastName: this.state.lastName,
                     email: this.state.email,
                     phoneNumber: this.state.phoneNumber,
-                    departmentId: "1",
+                    department: "1",
                     jobTitles: this.state.jobTitles,
                     skills: this.state.skills,
                     role: this.state.role

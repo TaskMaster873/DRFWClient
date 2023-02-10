@@ -53,10 +53,10 @@ export class ComponentEmployeeList extends React.Component<EmployeeList> {
                 <td key={"phoneNumber " + index}>
                   {employee.phoneNumber}
                 </td>
-                <td key={"departmentId " + index}>{employee.departmentId}</td>
+                <td key={"departmentId " + index}>{employee.department}</td>
                 <td key={"actif " + index}>{employee.isActive ? "Oui" : "Non"}</td>
                 <td key={"jobTitles " + index}>
-                  {employee.jobTitles.join(", ")}
+                  {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
                 </td>
                 <td key={"skills " + index}>{employee.skills}</td>
               </tr>

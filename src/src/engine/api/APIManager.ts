@@ -4,10 +4,10 @@ import {FirebaseApp, initializeApp} from "firebase/app";
 import {Analytics, getAnalytics, isSupported} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {addDoc, collection, DocumentData, Firestore, getDocs, getFirestore, query, QuerySnapshot, where} from "firebase/firestore";
+import {addDoc, collection, Firestore, getDocs, getFirestore, query, where} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig} from "./config/FirebaseConfig";
-import {EmployeeCreateDTO} from "../types/Employee";
+import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Errors} from "./errors/Errors";
 import {Department} from "../types/Department";
 
@@ -227,7 +227,7 @@ class APIManager extends Logger {
                         created = false;
                     })
                 }
-            }).catch((e : FirebaseAuth.AuthError) => {
+            }).catch((e: FirebaseAuth.AuthError) => {
                 this.error(e);
                 created = false;
             });
@@ -251,6 +251,31 @@ class APIManager extends Logger {
                 })
             }
             resolve(created);
+        });
+    }
+
+    public async getEmployees(): Promise<Employee[]> {
+        let employees: Employee[] = []
+        return new Promise(async (resolve) => {
+            let queryDepartment = query(collection(this.#db, `departments`));
+            await getDocs(queryDepartment).then((snaps) => {
+                snaps.docs.forEach((doc) => {
+                    let data = doc.data();
+                    employees.push(new Employee({
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        email: data.email,
+                        phoneNumber: data.phoneNumber,
+                        department: data.department,
+                        jobTitles: data.jobTitles,
+                        skills: data.skills,
+                        role: data.role
+                    }))
+                })
+            }).catch((e) => {
+                this.error(e);
+            })
+            resolve(employees);
         });
     }
 

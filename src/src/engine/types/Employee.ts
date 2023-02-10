@@ -15,7 +15,7 @@ export class Employee {
     email: string = "";
     phoneNumber: string = "";
     isActive: boolean = true;
-    departmentId: string = "";
+    department: string = "";
     jobTitles: string[] = [];
     skills: string[] = [];
     role: number = 0;
@@ -25,7 +25,7 @@ export class Employee {
         this.lastName = employee.lastName;
         this.email = employee.email;
 		this.phoneNumber = employee.phoneNumber;
-        this.departmentId = employee.departmentId;
+        this.department = employee.department;
         this.jobTitles = employee.jobTitles;
         this.skills = employee.skills;
         this.role = employee.role;
@@ -39,7 +39,7 @@ export interface EmployeeCreateDTO {
     readonly lastName: string;
     readonly email: string;
 	readonly phoneNumber: string;
-	readonly departmentId: string;
+	readonly department: string;
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
