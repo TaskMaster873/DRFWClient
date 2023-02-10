@@ -66,7 +66,6 @@ export class Engine extends React.Component {
                         size={25}
                         cssOverride={override}
                         aria-label="Loading Spinner"
-                        data-testid="loader"
                     />
                 </div>
             </React.StrictMode>);

@@ -3,6 +3,7 @@ import {Button, Col, Row, Table} from "react-bootstrap";
 import {Employee, EmployeeListProps} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
+import {API} from "../api/APIManager";
 
 /***
  * Ce composant affiche la liste de tous les employés d'un département
@@ -23,13 +24,11 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         return (<div className="mt-5">
             {this.renderSearchBar(searchProps)}
             {this.renderList()}
-            <LinkContainer to="/add-employee">
-                <Button className="mt-3">Ajouter</Button>
-            </LinkContainer>
+            {this.renderAddEmployeeButton()}
         </div>);
     }
 
-    private renderSearchBar(searchProps): JSX.Element | undefined {
+    private renderSearchBar(searchProps): JSX.Element {
         if (this.props.list.length != 0) {
             return (<Row>
                 <Col xs={7}><h3>Liste des employés du département {this.props.department}</h3></Col>
@@ -77,5 +76,13 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
             </Table>);
         }
         return <h6>Aucun employé est présent dans ce département</h6>;
+    }
+
+    private renderAddEmployeeButton() : JSX.Element | undefined {
+        if(API.isAuth()) {
+            return (<LinkContainer to="/add-employee">
+                <Button className="mt-3">Ajouter</Button>
+            </LinkContainer>);
+        }
     }
 }
