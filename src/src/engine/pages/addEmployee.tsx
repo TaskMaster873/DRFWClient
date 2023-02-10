@@ -7,7 +7,7 @@ import {RolesList} from "../types/Role";
  */
 export class AddEmployee extends React.Component {
     private titles: string[] = ["Menuisier", "Plombier"];
-    private roles: string[] = ["Employé", "Administrateur"];
+    private roles: string[] = ["Employé", "Gestionnaire","Administrateur"];
 
     public componentDidMount() {
         document.title = "Ajouter un Employé - TaskMaster";
