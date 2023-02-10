@@ -3,15 +3,12 @@ import {Table} from "react-bootstrap";
 import {Department, DepartmentList} from "../types/Department";
 import {ComponentAddDepartement} from "./ComponentAddDepartement";
 
-export class ComponentDepartmentList extends React.Component {
-  private list: Department[];
+export class ComponentDepartmentList extends React.Component<DepartmentList> {
   constructor(props: DepartmentList) {
     super(props);
-    this.list = props.list;
   }
 
   public render(): JSX.Element {
-    console.log(this.list)
     return (
       <div className="mt-5">
         <h3>Liste des départements</h3>
@@ -24,7 +21,7 @@ export class ComponentDepartmentList extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {this.list.map((department, index) => (
+            {this.props.list.map((department, index) => (
               <tr key={"secondCol" + index}>
                 <td key={"no" + index}>{index}</td>
                 <td key={"name " + index}>

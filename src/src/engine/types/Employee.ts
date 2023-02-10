@@ -12,6 +12,7 @@ export interface EmployeeList {
 export class Employee {
     lastName: string =  "";
     firstName: string = "";
+    email: string = "";
     phoneNumber: string = "";
     isActive: boolean = true;
     departmentId: string = "";
@@ -22,6 +23,7 @@ export class Employee {
     constructor(employee: EmployeeCreateDTO) {
 		this.firstName = employee.firstName;
         this.lastName = employee.lastName;
+        this.email = employee.email;
 		this.phoneNumber = employee.phoneNumber;
         this.departmentId = employee.departmentId;
         this.jobTitles = employee.jobTitles;
@@ -35,6 +37,7 @@ export class Employee {
 export interface EmployeeCreateDTO {
 	readonly firstName: string;
     readonly lastName: string;
+    readonly email: string;
 	readonly phoneNumber: string;
 	readonly departmentId: string;
     readonly jobTitles: string[];

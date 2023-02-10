@@ -201,9 +201,10 @@ export class ComponentAddEmployee extends React.Component<Props> {
             error: errorType,
         });
         if (errorType === FormErrorType.NO_ERROR) {
-            let created = await API.createEmployee(this.state.email, this.state.password, new Employee({
+            let created = await API.createEmployee(this.state.password, new Employee({
                     firstName: this.state.firstName,
                     lastName: this.state.lastName,
+                    email: this.state.email,
                     phoneNumber: this.state.phoneNumber,
                     departmentId: "1",
                     jobTitles: this.state.jobTitles,
