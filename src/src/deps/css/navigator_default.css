@@ -87,3 +87,15 @@ body .navigator_default_busy {
 .navigator_default_cell_text {
   cursor: pointer;
 }
+
+.flex_Hundred {
+  display: flex;
+  height: 90vh;
+}
+
+/*div.calendar_default_main  div:nth-child(2)  {
+  height: 80vh !important;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #ee4f2e;
+  background-color: blue;
+}*/
