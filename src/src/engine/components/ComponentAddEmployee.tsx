@@ -246,6 +246,5 @@ export class ComponentAddEmployee extends React.Component<Props> {
     private handleSelect(event: ChangeEvent<HTMLSelectElement>) {
         const target = event.target;
         this.setState({[target.id]: target.value});
-        console.log(this.state.role)
     }
 }
