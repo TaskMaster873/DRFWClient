@@ -1,7 +1,7 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {errors, FormErrorType, success} from "../messages/FormMessages";
+import {errors, FormErrorType, successes} from "../messages/FormMessages";
 
 import {NotificationManager} from 'react-notifications';
 
@@ -55,10 +55,10 @@ export class ComponentResetPassword extends React.Component {
                             placeholder="Entrez votre adresse courriel"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidEmail">
-                            {errors.errorInvalidEmail}
+                            {errors.invalidEmail}
                         </Form.Control.Feedback>
                         <Form.Control.Feedback type="valid" id="validEmail">
-                            {success.emailSent}
+                            {successes.emailSent}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Text

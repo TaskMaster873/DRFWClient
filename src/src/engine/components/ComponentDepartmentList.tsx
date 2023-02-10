@@ -3,11 +3,9 @@ import {Table} from "react-bootstrap";
 import {Department, DepartmentList} from "../types/Department";
 import {ComponentAddDepartement} from "./ComponentAddDepartement";
 
-export class ComponentDepartmentList extends React.Component {
-  private list: Department[] = [];
+export class ComponentDepartmentList extends React.Component<DepartmentList> {
   constructor(props: DepartmentList) {
     super(props);
-    this.list = props.list;
   }
 
   public render(): JSX.Element {
@@ -23,16 +21,16 @@ export class ComponentDepartmentList extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {Array.from({ length: this.list.length }).map((_, index) => (
+            {this.props.list.map((department, index) => (
               <tr key={"secondCol" + index}>
                 <td key={"no" + index}>{index}</td>
                 <td key={"name " + index}>
                   <a
                       className={"employeeNameBtn"}
-                    href={"/employees/" + this.list[index].name}
+                    href={"/employees/" + department.name}
                     style={{ textDecoration: "none" }}
                   >
-                    {this.list[index].name}
+                    {department.name}
                   </a>
                 </td>
                 <td key={"director " + index}>

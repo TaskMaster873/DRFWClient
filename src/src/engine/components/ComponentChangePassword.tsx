@@ -53,7 +53,7 @@ export class ComponentChangePassword extends React.Component {
                             placeholder="Entrez l'ancien mot de passe"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidOldPassword">
-                            {errors.errorRequiredOldPassword}
+                            {errors.requiredOldPassword}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>
@@ -68,7 +68,7 @@ export class ComponentChangePassword extends React.Component {
                             placeholder="Entrez le nouveau mot de passe"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidNewPassword">
-                            {errors.errorInvalidNewPassword}
+                            {errors.invalidNewPassword}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Text

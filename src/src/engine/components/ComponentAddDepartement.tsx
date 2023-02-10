@@ -3,32 +3,26 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {errors, FormErrorType} from "../messages/FormMessages";
+import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import {Logger} from "../Logger";
+import {API} from "../api/APIManager";
+import {NotificationManager} from 'react-notifications';
 
 /**
  *
  * Ceci est le composant pour ajouter les employés
  */
 export class ComponentAddDepartement extends React.Component {
-    private logger: Logger = new Logger(
-        `ComponentAddDepartement`,
-        `#20f6a4`,
-        false
-    );
-    private jobTitles: string[] = [];
-    private roles: string[] = [];
+
     private errorMessage = "";
     public state: {
-        name?: string;
+        name: string;
         validated?: boolean;
         error: FormErrorType;
     };
 
     constructor(props: { titles: string[]; roles: string[] }) {
         super(props);
-        this.jobTitles = props.titles;
-        this.roles = props.roles;
         this.state = {
             name: "",
             validated: false,
@@ -52,13 +46,13 @@ export class ComponentAddDepartement extends React.Component {
                     <Form.Group as={Col} md="3">
                         <Form.Label className="mt-3">Ajouter un département</Form.Label>
                         <Form.Control
-                            id="nameAddEmployee"
+                            id="name"
                             required
                             type="text"
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.errorRequiredDepartmentName}
+                            {errors.requiredDepartmentName}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
@@ -77,15 +71,15 @@ export class ComponentAddDepartement extends React.Component {
         );
     }
 
-    private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
 
+        event.preventDefault();
+        event.stopPropagation();
+
         let errorType = FormErrorType.NO_ERROR;
         if (!isValid) {
-            event.preventDefault();
-            event.stopPropagation();
-
             errorType = FormErrorType.INVALID_FORM;
         }
 
@@ -93,6 +87,14 @@ export class ComponentAddDepartement extends React.Component {
             validated: true,
             error: errorType,
         });
+        if (errorType === FormErrorType.NO_ERROR) {
+            let created = await API.createDepartment(this.state.name);
+            if (created) {
+                NotificationManager.success(successes.success, successes.departmentCreated);
+            } else {
+                NotificationManager.error(errors.departmentAlreadyExists, errors.error);
+            }
+        }
     }
 
     private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
