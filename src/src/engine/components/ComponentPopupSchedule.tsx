@@ -86,7 +86,7 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 		});
 	}
 	/**
-	 * 
+	 *
 	 * Appelle le parent et envoie le corps de travail avec toutes les données en Event
 	 * @returns EventForCalendar
 	 */
@@ -109,7 +109,7 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 	 * @param startTime: la date en format DayPilot.Date du début du corps de travail.
 	 * @param endTime: la date en format DayPilot.Date de la fin du corps de travail.
 	 * @param resourceId: l'id de la rangée où le corps sera.
-	 * 
+	 *
 	 */
 	public saveContent = (startTime: DayPilot.Date, endTime: DayPilot.Date, resourceId: string) => {
 		console.log("le state doit avoir les 3 non null:", startTime, endTime, resourceId);
@@ -118,7 +118,7 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 		this.onChange();
 	}
 	/**
-	 * 
+	 *
 	 * @param event qui est le formulaire à envoyer
 	 */
 	private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {

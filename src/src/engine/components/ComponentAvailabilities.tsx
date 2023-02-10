@@ -73,7 +73,7 @@ export class ComponentAvailabilities extends Component {
                         onTimeRangeSelected= {this.onTimeRangeSelected}
                         eventDeleteHandling= {"Update"}
                         allowEventOverlap= {false}
-                        durationBarVisible= {false}
+                        durationBarVisible= {true}
                         ref={this.calendarRef}
                     />
                 </div>
