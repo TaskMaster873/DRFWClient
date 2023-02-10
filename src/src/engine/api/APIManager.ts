@@ -301,7 +301,7 @@ class APIManager extends Logger {
         });
     }
 
-    async getRoles(): Promise<string[]> {
+    public async getRoles(): Promise<string[]> {
         let roles: string[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `roles`));
@@ -317,7 +317,7 @@ class APIManager extends Logger {
         });
     }
 
-    async getJobTitles(): Promise<string[]> {
+    public async getJobTitles(): Promise<string[]> {
         let jobTitles: string[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `jobTitles`));
