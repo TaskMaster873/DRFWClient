@@ -338,4 +338,3 @@ export const API = new APIManager;
 
 // @ts-ignore
 window.API = API;
-
