@@ -225,6 +225,9 @@ class APIManager extends Logger {
                     await addDoc(collection(this.#db, `employees`), {...employee}).catch((e) => {
                         this.error(e);
                         created = false;
+                        if (this.#auth.currentUser) {
+                            FirebaseAuth.deleteUser(this.#auth.currentUser)
+                        }
                     })
                 }
             }).catch((e: FirebaseAuth.AuthError) => {
@@ -257,7 +260,7 @@ class APIManager extends Logger {
     public async getEmployeesByDepartment(department: string): Promise<Employee[]> {
         let employees: Employee[] = []
         return new Promise(async (resolve) => {
-            let queryDepartment = query(collection(this.#db, `departments`), where("department", "==", department));
+            let queryDepartment = query(collection(this.#db, `employees`), where("department", "==", department));
             await getDocs(queryDepartment).then((snaps) => {
                 snaps.docs.forEach((doc) => {
                     let data = doc.data();
@@ -294,7 +297,7 @@ class APIManager extends Logger {
         });
     }
 
-    async getRoles() {
+    async getRoles(): Promise<string[]> {
         let roles: string[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `roles`));
@@ -309,7 +312,7 @@ class APIManager extends Logger {
         });
     }
 
-    async getJobTitles() {
+    async getJobTitles(): Promise<string[]> {
         let jobTitles: string[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `jobTitles`));

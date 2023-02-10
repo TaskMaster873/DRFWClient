@@ -18,15 +18,28 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         this.setState({list: filteredList});
     }
 
-    private renderSearchBar(searchProps): JSX.Element | undefined {
-        if (this.props.list.length != 0) {
-            return (<div><Col xs={4}></Col>
-                <Col><ComponentSearchBar {...searchProps} /></Col></div>);
-        }
-        return undefined;
+    public render(): JSX.Element {
+        let searchProps = {list: this.props.list, filterList: this.updateList};
+        return (<div className="mt-5">
+            {this.renderSearchBar(searchProps)}
+            {this.renderList()}
+            <LinkContainer to="/add-employee">
+                <Button className="mt-3">Ajouter</Button>
+            </LinkContainer>
+        </div>);
     }
 
-    private renderList(list): JSX.Element | undefined {
+    private renderSearchBar(searchProps): JSX.Element | undefined {
+        if (this.props.list.length != 0) {
+            return (<Row>
+                <Col xs={7}><h3>Liste des employés du département {this.props.department}</h3></Col>
+                <Col xs={2}></Col>
+                <Col xs={3}><ComponentSearchBar {...searchProps} /></Col></Row>);
+        }
+        return <h3>Liste des employés du département {this.props.department}</h3>;
+    }
+
+    private renderList(): JSX.Element | undefined {
         if (this.props.list.length != 0) {
             return (<Table responsive bordered hover>
                 <thead>
@@ -63,21 +76,6 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
                 </tbody>
             </Table>);
         }
-        return <h6>Aucun employés présents dans ce département</h6>;
-    }
-
-    public render(): JSX.Element {
-        console.log(this.props.list)
-        let searchProps = {list: this.props.list, filterList: this.updateList};
-        return (<div className="mt-5">
-            <Row>
-                <Col><h3>Liste des employés du département {}</h3></Col>
-                {this.renderSearchBar(searchProps)}
-            </Row>
-            {this.renderList(this.props.list)}
-            <LinkContainer to="/add-employee">
-                <Button className="mt-3">Ajouter</Button>
-            </LinkContainer>
-        </div>);
+        return <h6>Aucun employé est présent dans ce département</h6>;
     }
 }
