@@ -220,7 +220,7 @@ class APIManager extends Logger {
     public async createEmployee(password: string, employee: EmployeeCreateDTO): Promise<boolean> {
         return new Promise(async (resolve) => {
             let created = true;
-            await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, password).then(async () => {
+            await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, email, password).then(async () => {
                 if (this.#auth.currentUser) {
                     await addDoc(collection(this.#db, `employees`), {...employee}).catch((e) => {
                         this.error(e);
