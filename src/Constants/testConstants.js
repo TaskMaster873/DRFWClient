@@ -11,3 +11,9 @@ const testConstants = {
 };
 
 export default testConstants;
+
+export const testPopupConstant = {
+    validRGBColor: "#6aa84f",
+};
+
+
