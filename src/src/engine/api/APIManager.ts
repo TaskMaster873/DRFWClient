@@ -130,7 +130,7 @@ class APIManager extends Logger {
     private async listenEvents(): Promise<void> {
         let resolved = false;
 
-        this.awaitLogin = new Promise(async (resolve, reject) => {
+        this.awaitLogin = new Promise(async (resolve) => {
             FirebaseAuth.onAuthStateChanged(this.#auth, (user) => {
                 this.log('Auth state changed!');
 
@@ -242,11 +242,12 @@ class APIManager extends Logger {
         return new Promise(async (resolve) => {
             let created = true;
             let queryDepartment = query(collection(this.#db, `departments`), where("name", "==", name));
-            await getDocs(queryDepartment).then((snaps) => {
-                if (snaps.docs.length > 0) {
-                    created = false;
-                }
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
             })
+            if (snaps && snaps.docs.length > 0) {
+                created = false;
+            }
             if (created) {
                 await addDoc(collection(this.#db, `departments`), {name: name}).catch((e) => {
                     this.error(e);
@@ -261,7 +262,10 @@ class APIManager extends Logger {
         let employees: Employee[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `employees`), where("department", "==", department));
-            await getDocs(queryDepartment).then((snaps) => {
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
+            })
+            if(snaps) {
                 snaps.docs.forEach((doc) => {
                     let data = doc.data();
                     employees.push(new Employee({
@@ -275,9 +279,8 @@ class APIManager extends Logger {
                         role: data.role
                     }))
                 })
-            }).catch((e) => {
-                this.error(e);
-            })
+            }
+
             resolve(employees);
         });
     }
@@ -286,13 +289,14 @@ class APIManager extends Logger {
         let departments: Department[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `departments`));
-            await getDocs(queryDepartment).then((snaps) => {
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
+            })
+            if(snaps) {
                 snaps.docs.forEach((doc) => {
                     departments.push(new Department({name: doc.data().name}))
                 })
-            }).catch((e) => {
-                this.error(e);
-            })
+            }
             resolve(departments);
         });
     }
@@ -301,13 +305,14 @@ class APIManager extends Logger {
         let roles: string[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `roles`));
-            await getDocs(queryDepartment).then((snaps) => {
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
+            })
+            if(snaps) {
                 snaps.docs.forEach((doc) => {
                     roles.push(doc.data().name)
                 })
-            }).catch((e) => {
-                this.error(e);
-            })
+            }
             resolve(roles);
         });
     }
@@ -316,13 +321,14 @@ class APIManager extends Logger {
         let jobTitles: string[] = []
         return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `jobTitles`));
-            await getDocs(queryDepartment).then((snaps) => {
+            let snaps = await getDocs(queryDepartment).catch((e) => {
+                this.error(e);
+            })
+            if(snaps) {
                 snaps.docs.forEach((doc) => {
                     jobTitles.push(doc.data().name)
                 })
-            }).catch((e) => {
-                this.error(e);
-            })
+            }
             resolve(jobTitles);
         });
     }
