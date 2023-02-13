@@ -1,46 +1,62 @@
+import {Department} from "./Department";
 
 /**
- * Liste d'employé, comme dit dans le idm
+ * Liste d'employé
  */
 export interface EmployeeList {
     list : Employee[];
 }
 
 /**
- * Contient tout les renseignements des employés de l'application web
+ * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
-    id: number = 0;
-    name: string =  "";
+    lastName: string =  "";
     firstName: string = "";
+    email: string = "";
     phoneNumber: string = "";
-    active: boolean = true;
-    manager: number = 0;
+    isActive: boolean = true;
+    department: string = "";
     jobTitles: string[] = [];
     skills: string[] = [];
-    role: string = "user";
+    role: number = 0;
 
     constructor(employee: EmployeeCreateDTO) {
-        this.id = employee.id;
-		this.name = employee.name;
 		this.firstName = employee.firstName;
+        this.lastName = employee.lastName;
+        this.email = employee.email;
 		this.phoneNumber = employee.phoneNumber;
-        this.manager = employee.manager;
+        this.department = employee.department;
         this.jobTitles = employee.jobTitles;
+        this.skills = employee.skills;
+        this.role = employee.role;
 	}
 }
 /**
- * Contient tout les renseignements pour créer un iduveau employé dans la bd
+ * Contient tous les renseignements pour créer un iduveau employé dans la bd
  */
 export interface EmployeeCreateDTO {
-    readonly id: number;
-	readonly name: string;
 	readonly firstName: string;
+    readonly lastName: string;
+    readonly email: string;
 	readonly phoneNumber: string;
-	readonly manager: number;
+	readonly department: string;
     readonly jobTitles: string[];
+    readonly skills: string[];
+    readonly role: number;
 }
 
 export interface EmployeeProps {
     params;
+}
+
+export interface EmployeeListProps {
+    list: Employee[];
+    department: string;
+}
+
+export interface AddEmployeeProps {
+    departments: Department[];
+    roles: string[];
+    jobTitles: string[];
 }

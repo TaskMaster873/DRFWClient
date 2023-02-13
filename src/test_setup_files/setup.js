@@ -1,6 +1,6 @@
-import {cleanup, fireEvent} from "@testing-library/react";
+import {cleanup} from "@testing-library/react";
 import MatchMediaMock from "jest-matchmedia-mock";
-import { act } from "react-dom/test-utils";
+import {act} from "react-dom/test-utils";
 import userEvent from "@testing-library/user-event";
 
 global.IS_REACT_ACT_ENVIRONMENT = true;

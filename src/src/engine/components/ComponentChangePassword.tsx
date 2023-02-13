@@ -1,14 +1,13 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {FormErrorType} from "../errors/FormErrorType";
-import {Config} from "../config/Config";
-import {constants} from "../../../Constants/Constants";
+
+import {errors, FormErrorType} from "../messages/FormMessages";
+import { API } from "../api/APIManager";
 
 /* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
-
 
 /***
  * Ce composant affiche le formulaire pour changer le mot de passe
@@ -54,7 +53,7 @@ export class ComponentChangePassword extends React.Component {
                             placeholder="Entrez l'ancien mot de passe"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidOldPassword">
-                            {constants.errorRequiredOldPassword}
+                            {errors.requiredOldPassword}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>
@@ -69,7 +68,7 @@ export class ComponentChangePassword extends React.Component {
                             placeholder="Entrez le nouveau mot de passe"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidNewPassword">
-                            {constants.errorInvalidNewPassword}
+                            {errors.invalidNewPassword}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Text
@@ -114,8 +113,7 @@ export class ComponentChangePassword extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            //Runs in WEBSOCKETMANAGER.ts
-            Config.changePassword(this.state.oldPassword, this.state.newPassword);
+            API.changePassword(this.state.oldPassword, this.state.newPassword);
         }
     }
 

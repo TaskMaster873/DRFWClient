@@ -1,40 +1,25 @@
 import React from "react";
-import { Container } from "react-bootstrap";
-import { ComponentEmployeeList } from "../components/ComponentEmployeeList";
-import { EmployeeList, Employee, EmployeeProps } from "../types/Employee";
+import {Container} from "react-bootstrap";
+import {ComponentEmployeeList} from "../components/ComponentEmployeeList";
+import {EmployeeProps} from "../types/Employee";
+import {API} from "../api/APIManager";
 
 /**
- * Ceci est la page pour les employés
+ * Page de liste les employés
  */
+export class Employees extends React.Component<EmployeeProps> {
+    public state = {
+        list: []
+    }
 
-export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
-  private department_id : string = "";
-  constructor(props: EmployeeProps) {
-    super(props);
-    console.log(this.props.params);
-  }
+    constructor(props: EmployeeProps) {
+        super(props);
+    }
 
-  private list: Employee[] = [
-    new Employee({
-      id: 0,
-      name: "Blanchet",
-      firstName: "Stéphane",
-      phoneNumber: "581-555-5555",
-      manager: 0,
-      jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-    }),
-    new Employee({
-      id: 1,
-      name: "Blanchette",
-      firstName: "Roger",
-      phoneNumber: "581-555-2312",
-      manager: 0,
-      jobTitles: ["Gestionnaire de projet", "Directeur de production"],
-    }),
-  ];
-
-    public componentDidMount() {
-        document.title = "Employés - TaskMaster";
+    public async componentDidMount() {
+        let employees = await API.getEmployeesByDepartment(this.props.params.id);
+        this.setState({list: employees})
+        document.title = "Employés " + this.props.params.id + " - TaskMaster";
     }
 
     /**
@@ -42,11 +27,8 @@ export class Employees extends React.Component<EmployeeProps, EmployeeProps> {
      * @returns La liste des employés
      */
     public render(): JSX.Element {
-        let listData: EmployeeList = { list: this.list };
-        return (
-            <Container>
-                <ComponentEmployeeList {...listData} />
-            </Container>
-        );
+        return (<Container>
+                <ComponentEmployeeList list={this.state.list} department={this.props.params.id} />
+            </Container>);
     }
 }

@@ -1,5 +1,6 @@
-import { Employee } from "./Employee";
-import { Project } from "./Project";
+import {Employee} from "./Employee";
+import {Project} from "./Project";
+import {DayPilot} from "@daypilot/daypilot-lite-react";
 
 export interface ShiftsList {
   shifts: Shift[];
@@ -7,22 +8,19 @@ export interface ShiftsList {
 
 export interface Shift {
   project: Project;
-  text: string;
   resource: string;
   start: string;
   end: number;
-  employe: Employee;
+  employee: Employee;
   readonly id: string;
 }
 
 export interface ShiftDTO {
-  readonly text: string;
+  readonly employee: string;
   readonly resource: string;
   readonly start: string;
   readonly end: number;
-  readonly id: string;
   readonly project: Project;
-  readonly employe: Employee;
 }
 
 /**
@@ -31,11 +29,12 @@ export interface ShiftDTO {
  */
 export interface EventForCalendar {
   readonly id: number; //id unique dans le tableau d'horaire
-    text: string; // le nom de l'event
-    start: string;//heure de début
-    end: string; //heure de fin
-    resource: string;//l'id de la personne qui l'a
-    barColor: string; // couleur de la barre
+    text?: string; // le nom de l'event
+    start: DayPilot.date;//heure de début
+    end: DayPilot.date; //heure de fin
+    resource?: string;//l'id de la personne qui l'a
+    barColor?: string; // couleur de la barre
+    backColor?: string
 }
 
 export interface EventForCalendarList {

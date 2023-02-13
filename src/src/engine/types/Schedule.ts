@@ -12,3 +12,12 @@ export interface ScheduleResource {
     name: string;
     id: string;
 }
+
+export interface ScheduleDTO {
+    name: string;
+    id: string;
+    start: Date;
+    end: Date;
+    color: string;
+
+}

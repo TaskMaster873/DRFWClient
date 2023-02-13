@@ -1,6 +1,6 @@
 import React from "react";
-import { Container } from "react-bootstrap";
-import { ComponentLogin } from "../components/ComponentLogin";
+import {Container} from "react-bootstrap";
+import {ComponentLogin} from "../components/ComponentLogin";
 
 /***
  *

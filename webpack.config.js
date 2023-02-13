@@ -20,8 +20,7 @@ module.exports = {
             "http": false,
             "https": false,
             "stream": false,
-            "crypto": false,
-            "crypto-browserify": require.resolve('crypto-browserify'),
+            "crypto": false
         }
     },
     devServer: { static: path.join(__dirname, "src") },

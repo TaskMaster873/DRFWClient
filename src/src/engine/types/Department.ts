@@ -7,22 +7,19 @@ export interface DepartmentList {
 }
 
 /**
- * Contient tout les renseignements des employés de l'application web
+ * Contient tous les renseignements des employés de l'application web
  */
 export class Department {
-    no: number = 0;
     name: string =  "";
 
-    constructor(departement: DepartementCreateDTO) {
-        this.no = departement.no;
-		this.name = departement.name;
+    constructor(department: DepartmentCreateDTO) {
+		this.name = department.name;
 	}
 }
 /**
- * Contient tout les renseignements pour créer un nouveau employé dans la bd
+ * Contient tous les renseignements pour créer un nouveau département dans la bd
  */
-export interface DepartementCreateDTO {
-	readonly no: number;
+export interface DepartmentCreateDTO {
 	readonly name: string;
 }
 
