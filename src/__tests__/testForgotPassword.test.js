@@ -5,13 +5,13 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import testConstants from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {ResetPassword} from "../src/engine/pages/resetPassword";
+import {ForgotPassword} from "../src/engine/pages/forgotPassword";
 import {API} from "../src/engine/api/APIManager";
 
 let user;
 beforeEach(async () => {
     user = userEvent.setup();
-    render(<MemoryRouter><ResetPassword/></MemoryRouter>);
+    render(<MemoryRouter><ForgotPassword/></MemoryRouter>);
 });
 
 test("should render form inputs", async () => {
@@ -22,8 +22,8 @@ test("should render form inputs", async () => {
     expect(inputEmail).toHaveAttribute("type", "email");
 });
 
-describe("Reset password validation", () => {
-    test("Empty old password should show error", async () => {
+describe("Forgot password validation", () => {
+    test("Empty email should show error", async () => {
         const {inputEmail, form} = getFields();
 
         fireEvent.submit(form);
@@ -46,8 +46,8 @@ describe("Reset password validation", () => {
     });
 });
 
-test("Valid email password should submit form", async () => {
-    API.resetPassword = jest.fn();
+test("Valid email should submit form", async () => {
+    API.sendResetPassword = jest.fn();
     const {inputEmail, form} = getFields();
 
     await user.type(inputEmail, testConstants.validEmail);
@@ -57,7 +57,7 @@ test("Valid email password should submit form", async () => {
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect(API.resetPassword).toBeCalled();
+    expect(API.sendResetPassword).toBeCalled();
 });
 
 function getFields() {

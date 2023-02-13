@@ -10,6 +10,7 @@ import {firebaseConfig} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Errors} from "./errors/Errors";
 import {Department} from "../types/Department";
+import { verifyPasswordResetCode, confirmPasswordReset } from "firebase/auth";
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
@@ -86,7 +87,7 @@ class APIManager extends Logger {
         }
     }
 
-    public async resetPassword(email: string): Promise<boolean> {
+    public async sendResetPassword(email: string): Promise<boolean> {
         let sentWithoutErrors = true;
         await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch((e) => {
             this.error(e);
@@ -181,6 +182,41 @@ class APIManager extends Logger {
     private elementExist(element: any): boolean {
         return element !== undefined && element !== null;
     }
+
+        /**
+     * Valide le code de réinitialisation de mot de passe
+     * @param actionCode Le code de réinitialisation de mot de passe
+     * @returns Soi le courriel ou rien
+     */
+        public async verifyResetPassword(actionCode: string): Promise<string> {
+            return new Promise(async (resolve) => {
+                let accountEmail: string = "None";
+                await verifyPasswordResetCode(this.#auth, actionCode).then((email) => {
+                    accountEmail = email;
+                }).catch((error) => {
+                    this.error(error)
+                })
+                resolve(accountEmail);
+            })
+        }
+    
+        /**
+         * Valide le code de réinitialisation de mot de passe et applique le nouveau mot de passe
+         * @param actionCode Le code de réinitialisation de mot de passe
+         * @param newPassword Le nouveau mot de passe
+         * @returns True si la réinitialisation a réussie, False si elle n'a pas réussie
+         */
+        public async applyResetPassword(actionCode: string, newPassword: string): Promise<boolean> {
+            return new Promise(async (resolve) => {
+                let resetSuccess: boolean = false;
+                await confirmPasswordReset(this.#auth, actionCode, newPassword).then(() => {
+                    resetSuccess = true;
+                }).catch((error) => {
+                    this.error(error)
+                })
+                resolve(resetSuccess);
+            })
+        }
 
     public async changePassword(oldPassword: string, newPassword: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
