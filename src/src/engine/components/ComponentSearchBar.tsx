@@ -1,38 +1,34 @@
 import React from "react";
-import {Col, Form} from "react-bootstrap";
-import {Employee} from "../types/Employee";
+import {Form} from "react-bootstrap";
+import {SearchParams} from "../types/SearchParams";
+import {Filter} from "../utils/Filter";
 
-export class ComponentSearchBar extends React.Component<{ list: any, filterList: (filteredList: any) => void }> {
-    public state: { list: any };
-
-    constructor(props: { list: any, filterList: (filteredList: Employee[]) => void }) {
+export class ComponentSearchBar<T> extends React.Component<SearchParams<T>> {
+    constructor(props: SearchParams<T>) {
         super(props);
-        this.state = {
-            list: props.list
-        };
     }
 
-    handleSearchChange = (event) => {
+    private handleSearchChange(event): void {
         this.filterList(event.target.value);
-    };
+    }
 
-    filterList = (searchTerm) => {
-        let filteredList: any = [];
-        if (searchTerm != "") {
-            filteredList = this.state.list.filter((item) => item.firstName.toLowerCase().includes(searchTerm.toLowerCase()));
+    private filterList(searchTerm: string): void {
+        let filteredList: T[] = [];
+        if (searchTerm !== null && searchTerm) {
+            filteredList = Filter.filter<T>(this.props.list, searchTerm);
+
             this.props.filterList(filteredList);
         } else {
-            this.props.filterList(this.state.list);
+            this.props.filterList(this.props.list);
         }
     }
 
-
-    render() {
+    public render(): JSX.Element {
         return (<Form.Group>
                 <Form.Control
                     type="text"
                     placeholder="Search"
-                    onChange={this.handleSearchChange}
+                    onChange={this.handleSearchChange.bind(this)}
                 />
         </Form.Group>);
     }

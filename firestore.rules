@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+
+      match /employees/{employeeId} {
+      	allow read;
+        allow create: if isValidEmployee(employeeId);
+      }
+      
+      function isValidEmployee(employeeId) {
+        let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
+        
+        return createdValidEmployee && isUserAdmin(request.auth.uid);
+      }
+      
+      match /departments/{departmentId} {
+      	allow read;
+        allow create: if isValidDepartment(departmentId);
+        
+      }
+      
+      function isValidDepartment(departmentId) {
+        let createdValidDepartment = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
+        
+        return createdValidDepartment && isUserAdmin(request.auth.uid);
+      }
+      
+      match /roles/{roleId} {
+      	allow read;
+        allow create: if isValidRole(roleId);
+      }
+      
+      function isValidRole(roleId) {
+        let createdValidRole = existsAfter(/databases/$(database)/documents/roles/$(roleId));
+        
+        return createdValidRole;
+      }
+      
+      match /jobTitles/{jobTitleId} {
+      	allow read;
+        allow create: if isValidJobTitle(jobTitleId);
+      }
+      
+      function isValidJobTitle(jobTitleId) {
+        let alreadyExists = exists(/databases/$(database)/documents/jobTitles/$(request.resource.data.name));
+        let createdValidJobTitle = existsAfter(/databases/$(database)/documents/jobTitles/$(jobTitleId));
+        
+        return createdValidJobTitle && !alreadyExists;
+      }
+      
+      function isUserAdmin(id) {
+      	let employeeRole = get(/databases/$(database)/documents/employees/$(id)).role;
+        
+        return employeeRole >= 4
+      }
+      
+      match /shifts/{shiftId} {
+    		allow read;
+    	}
+    }
+    	
+  }
+}

@@ -17,20 +17,20 @@ export class ResourceGroups extends React.Component<{ groups: ScheduleGroup[], o
         this.selectRef = React.createRef();
     }
 
-    find(id: string) {
+    private find(id: string) {
         if (!this.props) {
             return null;
         }
         return this.groups.find((item) => item.id === id);
     }
 
-    componentDidMount() {
+    public componentDidMount() {
         if (this.groups && this.groups.length > 0) {
             setTimeout(() => this.doOnChange(this.groups.at(0)), 0);
         }
     }
 
-    render() {
+    public render() : JSX.Element {
         return (
             <span>
         Group: &nbsp;
@@ -45,13 +45,13 @@ export class ResourceGroups extends React.Component<{ groups: ScheduleGroup[], o
         );
     }
 
-    change(ev: React.ChangeEvent<HTMLSelectElement>) {
+    private change(ev: React.ChangeEvent<HTMLSelectElement>): void {
         const value = ev.target.value;
         const item = this.find(value);
         this.doOnChange(item);
     }
 
-    doOnChange(location: ScheduleGroup | undefined | null) {
+    private doOnChange(location: ScheduleGroup | undefined | null): void {
         const args = { selected: location };
         if (this.onChange) {
             this.onChange(args);
