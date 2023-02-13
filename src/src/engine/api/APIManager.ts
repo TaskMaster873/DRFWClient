@@ -11,6 +11,7 @@ import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} fr
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Errors} from "./errors/Errors";
 import {Department} from "../types/Department";
+import { Shift } from "../types/Shift";
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
