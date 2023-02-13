@@ -34,8 +34,8 @@ export function ComponentForgotPassword(props) {
     setError(errorType);
 
     if (errorType === FormErrorType.NO_ERROR) {
-      let success = await API.sendResetPassword(email);
-      if (success) {
+      let message = await API.sendResetPassword(email);
+      if (message) {
         NotificationManager.info(
           "Réinitialisation du mot de passe",
           "Un courriel a été envoyé à votre adresse courriel."
