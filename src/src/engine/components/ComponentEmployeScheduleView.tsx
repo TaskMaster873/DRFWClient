@@ -1,25 +1,14 @@
 import React from 'react';
 import { DayPilot, DayPilotCalendar, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
+import { Shift, ShiftForCalendar } from '../types/Shift';
 
-const styles = {
-    wrap: {
-        display: "flex"
-    },
-    left: {
-        marginRight: "10px"
-    },
-    main: {
-        flexGrow: "1"
-    },
-    oneHundred: {
-        height: "100vh"
-    }
-};
+type Props = { listOfShifts: Shift[]}
 
-export class ComponentEmployeScheduleView extends React.Component {
+export class ComponentEmployeScheduleView extends React.Component<Props> {
     calendarRef: React.RefObject<any>;
     datePickerRef: React.RefObject<any>;
-    constructor(props) {
+    listOfShifts: Shift[] = [];
+    constructor(props: Props) {
         super(props);
         this.datePickerRef = React.createRef();
         this.calendarRef = React.createRef();
@@ -30,14 +19,6 @@ export class ComponentEmployeScheduleView extends React.Component {
             eventResizeHandling: "Disabled",
             eventMoveHandling: "Disabled",
             eventDeleteHandling: "Disabled",
-            /*businessBeginsHour: 0,
-            businessEndsHour: 24,
-            businessWeekends: true,
-            durationBarVisible: false,
-            showNonBusiness: true,*/
-            //timeRangeSelectedHandling: "Disabled",
-            // eventDeleteHandling: "Disabled",
-           // onEventClick: this.onEventClick
         };
     }
 
@@ -48,56 +29,26 @@ export class ComponentEmployeScheduleView extends React.Component {
     get datePicker() {
         return this.datePickerRef.current.control;
     }
-    componentDidMount() {
 
-        const events = [
-            {
-                id: 1,
-                text: "Event 1",
-                start: "2023-03-07T10:30:00",
-                end: "2023-03-07T13:00:00"
-            },
-            {
-                id: 2,
-                text: "Event 2",
-                start: "2023-03-08T09:30:00",
-                end: "2023-03-08T11:30:00",
-                backColor: "#6aa84f"
-            },
-            {
-                id: 3,
-                text: "Event 3",
-                start: "2023-03-08T12:00:00",
-                end: "2023-03-08T15:00:00",
-                backColor: "#f1c232"
-            },
-            {
-                id: 4,
-                text: "Event 4",
-                start: "2023-03-06T11:30:00",
-                end: "2023-03-06T14:30:00",
-                backColor: "#cc4125"
-            },
-            {
-                id: 5,
-                text: "Event 5",
-                start: "2023-03-12T11:30:00",
-                end: "2023-03-12T14:30:00",
-                backColor: "#cc4125"
-            },
-        ];
+    componentDidUpdate(): void {
+        let listOfEvent: ShiftForCalendar[] = [];
+        for (let index = 0; index < this.props.listOfShifts.length; index++) { // foreach met des erreurs
+            listOfEvent.push({ 
+                start: this.props.listOfShifts[index].start,
+                end: this.props.listOfShifts[index].end,
+            });
+            
+        }
+        this.calendar.update({events: listOfEvent });
+        this.datePicker.update({ events: listOfEvent });
 
-        const startDate = "2023-03-07";
-
-        this.calendar.update({ startDate, events });
-        this.datePicker.update({ events: events });
-
+        console.log("liste:",listOfEvent);
     }
 
     render() {
         return (
             <div className='flex_Hundred'>
-                <div style={styles.left}>
+                <div className='left'>
                     <DayPilotNavigator
                         selectMode={"week"}
                         showMonths={3}
@@ -112,7 +63,7 @@ export class ComponentEmployeScheduleView extends React.Component {
                         ref= {this.datePickerRef}
                     />
                 </div>
-                <div style={styles.main}>
+                <div className='main'>
                     <DayPilotCalendar
                         {...this.state}
                         cellsMarkBusiness= {false}

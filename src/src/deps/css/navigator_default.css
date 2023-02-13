@@ -93,6 +93,19 @@ body .navigator_default_busy {
   height: 90vh;
 }
 
+
+.wrap {
+  display: flex;
+}
+
+.left {
+  margin-right: 10px;
+}
+
+.main {
+  flex-grow: 1;
+}
+
 /*div.calendar_default_main  div:nth-child(2)  {
   height: 80vh !important;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

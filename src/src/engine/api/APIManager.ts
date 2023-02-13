@@ -11,6 +11,7 @@ import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Errors} from "./errors/Errors";
 import {Department} from "../types/Department";
 import { verifyPasswordResetCode, confirmPasswordReset } from "firebase/auth";
+import { Shift, ShiftDTO } from "../types/Shift";
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
@@ -385,6 +386,34 @@ class APIManager extends Logger {
                 })
             }
             return jobTitles;
+    }
+
+    public async getScheduleForOneEmployee(): Promise<Shift[]> {
+        let shifts: Shift[] = [];
+        if(this.isAuthenticated){
+            return new Promise(async (resolve) => {
+                let queryShifts = query(collection(this.#db, `shifts`), where("employeeId", "==", "123" /*this.#user?.uid*/));
+                let snaps = await getDocs(queryShifts).catch((e) => {
+                    console.log("error");
+                    this.error(e);
+                })
+                if(snaps) {
+                    snaps.docs.forEach((doc) => {
+                        let data = doc.data();
+                        shifts.push(new Shift({
+                            employeeId: data.employeeId,
+                            projectName: data.projectName,
+                            start: data.start,
+                            end: data.end,
+                        }))
+                    })
+                }
+                resolve(shifts);
+            });
+        } else {
+            return shifts;
+        }
+        
     }
 }
 

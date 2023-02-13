@@ -3,15 +3,22 @@ import {Container} from "react-bootstrap";
 import {ComponentSchedule} from "../components/ComponentSchedule";
 import {ComponentEmployeScheduleView} from "../components/ComponentEmployeScheduleView";
 import {Employee, EmployeeList} from "../types/Employee";
-
+import {Shift} from "../types/Shift";
+import {API} from "../api/APIManager";
 /**
  * Page qui affiche l'horaire des employés
  */
 export class Schedule extends React.Component {
-    private list: Employee[] = [];
-    public componentDidMount() {
-        document.title = "Horaire - TaskMaster";
-    }
+    public state = {
+        list: [],
+  }
+
+  public async componentDidMount() {
+    let shifts = await API.getScheduleForOneEmployee();
+    console.log(shifts);
+    this.setState({list: shifts})
+    document.title = "Horaire - TaskMaster";
+  }
 
     /***
      *
@@ -19,15 +26,11 @@ export class Schedule extends React.Component {
      *
      */
     public render(): JSX.Element {
-        let listData: EmployeeList = {list: this.list};
+        let listData: Shift[] = this.state.list;
         if(true) {
-            return (<ComponentEmployeScheduleView>
-                </ComponentEmployeScheduleView>);
+            return (<ComponentEmployeScheduleView listOfShifts={...listData}/>);
         } else {
             return (<Container className="mt-5 mb-5">
-
-            <ComponentEmployeScheduleView>
-            </ComponentEmployeScheduleView>
 
             <ComponentSchedule {...listData} />
         </Container>);
