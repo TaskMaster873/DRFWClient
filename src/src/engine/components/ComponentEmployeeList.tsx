@@ -79,7 +79,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     }
 
     private renderAddEmployeeButton() : JSX.Element | undefined {
-        if(API.isAuth()) {
+        if(API.isAuth() && API.isAdmin) {
             return (<LinkContainer to="/add-employee">
                 <Button className="mt-3">Ajouter</Button>
             </LinkContainer>);

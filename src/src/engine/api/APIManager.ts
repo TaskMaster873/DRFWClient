@@ -10,7 +10,6 @@ import {firebaseConfig} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Errors} from "./errors/Errors";
 import {Department} from "../types/Department";
-import {getRoles} from "@testing-library/react";
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
@@ -57,6 +56,10 @@ class APIManager extends Logger {
 
     public isAuth(): boolean {
         return this.isAuthenticated;
+    }
+
+    public get isAdmin(): boolean {
+        return this.#userRole == "Administrateur";
     }
 
     public async loginWithPassword(email: string, password: string): Promise<FirebaseAuth.UserCredential | null> {
