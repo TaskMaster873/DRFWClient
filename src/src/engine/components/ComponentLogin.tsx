@@ -65,7 +65,7 @@ export class ComponentLogin extends React.Component {
                     >
                         <Form.Group>
                             <Form.Label htmlFor="no" className="mt-2">
-                                Numéro d'employé
+                                Adresse courriel
                             </Form.Label>
                             <Form.Control
                                 required
@@ -102,7 +102,7 @@ export class ComponentLogin extends React.Component {
                             aria-errormessage={this.errorMessage}
                         ></Form.Text>
                         <div className="me-4 mt-4 d-block text-center mx-auto">
-                            <Link className="d-block" to="/resetPassword">
+                            <Link className="d-block" to="/forgot-password">
                                 Mot de passe oublié ?
                             </Link>
                             <Button

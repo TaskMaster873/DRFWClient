@@ -1,3 +1,4 @@
+import {Department} from "./Department";
 
 /**
  * Liste d'employé
@@ -47,4 +48,15 @@ export interface EmployeeCreateDTO {
 
 export interface EmployeeProps {
     params;
+}
+
+export interface EmployeeListProps {
+    list: Employee[];
+    department: string;
+}
+
+export interface AddEmployeeProps {
+    departments: Department[];
+    roles: string[];
+    jobTitles: string[];
 }
