@@ -22,7 +22,6 @@ export class Departments extends React.Component {
    * @returns La liste des employés
    */
   public render(): JSX.Element {
-    console.log(this.state.list);
     return (
       <Container>
         <ComponentDepartmentList list={this.state.list} />

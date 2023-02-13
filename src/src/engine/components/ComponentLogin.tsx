@@ -65,7 +65,7 @@ export class ComponentLogin extends React.Component {
                     >
                         <Form.Group>
                             <Form.Label htmlFor="no" className="mt-2">
-                                Numéro d'employé
+                                Adresse courriel
                             </Form.Label>
                             <Form.Control
                                 required

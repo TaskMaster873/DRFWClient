@@ -4,7 +4,7 @@ import {FirebaseApp, initializeApp} from "firebase/app";
 import {Analytics, getAnalytics, isSupported} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {addDoc, collection, Firestore, getDocs, getFirestore, query, where} from "firebase/firestore";
+import {addDoc, collection, doc, Firestore, getDoc, getDocs, getFirestore, query, where} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
@@ -28,6 +28,7 @@ class APIManager extends Logger {
     #db: Firestore;
     #userInfo: FirebaseAuth.UserCredential | null = null;
     #user: FirebaseAuth.User | null = null;
+    #userRole: string | null = null;
 
     private isAuthenticated: boolean = false;
 
@@ -56,6 +57,10 @@ class APIManager extends Logger {
 
     public isAuth(): boolean {
         return this.isAuthenticated;
+    }
+
+    public get isAdmin(): boolean {
+        return this.#userRole == "Administrateur";
     }
 
     public async loginWithPassword(email: string, password: string): Promise<FirebaseAuth.UserCredential | null> {
@@ -132,7 +137,7 @@ class APIManager extends Logger {
         let resolved = false;
 
         this.awaitLogin = new Promise(async (resolve) => {
-            FirebaseAuth.onAuthStateChanged(this.#auth, (user) => {
+            FirebaseAuth.onAuthStateChanged(this.#auth, async (user) => {
                 this.log('Auth state changed!');
 
                 if (user === null || !user) {
@@ -140,8 +145,10 @@ class APIManager extends Logger {
                 } else {
                     this.isAuthenticated = true;
                     this.#user = user;
+                    this.#userRole = await this.getCurrentEmployeeRole(user.uid);
 
                     console.log('user', user);
+                    console.log('userRole', this.#userRole);
                 }
 
                 if (!resolved) {
@@ -221,7 +228,6 @@ class APIManager extends Logger {
     public async changePassword(oldPassword: string, newPassword: string): Promise<void> {
         return new Promise(async (resolve, reject) => {
             const user = this.#auth.currentUser;
-
             if (user !== null && user) {
                 if (this.elementExist(user.email)) {
                     let email = user.email || '';
@@ -353,9 +359,22 @@ class APIManager extends Logger {
         });
     }
 
+    public async getCurrentEmployeeRole(uid: string) : Promise<string> {
+        let employeeRole : string = (await this.getRoles())[0];
+            let employee = await getDoc(doc(this.#db, `roles`, uid)).catch((e) => {
+                this.error(e);
+            })
+            if(employee && employee.data() != undefined) {
+                let employeeData = employee.data();
+                if(employeeData != undefined) {
+                    employeeRole = employeeData.role;
+                }
+            }
+            return employeeRole;
+    }
+
     public async getJobTitles(): Promise<string[]> {
         let jobTitles: string[] = []
-        return new Promise(async (resolve) => {
             let queryDepartment = query(collection(this.#db, `jobTitles`));
             let snaps = await getDocs(queryDepartment).catch((e) => {
                 this.error(e);
@@ -365,8 +384,7 @@ class APIManager extends Logger {
                     jobTitles.push(doc.data().name)
                 })
             }
-            resolve(jobTitles);
-        });
+            return jobTitles;
     }
 }
 
