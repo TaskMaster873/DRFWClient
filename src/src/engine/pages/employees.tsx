@@ -28,7 +28,7 @@ export class Employees extends React.Component<EmployeeProps> {
      */
     public render(): JSX.Element {
         return (<Container>
-                <ComponentEmployeeList list={this.state.list} department={this.props.params.id} />
+                <ComponentEmployeeList filteredList={null} list={this.state.list} department={this.props.params.id} />
             </Container>);
     }
 }

@@ -4,22 +4,10 @@ import {FirebaseApp, initializeApp} from "firebase/app";
 import {Analytics, getAnalytics, isSupported} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {confirmPasswordReset, verifyPasswordResetCode} from "firebase/auth";
-import {
-    addDoc,
-    collection,
-    doc,
-    Firestore,
-    getDoc,
-    getDocs,
-    getFirestore,
-    query,
-    QueryDocumentSnapshot,
-    setDoc,
-    where
-} from "firebase/firestore";
+import {confirmPasswordReset, connectAuthEmulator, verifyPasswordResetCode} from "firebase/auth";
+import {addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, getDocs, getFirestore, query, QueryDocumentSnapshot, setDoc, where} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
-import {firebaseConfig} from "./config/FirebaseConfig";
+import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {errors} from "../messages/APIMessages";
@@ -190,6 +178,12 @@ class APIManager extends Logger {
         let isAnalyticsSupported = await isSupported();
         if (isAnalyticsSupported) {
             this.#analytics = getAnalytics(this.#app);
+        }
+
+        //Should this database be emulated?
+        if (location.hostname === "localhost") {
+            connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
+            connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
         }
 
         this.log("Firebase loaded");

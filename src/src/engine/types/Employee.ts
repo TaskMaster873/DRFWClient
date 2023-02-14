@@ -51,7 +51,8 @@ export interface EmployeeProps {
 }
 
 export interface EmployeeListProps {
-    list: Employee[];
+    list: Employee[] | null;
+    filteredList: Employee[] | null;
     department: string;
 }
 

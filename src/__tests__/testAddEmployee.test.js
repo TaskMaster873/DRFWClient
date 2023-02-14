@@ -10,7 +10,6 @@ import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
 jest.mock("../src/engine/api/APIManager");
-const {API} = require("../src/engine/api/APIManager");
 let user;
 
 let departments = [{name: "Informatique"}];
