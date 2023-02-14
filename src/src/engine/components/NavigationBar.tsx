@@ -78,7 +78,7 @@ export class NavigationBar extends React.Component {
      */
     private loginButton() : JSX.Element {
         if (API.isAuth()) {
-            return <Nav.Link onClick={this.logOut}>Se déconnecter</Nav.Link>;
+            return <Nav.Link id="logoutLink" onClick={this.logOut}>Se déconnecter</Nav.Link>;
         } else {
             return (
                 <LinkContainer to="/login">
