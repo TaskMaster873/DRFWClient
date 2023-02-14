@@ -13,7 +13,6 @@ import {AddDepartmentProps} from "../types/Department";
  * Ceci est le composant pour ajouter les employés
  */
 export class ComponentAddDepartment extends React.Component<AddDepartmentProps> {
-    private errorMessage = "";
     public state: {
         name: string;
         director: string;
@@ -46,7 +45,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
                 <Row className="mb-3">
                     <h5 className="mt-4 mb-3">Ajouter un département</h5>
                     <Form.Group as={Col} md="3">
-                        <Form.Label for="name" className="mt-2">Nom</Form.Label>
+                        <Form.Label htmlFor="name" className="mt-2">Nom</Form.Label>
                         <Form.Control
                             name="name"
                             id="name"
@@ -59,7 +58,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="3">
-                        <Form.Label for="director" className="mt-2">Directeur</Form.Label>
+                        <Form.Label htmlFor="director" className="mt-2">Directeur</Form.Label>
                         <Form.Select required name="director" id="director" value={this.state.director} onChange={this.handleSelect}>
                             {this.props.employees.map((employee, index) => (
                                 <option key={`${index}`} value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
