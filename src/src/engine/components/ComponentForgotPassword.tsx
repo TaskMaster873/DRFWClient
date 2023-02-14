@@ -34,11 +34,12 @@ export function ComponentForgotPassword() {
         setError(errorType);
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let error = await API.sendResetPassword(email);
-            if (!error) {
+            let errorMessage = await API.sendResetPassword(email);
+            //Regarde si l'erreur est null
+            if (!errorMessage) {
                 NotificationManager.info(info.emailSent, info.passwordReset);
             } else {
-                NotificationManager.error(error, errors.error);
+                NotificationManager.error(errorMessage, errors.errorGenericMessage);
             }
         }
     };

@@ -91,7 +91,7 @@ export class ComponentChangePassword extends React.Component {
         );
     }
 
-    private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
         let errorType = FormErrorType.NO_ERROR;
@@ -108,11 +108,11 @@ export class ComponentChangePassword extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let error = API.changePassword(this.state.oldPassword, this.state.newPassword);
+            let error = await API.changePassword(this.state.oldPassword, this.state.newPassword); //voici le changement en async
             if (!error) {
-                NotificationManager.success(successes.success, successes.changedPassword);
+                NotificationManager.success(successes.successGenericMessage, successes.changedPassword);
             } else {
-                NotificationManager.error(error, errors.error);
+                NotificationManager.error(error, errors.errorForm);
             }
         }
     }

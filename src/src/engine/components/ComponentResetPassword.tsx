@@ -44,11 +44,11 @@ export function ComponentResetPassword(props: Props) {
       let error = await API.applyResetPassword(props.actionCode, newPassword);
 
       if (!error) {
-        NotificationManager.info(successes.resetPassword, successes.success);
+        NotificationManager.info(successes.resetPassword, successes.successGenericMessage);
       } else {
         NotificationManager.error(
           error,
-          errors.error
+          errors.errorGenericMessage
         );
       }
       navigate("/login")
