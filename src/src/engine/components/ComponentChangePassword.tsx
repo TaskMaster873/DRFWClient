@@ -71,11 +71,6 @@ export class ComponentChangePassword extends React.Component {
                             {errors.invalidNewPassword}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Text
-                        className="text-muted"
-                        id="loginErrorMsg"
-                        aria-errormessage={this.errorMessage}
-                    ></Form.Text>
                     <div className="mt-4 me-4 d-block text-center mx-auto">
                         <Button onClick={() => history.back()} className="me-4 mt-4" size="lg" variant="secondary">
                             Retour

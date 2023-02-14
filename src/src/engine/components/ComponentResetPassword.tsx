@@ -94,11 +94,6 @@ export function ComponentResetPassword(props: Props) {
             {errors.invalidNewPassword}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Text
-          className="text-muted"
-          id="resetPasswordErrorMsg"
-          aria-errormessage={errorMessage}
-        ></Form.Text>
         <div className="mt-4 me-4 d-block text-center mx-auto">
           <Button
             onClick={() => history.back()}

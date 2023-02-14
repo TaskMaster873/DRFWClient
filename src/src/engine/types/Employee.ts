@@ -50,6 +50,7 @@ export interface EmployeeProps {
     params;
 }
 
+
 export interface EmployeeListProps {
     list: Employee[] | null;
     filteredList: Employee[] | null;

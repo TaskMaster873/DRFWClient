@@ -17,7 +17,7 @@ export class Employees extends React.Component<EmployeeProps> {
     }
 
     public async componentDidMount() {
-        let employees = await API.getEmployeesByDepartment(this.props.params.id);
+        let employees = await API.getEmployees(this.props.params.id);
         this.setState({list: employees})
         document.title = "Employés " + this.props.params.id + " - TaskMaster";
     }

@@ -18,7 +18,8 @@ export const errors = {
     invalidLogin: "Le numéro d'employé ou le mot de passe spécifié est invalide",
     departmentAlreadyExists: "Le département existe déjà",
     messageScheduleUnavailable: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
-    serverError: "Une erreur s'est produite, veuillez réessayer plus tard"
+    serverError: "Une erreur s'est produite, veuillez réessayer plus tard",
+    requiredDepartmentDirector: "Le directeur de département est requis"
 }
 
 export const successes = {

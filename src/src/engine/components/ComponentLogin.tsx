@@ -96,11 +96,6 @@ export class ComponentLogin extends React.Component {
                                 {errors.requiredPassword}
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Text
-                            className="text-muted"
-                            id="loginErrorMsg"
-                            aria-errormessage={this.errorMessage}
-                        ></Form.Text>
                         <div className="me-4 mt-4 d-block text-center mx-auto">
                             <Link className="d-block" to="/forgot-password">
                                 Mot de passe oublié ?

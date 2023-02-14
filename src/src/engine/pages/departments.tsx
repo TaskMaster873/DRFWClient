@@ -24,7 +24,7 @@ export class Departments extends React.Component {
   public render(): JSX.Element {
     return (
       <Container>
-        <ComponentDepartmentList list={this.state.list} />
+        <ComponentDepartmentList departments={this.state.list} />
       </Container>
     );
   }

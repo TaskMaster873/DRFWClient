@@ -1,4 +1,4 @@
-import React from "react";
+import React, {ChangeEvent} from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -6,23 +6,26 @@ import Col from "react-bootstrap/Col";
 import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
 import {NotificationManager} from 'react-notifications';
+import {AddDepartmentProps} from "../types/Department";
 
 /**
  *
  * Ceci est le composant pour ajouter les employés
  */
-export class ComponentAddDepartment extends React.Component {
+export class ComponentAddDepartment extends React.Component<AddDepartmentProps> {
     private errorMessage = "";
     public state: {
         name: string;
+        director: string;
         validated?: boolean;
         error: FormErrorType;
     };
 
-    constructor(props: { titles: string[]; roles: string[] }) {
+    constructor(props: AddDepartmentProps) {
         super(props);
         this.state = {
             name: "",
+            director: "",
             validated: false,
             error: FormErrorType.NO_ERROR
         };
@@ -41,9 +44,11 @@ export class ComponentAddDepartment extends React.Component {
                 data-error={this.state.error}
             >
                 <Row className="mb-3">
+                    <h5 className="mt-4 mb-3">Ajouter un département</h5>
                     <Form.Group as={Col} md="3">
-                        <Form.Label className="mt-3">Ajouter un département</Form.Label>
+                        <Form.Label for="name" className="mt-2">Nom</Form.Label>
                         <Form.Control
+                            name="name"
                             id="name"
                             required
                             type="text"
@@ -53,18 +58,20 @@ export class ComponentAddDepartment extends React.Component {
                             {errors.requiredDepartmentName}
                         </Form.Control.Feedback>
                     </Form.Group>
+                    <Form.Group as={Col} md="3">
+                        <Form.Label for="director" className="mt-2">Directeur</Form.Label>
+                        <Form.Select required name="director" id="director" value={this.state.director} onChange={this.handleSelect}>
+                            {this.props.employees.map((employee, index) => (
+                                <option key={`${index}`} value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
+                        </Form.Select>
+                        <Form.Control.Feedback type="invalid">
+                            {errors.requiredDepartmentDirector}
+                        </Form.Control.Feedback>
+                    </Form.Group>
                 </Row>
-                <Button className="mb-3" variant="primary" type="submit">
+                <Button className="mt-3 mb-3" variant="primary" type="submit">
                     Ajouter
                 </Button>
-
-                <div className="d-flex justify-content-center">
-                    <Form.Text
-                        className="text-muted"
-                        id="loginErrorMsg"
-                        aria-errormessage={this.errorMessage}
-                    ></Form.Text>
-                </div>
             </Form>
         );
     }
@@ -86,7 +93,7 @@ export class ComponentAddDepartment extends React.Component {
             error: errorType,
         });
         if (errorType === FormErrorType.NO_ERROR) {
-            let error = await API.createDepartment(this.state.name);
+            let error = await API.createDepartment(this.state.name, this.state.director);
             if (!error) {
                 NotificationManager.success(successes.success, successes.departmentCreated);
             } else {
@@ -107,5 +114,10 @@ export class ComponentAddDepartment extends React.Component {
         this.setState({
             [name]: value,
         });
+    }
+
+    private handleSelect(event: ChangeEvent<HTMLSelectElement>) {
+        const target = event.target;
+        this.setState({[target.id]: target.value});
     }
 }

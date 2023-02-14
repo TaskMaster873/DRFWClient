@@ -6,8 +6,17 @@ import {API} from "../api/APIManager";
 import {LinkContainer} from "react-router-bootstrap";
 
 export class ComponentDepartmentList extends React.Component<DepartmentList> {
+    public state = {
+        employees: [],
+    }
     constructor(props: DepartmentList) {
         super(props);
+    }
+
+    public async componentDidMount() {
+        let employees = await API.getEmployees();
+        this.setState({employees: employees})
+        document.title = "Liste des départements - TaskMaster";
     }
 
     public render(): JSX.Element {
@@ -22,7 +31,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentList> {
                 </tr>
                 </thead>
                 <tbody>
-                {this.props.list.map((department, index) => (<tr key={"secondCol" + index}>
+                {this.props.departments.map((department, index) => (<tr key={"secondCol" + index}>
                     <td key={"no" + index}>{index}</td>
                     <td key={"name " + index}>
                         <LinkContainer
@@ -33,7 +42,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentList> {
                         </LinkContainer>
                     </td>
                     <td key={"director " + index}>
-                        <a> - </a>
+                        {department.director ?? "-"}
                     </td>
                 </tr>))}
                 </tbody>
@@ -44,7 +53,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentList> {
 
     private renderAddDepartmentComponent(): JSX.Element | undefined {
         if (API.isAuth() && API.isAdmin) {
-            return (<ComponentAddDepartment/>);
+            return (<ComponentAddDepartment employees={this.state.employees}/>);
         }
     }
 }

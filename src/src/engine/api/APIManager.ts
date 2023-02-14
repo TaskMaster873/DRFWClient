@@ -38,9 +38,12 @@ class APIManager extends Logger {
 
         this.loadFirebase();
     }
-
+    /**
+     * Fonction retourne le nom de l'employé
+     * @returns Le nom de l'employé si non défini retourne l'adresse courriel sinon Anonyme
+     */
     public getEmployeeName(): string {
-        return this.#user?.displayName || this.#user?.email || "Unknown";
+        return this.#user?.displayName || this.#user?.email || "Anonyme";
     }
 
     private onEvent(): void {
@@ -61,9 +64,9 @@ class APIManager extends Logger {
         return this.#userRole >= 4;
     }
 
-    public getErrorMessageFromCode(code): string {
+    public getErrorMessageFromCode(error): string {
         let errorMessage: string;
-        switch (code) {
+        switch (error) {
             case "auth/invalid-email":
                 errorMessage = errors.invalidLogin;
                 break;
@@ -73,11 +76,14 @@ class APIManager extends Logger {
             case "auth/wrong-password":
                 errorMessage = errors.invalidLogin;
                 break;
+            case "permission-denied":
+                errorMessage = errors.permissionDenied;
+                break;
             default:
                 errorMessage = errors.defaultMessage;
                 break;
         }
-        this.error(`Erreur: ${errorMessage}`);
+        this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${error.message}`);
         return errorMessage;
     }
 
@@ -85,7 +91,7 @@ class APIManager extends Logger {
         await API.awaitLogin;
         let errorMessage: string | null = null;
         let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         });
 
         if (userCredentials !== null && userCredentials) {
@@ -105,17 +111,18 @@ class APIManager extends Logger {
     public async sendResetPassword(email: string): Promise<string | null> {
         let errorMessage: string | null = null;
         await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         });
 
         return errorMessage;
     }
 
+
     public async logout(): Promise<string | null> {
         this.log('Logging out...');
         let errorMessage: string | null = null;
         await FirebaseAuth.signOut(this.#auth).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         });
 
         this.onEvent();
@@ -125,7 +132,7 @@ class APIManager extends Logger {
     private async verifyEmailAddress(user: FirebaseAuth.User): Promise<string | null> {
         let errorMessage: string | null = null;
         await FirebaseAuth.sendEmailVerification(user).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         });
         return errorMessage;
     }
@@ -156,7 +163,7 @@ class APIManager extends Logger {
 
             await FirebaseAuth.setPersistence(this.#auth, FirebaseAuth.browserSessionPersistence).catch((error) => {
                 // Handle Errors here.
-                const errorCode = error.code;
+                const errorCode = error;
                 const errorMessage = error.message;
 
                 this.error(`Error code: ${errorCode} - ${errorMessage}`);
@@ -196,14 +203,14 @@ class APIManager extends Logger {
     /**
      * Valide le code de réinitialisation de mot de passe
      * @param actionCode Le code de réinitialisation de mot de passe
-     * @returns Soi le courriel ou rien
+     * @returns Soit le courriel ou rien
      */
     public async verifyResetPassword(actionCode: string): Promise<string> {
         let accountEmail: string = "None";
         await verifyPasswordResetCode(this.#auth, actionCode).then((email) => {
             accountEmail = email;
         }).catch((error) => {
-            this.getErrorMessageFromCode(error.code);
+            this.getErrorMessageFromCode(error);
         })
         return accountEmail;
     }
@@ -212,13 +219,13 @@ class APIManager extends Logger {
      * Valide le code de réinitialisation de mot de passe et applique le nouveau mot de passe
      * @param actionCode Le code de réinitialisation de mot de passe
      * @param newPassword Le nouveau mot de passe
-     * @returns True si la réinitialisation a réussie, False si elle n'a pas réussie
+     * @returns null si la réinitialisation a réussie, et le message d'erreur si elle n'a pas réussie
      */
     public async applyResetPassword(actionCode: string, newPassword: string): Promise<string | null> {
         let errorMessage: string | null = null;
         await confirmPasswordReset(this.#auth, actionCode, newPassword).then(() => {
         }).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         })
         return errorMessage;
     }
@@ -233,14 +240,14 @@ class APIManager extends Logger {
                 const credential = FirebaseAuth.EmailAuthProvider.credential(email, oldPassword);
 
                 let isOk = await FirebaseAuth.updatePassword(user, newPassword).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error.code);
+                    errorMessage = this.getErrorMessageFromCode(error);
                 });
 
                 console.log('change password', isOk);
 
                 // Prompt the user to re-provide their sign-in credentials
                 let reAuth = await FirebaseAuth.reauthenticateWithCredential(user, credential).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error.code);
+                    errorMessage = this.getErrorMessageFromCode(error);
                 });
                 console.log('reauth', reAuth);
             }
@@ -252,11 +259,11 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         let createdUser = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, password)
             .catch((error: FirebaseAuth.AuthError) => {
-                errorMessage = this.getErrorMessageFromCode(error.code);
+                errorMessage = this.getErrorMessageFromCode(error);
             });
         if (this.#auth.currentUser && createdUser) {
             await setDoc(doc(this.#db, `employees`, createdUser.user.uid), {...employee}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error.code);
+                errorMessage = this.getErrorMessageFromCode(error);
                 if (this.#auth.currentUser) {
                     FirebaseAuth.deleteUser(this.#auth.currentUser)
                 }
@@ -265,33 +272,36 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async createDepartment(name: string): Promise<string | null> {
+    public async createDepartment(name: string, director: string): Promise<string | null> {
         let errorMessage: string | null = null;
         let queryDepartment = query(collection(this.#db, `departments`),
             where("name", "==", name));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         })
 
-        let alreadyCreated = true;
         if (snaps && snaps.docs.length > 0) {
-            alreadyCreated = false;
+            errorMessage = errors.departmentAlreadyExists;
         }
-        if (alreadyCreated) {
-            await addDoc(collection(this.#db, `departments`), {name: name}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error.code);
+        if (!errorMessage) {
+            await addDoc(collection(this.#db, `departments`), {name: name, director: director}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
             })
         }
         return errorMessage;
     }
 
-    public async getEmployeesByDepartment(department: string): Promise<Employee[] | string> {
+    public async getEmployees(department?: string): Promise<Employee[] | string> {
         let errorMessage: string | null = null;
         let employees: Employee[] = []
-        let queryDepartment = query(collection(this.#db, `employees`),
-            where("department", "==", department));
+        let queryDepartment = query(collection(this.#db, `employees`));
+        if(department) {
+            queryDepartment = query(collection(this.#db, `employees`),
+                where("department", "==", department));
+        }
+
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
@@ -316,11 +326,11 @@ class APIManager extends Logger {
         let departments: Department[] = []
         let queryDepartment = query(collection(this.#db, `departments`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
-                departments.push(new Department({name: doc.data().name}))
+                departments.push(new Department({name: doc.data().name, director: doc.data().director}))
             })
         }
         return errorMessage ?? departments;
@@ -331,7 +341,7 @@ class APIManager extends Logger {
         let roles: string[] = []
         let queryDepartment = query(collection(this.#db, `roles`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
@@ -344,7 +354,7 @@ class APIManager extends Logger {
     public async getCurrentEmployeeRole(uid: string): Promise<number> {
         let employeeRole: number = 0;
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
-            this.getErrorMessageFromCode(error.code);
+            this.getErrorMessageFromCode(error);
         })
         if (employee && employee) {
             let employeeData = employee.data();
@@ -363,7 +373,7 @@ class APIManager extends Logger {
         let jobTitles: string[] = []
         let queryDepartment = query(collection(this.#db, `jobTitles`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            errorMessage = this.getErrorMessageFromCode(error);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
@@ -372,6 +382,7 @@ class APIManager extends Logger {
         }
         return errorMessage ?? jobTitles;
     }
+
 }
 
 export const API = new APIManager;
