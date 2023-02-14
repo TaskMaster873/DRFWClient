@@ -103,8 +103,8 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
         });
         console.log(this.state)
         if (errorType === FormErrorType.NO_ERROR) {
-            let error = await API.createDepartment(this.state.name, this.state.director);
-            if (!error) {
+            let errorMessage = await API.createDepartment(this.state.name, this.state.director);
+            if (!errorMessage) {
                 NotificationManager.success(successes.successGenericMessage, successes.departmentCreated);
             } else {
                 NotificationManager.error(errorMessage, errors.errorGenericMessage);
