@@ -391,7 +391,7 @@ class APIManager extends Logger {
         let shifts: Shift[] = [];
         if(this.isAuthenticated){
             return new Promise(async (resolve) => {
-                let queryShifts = query(collection(this.#db, `shifts`), where("employeeId", "==", "123" /*this.#user?.uid*/));
+                let queryShifts = query(collection(this.#db, `shifts`), where("employeeId", "==", this.#user?.uid));
                 let snaps = await getDocs(queryShifts).catch((e) => {
                     console.log("error");
                     this.error(e);
