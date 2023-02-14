@@ -5,6 +5,7 @@ import {ComponentEmployeScheduleView} from "../components/ComponentEmployeSchedu
 import {Employee, EmployeeList} from "../types/Employee";
 import {Shift} from "../types/Shift";
 import {API} from "../api/APIManager";
+import { ComponentLoading } from "../components/ComponentLoading";
 /**
  * Page qui affiche l'horaire des employés
  */
@@ -13,12 +14,13 @@ export class Schedule extends React.Component {
         list: [],
   }
 
-  public async componentDidMount() {
+  public async componentWillMount () {
     let shifts = await API.getScheduleForOneEmployee();
-    console.log(shifts);
-    this.setState({list: shifts})
+    console.log("ok",shifts);
+    this.setState({list: shifts});
     document.title = "Horaire - TaskMaster";
   }
+
 
     /***
      *
@@ -27,14 +29,33 @@ export class Schedule extends React.Component {
      */
     public render(): JSX.Element {
         let listData: Shift[] = this.state.list;
-        if(true) {
+        let length = listData.length;
+        console.log(length);
+        switch(length){
+            case 0:
+              //Chargement pendant que verifyActionCode valide avec le serveur que le code est bon.
+              return (
+                 <ComponentLoading />
+                );
+            default :
+                console.log("je retourne quelque chose", length);
+                console.log(listData);
+                return (<ComponentEmployeScheduleView listOfShifts={...listData}/>);
+              //Le actionCode est invalide
+        }
+        /*if(listData.length > 0) {
             return (<ComponentEmployeScheduleView listOfShifts={...listData}/>);
-        } else {
+        } else if(false) {
             return (<Container className="mt-5 mb-5">
 
             <ComponentSchedule {...listData} />
         </Container>);
-        }
+
+        }else {
+            return (
+            <p>Vous n'avez aucun horaire</p>
+            );
+        }*/
        
     }
 }

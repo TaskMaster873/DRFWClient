@@ -30,6 +30,22 @@ export class ComponentEmployeScheduleView extends React.Component<Props> {
         return this.datePickerRef.current.control;
     }
 
+   componentDidMount(): void {
+        let listOfEvent: ShiftForCalendar[] = [];
+        for (let index = 0; index < this.props.listOfShifts.length; index++) { // foreach met des erreurs
+            listOfEvent.push({ 
+                start: this.props.listOfShifts[index].start,
+                end: this.props.listOfShifts[index].end,
+            });
+            
+        }
+        this.calendar.update({events: listOfEvent });
+        this.datePicker.update({ events: listOfEvent,  });
+
+        console.log("listemount:",listOfEvent);
+    }
+
+
     componentDidUpdate(): void {
         let listOfEvent: ShiftForCalendar[] = [];
         for (let index = 0; index < this.props.listOfShifts.length; index++) { // foreach met des erreurs
