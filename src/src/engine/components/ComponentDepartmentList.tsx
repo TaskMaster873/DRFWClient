@@ -45,7 +45,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentList> {
                         {department.director ?? "-"}
                     </td>
                     <td key={"numberEmployees " + index}>
-                        {department.director ?? "-"}
+                        {department.director ?? ""}
                     </td>
                 </tr>))}
                 </tbody>

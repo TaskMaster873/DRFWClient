@@ -7,6 +7,7 @@ import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
 import {NotificationManager} from 'react-notifications';
 import {AddDepartmentProps} from "../types/Department";
+import { Employee } from "../types/Employee";
 
 /**
  *
@@ -31,6 +32,15 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+    }
+
+    componentDidUpdate(prevProps: AddDepartmentProps) {
+        if (prevProps.employees !== this.props.employees && this.props.employees.length > 0) {
+            let firstEmployee: Employee = this.props.employees[0];
+            this.setState({
+                director: `${firstEmployee.firstName} ${firstEmployee.lastName}`
+            });
+        }
     }
 
     public render(): JSX.Element {
@@ -91,6 +101,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
             validated: true,
             error: errorType,
         });
+        console.log(this.state)
         if (errorType === FormErrorType.NO_ERROR) {
             let error = await API.createDepartment(this.state.name, this.state.director);
             if (!error) {
