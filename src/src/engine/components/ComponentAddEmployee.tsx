@@ -220,9 +220,9 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                 role: this.state.role
             }));
             if (!error) {
-                NotificationManager.success(successes.success, successes.employeeCreated);
+                NotificationManager.success(successes.successGenericMessage, successes.employeeCreated);
             } else {
-                NotificationManager.error(error, errors.error);
+                NotificationManager.error(error, errors.errorGenericMessage);
             }
         }
     }

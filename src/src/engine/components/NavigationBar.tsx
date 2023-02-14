@@ -95,9 +95,9 @@ export class NavigationBar extends React.Component {
     private async logOut() : Promise<void> {
         let error = await API.logout();
         if (!error) {
-            NotificationManager.success(successes.success, successes.logout);
+            NotificationManager.success(successes.successGenericMessage, successes.logout);
         } else {
-            NotificationManager.error(error, errors.error);
+            NotificationManager.error(error, errors.errorLogout);
         }
     }
 }

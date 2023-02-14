@@ -4,7 +4,8 @@ export enum FormErrorType {
 }
 
 export const errors = {
-    error: "Erreur",
+    errorForm: "Il y a une erreur",
+    errorLogout: "Erreur de déconnexion",
     requiredFirstName: "Le prénom est requis",
     requiredName: "Le nom est requis",
     requiredPassword: "Le mot de passe est requis",
@@ -18,11 +19,12 @@ export const errors = {
     invalidLogin: "Le numéro d'employé ou le mot de passe spécifié est invalide",
     departmentAlreadyExists: "Le département existe déjà",
     messageScheduleUnavailable: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
-    serverError: "Une erreur s'est produite, veuillez réessayer plus tard"
+    serverError: "Une erreur s'est produite, veuillez réessayer plus tard",
+    errorGenericMessage: "Erreur ",
 }
 
 export const successes = {
-    success: "Succès !",
+    successGenericMessage: "Succès",
     emailSent: "Un courriel a bien été envoyé !",
     employeeCreated: "Un nouvel employé a été ajouté avec succès !",
     departmentCreated: "Un nouveau département a été ajouté avec succès !",

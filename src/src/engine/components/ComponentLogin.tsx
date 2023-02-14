@@ -149,14 +149,14 @@ export class ComponentLogin extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let error = await API.loginWithPassword(this.state.emailLogin, this.state.passwordLogin);
+            let errorMessage = await API.loginWithPassword(this.state.emailLogin, this.state.passwordLogin);
 
-            if (!error) {
+            if (!errorMessage) {
                 this.state.isLoggedIn = true;
                 this.forceUpdate();
-                NotificationManager.success(successes.login, successes.success);
+                NotificationManager.success(successes.login, successes.successGenericMessage);
             } else {
-                NotificationManager.error(error, errors.error);
+                NotificationManager.error(errorMessage, errors.errorGenericMessage);
             }
         }
     }
