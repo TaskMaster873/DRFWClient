@@ -8,6 +8,7 @@ import {LinkContainer} from "react-router-bootstrap";
 export class ComponentDepartmentList extends React.Component<DepartmentList> {
     public state = {
         employees: [],
+        employeeNbDepartments: []
     }
     constructor(props: DepartmentList) {
         super(props);
@@ -15,7 +16,8 @@ export class ComponentDepartmentList extends React.Component<DepartmentList> {
 
     public async componentDidMount() {
         let employees = await API.getEmployees();
-        this.setState({employees: employees})
+        let employeeNb = await API.getEmployeeNbDepartments();
+        this.setState({employees: employees, employeeNbDepartments: employeeNb})
         document.title = "Liste des départements - TaskMaster";
     }
 
@@ -28,6 +30,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentList> {
                     <th key={"no"}>#</th>
                     <th key={"name"}>Nom</th>
                     <th key={"director"}>Directeur(s)/Gérant(s)</th>
+                    <th key={"employeeNb"}>Nombre d'employés</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -44,8 +47,8 @@ export class ComponentDepartmentList extends React.Component<DepartmentList> {
                     <td key={"director " + index}>
                         {department.director ?? "-"}
                     </td>
-                    <td key={"numberEmployees " + index}>
-                        {department.director ?? ""}
+                    <td key={"employeeNb " + index}>
+                        {this.state.employeeNbDepartments[index]}
                     </td>
                 </tr>))}
                 </tbody>

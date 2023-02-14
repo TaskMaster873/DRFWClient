@@ -11,6 +11,7 @@ import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} fr
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {errors} from "../messages/APIMessages";
+import {forEach} from "react-bootstrap/ElementChildren";
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
@@ -334,6 +335,28 @@ class APIManager extends Logger {
             })
         }
         return errorMessage ?? departments;
+    }
+
+    public async getEmployeeNbDepartments(): Promise<number[] | string> {
+        let errorMessage: string | null = null;
+        let employeeNb: number[] = []
+        let departments = await this.getDepartments();
+        if(typeof(departments) !== "string") {
+            for (const department of departments) {
+                let queryEmployees = query(collection(this.#db, `employees`),
+                    where("department", "==", department.name) );
+                let snaps = await getDocs(queryEmployees).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+                })
+                if (snaps) {
+                    employeeNb.push(snaps.docs.length);
+                }
+            }
+        } else {
+            errorMessage = departments;
+        }
+
+        return errorMessage ?? employeeNb;
     }
 
     public async getRoles(): Promise<string[] | string> {
