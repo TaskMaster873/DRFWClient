@@ -9,6 +9,7 @@ import {NotificationManager} from 'react-notifications';
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
 import {API} from "../api/APIManager";
+import {errors, successes} from "../messages/FormMessages";
 
 /**
  * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
@@ -92,11 +93,11 @@ export class NavigationBar extends React.Component {
      * Je ne sais pas si il faudrait le garder
      */
     private async logOut() : Promise<void> {
-        let success = await API.logout();
-        if (success) {
-            NotificationManager.success('Déconnection réussi', 'Vous êtes maitenant déconnecté.');
+        let error = await API.logout();
+        if (!error) {
+            NotificationManager.success(successes.successGenericMessage, successes.logout);
         } else {
-            NotificationManager.error('Erreur lors de la déconnection', 'Veuillez réessayer plus tard.');
+            NotificationManager.error(error, errors.errorLogout);
         }
     }
 }

@@ -9,8 +9,8 @@ import {addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, ge
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
-import {Errors} from "./errors/Errors";
 import {Department} from "../types/Department";
+import {errors} from "../messages/APIMessages";
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
@@ -61,81 +61,80 @@ class APIManager extends Logger {
         return this.#userRole >= 4;
     }
 
-    public async loginWithPassword(email: string, password: string): Promise<FirebaseAuth.UserCredential | null> {
+    public getErrorMessageFromCode(code): string {
+        let errorMessage: string;
+        switch (code) {
+            case "auth/invalid-email":
+                errorMessage = errors.invalidLogin;
+                break;
+            case "auth/user-not-found":
+                errorMessage = errors.invalidLogin;
+                break;
+            case "auth/wrong-password":
+                errorMessage = errors.invalidLogin;
+                break;
+            default:
+                errorMessage = errors.defaultMessage;
+                break;
+        }
+        this.error(`Erreur: ${errorMessage}`);
+        return errorMessage;
+    }
+
+    public async loginWithPassword(email: string, password: string): Promise<string | null> {
         await API.awaitLogin;
-
-        if (FirebaseAuth !== null && FirebaseAuth) {
-            return new Promise(async (resolve, reject) => {
-                let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((e) => {
-                    this.error(`Error while logging in: ${e}`);
-                });
-
-                if (userCredentials !== null && userCredentials) {
-                    console.log('credentials', userCredentials);
-
-                    if (userCredentials.user !== null && userCredentials.user) {
-                        this.#user = userCredentials.user;
-                    }
-
-                    this.isAuthenticated = true;
-                    resolve(userCredentials);
-                } else {
-                    reject(Errors.USER_NOT_FOUND);
-                }
-
-                this.onEvent();
-            });
-        } else {
-            return null;
-        }
-    }
-
-    public async sendResetPassword(email: string): Promise<boolean> {
-        let sentWithoutErrors = true;
-        await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch((e) => {
-            this.error(e);
-
-            sentWithoutErrors = false;
+        let errorMessage: string | null = null;
+        let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         });
 
-        return sentWithoutErrors;
-    }
+        if (userCredentials !== null && userCredentials) {
+            console.log('credentials', userCredentials);
 
-    public async logout(): Promise<boolean> {
-        if (this.isAuthenticated) {
-            this.log('Logging out...');
+            if (userCredentials.user !== null && userCredentials.user) {
+                this.#user = userCredentials.user;
+            }
 
-            let exitWithoutErrors = true;
-            await FirebaseAuth.signOut(this.#auth).catch((e) => {
-                this.error(e);
-
-                exitWithoutErrors = false;
-            });
-
-            if (exitWithoutErrors) this.onEvent();
-
-            return exitWithoutErrors;
-        } else {
-            return false;
+            this.isAuthenticated = true;
         }
+
+        this.onEvent();
+        return errorMessage;
     }
 
-    private async verifyEmailAddress(user: FirebaseAuth.User): Promise<boolean> {
-        let sentWithoutErrors = true;
-        await FirebaseAuth.sendEmailVerification(user).catch((e) => {
-            this.error(e);
-
-            sentWithoutErrors = false;
+    public async sendResetPassword(email: string): Promise<string | null> {
+        let errorMessage: string | null = null;
+        await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         });
 
-        return sentWithoutErrors;
+        return errorMessage;
+    }
+
+    public async logout(): Promise<string | null> {
+        this.log('Logging out...');
+        let errorMessage: string | null = null;
+        await FirebaseAuth.signOut(this.#auth).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
+        });
+
+        this.onEvent();
+        return errorMessage;
+    }
+
+    private async verifyEmailAddress(user: FirebaseAuth.User): Promise<string | null> {
+        let errorMessage: string | null = null;
+        await FirebaseAuth.sendEmailVerification(user).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
+        });
+        return errorMessage;
     }
 
     private async listenEvents(): Promise<void> {
         let resolved = false;
 
         this.awaitLogin = new Promise(async (resolve) => {
-            FirebaseAuth.onAuthStateChanged(this.#auth, async (user) => {
+            FirebaseAuth.onAuthStateChanged(this.#auth, async (user: FirebaseAuth.User | null) => {
                 this.log('Auth state changed!');
 
                 if (user === null || !user) {
@@ -200,15 +199,13 @@ class APIManager extends Logger {
      * @returns Soi le courriel ou rien
      */
     public async verifyResetPassword(actionCode: string): Promise<string> {
-        return new Promise(async (resolve) => {
-            let accountEmail: string = "None";
-            await verifyPasswordResetCode(this.#auth, actionCode).then((email) => {
-                accountEmail = email;
-            }).catch((error) => {
-                this.error(error)
-            })
-            resolve(accountEmail);
+        let accountEmail: string = "None";
+        await verifyPasswordResetCode(this.#auth, actionCode).then((email) => {
+            accountEmail = email;
+        }).catch((error) => {
+            this.getErrorMessageFromCode(error.code);
         })
+        return accountEmail;
     }
 
     /**
@@ -217,100 +214,87 @@ class APIManager extends Logger {
      * @param newPassword Le nouveau mot de passe
      * @returns True si la réinitialisation a réussie, False si elle n'a pas réussie
      */
-    public async applyResetPassword(actionCode: string, newPassword: string): Promise<boolean> {
-        return new Promise(async (resolve) => {
-            let resetSuccess: boolean = false;
-            await confirmPasswordReset(this.#auth, actionCode, newPassword).then(() => {
-                resetSuccess = true;
-            }).catch((error) => {
-                this.error(error)
-            })
-            resolve(resetSuccess);
+    public async applyResetPassword(actionCode: string, newPassword: string): Promise<string | null> {
+        let errorMessage: string | null = null;
+        await confirmPasswordReset(this.#auth, actionCode, newPassword).then(() => {
+        }).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
+        return errorMessage;
     }
 
-    public async changePassword(oldPassword: string, newPassword: string): Promise<void> {
-        return new Promise(async (resolve, reject) => {
-            const user = this.#auth.currentUser;
-            if (user !== null && user) {
-                if (this.elementExist(user.email)) {
-                    let email = user.email || '';
+    public async changePassword(oldPassword: string, newPassword: string): Promise<string | null> {
+        let errorMessage: string | null = null;
+        const user = this.#auth.currentUser;
+        if (user !== null && user) {
+            if (this.elementExist(user.email)) {
+                let email = user.email || '';
 
-                    const credential = FirebaseAuth.EmailAuthProvider.credential(email, oldPassword);
+                const credential = FirebaseAuth.EmailAuthProvider.credential(email, oldPassword);
 
-                    let isOk = await FirebaseAuth.updatePassword(user, newPassword).catch((e) => {
-                        this.error(e);
-                        reject(e);
-                    });
+                let isOk = await FirebaseAuth.updatePassword(user, newPassword).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error.code);
+                });
 
-                    console.log('change password', isOk);
+                console.log('change password', isOk);
 
-                    // Prompt the user to re-provide their sign-in credentials
-                    let reAuth = await FirebaseAuth.reauthenticateWithCredential(user, credential).catch((e) => {
-                        this.error(e);
-                        reject(e);
-                    });
-
-                    console.log('reauth', reAuth);
-                } else {
-                    reject(Errors.EMAIL_NOT_FOUND);
-                }
-            } else {
-
+                // Prompt the user to re-provide their sign-in credentials
+                let reAuth = await FirebaseAuth.reauthenticateWithCredential(user, credential).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error.code);
+                });
+                console.log('reauth', reAuth);
             }
-
-
-        });
+        }
+        return errorMessage;
     }
 
-    public async createEmployee(password: string, employee: EmployeeCreateDTO): Promise<boolean> {
-        let createdUser: FirebaseAuth.UserCredential | boolean = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, password).catch((e: FirebaseAuth.AuthError) => {
-            this.error(e);
-            return false;
-        });
-        if (this.#auth.currentUser && typeof (createdUser) !== "boolean") {
-            await setDoc(doc(this.#db, `employees`, createdUser.user.uid), {...employee}).catch((e) => {
-                this.error(e);
+    public async createEmployee(password: string, employee: EmployeeCreateDTO): Promise<string | null> {
+        let errorMessage: string | null = null;
+        let createdUser = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, password)
+            .catch((error: FirebaseAuth.AuthError) => {
+                errorMessage = this.getErrorMessageFromCode(error.code);
+            });
+        if (this.#auth.currentUser && createdUser) {
+            await setDoc(doc(this.#db, `employees`, createdUser.user.uid), {...employee}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error.code);
                 if (this.#auth.currentUser) {
                     FirebaseAuth.deleteUser(this.#auth.currentUser)
                 }
-                return false;
             })
-            return true;
         }
-        return false;
+        return errorMessage;
     }
 
-    public async createDepartment(name: string): Promise<boolean> {
-        return new Promise(async (resolve) => {
-            let created = true;
-            let queryDepartment = query(collection(this.#db, `departments`), 
-                where("name", "==", name));
-            let snaps = await getDocs(queryDepartment).catch((e) => {
-                this.error(e);
+    public async createDepartment(name: string): Promise<string | null> {
+        let errorMessage: string | null = null;
+        let queryDepartment = query(collection(this.#db, `departments`),
+            where("name", "==", name));
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
+        })
+
+        let alreadyCreated = true;
+        if (snaps && snaps.docs.length > 0) {
+            alreadyCreated = false;
+        }
+        if (alreadyCreated) {
+            await addDoc(collection(this.#db, `departments`), {name: name}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error.code);
             })
-            if (snaps && snaps.docs.length > 0) {
-                created = false;
-            }
-            if (created) {
-                await addDoc(collection(this.#db, `departments`), {name: name}).catch((e) => {
-                    this.error(e);
-                    created = false;
-                })
-            }
-            resolve(created);
-        });
+        }
+        return errorMessage;
     }
 
-    public async getEmployeesByDepartment(department: string): Promise<Employee[]> {
+    public async getEmployeesByDepartment(department: string): Promise<Employee[] | string> {
+        let errorMessage: string | null = null;
         let employees: Employee[] = []
-        let queryDepartment = query(collection(this.#db, `employees`), 
+        let queryDepartment = query(collection(this.#db, `employees`),
             where("department", "==", department));
-        let snaps = await getDocs(queryDepartment).catch((e) => {
-            this.error(e);
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
         if (snaps) {
-            snaps.docs.forEach((doc : QueryDocumentSnapshot) => {
+            snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 let data = doc.data();
                 employees.push(new Employee({
                     firstName: data.firstName,
@@ -324,47 +308,49 @@ class APIManager extends Logger {
                 }))
             })
         }
-        return employees;
+        return errorMessage ?? employees;
     }
 
-    public async getDepartments(): Promise<Department[]> {
+    public async getDepartments(): Promise<Department[] | string> {
+        let errorMessage: string | null = null;
         let departments: Department[] = []
         let queryDepartment = query(collection(this.#db, `departments`));
-        let snaps = await getDocs(queryDepartment).catch((e) => {
-            this.error(e);
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 departments.push(new Department({name: doc.data().name}))
             })
         }
-        return departments;
+        return errorMessage ?? departments;
     }
 
-    public async getRoles(): Promise<string[]> {
+    public async getRoles(): Promise<string[] | string> {
+        let errorMessage: string | null = null;
         let roles: string[] = []
         let queryDepartment = query(collection(this.#db, `roles`));
-        let snaps = await getDocs(queryDepartment).catch((e) => {
-            this.error(e);
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 roles.push(doc.data().name)
             })
         }
-        return roles;
+        return errorMessage ?? roles;
     }
 
     public async getCurrentEmployeeRole(uid: string): Promise<number> {
         let employeeRole: number = 0;
-        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((e) => {
-            this.error(e);
+        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
+            this.getErrorMessageFromCode(error.code);
         })
         if (employee && employee) {
             let employeeData = employee.data();
             if (employeeData) {
                 employeeRole = employeeData.role;
-                if(!employeeData.role) {
+                if (!employeeData.role) {
                     return 0;
                 }
             }
@@ -372,18 +358,19 @@ class APIManager extends Logger {
         return employeeRole;
     }
 
-    public async getJobTitles(): Promise<string[]> {
+    public async getJobTitles(): Promise<string[] | string> {
+        let errorMessage: string | null = null;
         let jobTitles: string[] = []
         let queryDepartment = query(collection(this.#db, `jobTitles`));
-        let snaps = await getDocs(queryDepartment).catch((e) => {
-            this.error(e);
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 jobTitles.push(doc.data().name)
             })
         }
-        return jobTitles;
+        return errorMessage ?? jobTitles;
     }
 }
 

@@ -28,7 +28,10 @@ export function ResetPassword() {
   }, []);
 
   const verifyActionCode = async () => {
-    setEmail(await API.verifyResetPassword(actionCode));
+    let email = await API.verifyResetPassword(actionCode);
+    if(email) {
+      setEmail(email);
+    }
   };
 
   switch(email){

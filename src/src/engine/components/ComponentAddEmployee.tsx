@@ -209,7 +209,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
             validated: true, error: errorType,
         });
         if (errorType === FormErrorType.NO_ERROR) {
-            let created = await API.createEmployee(this.state.password, new Employee({
+            let error = await API.createEmployee(this.state.password, new Employee({
                 firstName: this.state.firstName,
                 lastName: this.state.lastName,
                 email: this.state.email,
@@ -219,10 +219,10 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                 skills: this.state.skills,
                 role: this.state.role
             }));
-            if (created) {
-                NotificationManager.success(successes.success, successes.employeeCreated);
+            if (!error) {
+                NotificationManager.success(successes.successGenericMessage, successes.employeeCreated);
             } else {
-                NotificationManager.error(errors.error, errors.serverError);
+                NotificationManager.error(error, errors.errorGenericMessage);
             }
         }
     }
