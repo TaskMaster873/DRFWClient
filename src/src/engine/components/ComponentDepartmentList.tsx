@@ -1,7 +1,7 @@
 import React from "react";
 import {Nav, Table} from "react-bootstrap";
 import {DepartmentList} from "../types/Department";
-import {ComponentAddDepartement} from "./ComponentAddDepartement";
+import {ComponentAddDepartment} from "./ComponentAddDepartment";
 import {API} from "../api/APIManager";
 import {LinkContainer} from "react-router-bootstrap";
 
@@ -44,7 +44,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentList> {
 
     private renderAddDepartmentComponent(): JSX.Element | undefined {
         if (API.isAuth() && API.isAdmin) {
-            return (<ComponentAddDepartement/>);
+            return (<ComponentAddDepartment/>);
         }
     }
 }

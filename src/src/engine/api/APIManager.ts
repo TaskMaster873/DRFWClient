@@ -204,15 +204,14 @@ class APIManager extends Logger {
      * @param actionCode Le code de réinitialisation de mot de passe
      * @returns Soi le courriel ou rien
      */
-    public async verifyResetPassword(actionCode: string): Promise<string | null> {
-        let errorMessage: string | null = null;
+    public async verifyResetPassword(actionCode: string): Promise<string> {
         let accountEmail: string = "None";
         await verifyPasswordResetCode(this.#auth, actionCode).then((email) => {
             accountEmail = email;
         }).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error.code);
+            this.getErrorMessageFromCode(error.code);
         })
-        return errorMessage ?? accountEmail;
+        return accountEmail;
     }
 
     /**
@@ -274,30 +273,31 @@ class APIManager extends Logger {
 
     public async createDepartment(name: string): Promise<string | null> {
         let errorMessage: string | null = null;
-            let queryDepartment = query(collection(this.#db, `departments`),
-                where("name", "==", name));
-            let snaps = await getDocs(queryDepartment).catch((error) => {
+        let queryDepartment = query(collection(this.#db, `departments`),
+            where("name", "==", name));
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
+        })
+
+        let alreadyCreated = true;
+        if (snaps && snaps.docs.length > 0) {
+            alreadyCreated = false;
+        }
+        if (alreadyCreated) {
+            await addDoc(collection(this.#db, `departments`), {name: name}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error.code);
             })
-
-            let alreadyCreated = true;
-            if (snaps && snaps.docs.length > 0) {
-                alreadyCreated = false;
-            }
-            if (alreadyCreated) {
-                await addDoc(collection(this.#db, `departments`), {name: name}).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error.code);
-                })
-            }
-            return errorMessage;
+        }
+        return errorMessage;
     }
 
-    public async getEmployeesByDepartment(department: string): Promise<Employee[]> {
+    public async getEmployeesByDepartment(department: string): Promise<Employee[] | string> {
+        let errorMessage: string | null = null;
         let employees: Employee[] = []
         let queryDepartment = query(collection(this.#db, `employees`),
             where("department", "==", department));
-        let snaps = await getDocs(queryDepartment).catch((e) => {
-            this.error(e);
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
@@ -314,41 +314,43 @@ class APIManager extends Logger {
                 }))
             })
         }
-        return employees;
+        return errorMessage ?? employees;
     }
 
-    public async getDepartments(): Promise<Department[]> {
+    public async getDepartments(): Promise<Department[] | string> {
+        let errorMessage: string | null = null;
         let departments: Department[] = []
         let queryDepartment = query(collection(this.#db, `departments`));
-        let snaps = await getDocs(queryDepartment).catch((e) => {
-            this.error(e);
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 departments.push(new Department({name: doc.data().name}))
             })
         }
-        return departments;
+        return errorMessage ?? departments;
     }
 
-    public async getRoles(): Promise<string[]> {
+    public async getRoles(): Promise<string[] | string> {
+        let errorMessage: string | null = null;
         let roles: string[] = []
         let queryDepartment = query(collection(this.#db, `roles`));
-        let snaps = await getDocs(queryDepartment).catch((e) => {
-            this.error(e);
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 roles.push(doc.data().name)
             })
         }
-        return roles;
+        return errorMessage ?? roles;
     }
 
     public async getCurrentEmployeeRole(uid: string): Promise<number> {
         let employeeRole: number = 0;
-        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((e) => {
-            this.error(e);
+        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
+            this.getErrorMessageFromCode(error.code);
         })
         if (employee && employee) {
             let employeeData = employee.data();
@@ -362,18 +364,19 @@ class APIManager extends Logger {
         return employeeRole;
     }
 
-    public async getJobTitles(): Promise<string[]> {
+    public async getJobTitles(): Promise<string[] | string> {
+        let errorMessage: string | null = null;
         let jobTitles: string[] = []
         let queryDepartment = query(collection(this.#db, `jobTitles`));
-        let snaps = await getDocs(queryDepartment).catch((e) => {
-            this.error(e);
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error.code);
         })
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 jobTitles.push(doc.data().name)
             })
         }
-        return jobTitles;
+        return errorMessage ?? jobTitles;
     }
 }
 

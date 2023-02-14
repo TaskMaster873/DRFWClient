@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { errors, FormErrorType } from "../messages/FormMessages";
+import {errors, FormErrorType, info, successes} from "../messages/FormMessages";
 import { API } from "../api/APIManager";
 import { NotificationManager } from "react-notifications";
 import { useNavigate } from "react-router-dom";
@@ -41,17 +41,14 @@ export function ComponentResetPassword(props: Props) {
     setError(errorType);
 
     if (errorType === FormErrorType.NO_ERROR) {
-      let success = await API.applyResetPassword(props.actionCode, newPassword);
+      let error = await API.applyResetPassword(props.actionCode, newPassword);
 
-      if (success) {
-        NotificationManager.info(
-          "Réinitialisation du mot de passe",
-          "Votre mot de passe a été mis à jour."
-        );
+      if (!error) {
+        NotificationManager.info(successes.resetPassword, successes.success);
       } else {
         NotificationManager.error(
-          "Erreur",
-          "Une erreur est survenue lors de la réinitialisation de votre mot de passe."
+          error,
+          errors.error
         );
       }
       navigate("/login")

@@ -4,7 +4,6 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType, successes} from "../messages/FormMessages";
-import {Logger} from "../Logger";
 import {API} from "../api/APIManager";
 import {NotificationManager} from 'react-notifications';
 
@@ -12,8 +11,7 @@ import {NotificationManager} from 'react-notifications';
  *
  * Ceci est le composant pour ajouter les employés
  */
-export class ComponentAddDepartement extends React.Component {
-
+export class ComponentAddDepartment extends React.Component {
     private errorMessage = "";
     public state: {
         name: string;
@@ -88,11 +86,11 @@ export class ComponentAddDepartement extends React.Component {
             error: errorType,
         });
         if (errorType === FormErrorType.NO_ERROR) {
-            let created = await API.createDepartment(this.state.name);
-            if (created) {
+            let error = await API.createDepartment(this.state.name);
+            if (!error) {
                 NotificationManager.success(successes.success, successes.departmentCreated);
             } else {
-                NotificationManager.error(errors.departmentAlreadyExists, errors.error);
+                NotificationManager.error(error, errors.error);
             }
         }
     }

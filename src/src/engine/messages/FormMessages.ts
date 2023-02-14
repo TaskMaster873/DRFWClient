@@ -23,7 +23,17 @@ export const errors = {
 
 export const successes = {
     success: "Succès !",
-    emailSent: "Un courriel a bien été envoyé",
+    emailSent: "Un courriel a bien été envoyé !",
     employeeCreated: "Un nouvel employé a été ajouté avec succès !",
-    departmentCreated: "Un nouveau département a été ajouté avec succès !"
+    departmentCreated: "Un nouveau département a été ajouté avec succès !",
+    login: "Vous êtes maintenant connecté !",
+    logout: "Vous êtes maintenant déconnecté !",
+    changedPassword: "Le changement de mot de passe a bien été effectué !",
+    resetPassword: "Le mot de passe a bien été mis à jour !"
+}
+
+export const info = {
+    passwordReset: "Réinitialisation du mot de passe",
+    emailSent: "Un courriel a été envoyé à votre adresse courriel.",
+
 }
