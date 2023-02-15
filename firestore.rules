@@ -3,58 +3,88 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
 
+      function hasMinPermission(id, permissionLevel) {
+      	let employeeRole = get(/databases/$(database)/documents/employees/$(id)).data.role;
+
+        return employeeRole >= permissionLevel
+      }
+
       match /employees/{employeeId} {
       	allow read;
+        allow write: if isValidEmployee(employeeId);
+        allow update:  if isValidEmployee(employeeId);
         allow create: if isValidEmployee(employeeId);
       }
-      
+
+      function employeeFieldTypes() {
+      	return request.resource.data.firstName is string &&
+        request.resource.data.lastName is string &&
+        request.resource.data.phoneNumber is string &&
+        request.resource.data.department is string &&
+        request.resource.data.jobTitles is map &&
+        request.resource.data.skills is map &&
+        request.resource.data.role is number
+      }
+
       function isValidEmployee(employeeId) {
         let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
-        
-        return createdValidEmployee && isUserAdmin(request.auth.uid);
+        let hasAllfields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email',
+        'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
+
+
+        return createdValidEmployee && hasAllfields
+        && hasMinPermission(request.auth.uid, 4) && employeeFieldTypes();
       }
-      
+
+      function departmentFieldTypes() {
+      	return request.resource.data.name is string &&
+        request.resource.data.director is string
+      }
+
       match /departments/{departmentId} {
       	allow read;
         allow create: if isValidDepartment(departmentId);
-        
+
       }
-      
+
       function isValidDepartment(departmentId) {
         let createdValidDepartment = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
-        
-        return createdValidDepartment && isUserAdmin(request.auth.uid);
+        let hasAllfields = request.resource.data.keys().hasOnly(['name', 'director']);
+
+        return createdValidDepartment && hasAllfields && request.auth != null
+        && hasMinPermission(request.auth.uid, 4) && departmentFieldTypes();
       }
-      
+
+      function nameFieldTypes() {
+      	return request.resource.data.name is string
+      }
+
       match /roles/{roleId} {
       	allow read;
         allow create: if isValidRole(roleId);
       }
-      
+
       function isValidRole(roleId) {
         let createdValidRole = existsAfter(/databases/$(database)/documents/roles/$(roleId));
-        
-        return createdValidRole;
+        let hasAllfields = request.resource.data.keys().hasOnly(['name']);
+
+        return createdValidRole && hasAllfields
+        && hasMinPermission(request.auth.uid, 5) && nameFieldTypes();
       }
-      
+
       match /jobTitles/{jobTitleId} {
       	allow read;
         allow create: if isValidJobTitle(jobTitleId);
       }
-      
+
       function isValidJobTitle(jobTitleId) {
-        let alreadyExists = exists(/databases/$(database)/documents/jobTitles/$(request.resource.data.name));
         let createdValidJobTitle = existsAfter(/databases/$(database)/documents/jobTitles/$(jobTitleId));
-        
-        return createdValidJobTitle && !alreadyExists;
+        let hasAllfields = request.resource.data.keys().hasOnly(['name']);
+
+        return createdValidJobTitle && hasAllfields
+        && hasMinPermission(request.auth.uid, 4) && nameFieldTypes();
       }
-      
-      function isUserAdmin(id) {
-      	let employeeRole = get(/databases/$(database)/documents/employees/$(id)).role;
-        
-        return employeeRole >= 4
-      }
-      
+
       match /shifts/{shiftId} {
     		allow read;
     	}

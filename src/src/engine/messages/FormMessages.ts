@@ -4,6 +4,7 @@ export enum FormErrorType {
 }
 
 export const errors = {
+    errorGenericMessage: "Erreur ",
     errorForm: "Il y a une erreur",
     errorLogout: "Erreur de déconnexion",
     requiredFirstName: "Le prénom est requis",
@@ -20,7 +21,7 @@ export const errors = {
     departmentAlreadyExists: "Le département existe déjà",
     messageScheduleUnavailable: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
     serverError: "Une erreur s'est produite, veuillez réessayer plus tard",
-    errorGenericMessage: "Erreur ",
+    requiredDepartmentDirector: "Le directeur de département est requis",
     invalidActionCode: "L'hyperlien de réinitialisation de mot de passe est invalide ou expiré. Essayez à nouveau."
 }
 

@@ -15,14 +15,32 @@ import {errors, successes} from "../messages/FormMessages";
  * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
  */
 export class NavigationBar extends React.Component {
+    private _isMountedAPI: boolean = false;
+
     constructor(props) {
         super(props);
 
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
+    public componentDidMount() {
+        this._isMountedAPI = true;
+    }
+
+    public componentWillUnmount() {
+        this._isMountedAPI = false;
+    }
+
     private async onEvent(): Promise<void> {
-        this.forceUpdate();
+        return new Promise((resolve) => {
+            if(this._isMountedAPI) {
+                this.setState({}, () => {
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
+        });
     }
 
     public render(): JSX.Element {
