@@ -21,6 +21,7 @@ export const errors = {
     messageScheduleUnavailable: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
     serverError: "Une erreur s'est produite, veuillez réessayer plus tard",
     errorGenericMessage: "Erreur ",
+    invalidActionCode: "L'hyperlien de réinitialisation de mot de passe est invalide ou expiré. Essayez à nouveau."
 }
 
 export const successes = {
