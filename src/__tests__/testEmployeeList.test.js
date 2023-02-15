@@ -21,7 +21,19 @@ let employee = new Employee({
     skills: [],
     role: 1,
 })
+
+let employee2 = new Employee({
+    firstName: "Mathieu",
+    lastName: "Bédard",
+    email: "mathieubedard@gmail.com",
+    phoneNumber: "418-325-2222",
+    department: "Informatique",
+    jobTitles: [],
+    skills: [],
+    role: 2,
+})
 let filteredList = [employee]
+let filteredList2 = [employee, employee2]
 
 beforeEach(async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
@@ -29,6 +41,8 @@ beforeEach(async () => {
 });
 
 test("should render employee informations", async () => {
+    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
+                                                list={filteredList}/></MemoryRouter>);
     const {
         table,
         ths,
@@ -40,28 +54,104 @@ test("should render employee informations", async () => {
     expect(ths).not.toBeNull();
     expect(trs).not.toBeNull();
     expect(tds).not.toBeNull();
-    expect(ths.length).toBe(Object.keys(employee).length);
-    expect(trs.length).toBe(filteredList.length + 1);
-    expect(tds.length).toBe(Object.keys(employee).length * filteredList.length);
+    verifyTableLength(ths, trs, tds);
+});
+
+test("should have correct length based on employee list", async () => {
+    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList2}
+                                                list={filteredList2}/></MemoryRouter>);
+    const {
+        ths,
+        trs,
+        tds,
+    } = getFields();
+
+    verifyTableLength(ths, trs, tds);
 });
 
 test("Table heads should have proper values", async () => {
+    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
+                                                list={filteredList}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
 
-    for (let i = 0; i < ths.length; i++) {
-        expect(ths[i].innerHTML).toBe(employeeTableHeads[i]);
-    }
+    checkTableHeads(ths);
+});
+
+test("Table heads should have proper values 2", async () => {
+    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList2}
+                                                list={filteredList2}/></MemoryRouter>);
+    const {
+        ths,
+    } = getFields();
+
+    checkTableHeads(ths);
 });
 
 test("Employee number should be incremental", async () => {
+    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
+                                                list={filteredList}/></MemoryRouter>);
     const {
         trs,
         ths,
         tds,
     } = getFields();
 
+
+    verifyEmployeeNumber(trs, tds, ths);
+});
+
+test("Employee number should be incremental 2", async () => {
+    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList2}
+                                                list={filteredList2}/></MemoryRouter>);
+    const {
+        trs,
+        ths,
+        tds,
+    } = getFields();
+
+
+    verifyEmployeeNumber(trs, tds, ths);
+});
+
+test("Employee fields should match employee infos", async () => {
+    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
+                                                list={filteredList}/></MemoryRouter>);
+    const {
+        trs,
+        ths,
+        tds,
+    } = getFields();
+
+    checkFieldValues(trs, tds, ths);
+});
+
+test("Employee fields should match employee infos 2", async () => {
+    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList2}
+                                                list={filteredList2}/></MemoryRouter>);
+    const {
+        trs,
+        ths,
+        tds,
+    } = getFields();
+
+    checkFieldValues(trs, tds, ths);
+});
+
+function verifyTableLength(ths, trs, tds) {
+    expect(ths.length).toBe(Object.keys(employee).length);
+    expect(trs.length).toBe(filteredList.length + 1);
+    expect(tds.length).toBe(Object.keys(employee).length * filteredList.length);
+}
+
+function checkTableHeads(ths) {
+    for (let i = 0; i < ths.length; i++) {
+        expect(ths[i].innerHTML).toBe(employeeTableHeads[i]);
+    }
+}
+
+function verifyEmployeeNumber(trs, tds, ths) {
     /*
         i: nombre total de "table data"
         j: index représente le numéro courant d'employé
@@ -71,15 +161,9 @@ test("Employee number should be incremental", async () => {
         expect(tds[j].innerHTML).toBe(i.toString());
         j += ths.length;
     }
-});
+}
 
-test("Employee fields should match employee infos", async () => {
-    const {
-        trs,
-        ths,
-        tds,
-    } = getFields();
-
+function checkFieldValues(trs, tds, ths) {
     /*
         i: nombre total de "table data"
      */
@@ -93,13 +177,16 @@ test("Employee fields should match employee infos", async () => {
         expect(tds[i * ths.length + 7].innerHTML).toBe("");
         expect(tds[i * ths.length + 8].innerHTML).toBe("");
     }
-});
+}
+
+
 
 function getFields() {
     const table = document.querySelector("table");
     const ths = document.querySelectorAll("th");
     const trs = document.querySelectorAll("tr");
     const tds = document.querySelectorAll("td");
+
     return {
         table,
         ths,
@@ -107,3 +194,4 @@ function getFields() {
         tds,
     };
 }
+
