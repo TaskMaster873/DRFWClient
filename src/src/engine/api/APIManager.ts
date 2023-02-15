@@ -198,14 +198,10 @@ class APIManager extends Logger {
      * @param actionCode Le code de réinitialisation de mot de passe
      * @returns Soi le courriel ou rien
      */
-    public async verifyResetPassword(actionCode: string): Promise<string> {
-        let accountEmail: string = "None";
-        await verifyPasswordResetCode(this.#auth, actionCode).then((email) => {
-            accountEmail = email;
-        }).catch((error) => {
+    public async verifyResetPassword(actionCode: string): Promise<string | void> {
+        return await verifyPasswordResetCode(this.#auth, actionCode).catch((error) => {
             this.getErrorMessageFromCode(error.code);
-        })
-        return accountEmail;
+        });
     }
 
     /**
@@ -216,8 +212,7 @@ class APIManager extends Logger {
      */
     public async applyResetPassword(actionCode: string, newPassword: string): Promise<string | null> {
         let errorMessage: string | null = null;
-        await confirmPasswordReset(this.#auth, actionCode, newPassword).then(() => {
-        }).catch((error) => {
+        await confirmPasswordReset(this.#auth, actionCode, newPassword).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error.code);
         })
         return errorMessage;
