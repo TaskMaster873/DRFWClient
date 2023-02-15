@@ -6,21 +6,32 @@ export interface ShiftsList {
   shifts: Shift[];
 }
 
-export interface Shift {
-  project: Project;
-  resource: string;
+export interface ShiftForCalendar {
   start: string;
-  end: number;
-  employee: Employee;
-  readonly id: string;
+  end: string;
+}
+
+export class Shift {
+  projectName: string = "";
+  start: string = "";
+  end: string = "";
+  employeeId: string = "";
+  
+  constructor(shift: ShiftDTO) {
+  this.employeeId= shift.employeeId;
+  this.projectName = shift.projectName;
+   this.start = shift.start;
+  this.end = shift.end;
+ }
 }
 
 export interface ShiftDTO {
-  readonly employee: string;
-  readonly resource: string;
+  readonly employeeId: string;
   readonly start: string;
-  readonly end: number;
-  readonly project: Project;
+  readonly end: string;
+  readonly projectName: string;
+
+  
 }
 
 /**

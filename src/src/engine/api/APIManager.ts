@@ -13,6 +13,7 @@ import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department} from "../types/Department";
+import { Shift } from "../types/Shift";
 import {errors} from "../messages/APIMessages";
 
 type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
@@ -433,6 +434,33 @@ class APIManager extends Logger {
         return errorMessage ?? jobTitles;
     }
 
+    public async getScheduleForOneEmployee(): Promise<Shift[]> {
+        let shifts: Shift[] = [];
+        if(this.isAuthenticated){
+            return new Promise(async (resolve) => {
+                let queryShifts = query(collection(this.#db, `shifts`), where("employeeId", "==", this.#user?.uid));
+                let snaps = await getDocs(queryShifts).catch((e) => {
+                    console.log("error");
+                    this.error(e);
+                })
+                if(snaps) {
+                    snaps.docs.forEach((doc) => {
+                        let data = doc.data();
+                        shifts.push(new Shift({
+                            employeeId: data.employeeId,
+                            projectName: data.projectName,
+                            start: data.start,
+                            end: data.end,
+                        }))
+                    })
+                }
+                resolve(shifts);
+            });
+        } else {
+            return shifts;
+        }
+
+    }
 }
 
 export const API = new APIManager;
