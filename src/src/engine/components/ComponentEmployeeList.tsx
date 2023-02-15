@@ -100,7 +100,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         } else {
             return [
                 <tr key={"firstCol"}>
-                    <td colSpan={4}>
+                    <td colSpan={9}>
                         <h6>Aucun employé est présent dans ce département</h6>
                     </td>
                 </tr>
