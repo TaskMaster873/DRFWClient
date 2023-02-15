@@ -51,7 +51,7 @@ service cloud.firestore {
         let createdValidDepartment = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
         let hasAllfields = request.resource.data.keys().hasOnly(['name', 'director']);
 
-        return createdValidDepartment && hasAllfields
+        return createdValidDepartment && hasAllfields && request.auth != null
         && hasMinPermission(request.auth.uid, 4) && departmentFieldTypes();
       }
 
@@ -84,8 +84,6 @@ service cloud.firestore {
         return createdValidJobTitle && hasAllfields
         && hasMinPermission(request.auth.uid, 4) && nameFieldTypes();
       }
-
-
 
       match /shifts/{shiftId} {
     		allow read;
