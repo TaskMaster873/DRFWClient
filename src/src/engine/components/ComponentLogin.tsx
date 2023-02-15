@@ -122,7 +122,7 @@ export class ComponentLogin extends React.Component {
 
         if (API.isAuth()) {
             this.state.isLoggedIn = true;
-            this.forceUpdate();
+            this.setState(this.state);
         }
     }
 
@@ -146,9 +146,10 @@ export class ComponentLogin extends React.Component {
         if (errorType === FormErrorType.NO_ERROR) {
             let errorMessage = await API.loginWithPassword(this.state.emailLogin, this.state.passwordLogin);
 
-            if (!errorMessage) {
+            if (errorMessage === null) {
                 this.state.isLoggedIn = true;
-                this.forceUpdate();
+                this.setState(this.state);
+
                 NotificationManager.success(successes.login, successes.successGenericMessage);
             } else {
                 NotificationManager.error(errorMessage, errors.errorGenericMessage);

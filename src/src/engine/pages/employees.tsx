@@ -28,8 +28,13 @@ export class Employees extends React.Component<EmployeeProps> {
      * @returns La liste des employés
      */
     public render(): JSX.Element {
+        // ...
+        let id: any = this.props.params.id;
+        if(!id) {
+            id = null;
+        }
         return (<Container>
-                <ComponentEmployeeList filteredList={null} list={this.state.list} department={this.props.params.id} />
+                <ComponentEmployeeList filteredList={null} list={this.state.list} department={id} />
             </Container>);
     }
 }

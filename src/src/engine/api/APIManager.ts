@@ -95,6 +95,7 @@ class APIManager extends Logger {
 
     public async loginWithPassword(email: string, password: string): Promise<string | null> {
         await API.awaitLogin;
+
         let errorMessage: string | null = null;
         let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
