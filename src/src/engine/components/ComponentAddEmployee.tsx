@@ -212,7 +212,8 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                 department: this.state.department,
                 jobTitles: this.state.jobTitles,
                 skills: this.state.skills,
-                role: this.state.role
+                // @ts-ignore
+                role: parseInt(this.state.role)
             }));
             if (!error) {
                 NotificationManager.success(successes.successGenericMessage, successes.employeeCreated);
