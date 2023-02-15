@@ -29,14 +29,26 @@ export class Schedule extends React.Component {
     public render(): JSX.Element {
         let listData: Shift[] = this.state.list;
         let length = listData.length;
-        switch(length){
-            case 0: //quand la liste charge
-              return (
-                 <ComponentLoading />
-                );
-            default :
-                return (<ComponentEmployeScheduleView listOfShifts={...listData}/>);
+        if(false){
+            switch(length){
+                case 0: //quand la liste charge
+                  return (
+                     <ComponentLoading />
+                    );
+                default :
+                    return (<ComponentSchedule /*list={...listData}*//>);
+            }
+        } else {
+            switch(length){
+                case 0: //quand la liste charge
+                  return (
+                     <ComponentLoading />
+                    );
+                default :
+                    return (<ComponentEmployeScheduleView listOfShifts={...listData}/>);
+            }
         }
+       
        
     }
 }
