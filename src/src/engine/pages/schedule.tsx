@@ -14,9 +14,8 @@ export class Schedule extends React.Component {
         list: [],
   }
 
-  public async componentWillMount () {
-    let shifts = await API.getScheduleForOneEmployee();
-    console.log("ok",shifts);
+  public async componentDidMount () {
+    let shifts = await API.getScheduleForOneEmployee(); // pour get tout les heures de l'employé connecté
     this.setState({list: shifts});
     document.title = "Horaire - TaskMaster";
   }
@@ -30,32 +29,14 @@ export class Schedule extends React.Component {
     public render(): JSX.Element {
         let listData: Shift[] = this.state.list;
         let length = listData.length;
-        console.log(length);
         switch(length){
-            case 0:
-              //Chargement pendant que verifyActionCode valide avec le serveur que le code est bon.
+            case 0: //quand la liste charge
               return (
                  <ComponentLoading />
                 );
             default :
-                console.log("je retourne quelque chose", length);
-                console.log(listData);
                 return (<ComponentEmployeScheduleView listOfShifts={...listData}/>);
-              //Le actionCode est invalide
         }
-        /*if(listData.length > 0) {
-            return (<ComponentEmployeScheduleView listOfShifts={...listData}/>);
-        } else if(false) {
-            return (<Container className="mt-5 mb-5">
-
-            <ComponentSchedule {...listData} />
-        </Container>);
-
-        }else {
-            return (
-            <p>Vous n'avez aucun horaire</p>
-            );
-        }*/
        
     }
 }
