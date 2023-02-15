@@ -39,7 +39,8 @@
   },
   "scripts": {
     "webpack": "webpack",
-    "dev": "concurrently --kill-others \"firebase emulators:start --import=./emulatorSave\" \"webpack serve\" ",
+    "dev": "webpack serve",
+    "devEmulator": "concurrently --kill-others \"firebase emulators:start --import=./emulatorSave\" \"webpack serve\" ",
     "build": "webpack --mode production --progress",
     "emulator": "firebase emulators:start --import=./emulatorSave",
     "export": "firebase emulators:export ./emulatorSave",

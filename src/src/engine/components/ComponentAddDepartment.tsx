@@ -32,9 +32,10 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSelect = this.handleSelect.bind(this);
     }
 
-    componentDidUpdate(prevProps: AddDepartmentProps) {
+    public componentDidUpdate(prevProps: AddDepartmentProps) : void {
         if (prevProps.employees !== this.props.employees && this.props.employees.length > 0) {
             let firstEmployee: Employee = this.props.employees[0];
             this.setState({
@@ -84,6 +85,12 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
         );
     }
 
+    private async onDataChange() : Promise<void> {
+        if(this.props.onDataChange !== null && this.props.onDataChange) {
+            await this.props.onDataChange();
+        }
+    }
+
     private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
@@ -100,11 +107,13 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
             validated: true,
             error: errorType,
         });
-        console.log(this.state)
+
         if (errorType === FormErrorType.NO_ERROR) {
             let errorMessage = await API.createDepartment(this.state.name, this.state.director);
             if (!errorMessage) {
                 NotificationManager.success(successes.successGenericMessage, successes.departmentCreated);
+
+                await this.onDataChange();
             } else {
                 NotificationManager.error(errorMessage, errors.errorGenericMessage);
             }
@@ -125,7 +134,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
         });
     }
 
-    private handleSelect(event: ChangeEvent<HTMLSelectElement>) {
+    private handleSelect(event: ChangeEvent<HTMLSelectElement>) : void {
         const target = event.target;
         this.setState({[target.id]: target.value});
     }
