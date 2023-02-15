@@ -1,5 +1,5 @@
 import React from "react";
-import {BrowserRouter as Router, Route, Routes, useParams} from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes, useParams, Params} from "react-router-dom";
 
 import "../deps/css/Engine.css";
 import "../deps/css/index.css";
@@ -23,7 +23,7 @@ import { ForgotPassword } from "./pages/forgotPassword";
 import 'react-notifications/lib/notifications.css';
 
 function EmployeeWrapper(): any {
-    let parameters: any = useParams();
+    let parameters: Readonly<Params<string>> = useParams();
     return (
         <Employees  {...{params: parameters}}/>
     );
