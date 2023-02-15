@@ -250,12 +250,15 @@ class APIManager extends Logger {
                 errorMessage = this.getErrorMessageFromCode(error.code);
             });
         if (this.#auth.currentUser && createdUser) {
+            //Crée l'utilisateur dans le Firestore
             await setDoc(doc(this.#db, `employees`, createdUser.user.uid), {...employee}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error.code);
                 if (this.#auth.currentUser) {
                     FirebaseAuth.deleteUser(this.#auth.currentUser)
                 }
             })
+            //Envoie le courriel de vérification
+            await this.verifyEmailAddress(createdUser.user);
         }
         return errorMessage;
     }
