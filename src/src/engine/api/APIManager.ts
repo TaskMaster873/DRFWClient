@@ -201,7 +201,7 @@ class APIManager extends Logger {
         }
 
         if (!(this.#db as any)._firestoreClient) {
-            await enableIndexedDbPersistence(this.#db).catch((err) => console.error(err.message));
+            await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
             this.log("IndexedDB persistence enabled");
         }
 
