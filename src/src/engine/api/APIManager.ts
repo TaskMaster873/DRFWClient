@@ -199,11 +199,9 @@ class APIManager extends Logger {
      * @returns Soi le courriel ou rien
      */
     public async verifyResetPassword(actionCode: string): Promise<string | void> {
-        let accountEmail: string | void;
-        accountEmail = await verifyPasswordResetCode(this.#auth, actionCode).catch((error) => {
+        return await verifyPasswordResetCode(this.#auth, actionCode).catch((error) => {
             this.getErrorMessageFromCode(error.code);
-        })
-        return accountEmail;
+        });
     }
 
     /**
