@@ -5,21 +5,20 @@ import { Shift, ShiftForCalendar } from '../types/Shift';
 type Props = { listOfShifts: Shift[] }
 
 export class ComponentEmployeScheduleView extends React.Component<Props> {
-  calendarRef: React.RefObject<any>;
-  datePickerRef: React.RefObject<any>;
-  listOfShifts: Shift[] = [];
+  private calendarRef: React.RefObject<any> =  React.createRef();
+  private datePickerRef: React.RefObject<any> =  React.createRef();
+  private listOfShifts: Shift[] = [];
+
+  public state: any = { durationBarVisible: false,
+    timeRangeSelectedHandling: "Enabled", 
+    eventResizeHandling: "Disabled", //changer la grosseur de l'event
+    eventMoveHandling: "Disabled", //pouvoir le bouger
+    eventDeleteHandling: "Disabled", // pouvoir le delete}
+   } 
+
   constructor(props: Props) {
     super(props);
     this.listOfShifts = this.props.listOfShifts;
-    this.datePickerRef = React.createRef();
-    this.calendarRef = React.createRef();
-    this.state = {
-      durationBarVisible: false,
-      timeRangeSelectedHandling: "Enabled", 
-      eventResizeHandling: "Disabled", //changer la grosseur de l'event
-      eventMoveHandling: "Disabled", //pouvoir le bouger
-      eventDeleteHandling: "Disabled", // pouvoir le delete
-    };
   }
 
   get calendar() {
@@ -31,11 +30,11 @@ export class ComponentEmployeScheduleView extends React.Component<Props> {
   }
 
 
-  componentDidMount(): void {
+  public componentDidMount(): void {
     let events: ShiftForCalendar[] = [];
     let startDate = DayPilot.Date.today();
 
-    for (let index = 0; index < this.props.listOfShifts.length; index++) {
+    for (let index = 0; index < this.listOfShifts.length; index++) {
       events.push({
         start: this.props.listOfShifts[index].start,
         end: this.props.listOfShifts[index].end,
@@ -46,7 +45,7 @@ export class ComponentEmployeScheduleView extends React.Component<Props> {
     this.datePicker.update({ events, startDate});
   }
 
-  render() {
+  public render(): JSX.Element {
     return (
       <div className='flex_Hundred'>
         <div className='left'>

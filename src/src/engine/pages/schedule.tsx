@@ -15,9 +15,10 @@ export class Schedule extends React.Component {
   }
 
   public async componentDidMount () {
+    document.title = "Horaire - TaskMaster";
     let shifts = await API.getScheduleForOneEmployee(); // pour get tout les heures de l'employé connecté
     this.setState({list: shifts});
-    document.title = "Horaire - TaskMaster";
+    
   }
 
 
