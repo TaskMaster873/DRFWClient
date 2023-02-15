@@ -28,7 +28,8 @@ export class Schedule extends React.Component {
      */
     public render(): JSX.Element {
         let listData: Shift[] = this.state.list;
-        let length = listData.length;
+        if(Array.isArray(listData)) {
+            let length = listData.length;
         if(false){
             switch(length){
                 case 0: //quand la liste charge
@@ -45,9 +46,15 @@ export class Schedule extends React.Component {
                      <ComponentLoading />
                     );
                 default :
-                    return (<ComponentEmployeScheduleView listOfShifts={...listData}/>);
+                    return (<ComponentEmployeScheduleView listOfShifts={listData}/>);   
             }
         }
+
+        }
+        else {
+            return(<div></div>);
+        }
+        
        
        
     }
