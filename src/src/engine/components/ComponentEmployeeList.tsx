@@ -14,9 +14,7 @@ import {ScaleLoader} from "react-spinners";
  */
 
 const override: CSSProperties = {
-    display: 'flex',
-    alignSelf: 'center',
-    margin: '0 auto',
+    display: 'flex', alignSelf: 'center', margin: '0 auto',
 };
 
 export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
@@ -39,11 +37,10 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
         let searchProps: SearchParams<Employee> = {list: list, filterList: this.updateList.bind(this)};
         return (<div className="mt-5">
-            {this.renderSearchBar(searchProps)}
-            {this.renderList()}
-            {this.renderAddEmployeeButton()}
-            </div>
-        );
+                {this.renderSearchBar(searchProps)}
+                {this.renderList()}
+                {this.renderAddEmployeeButton()}
+            </div>);
     }
 
     private updateList(filteredList: Employee[]): void {
@@ -63,27 +60,25 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
     private getEmployeeList(list: Employee[] | null): JSX.Element[] {
         console.log(this.state);
-        if(list === null) {
-            return [
-                <tr key={"firstCol"}>
-                    <td colSpan={9}>
-                        <div style={{height: '40vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                            <ScaleLoader
-                                color={"#A020F0"}
-                                loading={true}
-                                cssOverride={override}
-                                aria-label="Loading Spinner"
-                                data-testid="loader"
-                            />
-                        </div>
-                    </td>
-                </tr>
-            ]
+        if (list === null) {
+            return [<tr key={"firstCol"}>
+                <td colSpan={9}>
+                    <div style={{height: '40vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <ScaleLoader
+                            color={"#A020F0"}
+                            loading={true}
+                            cssOverride={override}
+                            aria-label="Loading Spinner"
+                            data-testid="loader"
+                        />
+                    </div>
+                </td>
+            </tr>]
         } else if (list.length !== 0) {
             return list.map((employee, index) => (<tr key={"secondCol" + index}>
                 <td key={"id" + index}>{index + 1}</td>
                 <td key={"firstName" + index}>
-                    <a>{employee.firstName}</a>
+                    {employee.firstName}
                 </td>
                 <td key={"name " + index}>{employee.lastName}</td>
                 <td key={"email " + index}>{employee.email}</td>
@@ -98,13 +93,11 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
                 <td key={"skills " + index}>{employee.skills}</td>
             </tr>));
         } else {
-            return [
-                <tr key={"firstCol"}>
-                    <td colSpan={9}>
-                        <h6>Aucun employé est présent dans ce département</h6>
-                    </td>
-                </tr>
-            ];
+            return [<tr key={"firstCol"}>
+                <td colSpan={9}>
+                    <h6>Aucun employé est présent dans ce département</h6>
+                </td>
+            </tr>];
         }
     }
 
@@ -114,7 +107,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         return (<Table responsive bordered hover>
             <thead>
             <tr key={"firstCol"}>
-                    {employeeTableHeads.map((th) => (<th key={th}>{th}</th>))}
+                {employeeTableHeads.map((th) => (<th key={th}>{th}</th>))}
             </tr>
             </thead>
             <tbody>

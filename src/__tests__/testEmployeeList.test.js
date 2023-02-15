@@ -14,12 +14,12 @@ let department = "Informatique";
 let employee = new Employee({
     firstName: "George",
     lastName: "Belleau",
-    department: "Construction",
     email: "georgeBelleau@gmail.com",
-    role: 1,
     phoneNumber: "418-532-5323",
+    department: "Construction",
     jobTitles: [],
-    skills: []
+    skills: [],
+    role: 1,
 })
 let filteredList = [employee]
 
@@ -55,26 +55,43 @@ test("Table heads should have proper values", async () => {
     }
 });
 
-test("Table fields should have proper values", async () => {
+test("Employee number should be incremental", async () => {
     const {
+        trs,
         ths,
         tds,
     } = getFields();
 
     /*
         i: nombre total de "table data"
-        j: index dans les éléments d'employé
-        z: index représente le numéro courant d'employé
+        j: index représente le numéro courant d'employé
      */
+    let j = 0;
+    for (let i = 1; i < trs.length; i++) {
+        expect(tds[j].innerHTML).toBe(i.toString());
+        j += ths.length;
+    }
+});
 
-    for (let i = 0, j = 0, z = 0; i < tds.length; i++, j++) {
-        if(i === 0 || j === Object.keys(ths).length) {
-            z++;
-            j = 0;
-            expect(tds[i].innerHTML).toBe(z.toString());
-        } else {
-            expect(tds[i].innerHTML).toBe(Object.values(employee)[j - 1]);
-        }
+test("Employee fields should match employee infos", async () => {
+    const {
+        trs,
+        ths,
+        tds,
+    } = getFields();
+
+    /*
+        i: nombre total de "table data"
+     */
+    for (let i = 0; i < trs.length - 1; i++) {
+        expect(tds[i * ths.length + 1].innerHTML).toBe(employee.firstName);
+        expect(tds[i * ths.length + 2].innerHTML).toBe(employee.lastName);
+        expect(tds[i * ths.length + 3].innerHTML).toBe(employee.email);
+        expect(tds[i * ths.length + 4].innerHTML).toBe(employee.phoneNumber);
+        expect(tds[i * ths.length + 5].innerHTML).toBe(employee.department);
+        expect(tds[i * ths.length + 6].innerHTML).toBe("Oui");
+        expect(tds[i * ths.length + 7].innerHTML).toBe("");
+        expect(tds[i * ths.length + 8].innerHTML).toBe("");
     }
 });
 
