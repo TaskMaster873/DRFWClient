@@ -10,7 +10,7 @@
     },
     "firestore": {
 	  "host": "localhost",
-      "port": 9098,
+      "port": 9098
     },
     "ui": {
 	  "host": "localhost",
