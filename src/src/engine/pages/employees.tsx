@@ -9,7 +9,7 @@ import {API} from "../api/APIManager";
  */
 export class Employees extends React.Component<EmployeeProps> {
     public state = {
-        list: []
+        list: null
     }
 
     constructor(props: EmployeeProps) {
@@ -17,9 +17,10 @@ export class Employees extends React.Component<EmployeeProps> {
     }
 
     public async componentDidMount() {
-        let employees = await API.getEmployeesByDepartment(this.props.params.id);
-        this.setState({list: employees})
         document.title = "Employés " + this.props.params.id + " - TaskMaster";
+
+        let employees = await API.getEmployees(this.props.params.id);
+        this.setState({list: employees});
     }
 
     /**
@@ -27,8 +28,13 @@ export class Employees extends React.Component<EmployeeProps> {
      * @returns La liste des employés
      */
     public render(): JSX.Element {
+        // ...
+        let id: any = this.props.params.id;
+        if(!id) {
+            id = null;
+        }
         return (<Container>
-                <ComponentEmployeeList filteredList={null} list={this.state.list} department={this.props.params.id} />
+                <ComponentEmployeeList filteredList={null} list={this.state.list} department={id} />
             </Container>);
     }
 }

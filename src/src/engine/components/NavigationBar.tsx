@@ -9,19 +9,38 @@ import {NotificationManager} from 'react-notifications';
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
 import {API} from "../api/APIManager";
+import {errors, successes} from "../messages/FormMessages";
 
 /**
  * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
  */
 export class NavigationBar extends React.Component {
+    private _isMountedAPI: boolean = false;
+
     constructor(props) {
         super(props);
 
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
+    public componentDidMount() {
+        this._isMountedAPI = true;
+    }
+
+    public componentWillUnmount() {
+        this._isMountedAPI = false;
+    }
+
     private async onEvent(): Promise<void> {
-        this.forceUpdate();
+        return new Promise((resolve) => {
+            if(this._isMountedAPI) {
+                this.setState({}, () => {
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
+        });
     }
 
     public render(): JSX.Element {
@@ -78,7 +97,7 @@ export class NavigationBar extends React.Component {
      */
     private loginButton() : JSX.Element {
         if (API.isAuth()) {
-            return <Nav.Link onClick={this.logOut}>Se déconnecter</Nav.Link>;
+            return <Nav.Link id="logoutLink" onClick={this.logOut}>Se déconnecter</Nav.Link>;
         } else {
             return (
                 <LinkContainer to="/login">
@@ -92,11 +111,11 @@ export class NavigationBar extends React.Component {
      * Je ne sais pas si il faudrait le garder
      */
     private async logOut() : Promise<void> {
-        let success = await API.logout();
-        if (success) {
-            NotificationManager.success('Déconnection réussi', 'Vous êtes maitenant déconnecté.');
+        let error = await API.logout();
+        if (!error) {
+            NotificationManager.success(successes.successGenericMessage, successes.logout);
         } else {
-            NotificationManager.error('Erreur lors de la déconnection', 'Veuillez réessayer plus tard.');
+            NotificationManager.error(error, errors.errorLogout);
         }
     }
 }

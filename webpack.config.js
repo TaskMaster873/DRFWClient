@@ -2,10 +2,23 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    entry: "./src/index.ts",
+    entry: {
+        index: {
+            import: "./src/index.ts",
+            dependOn: 'shared',
+        },
+
+        shared: 'lodash',
+    },
+    performance: {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
+    },
+    devtool: false,
     output: {
 		path: path.join(__dirname, "build"),
-		filename: "index.bundle.js",
+		filename: "[name].bundle.js",
 		publicPath: "/"
 	},
     mode: process.env.NODE_ENV || "development",
@@ -23,7 +36,6 @@ module.exports = {
             "crypto": false
         }
     },
-    devServer: { static: path.join(__dirname, "src") },
     module: {
         unknownContextCritical: false,
         rules: [
@@ -49,10 +61,18 @@ module.exports = {
     },
 	devServer: {
 		historyApiFallback: true,
+        static: path.join(__dirname, "src")
 	},
+    optimization: {
+        runtimeChunk: 'single',
+        splitChunks: {
+            chunks: 'all',
+        },
+    },
     plugins: [
         new HtmlWebpackPlugin({
             template: path.join(__dirname, "src/html", "index.html"),
+            favicon: "./src/html/favicon.ico",
         }),
     ]
 };

@@ -1,4 +1,5 @@
 import {Department} from "./Department";
+import {Params} from "react-router-dom";
 
 /**
  * Liste d'employé
@@ -32,6 +33,7 @@ export class Employee {
         this.role = employee.role;
 	}
 }
+
 /**
  * Contient tous les renseignements pour créer un iduveau employé dans la bd
  */
@@ -47,13 +49,13 @@ export interface EmployeeCreateDTO {
 }
 
 export interface EmployeeProps {
-    params;
+    params: Readonly<Params<string>>;
 }
 
 export interface EmployeeListProps {
     list: Employee[] | null;
     filteredList: Employee[] | null;
-    department: string;
+    department: string | null;
 }
 
 export interface AddEmployeeProps {

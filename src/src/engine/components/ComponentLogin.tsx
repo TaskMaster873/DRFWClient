@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {Link, Navigate} from "react-router-dom";
 
-import {FormErrorType, errors} from "../messages/FormMessages";
+import {FormErrorType, errors, successes} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
 
 /* === Images === */
@@ -96,11 +96,6 @@ export class ComponentLogin extends React.Component {
                                 {errors.requiredPassword}
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Text
-                            className="text-muted"
-                            id="loginErrorMsg"
-                            aria-errormessage={this.errorMessage}
-                        ></Form.Text>
                         <div className="me-4 mt-4 d-block text-center mx-auto">
                             <Link className="d-block" to="/forgot-password">
                                 Mot de passe oublié ?
@@ -127,7 +122,7 @@ export class ComponentLogin extends React.Component {
 
         if (API.isAuth()) {
             this.state.isLoggedIn = true;
-            this.forceUpdate();
+            this.setState(this.state);
         }
     }
 
@@ -149,17 +144,15 @@ export class ComponentLogin extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let rejected = false;
-            let isLoggedIn = await API.loginWithPassword(this.state.emailLogin, this.state.passwordLogin).catch((error) => {
-                NotificationManager.error('Oops!', error);
-                rejected = true;
-            });
+            let errorMessage = await API.loginWithPassword(this.state.emailLogin, this.state.passwordLogin);
 
-            if (isLoggedIn !== null && isLoggedIn) {
+            if (errorMessage === null) {
                 this.state.isLoggedIn = true;
-                this.forceUpdate();
-            } else if(!rejected) {
-                NotificationManager.error('Oops!', 'Something went wrong.');
+                this.setState(this.state);
+
+                NotificationManager.success(successes.login, successes.successGenericMessage);
+            } else {
+                NotificationManager.error(errorMessage, errors.errorGenericMessage);
             }
         }
     }

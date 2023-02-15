@@ -5,34 +5,18 @@
   },
   "emulators": {
     "auth": {
+	  "host": "localhost",
       "port": 9099
     },
     "firestore": {
-      "port": 9098
-    },
-    "functions": {
-      "port": 5001
+	  "host": "localhost",
+      "port": 9098,
     },
     "ui": {
+	  "host": "localhost",
       "enabled": true,
       "port": 9097
     },
     "singleProjectMode": true
-  },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint",
-        "npm --prefix \"$RESOURCE_DIR\" run build"
-      ]
-    }
-  ]
+  }
 }

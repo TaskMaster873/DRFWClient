@@ -1,9 +1,9 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-
-import {errors, FormErrorType} from "../messages/FormMessages";
+import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import { API } from "../api/APIManager";
+import {NotificationManager} from 'react-notifications';
 
 /* === Images === */
 // @ts-ignore
@@ -71,11 +71,6 @@ export class ComponentChangePassword extends React.Component {
                             {errors.invalidNewPassword}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Text
-                        className="text-muted"
-                        id="loginErrorMsg"
-                        aria-errormessage={this.errorMessage}
-                    ></Form.Text>
                     <div className="mt-4 me-4 d-block text-center mx-auto">
                         <Button onClick={() => history.back()} className="me-4 mt-4" size="lg" variant="secondary">
                             Retour
@@ -96,7 +91,7 @@ export class ComponentChangePassword extends React.Component {
         );
     }
 
-    private handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
         let errorType = FormErrorType.NO_ERROR;
@@ -113,7 +108,12 @@ export class ComponentChangePassword extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            API.changePassword(this.state.oldPassword, this.state.newPassword);
+            let error = await API.changePassword(this.state.oldPassword, this.state.newPassword); //voici le changement en async
+            if (!error) {
+                NotificationManager.success(successes.successGenericMessage, successes.changedPassword);
+            } else {
+                NotificationManager.error(error, errors.errorForm);
+            }
         }
     }
 
