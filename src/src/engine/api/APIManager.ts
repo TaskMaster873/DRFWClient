@@ -14,6 +14,9 @@ import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} fr
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import { Shift } from "../types/Shift";
+import {errors} from "../messages/APIMessages";
+
+type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
