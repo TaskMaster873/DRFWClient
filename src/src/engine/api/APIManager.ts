@@ -5,12 +5,17 @@ import {Analytics, getAnalytics, isSupported} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
 import {confirmPasswordReset, connectAuthEmulator, verifyPasswordResetCode} from "firebase/auth";
-import {addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, getDocs, getFirestore, query, QueryDocumentSnapshot, setDoc, where} from "firebase/firestore";
+import {
+    QuerySnapshot,
+    DocumentData,
+    addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, getDocs, getFirestore, query, QueryDocumentSnapshot, setDoc, where, enableIndexedDbPersistence} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {errors} from "../messages/APIMessages";
+
+type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
@@ -28,10 +33,11 @@ class APIManager extends Logger {
     #user: FirebaseAuth.User | null = null;
     #userRole: number = 0;
 
+    private emulatorLoaded: boolean = false;
     private isAuthenticated: boolean = false;
 
     public awaitLogin: Promise<void> | undefined;
-    private subscribers: Array<() => void> = [];
+    private subscribers: Array<SubscriberCallback> = [];
 
     constructor() {
         super();
@@ -46,13 +52,13 @@ class APIManager extends Logger {
         return this.#user?.displayName || this.#user?.email || "Anonyme";
     }
 
-    private onEvent(): void {
+    private async onEvent(): Promise<void> {
         for (let subscriber of this.subscribers) {
-            subscriber();
+            await subscriber();
         }
     }
 
-    public subscribeToEvent(subscriber: () => void): void {
+    public subscribeToEvent(subscriber: SubscriberCallback): void {
         this.subscribers.push(subscriber);
     }
 
@@ -104,7 +110,7 @@ class APIManager extends Logger {
             this.isAuthenticated = true;
         }
 
-        this.onEvent();
+        await this.onEvent();
         return errorMessage;
     }
 
@@ -125,7 +131,7 @@ class APIManager extends Logger {
             errorMessage = this.getErrorMessageFromCode(error);
         });
 
-        this.onEvent();
+        await this.onEvent();
         return errorMessage;
     }
 
@@ -160,40 +166,54 @@ class APIManager extends Logger {
                     resolve();
                 }
             });
-
-            await FirebaseAuth.setPersistence(this.#auth, FirebaseAuth.browserSessionPersistence).catch((error) => {
-                // Handle Errors here.
-                const errorCode = error;
-                const errorMessage = error.message;
-
-                this.error(`Error code: ${errorCode} - ${errorMessage}`);
-            });
         });
 
         await this.awaitLogin;
+        this.log('Login resolved!');
+    }
+
+    private async enablePersistence(): Promise<void> {
+        await FirebaseAuth.setPersistence(this.#auth, FirebaseAuth.browserSessionPersistence).catch((error) => {
+            // Handle Errors here.
+            const errorCode = error;
+            const errorMessage = error.message;
+
+            this.error(`Error code: ${errorCode} - ${errorMessage}`);
+        });
     }
 
     private async loadFirebase(): Promise<void> {
         this.#app = initializeApp(firebaseConfig);
 
         this.#auth = FirebaseAuth.getAuth(this.#app);
+        let loginAwait = this.listenEvents();
+
         this.#performance = getPerformance(this.#app);
         this.#db = getFirestore(this.#app);
 
-        await this.listenEvents();
+        //Should this database be emulated?
+        if (location.hostname === "localhost" && !this.emulatorLoaded) {
+            this.emulatorLoaded = true;
+            connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
+            connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
+
+            this.log("Firebase emulators loaded");
+        }
+
+        if (!(this.#db as any)._firestoreClient) {
+            await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
+            this.log("IndexedDB persistence enabled");
+        }
+
+        await this.enablePersistence();
 
         let isAnalyticsSupported = await isSupported();
         if (isAnalyticsSupported) {
             this.#analytics = getAnalytics(this.#app);
         }
 
-        //Should this database be emulated?
-        if (location.hostname === "localhost") {
-            connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
-            connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
-        }
-
         this.log("Firebase loaded");
+        await loginAwait;
     }
 
     private elementExist(element: any): boolean {
@@ -331,26 +351,33 @@ class APIManager extends Logger {
         return errorMessage ?? departments;
     }
 
-    public async getEmployeeNbDepartments(): Promise<number[] | string> {
-        let errorMessage: string | null = null;
-        let employeeNb: number[] = []
-        let departments = await this.getDepartments();
-        if(typeof(departments) !== "string") {
-            for (const department of departments) {
-                let queryEmployees = query(collection(this.#db, `employees`),
-                    where("department", "==", department.name) );
-                let snaps = await getDocs(queryEmployees).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
-                })
-                if (snaps) {
-                    employeeNb.push(snaps.docs.length);
-                }
-            }
-        } else {
-            errorMessage = departments;
-        }
+    public async getEmployeeNbDepartments(departments: Department[]): Promise<number[] | string> {
+        return new Promise((resolve) => {
+            let errorMessage: string | null = null;
+            let employeeNb: number[] = []
 
-        return errorMessage ?? employeeNb;
+            let promises: Promise<void | QuerySnapshot<DocumentData>>[] = [];
+
+            for (const department of departments) {
+                let queryEmployees = query(collection(this.#db, `employees`), where("department", "==", department.name));
+                let snaps = getDocs(queryEmployees);
+
+                promises.push(snaps);
+            }
+
+            Promise.all(promises).then((values) => {
+                for(let snapId in values) {
+                    let snaps = values[snapId];
+                    if(snaps !== null && snaps) {
+                        employeeNb.push(snaps.docs.length);
+                    }
+                }
+            }).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            }).finally(() => {
+                resolve(errorMessage ?? employeeNb);
+            });
+        });
     }
 
     public async getRoles(): Promise<string[] | string> {

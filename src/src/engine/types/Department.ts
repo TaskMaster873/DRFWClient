@@ -1,10 +1,9 @@
 import {Employee} from "./Employee";
 
-/**
- * Liste d'employé, comme dit dans le nom
- */
-export interface DepartmentList {
-    departments : Department[];
+export interface DepartmentListState {
+    employees: Employee[],
+    employeeNbDepartments: number[],
+    departments: Department[]
 }
 
 /**
@@ -30,5 +29,6 @@ export interface DepartmentCreateDTO {
 
 export interface AddDepartmentProps {
     employees: Employee[];
+    onDataChange: () => PromiseLike<void> | Promise<void> | void;
 }
 

@@ -7,15 +7,15 @@ const override: CSSProperties = {
     margin: '0 auto',
 };
 
-export function ComponentLoading() {
+export function ComponentLoading() : JSX.Element {
     return (<div style={{height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-    <BeatLoader
-        color={"#A020F0"}
-        loading={true}
-        size={25}
-        cssOverride={override}
-        aria-label="Loading Spinner"
-        data-testid="loader"
-    />
-</div>)
+        <BeatLoader
+            color={"#A020F0"}
+            loading={true}
+            size={25}
+            cssOverride={override}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+        />
+    </div>);
 }

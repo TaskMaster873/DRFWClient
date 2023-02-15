@@ -1,4 +1,5 @@
 import {Department} from "./Department";
+import {Params} from "react-router-dom";
 
 /**
  * Liste d'employé
@@ -47,7 +48,7 @@ export interface EmployeeCreateDTO {
 }
 
 export interface EmployeeProps {
-    params;
+    params: Readonly<Params<string>>;
 }
 
 
