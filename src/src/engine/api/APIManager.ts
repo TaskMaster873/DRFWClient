@@ -11,7 +11,6 @@ import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} fr
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {errors} from "../messages/APIMessages";
-import {forEach} from "react-bootstrap/ElementChildren";
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
