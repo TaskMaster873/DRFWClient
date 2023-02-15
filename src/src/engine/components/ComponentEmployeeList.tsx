@@ -1,6 +1,6 @@
 import React, {CSSProperties} from "react";
 import {Button, Col, Row, Table} from "react-bootstrap";
-import {Employee, EmployeeListProps} from "../types/Employee";
+import {Employee, EmployeeListProps, employeeTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 import {API} from "../api/APIManager";
@@ -21,9 +21,7 @@ const override: CSSProperties = {
 
 export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     public state: EmployeeListProps = {
-        list: null,
-        filteredList: null,
-        department: this.props.department
+        list: null, filteredList: null, department: this.props.department
     }
 
     constructor(props: EmployeeListProps) {
@@ -32,16 +30,8 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
     static getDerivedStateFromProps(props: EmployeeListProps, state: EmployeeListProps): EmployeeListProps {
         return {
-            list: props.list,
-            department: props.department,
-            filteredList: state.filteredList
+            list: props.list, department: props.department, filteredList: state.filteredList
         };
-    }
-
-    private updateList(filteredList: Employee[]): void {
-        this.setState({
-            filteredList: filteredList
-        });
     }
 
     public render(): JSX.Element {
@@ -56,11 +46,19 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         );
     }
 
+    private updateList(filteredList: Employee[]): void {
+        this.setState({
+            filteredList: filteredList
+        });
+    }
+
     private renderSearchBar(searchProps: SearchParams<Employee>): JSX.Element | undefined {
         return (<Row>
             <Col xs={7}><h3>Liste des employés du département {this.state.department}</h3></Col>
             <Col xs={2}></Col>
             <Col xs={3}><ComponentSearchBar {...searchProps} /></Col></Row>);
+        //}
+        //return <h3>Liste des employés du département {this.state.department}</h3>;
     }
 
     private getEmployeeList(list: Employee[] | null): JSX.Element[] {
@@ -116,15 +114,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         return (<Table responsive bordered hover>
             <thead>
             <tr key={"firstCol"}>
-                <th key={"id"}>#</th>
-                <th key={"firstName"}>Prénom</th>
-                <th key={"name"}>Nom</th>
-                <th key={"email"}>Adresse courriel</th>
-                <th key={"phoneNumber"}>Tel</th>
-                <th key={"departmentId"}>Département</th>
-                <th key={"active"}>Actif</th>
-                <th key={"jobTitles"}>Role(s)</th>
-                <th key={"skills"}>Compétences</th>
+                    {employeeTableHeads.map((th) => (<th key={th}>{th}</th>))}
             </tr>
             </thead>
             <tbody>
@@ -133,8 +123,8 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         </Table>);
     }
 
-    private renderAddEmployeeButton() : JSX.Element | undefined {
-        if(API.isAuth() && API.isAdmin) {
+    private renderAddEmployeeButton(): JSX.Element | undefined {
+        if (API.isAuth() && API.isAdmin) {
             return (<LinkContainer to="/add-employee">
                 <Button className="mt-3 mb-3">Ajouter</Button>
             </LinkContainer>);

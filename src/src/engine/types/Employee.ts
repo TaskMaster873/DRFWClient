@@ -47,6 +47,11 @@ export interface EmployeeCreateDTO {
     readonly role: number;
 }
 
+let employeeTableHeads : string[] =
+    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
+
+export {employeeTableHeads};
+
 export interface EmployeeProps {
     params: Readonly<Params<string>>;
 }
