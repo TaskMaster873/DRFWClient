@@ -45,8 +45,8 @@ export class ComponentAvailabilities extends Component {
 
     render() {
         return (
-            <div style={styles.wrap}>
-                <div style={styles.left}>
+            <div className='wrap'>
+                <div className='left'>
                     <DayPilotNavigator
                         selectMode={"week"}
                         showMonths={3}
@@ -61,7 +61,7 @@ export class ComponentAvailabilities extends Component {
                         ref={this.datePickerRef}
                     />
                 </div>
-                <div style={styles.main}>
+                <div className='main'>
                     <DayPilotCalendar
                         {...this.state}
                         cellsMarkBusiness= {false}

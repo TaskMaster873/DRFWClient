@@ -1,115 +1,77 @@
 import React from 'react';
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
+import { DayPilot, DayPilotCalendar, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
+import { Shift, ShiftForCalendar } from '../types/Shift';
 
-const styles = {
-  wrap: {
-    display: "flex"
-  },
-  left: {
-    marginRight: "10px"
-  },
-  main: {
-    flexGrow: "1"
-  }
-};
+type Props = { listOfShifts: Shift[] }
 
-export class ComponentEmployeScheduleView extends React.Component {
-    calendarRef: React.RefObject<any>;
-    datePickerRef: React.RefObject<any>;
-  constructor(props) {
+export class ComponentEmployeScheduleView extends React.Component<Props> {
+  private calendarRef: React.RefObject<any> =  React.createRef();
+  private datePickerRef: React.RefObject<any> =  React.createRef();
+  private listOfShifts: Shift[] = [];
+
+  public state: any = { durationBarVisible: false,
+    timeRangeSelectedHandling: "Enabled", 
+    eventResizeHandling: "Disabled", //changer la grosseur de l'event
+    eventMoveHandling: "Disabled", //pouvoir le bouger
+    eventDeleteHandling: "Disabled", // pouvoir le delete}
+   } 
+
+  constructor(props: Props) {
     super(props);
-    this.datePickerRef = React.createRef();
-    this.calendarRef = React.createRef();
-    this.state = {
-      viewType: "Week",
-      durationBarVisible: false,
-      timeRangeSelectedHandling: "Enabled",
-      onTimeRangeSelected: async args => {
-        const dp = this.calendar;
-        const modal = await DayPilot.Modal.prompt("Create a new event:", "Event 1");
-        dp.clearSelection();
-        if (!modal.result) { return; }
-        dp.events.add({
-          start: args.start,
-          end: args.end,
-          id: DayPilot.guid(),
-          text: modal.result
-        });
-      },
-      eventDeleteHandling: "Update",
-      onEventClick: async args => {
-        const dp = this.calendar;
-        const modal = await DayPilot.Modal.prompt("Update event text:", args.e.text());
-        if (!modal.result) { return; }
-        const e = args.e;
-        e.data.text = modal.result;
-        dp.events.update(e);
-      },
-    };
+    this.listOfShifts = this.props.listOfShifts;
   }
 
   get calendar() {
     return this.calendarRef.current.control;
   }
 
-  componentDidMount() {
-
-    const events = [
-      {
-        id: 1,
-        text: "Event 1",
-        start: "2023-03-07T10:30:00",
-        end: "2023-03-07T13:00:00"
-      },
-      {
-        id: 2,
-        text: "Event 2",
-        start: "2023-03-08T09:30:00",
-        end: "2023-03-08T11:30:00",
-        backColor: "#6aa84f"
-      },
-      {
-        id: 3,
-        text: "Event 3",
-        start: "2023-03-08T12:00:00",
-        end: "2023-03-08T15:00:00",
-        backColor: "#f1c232"
-      },
-      {
-        id: 4,
-        text: "Event 4",
-        start: "2023-03-06T11:30:00",
-        end: "2023-03-06T14:30:00",
-        backColor: "#cc4125"
-      },
-    ];
-
-    const startDate = "2023-03-07";
-
-    this.calendar.update({startDate, events});
-
+  get datePicker() {
+    return this.datePickerRef.current.control;
   }
 
-  render() {
+
+  public componentDidMount(): void {
+    let events: ShiftForCalendar[] = [];
+    let startDate = DayPilot.Date.today();
+
+    for (let index = 0; index < this.listOfShifts.length; index++) {
+      events.push({
+        start: this.props.listOfShifts[index].start,
+        end: this.props.listOfShifts[index].end,
+      });
+    }  
+    this.calendar.update({ events, startDate});
+
+    this.datePicker.update({ events, startDate});
+  }
+
+  public render(): JSX.Element {
     return (
-      <div style={styles.wrap}>
-        <div style={styles.left}>
+      <div className='flex_Hundred'>
+        <div className='left'>
           <DayPilotNavigator
             selectMode={"week"}
-            showMonths={3}
-            skipMonths={3}
-            startDate={"2023-03-07"}
-            selectionDay={"2023-03-07"}
-            onTimeRangeSelected={ args => {
+            showMonths={3} // le nombre de calendrier
+            skipMonths={3} // change 3 mois plus tard quand cliqué
+            startDate={"2023-03-07"} // date de base
+            selectionDay={"2023-03-07"} // date de base
+            onTimeRangeSelected={args => {
               this.calendar.update({
                 startDate: args.day
               });
             }}
+            ref={this.datePickerRef}
           />
         </div>
-        <div style={styles.main}>
+        <div className='main'>
           <DayPilotCalendar
             {...this.state}
+            cellsMarkBusiness={false}
+            businessWeekends={true} // travail possible la fin de semaine
+            headerDateFormat={"dddd"} // pour voir les jours de la semaine
+            viewType={"Week"} // 7 jours
+            durationBarVisible={false} // la barre à gauche 
+            timeRangeSelectedHandling={"Disabled"} // la sélection des heures 
             ref={this.calendarRef}
           />
         </div>
