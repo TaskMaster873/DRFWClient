@@ -19,7 +19,6 @@ import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType} from "./type
 
 type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
 
-import * as Bob from "./ServiceWorker";
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
