@@ -49,7 +49,7 @@ export interface EmployeeCreateDTO {
 }
 
 export let employeeTableHeads : string[] =
-    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
+    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
 
 export interface EmployeeProps {
     params: Readonly<Params>;

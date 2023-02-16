@@ -67,8 +67,8 @@ class APIManager extends Logger {
         return this.isAuthenticated;
     }
 
-    public get isAdmin(): boolean {
-        return this.#userRole >= 3;
+    public hasPermission(permissionLevel: number): boolean {
+        return this.#userRole >= permissionLevel;
     }
 
     public getErrorMessageFromCode(error): string {
@@ -273,7 +273,7 @@ class APIManager extends Logger {
     }
 
     public async createEmployee(password: string, employee: Employee): Promise<string | null> {
-        if(!this.isAdmin) {
+        if(!this.hasPermission(4)) {
             return errors.permissionDenied;
         }
         let errorMessage: string | null = null;
@@ -298,7 +298,7 @@ class APIManager extends Logger {
     }
 
     public async createDepartment(department: DepartmentCreateDTO): Promise<string | null> {
-        if(!this.isAdmin) {
+        if(!this.hasPermission) {
             return errors.permissionDenied;
         }
         let errorMessage: string | null = null;

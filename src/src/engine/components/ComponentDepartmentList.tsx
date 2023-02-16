@@ -5,6 +5,7 @@ import {ComponentAddDepartment} from "./ComponentAddDepartment";
 import {API} from "../api/APIManager";
 import {LinkContainer} from "react-router-bootstrap";
 import {ScaleLoader} from "react-spinners";
+import {Roles} from "../types/Roles";
 
 const override: CSSProperties = {
     display: 'flex',
@@ -16,7 +17,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
     public render(): JSX.Element {
         return (<div className="mt-5">
             <h3>Liste des départements</h3>
-            <Table responsive bordered hover>
+            <Table responsive bordered hover className="text-center">
                 <thead>
                 <tr key={"firstCol"}>
                     {departmentTableHeads.map((th) => (<th key={th}>{th}</th>))}
@@ -73,7 +74,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
     }
 
     private renderAddDepartmentComponent(): JSX.Element | undefined {
-        if (API.isAuth() && API.isAdmin) {
+        if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
             return (
                 <ComponentAddDepartment employees={this.props.employees} onDataChange={this.onDataChange.bind(this)}/>);
         }
