@@ -43,7 +43,10 @@ export class ComponentEmployeScheduleView extends React.Component<Props> {
 		let startDate = DayPilot.Date.today();
 
 		for (let index = 0; index < this.listOfShifts.length; index++) {
+			let convertedStartTime = DayPilot.Date.parse(this.listOfShifts[index].start, "yyyy-MM-ddTHH:mm:ss").toString("H:mm");
+			let convertedEndTime = DayPilot.Date.parse(this.listOfShifts[index].end, "yyyy-MM-ddTHH:mm:ss").toString("H:mm");
 			events.push({
+				text: convertedStartTime + " à " + convertedEndTime + "\nProjet: " + this.listOfShifts[index].projectName,
 				start: this.listOfShifts[index].start,
 				end: this.listOfShifts[index].end,
 			});
