@@ -15,6 +15,7 @@ import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import { Shift } from "../types/Shift";
 import {errors} from "../messages/APIMessages";
+import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
 
 type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
 
@@ -34,17 +35,96 @@ class APIManager extends Logger {
     #user: FirebaseAuth.User | null = null;
     #userRole: number = 0;
 
+    #worker: Worker | null = null;
+
     private emulatorLoaded: boolean = false;
     private isAuthenticated: boolean = false;
 
     public awaitLogin: Promise<void> | undefined;
     private subscribers: Array<SubscriberCallback> = [];
 
+    private tasks: Map<string, Task> = new Map<string, Task>();
+
     constructor() {
         super();
 
         this.loadFirebase();
+        this.registerServiceWorker();
     }
+
+    private async registerServiceWorker(): Promise<void> {
+        const worker = new Worker(new URL('./ServiceWorker.ts', import.meta.url));
+
+        let initMessage: ThreadMessage = {
+            type: ThreadMessageType.INIT,
+            taskId: null,
+        }
+
+        worker.postMessage(initMessage);
+
+        this.#worker = worker;
+        this.listenWorkerEvents();
+    }
+
+    private async onWorkerMessage(message: MessageEvent) : Promise<void> {
+        let data = message.data as ThreadMessage;
+
+        switch(data.type) {
+            case ThreadMessageType.TASK_RESPONSE: {
+                await this.onTaskResponse(data.taskId, data.data);
+                break;
+            }
+
+            default: {
+                this.warn(`[MAIN] Unknown message type ${data.type}.`);
+            }
+        }
+    }
+
+    private generateTaskId(): string {
+        return Math.random().toString(36).substring(2);
+    }
+
+    private async requestUserCreationFromWorker(employee: EmployeeCreateDTO, password: string): Promise<CreatedAccountData> {
+        return new Promise((resolve) => {
+            let taskId = this.generateTaskId();
+            let createAccountMessage: ThreadMessage = {
+                type: ThreadMessageType.CREATE_NEW_ACCOUNT,
+                taskId: taskId,
+                data: {
+                    employee: employee,
+                    password: password,
+                }
+            }
+
+            let task: Task = {
+                callback: resolve
+            }
+
+            this.tasks.set(taskId, task);
+            this.#worker?.postMessage(createAccountMessage);
+        });
+    }
+
+    private async onTaskResponse(taskId: string | null, data: CreatedAccountData) : Promise<void> {
+        this.log(`Got response from worker for task ${taskId}`);
+
+        let task = this.tasks.get(taskId || "");
+        if(task) {
+            task.callback(data);
+
+            this.tasks.delete(taskId || "");
+        } else {
+            this.error(`Task ${taskId} not found.`);
+        }
+    }
+
+    private listenWorkerEvents(): void {
+        if(this.#worker !== null && this.#worker) {
+            this.#worker.onmessage = this.onWorkerMessage.bind(this);
+        }
+    }
+
     /**
      * Fonction retourne le nom de l'employé
      * @returns Le nom de l'employé si non défini retourne l'adresse courriel sinon Anonyme
@@ -71,9 +151,17 @@ class APIManager extends Logger {
         return this.#userRole >= 4;
     }
 
-    public getErrorMessageFromCode(error): string {
+    public getErrorMessageFromCode(error: Error | string): string {
         let errorMessage: string;
-        switch (error) {
+        let message: string;
+
+        if(typeof(error) === 'string') {
+            message = error;
+        } else {
+            message = error.message;
+        }
+
+        switch (message) {
             case "auth/invalid-email":
                 errorMessage = errors.invalidLogin;
                 break;
@@ -90,7 +178,7 @@ class APIManager extends Logger {
                 errorMessage = errors.defaultMessage;
                 break;
         }
-        this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${error.message}`);
+        this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${message}`);
         return errorMessage;
     }
 
@@ -274,23 +362,29 @@ class APIManager extends Logger {
 
     public async createEmployee(password: string, employee: EmployeeCreateDTO): Promise<string | null> {
         let errorMessage: string | null = null;
-        let createdUser = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, password)
-            .catch((error: FirebaseAuth.AuthError) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-            });
-        if (this.#auth.currentUser && createdUser && !errorMessage) {
-            //Crée l'utilisateur dans le Firestore
-            await setDoc(doc(this.#db, `employees`, createdUser.user.uid), {...employee}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-                if (this.#auth.currentUser) {
-                    FirebaseAuth.deleteUser(this.#auth.currentUser)
-                }
-            })
-            if(!errorMessage){
-                //Envoie le courriel de vérification
-                errorMessage = await this.verifyEmailAddress(createdUser.user);
+        let createdUserMessageData = await this.requestUserCreationFromWorker(employee, password);
+
+
+        if(createdUserMessageData.error !== null && createdUserMessageData.error) {
+            errorMessage = this.getErrorMessageFromCode(createdUserMessageData.error);
+        } else {
+            let userAuth = createdUserMessageData.createdUser;
+            let userId = userAuth?.userId;
+
+            if(userId !== null && userId !== undefined && userId) {
+                console.log(userId, employee);
+                await setDoc(doc(this.#db, `employees`, userId), {...employee}).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+
+                    // FIREBASE LIMITATION : We can't delete the user if it has been created. Because only connected users can delete them self.
+                });
+
+                // TODO: Send verification email on login until validated.
+            } else {
+                errorMessage = `Erreur inconnue lors de la création de l'employé.`;
             }
         }
+
         return errorMessage;
     }
 

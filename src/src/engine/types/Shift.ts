@@ -7,7 +7,6 @@ export interface ShiftsList {
 }
 
 export interface ShiftForCalendar {
-  text: string,
   start: string;
   end: string;
 }
