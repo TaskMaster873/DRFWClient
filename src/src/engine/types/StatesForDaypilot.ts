@@ -1,7 +1,9 @@
 /**
  * Ceci est pour "standardiser" les paramètres du calendrier.
- * Voici la doc : https://api.daypilot.org/daypilot-calendar-methods/
+ * Voici la doc : https://api.daypilot.org/daypilot-calendar-methods/ et https://api.daypilot.org/daypilot-calendar-properties/
  */
+
+import { EventForCalendar } from "./Shift";
 
 export interface CalendarAttributesForEmployeeSchedule {
     cellsMarkBusiness: boolean; //montrer le gris pâle ou non
@@ -14,3 +16,58 @@ export interface CalendarAttributesForEmployeeSchedule {
     eventMoveHandling: string; //pouvoir le bouger
     eventDeleteHandling: string; // pouvoir le delete
 }
+
+
+/**
+ * Ceci c'est pour le state de création d'employé
+ */
+
+export interface CalendarAttributesForEmployeeCreationComponent {
+	startDate: string;
+	columns: Array<{ name: string; id: string }>; //name = au nom de la personne et id est son id
+	events: EventForCalendar[]; // shift
+	heightSpec?: HeightSpecType;
+	height?: number; //a une valeur de 300px de base
+	cellHeight?: number; // 30px de base
+	cellDuration?: number // le temps que vaut une cellule 30 de base
+	viewType: ViewType; // En bref cela change la vue et ressource serait important pour les départements
+	eventDeleteHandling: EventDeleteHandlingType;
+}
+
+/**
+ * Les chois qu'on a gratuitement
+ */
+export enum HeightSpecType {
+	BusinessHours = "BusinessHours" ,
+	Full = "Full",
+}
+
+/**
+ * La façon que le calendrier s'afficher
+ */
+export enum ViewType {
+	Day = "Day",
+	Week  = "Week",
+	WorkWeek  = "WorkWeek",
+	Days = "Days",
+	Resources  = "Resources"
+}
+
+export enum EventDeleteHandlingType {
+	Update = "Update", //peut delete
+	Disabled = "Disabled", // désactivé
+	CallBack = "CallBack",
+	PostBack = "PostBack",
+
+}
+
+/*startDate: DayPilot.Date.today(),
+			columns: this.doColumns(),
+			//events: this.doEvents(),
+						heightSpec={"Full"}
+						height={2000}
+						cellHeight={20}
+						cellDuration={5}
+						viewType={"Resources"}
+						onTimeRangeSelected={this.onTimeRangeSelected}
+						eventDeleteHandling={"Update"}*/

@@ -6,7 +6,7 @@ import {ScheduleGroup} from "../types/Schedule";
  * Classe qui permet de faire afficher les employé selon les bons groupes (projets)
  */
 export class ResourceGroups extends React.Component<{ groups: ScheduleGroup[], onChange: any }> {
-    private selectRef: React.RefObject<HTMLSelectElement>;
+    private selectRef: React.RefObject<HTMLSelectElement> = React.createRef();
     private groups: ScheduleGroup[];
     private onChange: any;
 
@@ -14,7 +14,6 @@ export class ResourceGroups extends React.Component<{ groups: ScheduleGroup[], o
         super(props);
         this.groups = props.groups;
         this.onChange = props.onChange;
-        this.selectRef = React.createRef();
     }
 
     private find(id: string) {
@@ -33,8 +32,8 @@ export class ResourceGroups extends React.Component<{ groups: ScheduleGroup[], o
     public render() : JSX.Element {
         return (
             <span>
-        Group: &nbsp;
-                <select onChange={(ev) => this.change(ev)} ref={this.selectRef}>
+        Department: &nbsp;
+                <select onChange={(changeDepartment) => this.change(changeDepartment)} ref={this.selectRef}>
           {this.groups.map((item) => (
               <option key={item.id} value={item.id}>
                   {item.name}

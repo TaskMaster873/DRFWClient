@@ -81,7 +81,7 @@ export class ComponentPopupSchedule extends React.Component<Props, State> {
 	 */
 	private resetState() {
 		this.setState({
-			nameOfEvent: "event",
+			nameOfEvent: "Pas de nom",
 			colorOfEvent: "#000000"
 		});
 	}

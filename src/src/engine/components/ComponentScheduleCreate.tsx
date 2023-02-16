@@ -6,6 +6,7 @@ import {ScheduleGroups} from "../types/Schedule";
 import "./ComponentPopupSchedule";
 import {EventForCalendar} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
+import { CalendarAttributesForEmployeeCreationComponent, EventDeleteHandlingType, HeightSpecType, ViewType } from "../types/StatesForDaypilot";
 
 /**
  * Ceci est le composant d'horaire
@@ -14,16 +15,26 @@ export class ComponentScheduleCreate extends React.Component {
 
 	private list: Employee[] = [];
 	private listEvent: EventForCalendar[] = [];
-	child: React.RefObject<ComponentPopupSchedule>;
+	private child: React.RefObject<ComponentPopupSchedule> = React.createRef();
+
+	public state:  CalendarAttributesForEmployeeCreationComponent = {
+		startDate: DayPilot.Date.today().toString(),
+		columns: [], //name = au nom de la personne et id est son id
+		events:[], // shift
+		heightSpec: HeightSpecType.Full,
+		viewType: ViewType.Resources, // En bref cela change la vue et ressource serait important pour les départements
+		eventDeleteHandling: EventDeleteHandlingType.Update,
+	}
+
 	constructor(props: any) {
 		super(props);
-		this.child = React.createRef();
+		
 		//this.dateRef = React.createRef(); //DayPilot.Date.today();
-		this.state = {
+		/*this.state = {
 			startDate: DayPilot.Date.today(),
 			columns: this.doColumns(),
 			//events: this.doEvents(),
-		};
+		};*/
 
 	}
 
@@ -37,22 +48,33 @@ export class ComponentScheduleCreate extends React.Component {
 					<DayPilotCalendar
 						businessBeginsHour={8}
 						businessEndsHour={20}
-						heightSpec={"Full"}
 						height={2000}
 						cellHeight={20}
 						cellDuration={5}
-						viewType={"Resources"}
-						showNonBusiness={false}
-						//onTimeRangeSelected={this.onTimeRangeSelected}
-						eventDeleteHandling={"Update"}
+						onTimeRangeSelected={this.onTimeRangeSelected}
 						{...this.state}
 					/>
-					
+					<ComponentPopupSchedule ref={this.child} isShowing={false} eventAdd={this.ShiftAdd}></ComponentPopupSchedule>
 				</div>
-				/*<ComponentPopupSchedule ref={this.child} isShowing={false} eventAdd={this.eventAdd}></ComponentPopupSchedule>*/
-				//<div>Tu peux me voir</div>*/
 			);
 	}
+
+	/**
+	 * 
+	 * @param event = un shift avec toutes les données pour être créé.
+	 */
+	public ShiftAdd = (event: EventForCalendar) => {
+		console.log(event);
+		this.listEvent.push({
+			id: 1,
+			text: event.start.toString("dd MMMM yyyy ", "fr-fr") + " " + event.start.toString("hh") + "h" + event.start.toString("mm") + "-" + event.end.toString("hh") + "h" + event.end.toString("mm") + " " + event.text,
+			start: event.start,
+			end: event.end,
+			resource: event.resource,
+			barColor: event.barColor,
+		});
+		this.setState({ events: this.listEvent });
+	};
 
 	private doColumns(): Array<{ name: string; id: string }> {
 		let listToReturn: Array<{ name: string; id: string }>;
@@ -63,13 +85,19 @@ export class ComponentScheduleCreate extends React.Component {
 				id: "0",
 			});
 		}*/
-		for (let index = 0; index < 5; index++) {
+		for (let index = 0; index < 10; index++) {
 			listToReturn.push({
 				name: "bob"+ index ,
-				id: "0",
+				id: index.toString(),
 			});
 		}
 		return listToReturn;
+	}
+
+	onTimeRangeSelected = (args: any) => {
+		this.child.current?.saveContent(args.start, args.end, args.resource);
+		//let name = prompt("New event name:", "Event");
+		DayPilot.Calendar.clearSelection;
 	}
 	/*private loadGroups(): ScheduleGroups {
 		let data: ScheduleGroups = {
@@ -168,7 +196,7 @@ export class ComponentScheduleCreate extends React.Component {
 			barColor: event.barColor,
 		});
 		this.setState({ events: this.listEvent });
-	};
+	};*/
 
 	/**
 	 *
