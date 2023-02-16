@@ -19,6 +19,7 @@ import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType} from "./type
 
 type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
 
+import * as Bob from "./ServiceWorker";
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
@@ -62,6 +63,8 @@ class APIManager extends Logger {
 
     private async registerServiceWorker(): Promise<void> {
         try {
+            let bob = import.meta.url;
+            console.log(new URL('./ServiceWorker.ts', import.meta.url));
             const worker = new Worker(new URL('./ServiceWorker.ts', import.meta.url));
 
             let initMessage: ThreadMessage = {
@@ -73,7 +76,9 @@ class APIManager extends Logger {
 
             this.#worker = worker;
             this.listenWorkerEvents();
-        } catch(e) {}
+        } catch(e: any) {
+            this.error(e.message);
+        }
     }
 
     private async onWorkerMessage(message: MessageEvent) : Promise<void> {
