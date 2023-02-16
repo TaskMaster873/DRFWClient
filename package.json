@@ -53,7 +53,8 @@
     "build": "webpack --mode production --progress",
     "emulator": "firebase emulators:start --import=./emulatorSave",
     "export": "firebase emulators:export ./emulatorSave",
-    "test": "jest --config=jest.config.js --watchAll"
+    "test": "jest --config=jest.config.js",
+    "testWatch": "jest --config=jest.config.js --watchAll"
   },
   "resolutions": {
     "glob-parent": "^6.0.2",
