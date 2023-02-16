@@ -19,7 +19,7 @@ const override: CSSProperties = {
 
 export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     public state: EmployeeListProps = {
-        list: null, filteredList: null, department: this.props.department
+        employees: null, filteredList: null, department: this.props.department
     }
 
     constructor(props: EmployeeListProps) {
@@ -28,12 +28,12 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
     static getDerivedStateFromProps(props: EmployeeListProps, state: EmployeeListProps): EmployeeListProps {
         return {
-            list: props.list, department: props.department, filteredList: state.filteredList
+            employees: props.employees, department: props.department, filteredList: state.filteredList
         };
     }
 
     public render(): JSX.Element {
-        let list: Employee[] = this.state.list !== null ? this.state.list : [];
+        let list: Employee[] = this.state.employees !== null ? this.state.employees : [];
 
         let searchProps: SearchParams<Employee> = {list: list, filterList: this.updateList.bind(this)};
         return (<div className="mt-5">
@@ -101,7 +101,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     }
 
     private renderList(): JSX.Element | undefined {
-        let list: Employee[] | null = this.state.filteredList !== null ? this.state.filteredList : this.state.list;
+        let list: Employee[] | null = this.state.filteredList !== null ? this.state.filteredList : this.state.employees;
 
         return (<Table responsive bordered hover>
             <thead>

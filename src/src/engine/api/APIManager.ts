@@ -12,7 +12,7 @@ import {
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
-import {Department} from "../types/Department";
+import {Department, DepartmentCreateDTO} from "../types/Department";
 import { Shift } from "../types/Shift";
 import {errors} from "../messages/APIMessages";
 
@@ -68,12 +68,12 @@ class APIManager extends Logger {
     }
 
     public get isAdmin(): boolean {
-        return this.#userRole >= 4;
+        return this.#userRole >= 3;
     }
 
     public getErrorMessageFromCode(error): string {
         let errorMessage: string;
-        switch (error) {
+        switch (error.code) {
             case "auth/invalid-email":
                 errorMessage = errors.invalidLogin;
                 break;
@@ -90,7 +90,7 @@ class APIManager extends Logger {
                 errorMessage = errors.defaultMessage;
                 break;
         }
-        this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${error.message}`);
+        this.error(`Erreur: ${errorMessage} Code: ${error.code} Message: ${error.message}`);
         return errorMessage;
     }
 
@@ -272,7 +272,10 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async createEmployee(password: string, employee: EmployeeCreateDTO): Promise<string | null> {
+    public async createEmployee(password: string, employee: Employee): Promise<string | null> {
+        if(!this.isAdmin) {
+            return errors.permissionDenied;
+        }
         let errorMessage: string | null = null;
         let createdUser = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, password)
             .catch((error: FirebaseAuth.AuthError) => {
@@ -294,10 +297,13 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async createDepartment(name: string, director: string): Promise<string | null> {
+    public async createDepartment(department: DepartmentCreateDTO): Promise<string | null> {
+        if(!this.isAdmin) {
+            return errors.permissionDenied;
+        }
         let errorMessage: string | null = null;
         let queryDepartment = query(collection(this.#db, `departments`),
-            where("name", "==", name));
+            where("name", "==", department.name));
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         })
@@ -306,7 +312,7 @@ class APIManager extends Logger {
             errorMessage = errors.departmentAlreadyExists;
         }
         if (!errorMessage) {
-            await addDoc(collection(this.#db, `departments`), {name: name, director: director}).catch((error) => {
+            await addDoc(collection(this.#db, `departments`), {...department}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             })
         }

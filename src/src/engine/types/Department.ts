@@ -27,8 +27,15 @@ export interface DepartmentCreateDTO {
 
 }
 
+export interface DepartmentListProps {
+    employees: Employee[],
+    employeeNb: number[],
+    departments: Department[],
+    onDataChange: (department) => PromiseLike<void> | Promise<void> | void;
+}
+
 export interface AddDepartmentProps {
     employees: Employee[];
-    onDataChange: () => PromiseLike<void> | Promise<void> | void;
+    onDataChange: (department) => PromiseLike<void> | Promise<void> | void;
 }
 

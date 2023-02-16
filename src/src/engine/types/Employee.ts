@@ -54,11 +54,11 @@ let employeeTableHeads : string[] =
 export {employeeTableHeads};
 
 export interface EmployeeProps {
-    params: Readonly<Params<string>>;
+    params: Readonly<Params>;
 }
 
 export interface EmployeeListProps {
-    list: Employee[] | null;
+    employees: Employee[] | null;
     filteredList: Employee[] | null;
     department: string | null;
 }
@@ -67,4 +67,5 @@ export interface AddEmployeeProps {
     departments: Department[];
     roles: string[];
     jobTitles: string[];
+    onDataChange: (password, employee) => PromiseLike<void> | Promise<void> | void;
 }
