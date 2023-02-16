@@ -61,8 +61,9 @@ export class ComponentEmployeScheduleView extends React.Component<Props> {
 						selectMode={"week"}
 						showMonths={3} // le nombre de calendrier
 						skipMonths={3} // change 3 mois plus tard quand cliqué
-						startDate={"2023-03-07"} // date de base
-						selectionDay={"2023-03-07"} // date de base
+						startDate={DayPilot.Date.today()} // date de base
+						selectionDay={DayPilot.Date.today()} // date de base
+						rowsPerMonth= {"Auto"}
 						onTimeRangeSelected={args => {
 							this.calendar.update({
 								startDate: args.day
