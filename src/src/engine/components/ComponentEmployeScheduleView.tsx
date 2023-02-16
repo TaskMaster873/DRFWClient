@@ -35,7 +35,9 @@ export class ComponentEmployeScheduleView extends React.Component<Props> {
 		return this.datePickerRef.current.control;
 	}
 
-
+	/**
+	 * Pour le moment on ne fait pas de refresh dans notre app quand il y a des changements dans la bd
+	 */
 	public componentDidMount(): void {
 		let events: ShiftForCalendar[] = [];
 		let startDate = DayPilot.Date.today();
@@ -55,7 +57,7 @@ export class ComponentEmployeScheduleView extends React.Component<Props> {
 		return (
 			<div className='flex_Hundred'>
 				<div className='left'>
-					<DayPilotNavigator
+					<DayPilotNavigator //ceci est les mini calendriers
 						selectMode={"week"}
 						showMonths={3} // le nombre de calendrier
 						skipMonths={3} // change 3 mois plus tard quand cliqué
@@ -70,7 +72,7 @@ export class ComponentEmployeScheduleView extends React.Component<Props> {
 					/>
 				</div>
 				<div className='main'>
-					<DayPilotCalendar
+					<DayPilotCalendar // le calendrier principal
 						{...this.state}
 						ref={this.calendarRef}
 					/>
