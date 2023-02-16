@@ -1,6 +1,6 @@
 import React, {CSSProperties} from "react";
 import {Nav, Table} from "react-bootstrap";
-import {Department, DepartmentListProps} from "../types/Department";
+import {Department, DepartmentListProps, departmentTableHeads} from "../types/Department";
 import {ComponentAddDepartment} from "./ComponentAddDepartment";
 import {API} from "../api/APIManager";
 import {LinkContainer} from "react-router-bootstrap";
@@ -24,10 +24,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
             <Table responsive bordered hover>
                 <thead>
                 <tr key={"firstCol"}>
-                    <th key={"no"}>#</th>
-                    <th key={"name"}>Nom</th>
-                    <th key={"director"}>Directeur(s)/Gérant(s)</th>
-                    <th key={"employeeNb"}>Nombre d'employés</th>
+                    {departmentTableHeads.map((th) => (<th key={th}>{th}</th>))}
                 </tr>
                 </thead>
                 <tbody>

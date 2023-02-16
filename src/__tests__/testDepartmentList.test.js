@@ -5,10 +5,9 @@
 import "@testing-library/jest-dom";
 import {render} from "@testing-library/react";
 import {MemoryRouter} from "react-router-dom";
-import {ComponentEmployeeList} from "../src/engine/components/ComponentEmployeeList";
-import {employeeTableHeads} from "../src/engine/types/Employee";
+import {departmentTableHeads} from "../src/engine/types/Department";
 import {ComponentDepartmentList} from "../src/engine/components/ComponentDepartmentList";
-import {department, departments, departments2, employee, employeeNb, employees, employees2} from "./data/testData";
+import {department, departments, departments2, employeeNb, employees, employees2} from "./data/testData";
 
 jest.mock("../src/engine/api/APIManager");
 test("should render department informations", async () => {
@@ -70,10 +69,10 @@ test("Department number should be incremental", async () => {
     } = getFields();
 
 
-    verifyEmployeeNumber(ths, trs, tds);
+    verifyDepartmentNumber(ths, trs, tds);
 });
 
-test("Employee number should be incremental 2", async () => {
+test("Department number should be incremental 2", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
                                                   onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
@@ -83,10 +82,10 @@ test("Employee number should be incremental 2", async () => {
     } = getFields();
 
 
-    verifyEmployeeNumber(ths, trs, tds);
+    verifyDepartmentNumber(ths, trs, tds);
 });
 
-test("Employee fields should match employee infos", async () => {
+test("Department fields should match employee infos", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
                                                   onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
@@ -95,10 +94,10 @@ test("Employee fields should match employee infos", async () => {
         tds,
     } = getFields();
 
-    checkFieldValues(ths, trs, tds, filteredList);
+    checkFieldValues(ths, trs, tds, employees);
 });
 
-test("Employee fields should match employee infos 2", async () => {
+test("Department fields should match employee infos 2", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments2} employees={employees2}
                                                   onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
@@ -107,7 +106,7 @@ test("Employee fields should match employee infos 2", async () => {
         tds,
     } = getFields();
 
-    checkFieldValues(ths, trs, tds, filteredList2);
+    checkFieldValues(ths, trs, tds, employees2);
 });
 
 function verifyTableLength(ths, trs, tds, list) {
@@ -118,11 +117,11 @@ function verifyTableLength(ths, trs, tds, list) {
 
 function checkTableHeads(ths) {
     for (let i = 0; i < ths.length; i++) {
-        expect(ths[i].innerHTML).toBe(employeeTableHeads[i]);
+        expect(ths[i].innerHTML).toBe(departmentTableHeads[i]);
     }
 }
 
-function verifyEmployeeNumber(ths, trs, tds) {
+function verifyDepartmentNumber(ths, trs, tds) {
     /*
         i: nombre total de "table data"
         j: index représente le numéro courant d'employé

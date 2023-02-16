@@ -18,6 +18,10 @@ export class Department {
         this.director = department.director;
 	}
 }
+
+export let departmentTableHeads : string[] =
+    ["#", "Nom", "Directeur/Gérant", "Nombre d'employés"];
+
 /**
  * Contient tous les renseignements pour créer un nouveau département dans la bd
  */
