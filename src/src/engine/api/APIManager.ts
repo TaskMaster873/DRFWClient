@@ -364,6 +364,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         let createdUserMessageData = await this.requestUserCreationFromWorker(employee, password);
 
+
         if(createdUserMessageData.error !== null && createdUserMessageData.error) {
             errorMessage = this.getErrorMessageFromCode(createdUserMessageData.error);
         } else {
