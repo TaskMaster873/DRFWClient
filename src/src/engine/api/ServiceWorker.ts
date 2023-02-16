@@ -110,6 +110,6 @@ class TaskMasterServiceWorker extends Logger {
     }
 }
 
-//new TaskMasterServiceWorker;
+new TaskMasterServiceWorker;
 
 export {};
