@@ -13,11 +13,6 @@ const override: CSSProperties = {
 };
 
 export class ComponentDepartmentList extends React.Component<DepartmentListProps> {
-
-    public componentDidMount(): void {
-        document.title = "Liste des départements - TaskMaster";
-    }
-
     public render(): JSX.Element {
         return (<div className="mt-5">
             <h3>Liste des départements</h3>

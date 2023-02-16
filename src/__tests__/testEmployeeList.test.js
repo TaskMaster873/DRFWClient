@@ -29,7 +29,7 @@ test("should render employee informations", async () => {
 });
 
 test("should have correct length based on employee list", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees2}
                                                 list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
@@ -41,7 +41,7 @@ test("should have correct length based on employee list", async () => {
 });
 
 test("Table heads should have proper values", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
                                                 list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
@@ -51,7 +51,7 @@ test("Table heads should have proper values", async () => {
 });
 
 test("Table heads should have proper values 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees2}
                                                 list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
@@ -61,7 +61,7 @@ test("Table heads should have proper values 2", async () => {
 });
 
 test("Employee number should be incremental", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
                                                 list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
@@ -74,7 +74,7 @@ test("Employee number should be incremental", async () => {
 });
 
 test("Employee number should be incremental 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees2}
                                                 list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
@@ -87,7 +87,7 @@ test("Employee number should be incremental 2", async () => {
 });
 
 test("Employee fields should match employee infos", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
                                                 list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
@@ -99,7 +99,7 @@ test("Employee fields should match employee infos", async () => {
 });
 
 test("Employee fields should match employee infos 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees2}
                                                 list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
@@ -111,9 +111,9 @@ test("Employee fields should match employee infos 2", async () => {
 });
 
 function verifyTableLength(ths, trs, tds, list) {
-    expect(ths.length).toBe(Object.keys(employee).length);
+    expect(ths.length).toBe(Object.keys(employeeTableHeads).length);
     expect(trs.length).toBe(list.length + 1);
-    expect(tds.length).toBe(Object.keys(employee).length * list.length);
+    expect(tds.length).toBe(Object.keys(employeeTableHeads).length * list.length);
 }
 
 function checkTableHeads(ths) {

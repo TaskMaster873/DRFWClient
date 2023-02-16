@@ -5,7 +5,7 @@
 import "@testing-library/jest-dom";
 import MatchMediaMock from "jest-matchmedia-mock";
 import { render } from "@testing-library/react";
-import testConstants from "../Constants/testConstants";
+import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 

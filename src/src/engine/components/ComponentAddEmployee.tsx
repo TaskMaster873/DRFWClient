@@ -15,8 +15,6 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
     public state: {
         clientId: string; firstName: string; lastName: string; email: string; phoneNumber: string; password: string; role: number; department: string; jobTitles: string[]; skills: string[]; validated?: boolean; error: FormErrorType;
     };
-    private errorMessage = "";
-
     constructor(props: AddEmployeeProps) {
         super(props);
         this.state = {
