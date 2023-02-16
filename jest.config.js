@@ -5,12 +5,44 @@ global.IS_REACT_ACT_ENVIRONMENT = true;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const config = {
-  verbose: false,
-  automock: true,
-  setupFiles: ["./test_setup_files/setup.js"],
-  moduleNameMapper: {
-    "^.+\\.(css|less|scss)$": "identity-obj-proxy",
-  },
+    verbose: false,
+    automock: false,
+    preset: 'ts-jest',
+    testEnvironment: 'jest-environment-jsdom',
+    transformIgnorePatterns: ['<rootDir>/node_modules/'],
+    transform: {
+        ".(ts|tsx)": [
+            'ts-jest',
+            {
+                diagnostics: {
+                    ignoreCodes: [1343]
+                },
+                astTransformers: {
+                    before: [
+                        {
+                            path: 'node_modules/ts-jest-mock-import-meta',  // or, alternatively, 'ts-jest-mock-import-meta' directly, without node_modules.
+                            //options: { metaObjectReplacement: { url: 'https://www.url.com' } }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    maxConcurrency: 4,
+    maxWorkers: '85%',
+
+    setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
+    testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    setupFiles: ['<rootDir>/setupJest.js'],
+    moduleNameMapper: {
+        '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|svg|webp)$': '<rootDir>/src/__mocks__/fileMock.js',
+        "^.+\\.(css|less|sass|scss)$": "<rootDir>/src/__mocks__/styleMock.js",
+    },
+    moduleFileExtensions: [
+        "ts",
+        "tsx",
+        "js"
+    ]
 };
 
-module.exports = config;
+export default config;
