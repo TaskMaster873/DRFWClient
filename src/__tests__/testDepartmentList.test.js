@@ -7,13 +7,13 @@ import {render} from "@testing-library/react";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentEmployeeList} from "../src/engine/components/ComponentEmployeeList";
 import {employeeTableHeads} from "../src/engine/types/Employee";
-import {department, employee, employees} from "./data/testData";
+import {ComponentDepartmentList} from "../src/engine/components/ComponentDepartmentList";
+import {department, departments, departments2, employee, employeeNb, employees, employees2} from "./data/testData";
 
 jest.mock("../src/engine/api/APIManager");
-
-test("should render employee informations", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
-                                                list={employees}/></MemoryRouter>);
+test("should render department informations", async () => {
+    render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
+                                                  onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
         table,
         ths,
@@ -25,24 +25,24 @@ test("should render employee informations", async () => {
     expect(ths).not.toBeNull();
     expect(trs).not.toBeNull();
     expect(tds).not.toBeNull();
-    verifyTableLength(ths, trs, tds, employees);
+    verifyTableLength(ths, trs, tds, departments);
 });
 
-test("should have correct length based on employee list", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
-                                                list={employees2}/></MemoryRouter>);
+test("should have correct length based on department list", async () => {
+    render(<MemoryRouter><ComponentDepartmentList departments={departments2} employees={employees}
+                                                  onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
         ths,
         trs,
         tds,
     } = getFields();
 
-    verifyTableLength(ths, trs, tds, employees2);
+    verifyTableLength(ths, trs, tds, departments2);
 });
 
 test("Table heads should have proper values", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
-                                                list={employees}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
+                                                  onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
@@ -51,8 +51,8 @@ test("Table heads should have proper values", async () => {
 });
 
 test("Table heads should have proper values 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
-                                                list={employees2}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentDepartmentList departments={departments2} employees={employees2}
+                                                  onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
@@ -60,9 +60,9 @@ test("Table heads should have proper values 2", async () => {
     checkTableHeads(ths);
 });
 
-test("Employee number should be incremental", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
-                                                list={employees}/></MemoryRouter>);
+test("Department number should be incremental", async () => {
+    render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
+                                                  onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -74,8 +74,8 @@ test("Employee number should be incremental", async () => {
 });
 
 test("Employee number should be incremental 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
-                                                list={employees2}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
+                                                  onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -87,33 +87,33 @@ test("Employee number should be incremental 2", async () => {
 });
 
 test("Employee fields should match employee infos", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
-                                                list={employees}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
+                                                  onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
         trs,
         ths,
         tds,
     } = getFields();
 
-    checkFieldValues(ths, trs, tds, employees);
+    checkFieldValues(ths, trs, tds, filteredList);
 });
 
 test("Employee fields should match employee infos 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
-                                                list={employees2}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentDepartmentList departments={departments2} employees={employees2}
+                                                  onDataChange={jest.fn()} employeeNb={employeeNb}/></MemoryRouter>);
     const {
         trs,
         ths,
         tds,
     } = getFields();
 
-    checkFieldValues(ths, trs, tds, employees2);
+    checkFieldValues(ths, trs, tds, filteredList2);
 });
 
 function verifyTableLength(ths, trs, tds, list) {
-    expect(ths.length).toBe(Object.keys(employee).length);
+    expect(ths.length).toBe(Object.keys(department).length);
     expect(trs.length).toBe(list.length + 1);
-    expect(tds.length).toBe(Object.keys(employee).length * list.length);
+    expect(tds.length).toBe(Object.keys(department).length * list.length);
 }
 
 function checkTableHeads(ths) {
