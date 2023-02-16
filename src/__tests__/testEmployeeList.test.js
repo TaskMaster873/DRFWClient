@@ -35,11 +35,6 @@ let employee2 = new Employee({
 let filteredList = [employee]
 let filteredList2 = [employee, employee2]
 
-beforeEach(async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
-                                                list={filteredList}/></MemoryRouter>);
-});
-
 test("should render employee informations", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
                                                 list={filteredList}/></MemoryRouter>);
@@ -54,7 +49,7 @@ test("should render employee informations", async () => {
     expect(ths).not.toBeNull();
     expect(trs).not.toBeNull();
     expect(tds).not.toBeNull();
-    verifyTableLength(ths, trs, tds);
+    verifyTableLength(ths, trs, tds, filteredList);
 });
 
 test("should have correct length based on employee list", async () => {
@@ -66,7 +61,7 @@ test("should have correct length based on employee list", async () => {
         tds,
     } = getFields();
 
-    verifyTableLength(ths, trs, tds);
+    verifyTableLength(ths, trs, tds, filteredList2);
 });
 
 test("Table heads should have proper values", async () => {
@@ -99,7 +94,7 @@ test("Employee number should be incremental", async () => {
     } = getFields();
 
 
-    verifyEmployeeNumber(trs, tds, ths);
+    verifyEmployeeNumber(ths, trs, tds);
 });
 
 test("Employee number should be incremental 2", async () => {
@@ -112,7 +107,7 @@ test("Employee number should be incremental 2", async () => {
     } = getFields();
 
 
-    verifyEmployeeNumber(trs, tds, ths);
+    verifyEmployeeNumber(ths, trs, tds);
 });
 
 test("Employee fields should match employee infos", async () => {
@@ -124,7 +119,7 @@ test("Employee fields should match employee infos", async () => {
         tds,
     } = getFields();
 
-    checkFieldValues(trs, tds, ths);
+    checkFieldValues(ths, trs, tds, filteredList);
 });
 
 test("Employee fields should match employee infos 2", async () => {
@@ -136,13 +131,13 @@ test("Employee fields should match employee infos 2", async () => {
         tds,
     } = getFields();
 
-    checkFieldValues(trs, tds, ths);
+    checkFieldValues(ths, trs, tds, filteredList2);
 });
 
-function verifyTableLength(ths, trs, tds) {
+function verifyTableLength(ths, trs, tds, list) {
     expect(ths.length).toBe(Object.keys(employee).length);
-    expect(trs.length).toBe(filteredList.length + 1);
-    expect(tds.length).toBe(Object.keys(employee).length * filteredList.length);
+    expect(trs.length).toBe(list.length + 1);
+    expect(tds.length).toBe(Object.keys(employee).length * list.length);
 }
 
 function checkTableHeads(ths) {
@@ -151,7 +146,7 @@ function checkTableHeads(ths) {
     }
 }
 
-function verifyEmployeeNumber(trs, tds, ths) {
+function verifyEmployeeNumber(ths, trs, tds) {
     /*
         i: nombre total de "table data"
         j: index représente le numéro courant d'employé
@@ -163,16 +158,16 @@ function verifyEmployeeNumber(trs, tds, ths) {
     }
 }
 
-function checkFieldValues(trs, tds, ths) {
+function checkFieldValues(ths, trs, tds, list) {
     /*
         i: nombre total de "table data"
      */
     for (let i = 0; i < trs.length - 1; i++) {
-        expect(tds[i * ths.length + 1].innerHTML).toBe(employee.firstName);
-        expect(tds[i * ths.length + 2].innerHTML).toBe(employee.lastName);
-        expect(tds[i * ths.length + 3].innerHTML).toBe(employee.email);
-        expect(tds[i * ths.length + 4].innerHTML).toBe(employee.phoneNumber);
-        expect(tds[i * ths.length + 5].innerHTML).toBe(employee.department);
+        expect(tds[i * ths.length + 1].innerHTML).toBe(list[i].firstName);
+        expect(tds[i * ths.length + 2].innerHTML).toBe(list[i].lastName);
+        expect(tds[i * ths.length + 3].innerHTML).toBe(list[i].email);
+        expect(tds[i * ths.length + 4].innerHTML).toBe(list[i].phoneNumber);
+        expect(tds[i * ths.length + 5].innerHTML).toBe(list[i].department);
         expect(tds[i * ths.length + 6].innerHTML).toBe("Oui");
         expect(tds[i * ths.length + 7].innerHTML).toBe("");
         expect(tds[i * ths.length + 8].innerHTML).toBe("");
@@ -183,7 +178,7 @@ function checkFieldValues(trs, tds, ths) {
 
 function getFields() {
     const table = document.querySelector("table");
-    const ths = document.querySelectorAll("th");
+    const ths = document.querySelectorAll("tr > th");
     const trs = document.querySelectorAll("tr");
     const tds = document.querySelectorAll("td");
 

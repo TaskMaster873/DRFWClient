@@ -59,7 +59,6 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     }
 
     private getEmployeeList(list: Employee[] | null): JSX.Element[] {
-        console.log(this.state);
         if (list === null) {
             return [<tr key={"firstCol"}>
                 <td colSpan={9}>
