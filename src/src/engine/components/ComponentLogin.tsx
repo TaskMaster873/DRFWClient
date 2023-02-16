@@ -14,6 +14,7 @@ import {NotificationManager} from 'react-notifications';
 
 
 export class ComponentLogin extends React.Component {
+    private errorMessage = "";
     public state: {
         emailLogin: string;
         passwordLogin: string;
