@@ -68,6 +68,7 @@ class APIManager extends Logger {
     }
 
     public get isAdmin(): boolean {
+        console.log( this.#userRole);
         return this.#userRole >= 4;
     }
 

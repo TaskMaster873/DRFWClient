@@ -2,21 +2,29 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import {LinkContainer} from "react-router-bootstrap";
-import {NotificationManager} from 'react-notifications';
+import { LinkContainer } from "react-router-bootstrap";
+import { NotificationManager } from 'react-notifications';
 
 /* === Images === */
 // @ts-ignore
 import Logo from "../../deps/images/logo.png";
-import {API} from "../api/APIManager";
-import {errors, successes} from "../messages/FormMessages";
+import { API } from "../api/APIManager";
+import { errors, successes } from "../messages/FormMessages";
 
 /**
  * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
  */
-export class NavigationBar extends React.Component {
+
+interface NavigationBarType {
+    showCreateSchedule: boolean;
+}
+
+export class NavigationBar extends React.Component<any, NavigationBarType> {
     private _isMountedAPI: boolean = false;
 
+    public state: NavigationBarType = {
+        showCreateSchedule: false,
+    };
     constructor(props) {
         super(props);
 
@@ -33,8 +41,10 @@ export class NavigationBar extends React.Component {
 
     private async onEvent(): Promise<void> {
         return new Promise((resolve) => {
-            if(this._isMountedAPI) {
-                this.setState({}, () => {
+            if (this._isMountedAPI) {
+                this.setState({
+                    showCreateSchedule: true
+                }, () => {
                     resolve();
                 });
             } else {
@@ -43,25 +53,27 @@ export class NavigationBar extends React.Component {
         });
     }
 
+
     public render(): JSX.Element {
         return (
-            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{fontSize: 15}}>
+            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{ fontSize: 15 }}>
                 <Container>
                     <LinkContainer to="/">
                         <Navbar.Brand>
-                    <img
-                        className="me-3"
-                        src={Logo}
-                        alt="Logo TaskMaster"
-                        width={50}
-                        height={60}
-                    />
-                        Task Master</Navbar.Brand>
+                            <img
+                                className="me-3"
+                                src={Logo}
+                                alt="Logo TaskMaster"
+                                width={50}
+                                height={60}
+                            />
+                            Task Master</Navbar.Brand>
                     </LinkContainer>
-                    <Navbar.Toggle aria-controls="responsive-navbar-nav"/>
+                    <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                         {/* eslint-disable-next-line no-restricted-globals */}
                         <Nav activeKey={location.pathname}>
+                            {this.showWhenAdmin()}
                             <LinkContainer to="/schedule">
                                 <Nav.Link>Mon horaire</Nav.Link>
                             </LinkContainer>
@@ -95,7 +107,7 @@ export class NavigationBar extends React.Component {
      *
      * @returns se déconnecter si la personne est connectée
      */
-    private loginButton() : JSX.Element {
+    private loginButton(): JSX.Element {
         if (API.isAuth()) {
             return (
                 <LinkContainer to="/login">
@@ -110,11 +122,24 @@ export class NavigationBar extends React.Component {
             );
         }
     }
+    /**
+     * 
+     * @returns les pages que seulement l'admin peut voir dans le navbar
+     */
+    private showWhenAdmin(): JSX.Element {
+        if (this.state.showCreateSchedule) {
+            return (<LinkContainer to="/create-schedule">
+                <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
+                </LinkContainer>)
+        } else {
+            return (<></>);
+        }
+    }
 
     /**
      * Je ne sais pas si il faudrait le garder
      */
-    private async logOut() : Promise<void> {
+    private async logOut(): Promise<void> {
         let error = await API.logout();
         if (!error) {
             NotificationManager.success(successes.successGenericMessage, successes.logout);

@@ -10,31 +10,30 @@ import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 /**
  * Ceci est le composant d'horaire
  */
-export class ComponentSchedule extends React.Component {
+export class ComponentScheduleCreate extends React.Component {
 
 	private list: Employee[] = [];
 	private listEvent: EventForCalendar[] = [];
 	child: React.RefObject<ComponentPopupSchedule>;
-	constructor(props: EmployeeList) {
+	constructor(props: any) {
 		super(props);
-		this.list = props.list;
 		this.child = React.createRef();
 		//this.dateRef = React.createRef(); //DayPilot.Date.today();
 		this.state = {
 			startDate: DayPilot.Date.today(),
 			columns: this.doColumns(),
-			events: this.doEvents(),
+			//events: this.doEvents(),
 		};
 
 	}
 
-	public render(): JSX.Element {
-		if (this.list === undefined || this.list.length == 0) {
+	public render(): JSX.Element  {
+		/*if (this.list === undefined || this.list.length == 0) {
 			return <div> Il n'y a pas d'horaire à voir</div>;
-		} else
+		} else*/
 			return (
+				//<ResourceGroups groups={this.loadGroups().groups} /*onChange={this.onChange}*/ onChange={undefined} /*onChange={this.onChange}*/ />
 				<div>
-					<ResourceGroups groups={this.loadGroups().groups} onChange={this.onChange} />
 					<DayPilotCalendar
 						businessBeginsHour={8}
 						businessEndsHour={20}
@@ -44,50 +43,35 @@ export class ComponentSchedule extends React.Component {
 						cellDuration={5}
 						viewType={"Resources"}
 						showNonBusiness={false}
-						onTimeRangeSelected={this.onTimeRangeSelected}
+						//onTimeRangeSelected={this.onTimeRangeSelected}
 						eventDeleteHandling={"Update"}
 						{...this.state}
 					/>
-					<ComponentPopupSchedule ref={this.child} isShowing={false} eventAdd={this.eventAdd}></ComponentPopupSchedule>
+					
 				</div>
+				/*<ComponentPopupSchedule ref={this.child} isShowing={false} eventAdd={this.eventAdd}></ComponentPopupSchedule>*/
+				//<div>Tu peux me voir</div>*/
 			);
 	}
 
-	/**
-	 *
-	 * @returns la liste des noms d'employé formattés pour columns de DayPilotCalendar qui existe déjà
-	 *
-	 */
 	private doColumns(): Array<{ name: string; id: string }> {
 		let listToReturn: Array<{ name: string; id: string }>;
 		listToReturn = [];
-		for (let index = 0; index < this.list.length; index++) {
+		/*for (let index = 0; index < this.list.length; index++) {
 			listToReturn.push({
 				name: this.list[index].firstName + " " + this.list[index].firstName,
-				id: "0", /*this.list[index].id.toString()*/
+				id: "0",
+			});
+		}*/
+		for (let index = 0; index < 5; index++) {
+			listToReturn.push({
+				name: "bob"+ index ,
+				id: "0",
 			});
 		}
 		return listToReturn;
 	}
-
-	/**
-	 * 
-	 * charge tous les corps de travail qui existe
-	 * @returns Liste de EventForCalendar qui est une liste de coprs de travail
-	 */
-	private doEvents(): EventForCalendar[] {
-		this.listEvent.push({
-			id: 1,
-			text: "Il faut mettre le temps et le titre",
-			start: DayPilot.Date.today(),
-			end: DayPilot.Date.now(),
-			resource: "1",
-			barColor: "#0C2840",
-		});
-		return this.listEvent;
-	}
-
-	loadGroups() {
+	/*private loadGroups(): ScheduleGroups {
 		let data: ScheduleGroups = {
 			groups: [
 				{
@@ -132,12 +116,48 @@ export class ComponentSchedule extends React.Component {
 			],
 		};
 		return data;
-	}
+	}*/
+}
+	/**
+	 *
+	 * @returns la liste des noms d'employé formattés pour columns de DayPilotCalendar qui existe déjà
+	 *
+	 */
+	//private doColumns(): void /*Array<{ name: string; id: string }> */{
+		/*let listToReturn: Array<{ name: string; id: string }>;
+		listToReturn = [];
+		for (let index = 0; index < this.list.length; index++) {
+			listToReturn.push({
+				name: this.list[index].firstName + " " + this.list[index].firstName,
+				id: "0", /*this.list[index].id.toString()*/
+			//});
+		//}
+		//return listToReturn;
+	//}
+
+	/**
+	 * 
+	 * charge tous les corps de travail qui existe
+	 * @returns Liste de EventForCalendar qui est une liste de coprs de travail
+	 */
+	/*private doEvents(): EventForCalendar[] {
+		this.listEvent.push({
+			id: 1,
+			text: "Il faut mettre le temps et le titre",
+			start: DayPilot.Date.today(),
+			end: DayPilot.Date.now(),
+			resource: "1",
+			barColor: "#0C2840",
+		});
+		return this.listEvent;
+	}*/
+
+	
 	/**
 	  *
 	  * @param args est le nouvel horaire à ajouter avec tout les paramètres.
 	  */
-	eventAdd = (event: EventForCalendar) => {
+	/*eventAdd = (event: EventForCalendar) => {
 		console.log(event);
 		this.listEvent.push({
 			id: 1,
@@ -155,15 +175,15 @@ export class ComponentSchedule extends React.Component {
 	 * @param args le groupe sélectionné
 	 * la fonction change le groupe qui est affiché
 	 */
-	onChange = (args: { selected: { resources: ResourceGroups } }) => {
+	/*onChange = (args: { selected: { resources: ResourceGroups } }) => {
 		this.groupChanged(args.selected);
-	};
+	};*/
 
 	/**
 	 *
 	 * @param group étant le projet qu'on veut montrer ses employés assigné
 	 */
-	private groupChanged(group: { resources: ResourceGroups }): void {
+	/*private groupChanged(group: { resources: ResourceGroups }): void {
 		const columns = group.resources;
 
 		const events = [
@@ -178,14 +198,14 @@ export class ComponentSchedule extends React.Component {
 			// ...
 		];
 		this.setState({ columns: columns, events: events });
-	}
+	}*/
 
 	/**
 	 *
 	 * @param args c'est toutes les données de l'évènement
 	 * @returns rien
 	 */
-	onTimeRangeSelected = (args: any) => {
+	/*onTimeRangeSelected = (args: any) => {
 		this.child.current?.saveContent(args.start, args.end, args.resource);
 		//let name = prompt("New event name:", "Event");
 		DayPilot.Calendar.clearSelection;
@@ -199,5 +219,5 @@ export class ComponentSchedule extends React.Component {
 			barColor: args.barColor,
 		})
 		this.setState({ events: this.listEvent });*/
-	}
-}
+	//}
+//}
