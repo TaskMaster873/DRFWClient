@@ -1,22 +1,11 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+import path from "path";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import { fileURLToPath } from 'url';
 
-<<<<<<< Updated upstream
-module.exports = {
-    entry: {
-        index: {
-            import: "./src/index.ts",
-            dependOn: 'shared',
-        },
-
-        shared: 'lodash',
-    },
-=======
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default {
->>>>>>> Stashed changes
     performance: {
         hints: false,
         maxEntrypointSize: 512000,
