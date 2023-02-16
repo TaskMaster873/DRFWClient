@@ -63,8 +63,6 @@ class APIManager extends Logger {
 
     private async registerServiceWorker(): Promise<void> {
         try {
-            let bob = import.meta.url;
-            console.log(new URL('./ServiceWorker.ts', import.meta.url));
             const worker = new Worker(new URL('./ServiceWorker.ts', import.meta.url));
 
             let initMessage: ThreadMessage = {
@@ -297,20 +295,22 @@ class APIManager extends Logger {
         this.#db = getFirestore(this.#app);
 
         //Should this database be emulated?
-        if (location.hostname === "localhost" && !this.emulatorLoaded) {
-            this.emulatorLoaded = true;
-            connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
-            connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
+        if('indexedDB' in window) {
+            if ('location' in window && location && location.hostname === "localhost" && !this.emulatorLoaded) {
+                this.emulatorLoaded = true;
+                connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
+                connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
 
-            this.log("Firebase emulators loaded");
+                this.log("Firebase emulators loaded");
+            }
+
+            if (!(this.#db as any)._firestoreClient) {
+                await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
+                this.log("IndexedDB persistence enabled");
+            }
+
+            await this.enablePersistence();
         }
-
-        if (!(this.#db as any)._firestoreClient) {
-            await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
-            this.log("IndexedDB persistence enabled");
-        }
-
-        await this.enablePersistence();
 
         let isAnalyticsSupported = await isSupported();
         if (isAnalyticsSupported) {
