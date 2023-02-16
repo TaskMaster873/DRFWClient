@@ -2,7 +2,7 @@ import {Employee} from "./Employee";
 
 export interface DepartmentListState {
     employees: Employee[],
-    employeeNbDepartments: number[],
+    employeeNb: number[],
     departments: Department[]
 }
 

@@ -138,14 +138,9 @@ function checkFieldValues(ths, trs, tds, list) {
         i: nombre total de "table data"
      */
     for (let i = 0; i < trs.length - 1; i++) {
-        expect(tds[i * ths.length + 1].innerHTML).toBe(list[i].firstName);
-        expect(tds[i * ths.length + 2].innerHTML).toBe(list[i].lastName);
-        expect(tds[i * ths.length + 3].innerHTML).toBe(list[i].email);
-        expect(tds[i * ths.length + 4].innerHTML).toBe(list[i].phoneNumber);
-        expect(tds[i * ths.length + 5].innerHTML).toBe(list[i].department);
-        expect(tds[i * ths.length + 6].innerHTML).toBe("Oui");
-        expect(tds[i * ths.length + 7].innerHTML).toBe("");
-        expect(tds[i * ths.length + 8].innerHTML).toBe("");
+        expect(tds[i * ths.length + 1].innerHTML).toBe(list[i].name);
+        expect(tds[i * ths.length + 2].innerHTML).toBe(list[i].director);
+        expect(tds[i * ths.length + 8].innerHTML).toBe(employeeNb[i].toString());
     }
 }
 

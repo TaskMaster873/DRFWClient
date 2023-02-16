@@ -11,7 +11,7 @@ import {NotificationManager} from 'react-notifications';
  */
 export class Departments extends React.Component {
     public state: DepartmentListState = {
-        employees: [], employeeNbDepartments: [], departments: []
+        employees: [], employeeNb: [], departments: []
     }
 
     public async componentDidMount() {
@@ -58,7 +58,7 @@ export class Departments extends React.Component {
     public render(): JSX.Element {
         return (<Container>
                 <ComponentDepartmentList employees={this.state.employees}
-                                         employeeNb={this.state.employeeNbDepartments}
+                                         employeeNb={this.state.employeeNb}
                                          departments={this.state.departments}
                                          onDataChange={this.addDepartment.bind(this)}/>
             </Container>);
