@@ -49,21 +49,31 @@ class APIManager extends Logger {
         super();
 
         this.loadFirebase();
-        this.registerServiceWorker();
+
+        // Stupid JEST doesn't support web workers.
+        try {
+            if(process === null || process === undefined) {
+                this.registerServiceWorker();
+            }
+        } catch(e) {
+            this.registerServiceWorker();
+        }
     }
 
     private async registerServiceWorker(): Promise<void> {
-        const worker = new Worker(new URL('./ServiceWorker.ts', import.meta.url));
+        try {
+            const worker = new Worker(new URL('./ServiceWorker.ts', import.meta.url));
 
-        let initMessage: ThreadMessage = {
-            type: ThreadMessageType.INIT,
-            taskId: null,
-        }
+            let initMessage: ThreadMessage = {
+                type: ThreadMessageType.INIT,
+                taskId: null,
+            }
 
-        worker.postMessage(initMessage);
+            worker.postMessage(initMessage);
 
-        this.#worker = worker;
-        this.listenWorkerEvents();
+            this.#worker = worker;
+            this.listenWorkerEvents();
+        } catch(e) {}
     }
 
     private async onWorkerMessage(message: MessageEvent) : Promise<void> {

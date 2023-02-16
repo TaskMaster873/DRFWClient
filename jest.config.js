@@ -5,11 +5,22 @@ global.IS_REACT_ACT_ENVIRONMENT = true;
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 const config = {
-  verbose: false,
+  verbose: true,
   automock: true,
-  setupFiles: ["./test_setup_files/setup.js"],
+  preset: 'ts-jest/presets/default-esm', // or other ESM presets
   moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
     "^.+\\.(css|less|scss)$": "identity-obj-proxy",
+  },
+  transform: {
+    // '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
+    // '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+      },
+    ],
   },
 };
 
