@@ -92,9 +92,10 @@ test("Department fields should match employee infos", async () => {
         trs,
         ths,
         tds,
+        tdLinks
     } = getFields();
 
-    checkFieldValues(ths, trs, tds, employees);
+    checkFieldValues(ths, trs, tds, tdLinks, departments);
 });
 
 test("Department fields should match employee infos 2", async () => {
@@ -104,9 +105,10 @@ test("Department fields should match employee infos 2", async () => {
         trs,
         ths,
         tds,
+        tdLinks
     } = getFields();
 
-    checkFieldValues(ths, trs, tds, employees2);
+    checkFieldValues(ths, trs, tds, tdLinks, departments2);
 });
 
 function verifyTableLength(ths, trs, tds, list) {
@@ -133,14 +135,15 @@ function verifyDepartmentNumber(ths, trs, tds) {
     }
 }
 
-function checkFieldValues(ths, trs, tds, list) {
+function checkFieldValues(ths, trs, tds, tdLinks, list) {
     /*
         i: nombre total de "table data"
      */
+
     for (let i = 0; i < trs.length - 1; i++) {
-        expect(tds[i * ths.length + 1].innerHTML).toBe(list[i].name);
+        expect(tdLinks[i].innerHTML).toBe(list[i].name);
         expect(tds[i * ths.length + 2].innerHTML).toBe(list[i].director);
-        expect(tds[i * ths.length + 8].innerHTML).toBe(employeeNb[i].toString());
+        expect(tds[i * ths.length + 3].innerHTML).toBe(employeeNb[i].toString());
     }
 }
 
@@ -148,15 +151,17 @@ function checkFieldValues(ths, trs, tds, list) {
 
 function getFields() {
     const table = document.querySelector("table");
-    const ths = document.querySelectorAll("tr > th");
+    const ths = document.querySelectorAll("th");
     const trs = document.querySelectorAll("tr");
     const tds = document.querySelectorAll("td");
+    const tdLinks = document.querySelectorAll("td > a");
 
     return {
         table,
         ths,
         trs,
         tds,
+        tdLinks
     };
 }
 

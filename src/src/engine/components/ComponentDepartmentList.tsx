@@ -47,7 +47,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
             </tr>];
         } else {
             return this.props.departments.map((department, index) => (<tr key={"secondCol" + index}>
-                <td key={"no" + index}>{index}</td>
+                <td key={"no" + index}>{index + 1}</td>
                 <td key={"name " + index}>
                     <LinkContainer
                         to={"/employees/" + department.name}>
