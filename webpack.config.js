@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
+<<<<<<< Updated upstream
 module.exports = {
     entry: {
         index: {
@@ -10,6 +11,12 @@ module.exports = {
 
         shared: 'lodash',
     },
+=======
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
+>>>>>>> Stashed changes
     performance: {
         hints: false,
         maxEntrypointSize: 512000,
@@ -65,9 +72,6 @@ module.exports = {
 	},
     optimization: {
         runtimeChunk: 'single',
-        splitChunks: {
-            chunks: 'all',
-        },
     },
     plugins: [
         new HtmlWebpackPlugin({
