@@ -7,7 +7,7 @@ import {render} from "@testing-library/react";
 import {MemoryRouter} from "react-router-dom";
 import {departmentTableHeads} from "../src/engine/types/Department";
 import {ComponentDepartmentList} from "../src/engine/components/ComponentDepartmentList";
-import {department, departments, departments2, employeeNb, employees, employees2} from "./data/testData";
+import {department, departments, departments2, employeeNb, employees, employees2} from "../Constants/testConstants";
 
 jest.mock("../src/engine/api/APIManager");
 test("should render department informations", async () => {

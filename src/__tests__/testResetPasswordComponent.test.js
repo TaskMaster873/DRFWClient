@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import * as router from 'react-router'
 import {fireEvent, render} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
-import testConstants from "../Constants/testConstants";
+import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import { ComponentResetPassword } from '../src/engine/components/ComponentResetPassword';

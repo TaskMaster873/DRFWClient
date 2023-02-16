@@ -7,13 +7,13 @@ import {render} from "@testing-library/react";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentEmployeeList} from "../src/engine/components/ComponentEmployeeList";
 import {employeeTableHeads} from "../src/engine/types/Employee";
-import {department, employee, employees} from "./data/testData";
+import {department, employee, employees, employees2} from "../Constants/testConstants";
 
 jest.mock("../src/engine/api/APIManager");
 
 test("should render employee informations", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
-                                                list={employees}/></MemoryRouter>);
+                                                list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         table,
         ths,
@@ -30,7 +30,7 @@ test("should render employee informations", async () => {
 
 test("should have correct length based on employee list", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
-                                                list={employees2}/></MemoryRouter>);
+                                                list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
         trs,
@@ -42,7 +42,7 @@ test("should have correct length based on employee list", async () => {
 
 test("Table heads should have proper values", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
-                                                list={employees}/></MemoryRouter>);
+                                                list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
@@ -52,7 +52,7 @@ test("Table heads should have proper values", async () => {
 
 test("Table heads should have proper values 2", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
-                                                list={employees2}/></MemoryRouter>);
+                                                list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
@@ -62,7 +62,7 @@ test("Table heads should have proper values 2", async () => {
 
 test("Employee number should be incremental", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
-                                                list={employees}/></MemoryRouter>);
+                                                list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -75,7 +75,7 @@ test("Employee number should be incremental", async () => {
 
 test("Employee number should be incremental 2", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
-                                                list={employees2}/></MemoryRouter>);
+                                                list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -88,7 +88,7 @@ test("Employee number should be incremental 2", async () => {
 
 test("Employee fields should match employee infos", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees}
-                                                list={employees}/></MemoryRouter>);
+                                                list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -100,7 +100,7 @@ test("Employee fields should match employee infos", async () => {
 
 test("Employee fields should match employee infos 2", async () => {
     render(<MemoryRouter><ComponentEmployeeList department={department} employees={employees2}
-                                                list={employees2}/></MemoryRouter>);
+                                                list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
         ths,
