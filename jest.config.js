@@ -28,6 +28,9 @@ const config = {
             }
         ]
     },
+    maxConcurrency: 4,
+    maxWorkers: '85%',
+
     setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
     testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     setupFiles: ['<rootDir>/setupJest.js'],
