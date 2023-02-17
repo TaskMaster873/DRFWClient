@@ -22,7 +22,7 @@ const override: CSSProperties = {
 
 export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     public state: EmployeeListProps = {
-        employees: null, filteredList: null, department: this.props.department
+        employees: null, filteredList: null, department: this.props.department, onEditEmployee: this.props.onEditEmployee, onDeactivateEmployee: this.props.onDeactivateEmployee
     }
 
     constructor(props: EmployeeListProps) {
@@ -31,7 +31,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
     static getDerivedStateFromProps(props: EmployeeListProps, state: EmployeeListProps): EmployeeListProps {
         return {
-            employees: props.employees, department: props.department, filteredList: state.filteredList
+            employees: props.employees, department: props.department, filteredList: state.filteredList, onEditEmployee: props.onEditEmployee, onDeactivateEmployee: props.onDeactivateEmployee
         };
     }
 
@@ -91,7 +91,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
                     {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
                 </td>
                 <td key={"skills " + index}>{employee.skills}</td>
-                <td key={"action " + index}>{this.renderAdminActions()}</td>
+                <td key={"action " + index}>{this.renderAdminActions(employee)}</td>
             </tr>));
         } else {
             return [<tr key={"firstCol"}>
@@ -125,9 +125,9 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         }
     }
 
-    private renderAdminActions(): JSX.Element | undefined {
-        if(API.isAuth() && API.hasPermission(Roles.ADMIN)) {
-            return <div><a><BiEdit /></a> <a><CgUnavailable /></a></div>
+    private renderAdminActions(employee: Employee): JSX.Element | undefined {
+        if(employee.employeeId && API.isAuth() && API.hasPermission(Roles.ADMIN)) {
+            return <div><a onClick={() => this.props.onEditEmployee(employee)}><BiEdit /></a> <a><CgUnavailable onClick={() => this.props.onDeactivateEmployee(employee.employeeId)}/></a></div>
         }
     }
 }
