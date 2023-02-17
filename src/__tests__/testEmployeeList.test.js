@@ -113,7 +113,7 @@ test("Employee fields should match employee infos 2", async () => {
 function verifyTableLength(ths, trs, tds, list) {
     expect(ths.length).toBe(Object.keys(employeeTableHeads).length);
     expect(trs.length).toBe(list.length + 1);
-    expect(tds.length).toBe(Object.keys(employeeTableHeads).length * list.length);
+    expect(tds.length).toBe((Object.keys(employeeTableHeads).length) * list.length);
 }
 
 function checkTableHeads(ths) {
