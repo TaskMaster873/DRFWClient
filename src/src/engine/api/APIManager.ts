@@ -8,7 +8,7 @@ import {confirmPasswordReset, connectAuthEmulator, verifyPasswordResetCode} from
 import {
     QuerySnapshot,
     DocumentData,
-    addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, getDocs, getFirestore, query, QueryDocumentSnapshot, setDoc, where, enableIndexedDbPersistence} from "firebase/firestore";
+    addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, getDocs, getFirestore, query, QueryDocumentSnapshot, setDoc, where, enableIndexedDbPersistence, Timestamp} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
@@ -313,7 +313,7 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async getEmployees(department?: string): Promise<Employee[] | string> {
+    public async getEmployees(department?: string): Promise<Employee[]> {
         let errorMessage: string | null = null;
         let employees: Employee[] = []
         let queryDepartment = query(collection(this.#db, `employees`));
@@ -329,6 +329,7 @@ class APIManager extends Logger {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 let data = doc.data();
                 employees.push(new Employee({
+                    employeeId: doc.id,
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
@@ -340,10 +341,10 @@ class APIManager extends Logger {
                 }))
             })
         }
-        return errorMessage ?? employees;
+        return employees;
     }
 
-    public async getDepartments(): Promise<Department[] | string> {
+    public async getDepartments(): Promise<Department[]> {
         let errorMessage: string | null = null;
         let departments: Department[] = []
         let queryDepartment = query(collection(this.#db, `departments`));
@@ -355,7 +356,7 @@ class APIManager extends Logger {
                 departments.push(new Department({name: doc.data().name, director: doc.data().director}))
             })
         }
-        return errorMessage ?? departments;
+        return departments;
     }
 
     public async getEmployeeNbDepartments(departments: Department[]): Promise<number[] | string> {
@@ -434,6 +435,10 @@ class APIManager extends Logger {
         return errorMessage ?? jobTitles;
     }
 
+    private getDayPilotDateString(date: Timestamp) : string{
+        return new Date(date.seconds*1000).toISOString().slice(0,-5);
+    }
+
     public async getScheduleForOneEmployee(): Promise<Shift[]> {
         let shifts: Shift[] = [];
         if(this.isAuthenticated){
@@ -448,9 +453,10 @@ class APIManager extends Logger {
                         let data = doc.data();
                         shifts.push(new Shift({
                             employeeId: data.employeeId,
+                            department: data.department,
                             projectName: data.projectName,
-                            start: data.start,
-                            end: data.end,
+                            start: this.getDayPilotDateString(data.start),
+                            end: this.getDayPilotDateString(data.end),
                         }))
                     })
                 }
@@ -460,6 +466,48 @@ class APIManager extends Logger {
             return shifts;
         }
 
+    }
+
+    private getFirebaseTimestamp(daypilotString : string) : Timestamp{
+        return new Timestamp(new Date(daypilotString).getTime()/1000, 0);
+    }
+
+    public async getDailyScheduleForDepartment(startDay: string, endDay: string, departmentName: string): Promise<Shift[]> {
+        let shifts: Shift[] = [];
+        if(this.isAuthenticated){
+            //Convert string datetimes to Timestamps
+            let convertedStartDay: Timestamp = this.getFirebaseTimestamp(startDay);
+            let convertedEndDay: Timestamp = this.getFirebaseTimestamp(endDay);
+            //Get employees by department
+            let employees: Employee[] = await this.getEmployees(departmentName);
+                let queryShifts = query(collection(this.#db, `shifts`), where("department", "==", departmentName), where("end", ">", convertedStartDay), where ("end", "<", convertedEndDay));
+                let snaps = await getDocs(queryShifts).catch((e) => {
+                    this.error(e);
+                })
+            if(snaps) {
+                snaps.docs.forEach((doc) => {
+                    let data = doc.data();
+                    //Get employee name if present
+                    let fetchedEmployeeName = "Unknown"
+                    employees.forEach(element => {
+                        if(element.employeeId == data.employeeId){
+                            fetchedEmployeeName = element.firstName + " " + element.lastName;
+                        }
+                    });
+                    //Build shift objects
+                    shifts.push(new Shift({
+                        employeeName: fetchedEmployeeName,
+                        employeeId: data.employeeId,
+                        department: data.department,
+                        projectName: data.projectName,
+                        start: this.getDayPilotDateString(data.start),
+                        end: this.getDayPilotDateString(data.end),
+                    }))
+                })
+            
+            }
+        }
+        return shifts;
     }
 }
 
