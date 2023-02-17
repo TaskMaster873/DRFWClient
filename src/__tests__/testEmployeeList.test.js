@@ -7,7 +7,7 @@ import {render} from "@testing-library/react";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentEmployeeList} from "../src/engine/components/ComponentEmployeeList";
 import {employeeTableHeads} from "../src/engine/types/Employee";
-import {department, employee, employees, employees2} from "../Constants/testConstants";
+import {department, employees, employees2} from "../Constants/testConstants";
 
 jest.mock("../src/engine/api/APIManager");
 
@@ -111,9 +111,9 @@ test("Employee fields should match employee infos 2", async () => {
 });
 
 function verifyTableLength(ths, trs, tds, list) {
-    expect(ths.length).toBe(Object.keys(employeeTableHeads).length);
+    expect(ths.length).toBe(employeeTableHeads.length);
     expect(trs.length).toBe(list.length + 1);
-    expect(tds.length).toBe((Object.keys(employeeTableHeads).length) * list.length);
+    expect(tds.length).toBe((employeeTableHeads.length) * list.length);
 }
 
 function checkTableHeads(ths) {
@@ -154,7 +154,7 @@ function checkFieldValues(ths, trs, tds, list) {
 
 function getFields() {
     const table = document.querySelector("table");
-    const ths = document.querySelectorAll("tr > th");
+    const ths = document.querySelectorAll("th");
     const trs = document.querySelectorAll("tr");
     const tds = document.querySelectorAll("td");
 

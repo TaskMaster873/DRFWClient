@@ -91,7 +91,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
                     {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
                 </td>
                 <td key={"skills " + index}>{employee.skills}</td>
-                {this.renderAdminActions(index)}
+                <td key={"action " + index}>{this.renderAdminActions()}</td>
             </tr>));
         } else {
             return [<tr key={"firstCol"}>
@@ -125,9 +125,9 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
         }
     }
 
-    private renderAdminActions(index: number): JSX.Element | undefined {
+    private renderAdminActions(): JSX.Element | undefined {
         if(API.isAuth() && API.hasPermission(Roles.ADMIN)) {
-            return <td key={"action " + index}><a><BiEdit /></a> <a><CgUnavailable /></a></td>
+            return <div><a><BiEdit /></a> <a><CgUnavailable /></a></div>
         }
     }
 }
