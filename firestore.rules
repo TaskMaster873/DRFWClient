@@ -21,19 +21,20 @@ service cloud.firestore {
         request.resource.data.lastName is string &&
         request.resource.data.phoneNumber is string &&
         request.resource.data.department is string &&
-        request.resource.data.jobTitles is map &&
-        request.resource.data.skills is map &&
+        request.resource.data.isActive is bool &&
+        request.resource.data.jobTitles is list &&
+        request.resource.data.skills is list &&
         request.resource.data.role is number
       }
 
       function isValidEmployee(employeeId) {
         let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
-        let hasAllfields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email',
-        'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
+        let hasOnlyfields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email',
+        'phoneNumber', 'department', 'isActive', 'jobTitles', 'skills', 'role']);
 
 
-        return createdValidEmployee && hasAllfields
-        && hasMinPermission(request.auth.uid, 4) && employeeFieldTypes();
+        return createdValidEmployee && hasOnlyfields
+        && hasMinPermission(request.auth.uid, 3) && employeeFieldTypes();
       }
 
       function departmentFieldTypes() {
@@ -52,7 +53,7 @@ service cloud.firestore {
         let hasAllfields = request.resource.data.keys().hasOnly(['name', 'director']);
 
         return createdValidDepartment && hasAllfields && request.auth != null
-        && hasMinPermission(request.auth.uid, 4) && departmentFieldTypes();
+        && hasMinPermission(request.auth.uid, 3) && departmentFieldTypes();
       }
 
       function nameFieldTypes() {
@@ -69,7 +70,7 @@ service cloud.firestore {
         let hasAllfields = request.resource.data.keys().hasOnly(['name']);
 
         return createdValidRole && hasAllfields
-        && hasMinPermission(request.auth.uid, 5) && nameFieldTypes();
+        && hasMinPermission(request.auth.uid, 4) && nameFieldTypes();
       }
 
       match /jobTitles/{jobTitleId} {
@@ -82,7 +83,7 @@ service cloud.firestore {
         let hasAllfields = request.resource.data.keys().hasOnly(['name']);
 
         return createdValidJobTitle && hasAllfields
-        && hasMinPermission(request.auth.uid, 4) && nameFieldTypes();
+        && hasMinPermission(request.auth.uid, 3) && nameFieldTypes();
       }
 
       match /shifts/{shiftId} {

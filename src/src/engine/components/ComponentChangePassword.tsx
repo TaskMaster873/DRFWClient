@@ -15,7 +15,6 @@ import Logo from "../../deps/images/logo.png";
  * state : ancien mot de passe, nouveau mot de passe, validation requis et regex de mot de passe
  */
 export class ComponentChangePassword extends React.Component {
-    private errorMessage = "";
     public state: { oldPassword: string; newPassword: string; validated: boolean, error: FormErrorType };
 
     constructor(props) {

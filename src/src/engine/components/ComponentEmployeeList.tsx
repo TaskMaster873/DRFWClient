@@ -5,6 +5,9 @@ import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 import {API} from "../api/APIManager";
 import {ScaleLoader} from "react-spinners";
+import {BiEdit} from "react-icons/bi"
+import {Roles} from "../types/Roles";
+import {CgUnavailable} from "react-icons/cg";
 import {SearchParams} from "../types/SearchParams";
 
 /***
@@ -19,7 +22,7 @@ const override: CSSProperties = {
 
 export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     public state: EmployeeListProps = {
-        list: null, filteredList: null, department: this.props.department
+        employees: null, filteredList: null, department: this.props.department
     }
 
     constructor(props: EmployeeListProps) {
@@ -28,12 +31,12 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
     static getDerivedStateFromProps(props: EmployeeListProps, state: EmployeeListProps): EmployeeListProps {
         return {
-            list: props.list, department: props.department, filteredList: state.filteredList
+            employees: props.employees, department: props.department, filteredList: state.filteredList
         };
     }
 
     public render(): JSX.Element {
-        let list: Employee[] = this.state.list !== null ? this.state.list : [];
+        let list: Employee[] = this.state.employees !== null ? this.state.employees : [];
 
         let searchProps: SearchParams<Employee> = {list: list, filterList: this.updateList.bind(this)};
         return (<div className="mt-5">
@@ -54,8 +57,6 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
             <Col xs={7}><h3>Liste des employés du département {this.state.department}</h3></Col>
             <Col xs={2}></Col>
             <Col xs={3}><ComponentSearchBar {...searchProps} /></Col></Row>);
-        //}
-        //return <h3>Liste des employés du département {this.state.department}</h3>;
     }
 
     private getEmployeeList(list: Employee[] | null): JSX.Element[] {
@@ -90,6 +91,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
                     {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
                 </td>
                 <td key={"skills " + index}>{employee.skills}</td>
+                <td key={"action " + index}><a><BiEdit /></a> {this.renderAdminActions()}</td>
             </tr>));
         } else {
             return [<tr key={"firstCol"}>
@@ -101,9 +103,9 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     }
 
     private renderList(): JSX.Element | undefined {
-        let list: Employee[] | null = this.state.filteredList !== null ? this.state.filteredList : this.state.list;
+        let list: Employee[] | null = this.state.filteredList !== null ? this.state.filteredList : this.state.employees;
 
-        return (<Table responsive bordered hover>
+        return (<Table responsive bordered hover className="text-center">
             <thead>
             <tr key={"firstCol"}>
                 {employeeTableHeads.map((th) => (<th key={th}>{th}</th>))}
@@ -116,10 +118,16 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     }
 
     private renderAddEmployeeButton(): JSX.Element | undefined {
-        if (API.isAuth() && API.isAdmin) {
+        if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
             return (<LinkContainer to="/add-employee">
                 <Button className="mt-3 mb-3">Ajouter</Button>
             </LinkContainer>);
+        }
+    }
+
+    private renderAdminActions(): JSX.Element | undefined {
+        if(API.isAuth() && API.hasPermission(Roles.ADMIN)) {
+            return <a><CgUnavailable /></a>
         }
     }
 }

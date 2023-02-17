@@ -2,7 +2,7 @@ import {Employee} from "./Employee";
 
 export interface DepartmentListState {
     employees: Employee[],
-    employeeNbDepartments: number[],
+    employeeNb: number[],
     departments: Department[]
 }
 
@@ -18,6 +18,10 @@ export class Department {
         this.director = department.director;
 	}
 }
+
+export let departmentTableHeads : string[] =
+    ["#", "Nom", "Directeur/Gérant", "Nombre d'employés"];
+
 /**
  * Contient tous les renseignements pour créer un nouveau département dans la bd
  */
@@ -27,8 +31,15 @@ export interface DepartmentCreateDTO {
 
 }
 
+export interface DepartmentListProps {
+    employees: Employee[],
+    employeeNb: number[],
+    departments: Department[],
+    onDataChange: (department) => PromiseLike<void> | Promise<void> | void;
+}
+
 export interface AddDepartmentProps {
     employees: Employee[];
-    onDataChange: () => PromiseLike<void> | Promise<void> | void;
+    onDataChange: (department) => PromiseLike<void> | Promise<void> | void;
 }
 

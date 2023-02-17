@@ -51,17 +51,15 @@ export interface EmployeeCreateDTO {
     readonly role: number;
 }
 
-let employeeTableHeads : string[] =
-    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
-
-export {employeeTableHeads};
+export let employeeTableHeads : string[] =
+    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
 
 export interface EmployeeProps {
-    params: Readonly<Params<string>>;
+    params: Readonly<Params>;
 }
 
 export interface EmployeeListProps {
-    list: Employee[] | null;
+    employees: Employee[] | null;
     filteredList: Employee[] | null;
     department: string | null;
 }
@@ -70,4 +68,5 @@ export interface AddEmployeeProps {
     departments: Department[];
     roles: string[];
     jobTitles: string[];
+    onDataChange: (password, employee) => PromiseLike<void> | Promise<void> | void;
 }
