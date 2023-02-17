@@ -11,7 +11,7 @@ import {
     addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, getDocs, getFirestore, query, QueryDocumentSnapshot, setDoc, where, enableIndexedDbPersistence, Timestamp} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
-import {Employee, EmployeeCreateDTO} from "../types/Employee";
+import {Employee, EmployeeCreateDTO, EmployeeDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import { Shift } from "../types/Shift";
 import {errors} from "../messages/APIMessages";
@@ -300,12 +300,12 @@ class APIManager extends Logger {
                 connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
                 connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
 
-                this.log("Firebase emulators loaded");
-            }
+                if (!(this.#db as any)._firestoreClient) {
+                    await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
+                    this.log("IndexedDB persistence enabled");
+                }
 
-            if (!(this.#db as any)._firestoreClient) {
-                await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
-                this.log("IndexedDB persistence enabled");
+                this.log("Firebase emulators loaded");
             }
 
             await this.enablePersistence();
@@ -374,13 +374,25 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    private generateEmployeeDTO(employee: Employee): EmployeeDTO {
+        return {
+            department: employee.department,
+            email: employee.email,
+            firstName: employee.firstName,
+            jobTitles: employee.jobTitles,
+            lastName: employee.lastName,
+            phoneNumber: employee.phoneNumber,
+            role: employee.role,
+            skills: employee.skills
+        };
+    }
+
     public async createEmployee(password: string, employee: Employee): Promise<string | null> {
         if(!this.hasPermission(4)) {
             return errors.permissionDenied;
         }
         let errorMessage: string | null = null;
         let createdUserMessageData = await this.requestUserCreationFromWorker(employee, password);
-
 
         if(createdUserMessageData.error !== null && createdUserMessageData.error) {
             errorMessage = this.getErrorMessageFromCode(createdUserMessageData.error);
@@ -389,8 +401,8 @@ class APIManager extends Logger {
             let userId = userAuth?.userId;
 
             if(userId !== null && userId !== undefined && userId) {
-                console.log(userId, employee);
-                await setDoc(doc(this.#db, `employees`, userId), {...employee}).catch((error) => {
+                let dto = this.generateEmployeeDTO(employee);
+                await setDoc(doc(this.#db, `employees`, userId), {...dto}).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
 
                     // FIREBASE LIMITATION : We can't delete the user if it has been created. Because only connected users can delete them self.
@@ -635,7 +647,7 @@ class APIManager extends Logger {
                         end: this.getDayPilotDateString(data.end),
                     }))
                 })
-            
+
             }
         }
         return shifts;
