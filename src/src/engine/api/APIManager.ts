@@ -669,6 +669,39 @@ class APIManager extends Logger {
         }
         return shifts;
     }
+    /**
+     * 
+     * @param shift est un shift avec toutes les données pour le créer
+     * @returns un booléen pour savoir si il est créé
+     */
+    public async createShift(shift: Shift): Promise<boolean> {
+        let isCreated: boolean = false
+        //Check if user has permission
+        if(!this.hasPermission(2)) {//Gestionnaire
+            return false;
+        }
+        //Get Employee Name and department
+        console.log("CreateShift",shift)
+        let queryEmployee = doc(this.#db, `employees`, shift.employeeId)
+
+        let snaps = await getDoc(queryEmployee).catch((error) => {
+            this.getErrorMessageFromCode(error);
+        })
+        if (snaps) {
+            let data = snaps.data();
+            if(data) { 
+                shift.employeeName = data.employeeName;
+                shift.department = data.department;
+            }
+        }
+        shift.projectName = "testing"
+        //Create Shift
+        let success = await addDoc(collection(this.#db, `shifts`), {...shift}).catch((error) => {
+            this.getErrorMessageFromCode(error);
+        })
+        if(success) isCreated = true;
+        return isCreated;
+    }
 }
 
 export const API = new APIManager;
