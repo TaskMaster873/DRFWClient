@@ -8,9 +8,7 @@ import {ScaleLoader} from "react-spinners";
 import {Roles} from "../types/Roles";
 
 const override: CSSProperties = {
-    display: 'flex',
-    alignSelf: 'center',
-    margin: '0 auto',
+    display: 'flex', alignSelf: 'center', margin: '0 auto',
 };
 
 export class ComponentDepartmentList extends React.Component<DepartmentListProps> {
@@ -68,7 +66,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
     }
 
     private async onDataChange(department: Department): Promise<void> {
-        if(this.props.onDataChange !== null && this.props.onDataChange) {
+        if (this.props.onDataChange !== null && this.props.onDataChange) {
             await this.props.onDataChange(department);
         }
     }
