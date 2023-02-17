@@ -5,12 +5,11 @@
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
-import testConstants from "../Constants/testConstants";
+import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
 jest.mock("../src/engine/api/APIManager");
-const {API} = require("../src/engine/api/APIManager");
 let user;
 
 let departments = [{name: "Informatique"}];

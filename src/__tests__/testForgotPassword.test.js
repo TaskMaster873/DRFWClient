@@ -2,7 +2,7 @@ import "@testing-library/react/dist/fire-event";
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
-import testConstants from "../Constants/testConstants";
+import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ForgotPassword} from "../src/engine/pages/forgotPassword";

@@ -9,14 +9,32 @@ import Logo from "../../deps/images/logo.png";
 import {API} from "../api/APIManager";
 
 export class ComponentHomePage extends React.Component {
+    private isMounted: boolean = false;
+
     constructor(props) {
         super(props);
 
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private onEvent(): void {
-        this.forceUpdate();
+    public componentDidMount() {
+        this.isMounted = true;
+    }
+
+    public componentWillUnmount() {
+        this.isMounted = false;
+    }
+
+    private async onEvent(): Promise<void> {
+        return new Promise((resolve) => {
+            if(this.isMounted) {
+                this.setState({}, () => {
+                    resolve();
+                });
+            } else {
+                resolve();
+            }
+        });
     }
 
     public render(): JSX.Element {

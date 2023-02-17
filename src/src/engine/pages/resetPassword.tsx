@@ -5,6 +5,7 @@ import { API } from "../api/APIManager";
 import { ComponentLoading } from "../components/ComponentLoading";
 import { ComponentResetPassword } from "../components/ComponentResetPassword";
 import { NotificationManager } from "react-notifications";
+import { errors } from "../messages/FormMessages";
 
 
 /**
@@ -28,7 +29,12 @@ export function ResetPassword() {
   }, []);
 
   const verifyActionCode = async () => {
-    setEmail(await API.verifyResetPassword(actionCode));
+    let email = await API.verifyResetPassword(actionCode);
+    if(email) {
+      setEmail(email);
+    }else{
+      setEmail("None")
+    }
   };
 
   switch(email){
@@ -38,8 +44,8 @@ export function ResetPassword() {
     case "None":
       //Le actionCode est invalide
       NotificationManager.error(
-        "Erreur",
-        "L'hyperlien de réinitialisation de mot de passe est invalide ou expiré. Essayez à nouveau."
+        errors.invalidActionCode,
+        errors.errorGenericMessage
       );
       return <Navigate to="/forgot-password"/>;
     default:

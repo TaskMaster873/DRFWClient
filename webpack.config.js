@@ -1,11 +1,20 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+import path from "path";
+import HtmlWebpackPlugin from "html-webpack-plugin";
+import { fileURLToPath } from 'url';
 
-module.exports = {
-    entry: "./src/index.ts",
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
+    performance: {
+        hints: false,
+        maxEntrypointSize: 512000,
+        maxAssetSize: 512000
+    },
+    devtool: false,
     output: {
 		path: path.join(__dirname, "build"),
-		filename: "index.bundle.js",
+		filename: "[name].bundle.js",
 		publicPath: "/"
 	},
     mode: process.env.NODE_ENV || "development",
@@ -23,7 +32,6 @@ module.exports = {
             "crypto": false
         }
     },
-    devServer: { static: path.join(__dirname, "src") },
     module: {
         unknownContextCritical: false,
         rules: [
@@ -49,10 +57,15 @@ module.exports = {
     },
 	devServer: {
 		historyApiFallback: true,
+        static: path.join(__dirname, "src")
 	},
+    optimization: {
+        runtimeChunk: 'single',
+    },
     plugins: [
         new HtmlWebpackPlugin({
             template: path.join(__dirname, "src/html", "index.html"),
+            favicon: "./src/html/favicon.ico",
         }),
     ]
 };

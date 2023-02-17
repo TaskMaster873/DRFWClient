@@ -1,11 +1,11 @@
 import React from "react";
-import {BrowserRouter as Router, Route, Routes, useParams} from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes, useParams, Params} from "react-router-dom";
 
 import "../deps/css/Engine.css";
 import "../deps/css/index.css";
 
 import {Index} from "./pages";
-import {Schedule} from "./pages/schedule";
+import {Schedule} from "./pages/scheduleEmployee";
 import {Employees} from "./pages/employees";
 import {About} from "./pages/about";
 import {Login} from "./pages/login";
@@ -21,9 +21,10 @@ import {NotificationContainer} from 'react-notifications';
 import { ComponentLoading } from "./components/ComponentLoading";
 import { ForgotPassword } from "./pages/forgotPassword";
 import 'react-notifications/lib/notifications.css';
+import { CreateSchedule } from "./pages/createSchedule";
 
 function EmployeeWrapper(): any {
-    let parameters: any = useParams();
+    let parameters: Readonly<Params<string>> = useParams();
     return (
         <Employees  {...{params: parameters}}/>
     );
@@ -64,6 +65,7 @@ export class Engine extends React.Component {
                         <Routes>
                             <Route path="/" element={<Index/>}/>
                             <Route path="/schedule" element={<Schedule/>}/>
+                            <Route path="/create-schedule" element={<CreateSchedule/>}/>
                             <Route path="/departments" element={<Departments/>}/>
                             <Route path="/employees/:id" element={<EmployeeWrapper/>}/>
                             <Route path="/about" element={<About/>}/>
