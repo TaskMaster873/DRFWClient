@@ -422,7 +422,7 @@ class APIManager extends Logger {
         if (!this.hasPermission) {
             return errors.permissionDenied;
         }
-        await updateDoc(doc(this.#db, `departments`, employeeId), {isActive: false}).catch((error) => {
+        await updateDoc(doc(this.#db, `employees`, employeeId), {isActive: false}).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
 
@@ -475,6 +475,7 @@ class APIManager extends Logger {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
+                    isActive: data.isActive,
                     phoneNumber: data.phoneNumber,
                     department: data.department,
                     jobTitles: data.jobTitles,

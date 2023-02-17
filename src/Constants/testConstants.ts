@@ -23,6 +23,7 @@ let employee = new Employee({
     email: "georgeBelleau@gmail.com",
     phoneNumber: "418-532-5323",
     department: "Construction",
+    isActive: true,
     jobTitles: [],
     skills: [],
     role: 1,
@@ -32,6 +33,7 @@ let employee2 = new Employee({
     firstName: "Mathieu",
     lastName: "Bédard",
     email: "mathieubedard@gmail.com",
+    isActive: true,
     phoneNumber: "418-325-2222",
     department: "Informatique",
     jobTitles: [],
@@ -49,10 +51,10 @@ let department2 = new Department({
     name: "Informatique", director: "Jasmin"
 })
 
-let departments : Department[] = [department];
-let departments2 : Department[] = [department, department2];
+let departments: Department[] = [department];
+let departments2: Department[] = [department, department2];
 
-let employeeNb : number[] = [1, 2];
+let employeeNb: number[] = [1, 2];
 
 export {employee, employee2, employees, employees2, department, department2, departments, departments2, employeeNb};
 

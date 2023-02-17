@@ -11,9 +11,8 @@ service cloud.firestore {
 
       match /employees/{employeeId} {
       	allow read;
-        allow write: if isValidEmployee(employeeId);
-        allow update:  if isValidEmployee(employeeId);
         allow create: if isValidEmployee(employeeId);
+        allow update:  if isValidUpdateEmployee(employeeId);
       }
 
       function employeeFieldTypes() {
@@ -35,6 +34,21 @@ service cloud.firestore {
         return createdValidEmployee && hasOnlyfields
         && hasMinPermission(request.auth.uid, 3) && employeeFieldTypes();
       }
+
+      function employeeActiveFieldType() {
+      	return request.resource.data.isActive is bool;
+      }
+
+
+      function isValidUpdateEmployee(employeeId) {
+  			let validEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
+        let hasOnlyFields = request.resource.data.keys().hasOnly(
+        ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role'])
+        || request.resource.data.keys().hasOnly(['isActive']);
+
+  			return validEmployee /*&& hasOnlyFields*/ && hasMinPermission(request.auth.uid, 3)
+        /*&& (employeeFieldTypes() || employeeActiveFieldType()*/;
+			}
 
       function departmentFieldTypes() {
       	return request.resource.data.name is string &&
@@ -87,7 +101,17 @@ service cloud.firestore {
 
       match /shifts/{shiftId} {
     		allow read;
+        allow create: if isValidShift(shiftId);
+        allow update: if isValidShift(shiftId);
     	}
+
+      function isValidShift(shiftId) {
+        let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+        let hasAllfields = request.resource.data.keys().hasOnly(['name']);
+
+        return createdValidShift && hasAllfields
+        && hasMinPermission(request.auth.uid, 3) && nameFieldTypes();
+      }
     }
     	
   }
