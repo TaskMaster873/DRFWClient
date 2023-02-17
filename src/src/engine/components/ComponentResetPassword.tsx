@@ -19,10 +19,9 @@ type Props = {
  * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un nouveau
  */
 export function ComponentResetPassword(props: Props) {
-  const errorMessage = "";
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
-  const [validated, setValdiated] = useState(false);
+  const [validated, setValidated] = useState(false);
   const [error, setError] = useState(FormErrorType.NO_ERROR);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -37,7 +36,7 @@ export function ComponentResetPassword(props: Props) {
     event.preventDefault();
     event.stopPropagation();
 
-    setValdiated(true);
+    setValidated(true);
     setError(errorType);
 
     if (errorType === FormErrorType.NO_ERROR) {

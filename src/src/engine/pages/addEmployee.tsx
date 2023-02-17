@@ -1,6 +1,9 @@
 import React from "react";
 import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {API} from "../api/APIManager";
+import {Employee} from "../types/Employee";
+import {errors, successes} from "../messages/FormMessages";
+import {NotificationManager} from 'react-notifications';
 
 /**
  * Ceci est la page pour ajouter un employé
@@ -19,6 +22,15 @@ export class AddEmployee extends React.Component {
         this.setState({departments: departments, roles: roles, titles: titles})
         document.title = "Ajouter un Employé - TaskMaster";
     }
+
+    public async addEmployee(password : string, employee: Employee) {
+        let error = await API.createEmployee(password, employee);
+        if (!error) {
+            NotificationManager.success(successes.successGenericMessage, successes.employeeCreated);
+        } else {
+            NotificationManager.error(error, errors.errorGenericMessage);
+        }
+    }
     /**
      *
      * @returns ComponentAddEmployee avec la liste de titre et celle de role
@@ -29,6 +41,7 @@ export class AddEmployee extends React.Component {
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
+                onDataChange={this.addEmployee.bind(this)}
             />
         );
     }

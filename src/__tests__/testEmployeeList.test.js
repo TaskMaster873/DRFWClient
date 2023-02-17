@@ -6,38 +6,14 @@ import "@testing-library/jest-dom";
 import {render} from "@testing-library/react";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentEmployeeList} from "../src/engine/components/ComponentEmployeeList";
-import {Employee, employeeTableHeads} from "../src/engine/types/Employee";
+import {employeeTableHeads} from "../src/engine/types/Employee";
+import {department, employees, employees2} from "../Constants/testConstants";
 
 jest.mock("../src/engine/api/APIManager");
 
-let department = "Informatique";
-let employee = new Employee({
-    firstName: "George",
-    lastName: "Belleau",
-    email: "georgeBelleau@gmail.com",
-    phoneNumber: "418-532-5323",
-    department: "Construction",
-    jobTitles: [],
-    skills: [],
-    role: 1,
-})
-
-let employee2 = new Employee({
-    firstName: "Mathieu",
-    lastName: "Bédard",
-    email: "mathieubedard@gmail.com",
-    phoneNumber: "418-325-2222",
-    department: "Informatique",
-    jobTitles: [],
-    skills: [],
-    role: 2,
-})
-let filteredList = [employee]
-let filteredList2 = [employee, employee2]
-
 test("should render employee informations", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
-                                                list={filteredList}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
+                                                list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         table,
         ths,
@@ -49,24 +25,24 @@ test("should render employee informations", async () => {
     expect(ths).not.toBeNull();
     expect(trs).not.toBeNull();
     expect(tds).not.toBeNull();
-    verifyTableLength(ths, trs, tds, filteredList);
+    verifyTableLength(ths, trs, tds, employees);
 });
 
 test("should have correct length based on employee list", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList2}
-                                                list={filteredList2}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees2}
+                                                list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
         trs,
         tds,
     } = getFields();
 
-    verifyTableLength(ths, trs, tds, filteredList2);
+    verifyTableLength(ths, trs, tds, employees2);
 });
 
 test("Table heads should have proper values", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
-                                                list={filteredList}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
+                                                list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
@@ -75,8 +51,8 @@ test("Table heads should have proper values", async () => {
 });
 
 test("Table heads should have proper values 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList2}
-                                                list={filteredList2}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees2}
+                                                list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
@@ -85,8 +61,8 @@ test("Table heads should have proper values 2", async () => {
 });
 
 test("Employee number should be incremental", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
-                                                list={filteredList}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
+                                                list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -98,8 +74,8 @@ test("Employee number should be incremental", async () => {
 });
 
 test("Employee number should be incremental 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList2}
-                                                list={filteredList2}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees2}
+                                                list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -111,33 +87,33 @@ test("Employee number should be incremental 2", async () => {
 });
 
 test("Employee fields should match employee infos", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList}
-                                                list={filteredList}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees}
+                                                list={employees} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
         ths,
         tds,
     } = getFields();
 
-    checkFieldValues(ths, trs, tds, filteredList);
+    checkFieldValues(ths, trs, tds, employees);
 });
 
 test("Employee fields should match employee infos 2", async () => {
-    render(<MemoryRouter><ComponentEmployeeList department={department} filteredList={filteredList2}
-                                                list={filteredList2}/></MemoryRouter>);
+    render(<MemoryRouter><ComponentEmployeeList department={department.name} employees={employees2}
+                                                list={employees2} filteredList={employees}/></MemoryRouter>);
     const {
         trs,
         ths,
         tds,
     } = getFields();
 
-    checkFieldValues(ths, trs, tds, filteredList2);
+    checkFieldValues(ths, trs, tds, employees2);
 });
 
 function verifyTableLength(ths, trs, tds, list) {
-    expect(ths.length).toBe(Object.keys(employee).length);
+    expect(ths.length).toBe(employeeTableHeads.length);
     expect(trs.length).toBe(list.length + 1);
-    expect(tds.length).toBe(Object.keys(employee).length * list.length);
+    expect(tds.length).toBe((employeeTableHeads.length) * list.length);
 }
 
 function checkTableHeads(ths) {
@@ -178,7 +154,7 @@ function checkFieldValues(ths, trs, tds, list) {
 
 function getFields() {
     const table = document.querySelector("table");
-    const ths = document.querySelectorAll("tr > th");
+    const ths = document.querySelectorAll("th");
     const trs = document.querySelectorAll("tr");
     const tds = document.querySelectorAll("td");
 

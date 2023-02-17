@@ -4,12 +4,10 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {EventForCalendar} from "../types/Shift";
-
-type Props = { isShowing: boolean, eventAdd: Function };
+type Props = { isShowing: boolean, eventAdd: any };
 type State = { isShowed?: boolean, nameOfEvent?: string, colorOfEvent?: string, start?: DayPilot.Date, end?: DayPilot.Date, resource?: string }
 
 export class ComponentPopupSchedule extends React.Component<Props, State> {
-
 	constructor(props: Props) {
 		super(props);
 		this.state = {

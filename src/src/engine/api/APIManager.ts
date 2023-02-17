@@ -8,13 +8,14 @@ import {confirmPasswordReset, connectAuthEmulator, verifyPasswordResetCode} from
 import {
     QuerySnapshot,
     DocumentData,
-    addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, getDocs, getFirestore, query, QueryDocumentSnapshot, setDoc, where, enableIndexedDbPersistence} from "firebase/firestore";
+    addDoc, collection, connectFirestoreEmulator, doc, Firestore, getDoc, getDocs, getFirestore, query, QueryDocumentSnapshot, setDoc, where, enableIndexedDbPersistence, Timestamp} from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
-import {Department} from "../types/Department";
+import {Department, DepartmentCreateDTO} from "../types/Department";
 import { Shift } from "../types/Shift";
 import {errors} from "../messages/APIMessages";
+import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
 
 type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
 
@@ -34,17 +35,108 @@ class APIManager extends Logger {
     #user: FirebaseAuth.User | null = null;
     #userRole: number = 0;
 
+    #worker: Worker | null = null;
+
     private emulatorLoaded: boolean = false;
     private isAuthenticated: boolean = false;
 
     public awaitLogin: Promise<void> | undefined;
     private subscribers: Array<SubscriberCallback> = [];
 
+    private tasks: Map<string, Task> = new Map<string, Task>();
+
     constructor() {
         super();
 
         this.loadFirebase();
+
+        // Stupid JEST doesn't support web workers.
+        try {
+            if(process === null || process === undefined) {
+                this.registerServiceWorker();
+            }
+        } catch(e) {
+            this.registerServiceWorker();
+        }
     }
+
+    private async registerServiceWorker(): Promise<void> {
+        try {
+            const worker = new Worker(new URL('./ServiceWorker.ts', import.meta.url));
+
+            let initMessage: ThreadMessage = {
+                type: ThreadMessageType.INIT,
+                taskId: null,
+            }
+
+            worker.postMessage(initMessage);
+
+            this.#worker = worker;
+            this.listenWorkerEvents();
+        } catch(e: any) {
+            this.error(e.message);
+        }
+    }
+
+    private async onWorkerMessage(message: MessageEvent) : Promise<void> {
+        let data = message.data as ThreadMessage;
+
+        switch(data.type) {
+            case ThreadMessageType.TASK_RESPONSE: {
+                await this.onTaskResponse(data.taskId, data.data);
+                break;
+            }
+
+            default: {
+                this.warn(`[MAIN] Unknown message type ${data.type}.`);
+            }
+        }
+    }
+
+    private generateTaskId(): string {
+        return Math.random().toString(36).substring(2);
+    }
+
+    private async requestUserCreationFromWorker(employee: EmployeeCreateDTO, password: string): Promise<CreatedAccountData> {
+        return new Promise((resolve) => {
+            let taskId = this.generateTaskId();
+            let createAccountMessage: ThreadMessage = {
+                type: ThreadMessageType.CREATE_NEW_ACCOUNT,
+                taskId: taskId,
+                data: {
+                    employee: employee,
+                    password: password,
+                }
+            }
+
+            let task: Task = {
+                callback: resolve
+            }
+
+            this.tasks.set(taskId, task);
+            this.#worker?.postMessage(createAccountMessage);
+        });
+    }
+
+    private async onTaskResponse(taskId: string | null, data: CreatedAccountData) : Promise<void> {
+        this.log(`Got response from worker for task ${taskId}`);
+
+        let task = this.tasks.get(taskId || "");
+        if(task) {
+            task.callback(data);
+
+            this.tasks.delete(taskId || "");
+        } else {
+            this.error(`Task ${taskId} not found.`);
+        }
+    }
+
+    private listenWorkerEvents(): void {
+        if(this.#worker !== null && this.#worker) {
+            this.#worker.onmessage = this.onWorkerMessage.bind(this);
+        }
+    }
+
     /**
      * Fonction retourne le nom de l'employé
      * @returns Le nom de l'employé si non défini retourne l'adresse courriel sinon Anonyme
@@ -67,14 +159,21 @@ class APIManager extends Logger {
         return this.isAuthenticated;
     }
 
-    public get isAdmin(): boolean {
-        console.log( this.#userRole);
-        return this.#userRole >= 4;
+    public hasPermission(permissionLevel: number): boolean {
+        return this.#userRole >= permissionLevel;
     }
 
-    public getErrorMessageFromCode(error): string {
+    public getErrorMessageFromCode(error: Error | string): string {
         let errorMessage: string;
-        switch (error) {
+        let message: string;
+
+        if(typeof(error) === 'string') {
+            message = error;
+        } else {
+            message = error.message;
+        }
+
+        switch (message) {
             case "auth/invalid-email":
                 errorMessage = errors.invalidLogin;
                 break;
@@ -91,7 +190,7 @@ class APIManager extends Logger {
                 errorMessage = errors.defaultMessage;
                 break;
         }
-        this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${error.message}`);
+        this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${message}`);
         return errorMessage;
     }
 
@@ -195,20 +294,22 @@ class APIManager extends Logger {
         this.#db = getFirestore(this.#app);
 
         //Should this database be emulated?
-        if (location.hostname === "localhost" && !this.emulatorLoaded) {
-            this.emulatorLoaded = true;
-            connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
-            connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
+        if('indexedDB' in window) {
+            if ('location' in window && location && location.hostname === "localhost" && !this.emulatorLoaded) {
+                this.emulatorLoaded = true;
+                connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
+                connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
 
-            this.log("Firebase emulators loaded");
+                this.log("Firebase emulators loaded");
+            }
+
+            if (!(this.#db as any)._firestoreClient) {
+                await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
+                this.log("IndexedDB persistence enabled");
+            }
+
+            await this.enablePersistence();
         }
-
-        if (!(this.#db as any)._firestoreClient) {
-            await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
-            this.log("IndexedDB persistence enabled");
-        }
-
-        await this.enablePersistence();
 
         let isAnalyticsSupported = await isSupported();
         if (isAnalyticsSupported) {
@@ -273,32 +374,44 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async createEmployee(password: string, employee: EmployeeCreateDTO): Promise<string | null> {
+    public async createEmployee(password: string, employee: Employee): Promise<string | null> {
+        if(!this.hasPermission(4)) {
+            return errors.permissionDenied;
+        }
         let errorMessage: string | null = null;
-        let createdUser = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, password)
-            .catch((error: FirebaseAuth.AuthError) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-            });
-        if (this.#auth.currentUser && createdUser && !errorMessage) {
-            //Crée l'utilisateur dans le Firestore
-            await setDoc(doc(this.#db, `employees`, createdUser.user.uid), {...employee}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-                if (this.#auth.currentUser) {
-                    FirebaseAuth.deleteUser(this.#auth.currentUser)
-                }
-            })
-            if(!errorMessage){
-                //Envoie le courriel de vérification
-                errorMessage = await this.verifyEmailAddress(createdUser.user);
+        let createdUserMessageData = await this.requestUserCreationFromWorker(employee, password);
+
+
+        if(createdUserMessageData.error !== null && createdUserMessageData.error) {
+            errorMessage = this.getErrorMessageFromCode(createdUserMessageData.error);
+        } else {
+            let userAuth = createdUserMessageData.createdUser;
+            let userId = userAuth?.userId;
+
+            if(userId !== null && userId !== undefined && userId) {
+                console.log(userId, employee);
+                await setDoc(doc(this.#db, `employees`, userId), {...employee}).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+
+                    // FIREBASE LIMITATION : We can't delete the user if it has been created. Because only connected users can delete them self.
+                });
+
+                // TODO: Send verification email on login until validated.
+            } else {
+                errorMessage = `Erreur inconnue lors de la création de l'employé.`;
             }
         }
+
         return errorMessage;
     }
 
-    public async createDepartment(name: string, director: string): Promise<string | null> {
+    public async createDepartment(department: DepartmentCreateDTO): Promise<string | null> {
+        if(!this.hasPermission) {
+            return errors.permissionDenied;
+        }
         let errorMessage: string | null = null;
         let queryDepartment = query(collection(this.#db, `departments`),
-            where("name", "==", name));
+            where("name", "==", department.name));
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         })
@@ -307,14 +420,14 @@ class APIManager extends Logger {
             errorMessage = errors.departmentAlreadyExists;
         }
         if (!errorMessage) {
-            await addDoc(collection(this.#db, `departments`), {name: name, director: director}).catch((error) => {
+            await addDoc(collection(this.#db, `departments`), {...department}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             })
         }
         return errorMessage;
     }
 
-    public async getEmployees(department?: string): Promise<Employee[] | string> {
+    public async getEmployees(department?: string): Promise<Employee[]> {
         let errorMessage: string | null = null;
         let employees: Employee[] = []
         let queryDepartment = query(collection(this.#db, `employees`));
@@ -330,6 +443,7 @@ class APIManager extends Logger {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 let data = doc.data();
                 employees.push(new Employee({
+                    employeeId: doc.id,
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
@@ -341,10 +455,10 @@ class APIManager extends Logger {
                 }))
             })
         }
-        return errorMessage ?? employees;
+        return employees;
     }
 
-    public async getDepartments(): Promise<Department[] | string> {
+    public async getDepartments(): Promise<Department[]> {
         let errorMessage: string | null = null;
         let departments: Department[] = []
         let queryDepartment = query(collection(this.#db, `departments`));
@@ -356,7 +470,7 @@ class APIManager extends Logger {
                 departments.push(new Department({name: doc.data().name, director: doc.data().director}))
             })
         }
-        return errorMessage ?? departments;
+        return departments;
     }
 
     public async getEmployeeNbDepartments(departments: Department[]): Promise<number[] | string> {
@@ -435,6 +549,10 @@ class APIManager extends Logger {
         return errorMessage ?? jobTitles;
     }
 
+    private getDayPilotDateString(date: Timestamp) : string{
+        return new Date(date.seconds*1000).toISOString().slice(0,-5);
+    }
+
     public async getScheduleForOneEmployee(): Promise<Shift[]> {
         let shifts: Shift[] = [];
         if(this.isAuthenticated){
@@ -449,9 +567,10 @@ class APIManager extends Logger {
                         let data = doc.data();
                         shifts.push(new Shift({
                             employeeId: data.employeeId,
+                            department: data.department,
                             projectName: data.projectName,
-                            start: data.start,
-                            end: data.end,
+                            start: this.getDayPilotDateString(data.start),
+                            end: this.getDayPilotDateString(data.end),
                         }))
                     })
                 }
@@ -461,6 +580,48 @@ class APIManager extends Logger {
             return shifts;
         }
 
+    }
+
+    private getFirebaseTimestamp(daypilotString : string) : Timestamp{
+        return new Timestamp(new Date(daypilotString).getTime()/1000, 0);
+    }
+
+    public async getDailyScheduleForDepartment(startDay: string, endDay: string, departmentName: string): Promise<Shift[]> {
+        let shifts: Shift[] = [];
+        if(this.isAuthenticated){
+            //Convert string datetimes to Timestamps
+            let convertedStartDay: Timestamp = this.getFirebaseTimestamp(startDay);
+            let convertedEndDay: Timestamp = this.getFirebaseTimestamp(endDay);
+            //Get employees by department
+            let employees: Employee[] = await this.getEmployees(departmentName);
+                let queryShifts = query(collection(this.#db, `shifts`), where("department", "==", departmentName), where("end", ">", convertedStartDay), where ("end", "<", convertedEndDay));
+                let snaps = await getDocs(queryShifts).catch((e) => {
+                    this.error(e);
+                })
+            if(snaps) {
+                snaps.docs.forEach((doc) => {
+                    let data = doc.data();
+                    //Get employee name if present
+                    let fetchedEmployeeName = "Unknown"
+                    employees.forEach(element => {
+                        if(element.employeeId == data.employeeId){
+                            fetchedEmployeeName = element.firstName + " " + element.lastName;
+                        }
+                    });
+                    //Build shift objects
+                    shifts.push(new Shift({
+                        employeeName: fetchedEmployeeName,
+                        employeeId: data.employeeId,
+                        department: data.department,
+                        projectName: data.projectName,
+                        start: this.getDayPilotDateString(data.start),
+                        end: this.getDayPilotDateString(data.end),
+                    }))
+                })
+
+            }
+        }
+        return shifts;
     }
 }
 

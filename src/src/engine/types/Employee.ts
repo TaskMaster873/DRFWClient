@@ -12,6 +12,7 @@ export interface EmployeeList {
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
+    employeeId?: string= "";
     lastName: string =  "";
     firstName: string = "";
     email: string = "";
@@ -23,6 +24,7 @@ export class Employee {
     role: number = 0;
 
     constructor(employee: EmployeeCreateDTO) {
+        this.employeeId = employee.employeeId;
 		this.firstName = employee.firstName;
         this.lastName = employee.lastName;
         this.email = employee.email;
@@ -38,6 +40,7 @@ export class Employee {
  * Contient tous les renseignements pour créer un iduveau employé dans la bd
  */
 export interface EmployeeCreateDTO {
+    readonly employeeId?: string;
 	readonly firstName: string;
     readonly lastName: string;
     readonly email: string;
@@ -48,17 +51,15 @@ export interface EmployeeCreateDTO {
     readonly role: number;
 }
 
-let employeeTableHeads : string[] =
-    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
-
-export {employeeTableHeads};
+export let employeeTableHeads : string[] =
+    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
 
 export interface EmployeeProps {
-    params: Readonly<Params<string>>;
+    params: Readonly<Params>;
 }
 
 export interface EmployeeListProps {
-    list: Employee[] | null;
+    employees: Employee[] | null;
     filteredList: Employee[] | null;
     department: string | null;
 }
@@ -67,4 +68,5 @@ export interface AddEmployeeProps {
     departments: Department[];
     roles: string[];
     jobTitles: string[];
+    onDataChange: (password, employee) => PromiseLike<void> | Promise<void> | void;
 }
