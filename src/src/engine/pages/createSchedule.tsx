@@ -20,9 +20,9 @@ export class CreateSchedule extends React.Component {
 
 	public async componentDidMount() {
 		document.title = "Création d'horaire - TaskMaster";
-		let shifts = await API.getDailyScheduleForDepartment("2023-03-06T00:00:00", "2023-03-07T00:00:00","bob3");
+		let shifts = await API.getDailyScheduleForDepartment("2023-02-17T00:00:00", "2023-02-18T00:00:00","bob3");
 		console.log(shifts);
-		this.setState({list: this.fakeListShift});
+		this.setState({list: shifts});
 		//let shifts = await API.getScheduleForOneEmployee(); // pour get tout les heures de l'employé connecté
 		//this.setState({list: shifts});
 
@@ -37,7 +37,7 @@ export class CreateSchedule extends React.Component {
                         <ComponentLoading />
                     );
                 default:
-                    return (<ComponentScheduleCreate listFetchedFromApi={this.state.list} />);
+                    return (<ComponentScheduleCreate listFetchedFromApi={listData} />);
             }
         } else {
             return (<div></div>);

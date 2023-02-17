@@ -1,3 +1,4 @@
+import {DayPilot} from "@daypilot/daypilot-lite-react";
 /**
  * Ceci est pour "standardiser" les paramètres du calendrier.
  * Voici la doc : https://api.daypilot.org/daypilot-calendar-methods/ et https://api.daypilot.org/daypilot-calendar-properties/
@@ -32,7 +33,11 @@ export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	cellDuration?: number // le temps que vaut une cellule 30 de base
 	viewType: ViewType; // En bref cela change la vue et ressource serait important pour les départements
 	eventDeleteHandling: EventDeleteHandlingType;
-	ListOfShifts?: ShiftForEventCreation[];
+	ListOfShifts: ShiftForEventCreation[];
+	isShowingModal: boolean;
+	start: DayPilot.Date;
+	end: DayPilot.Date;
+	resourceName: string;
 }
 
 export class ColumnsClass {
