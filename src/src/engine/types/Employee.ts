@@ -13,7 +13,6 @@ export interface EmployeeDTO {
     firstName: string;
     email: string;
     phoneNumber: string;
-    isActive: boolean;
     department: string;
     jobTitles: string[];
     skills: string[];

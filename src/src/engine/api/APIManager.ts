@@ -379,7 +379,6 @@ class APIManager extends Logger {
             department: employee.department,
             email: employee.email,
             firstName: employee.firstName,
-            isActive: employee.isActive,
             jobTitles: employee.jobTitles,
             lastName: employee.lastName,
             phoneNumber: employee.phoneNumber,
