@@ -13,7 +13,6 @@ import Logo from "../../deps/images/logo.png";
  * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un courriel
  */
 export function ComponentForgotPassword() {
-    const errorMessage = "";
     const [email, setEmail] = useState("");
     const [validated, setValidated] = useState(false);
     const [error, setError] = useState(FormErrorType.NO_ERROR);

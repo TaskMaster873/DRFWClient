@@ -4,9 +4,8 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType, successes} from "../messages/FormMessages";
-import {API} from "../api/APIManager";
-import {NotificationManager} from 'react-notifications';
-import {AddDepartmentProps} from "../types/Department";
+
+import {AddDepartmentProps, Department} from "../types/Department";
 import { Employee } from "../types/Employee";
 
 /**
@@ -85,9 +84,9 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
         );
     }
 
-    private async onDataChange() : Promise<void> {
+    private async onDataChange(department: Department) : Promise<void> {
         if(this.props.onDataChange !== null && this.props.onDataChange) {
-            await this.props.onDataChange();
+            await this.props.onDataChange(department);
         }
     }
 
@@ -109,14 +108,9 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let errorMessage = await API.createDepartment(this.state.name, this.state.director);
-            if (!errorMessage) {
-                NotificationManager.success(successes.successGenericMessage, successes.departmentCreated);
+            let department = new Department({name: this.state.name, director: this.state.director});
+            await this.onDataChange(department);
 
-                await this.onDataChange();
-            } else {
-                NotificationManager.error(errorMessage, errors.errorGenericMessage);
-            }
         }
     }
 
