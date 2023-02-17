@@ -28,6 +28,7 @@ export class Employee {
 		this.firstName = employee.firstName;
         this.lastName = employee.lastName;
         this.email = employee.email;
+        this.isActive = employee.isActive;
 		this.phoneNumber = employee.phoneNumber;
         this.department = employee.department;
         this.jobTitles = employee.jobTitles;
@@ -56,6 +57,7 @@ export interface EmployeeDTO {
     readonly lastName: string;
     readonly email: string;
     readonly phoneNumber: string;
+    readonly isActive: boolean;
     readonly department: string;
     readonly jobTitles: string[];
     readonly skills: string[];

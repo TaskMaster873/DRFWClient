@@ -27,10 +27,16 @@ export class Employees extends React.Component<EmployeeProps> {
 
     public async deactivateEmployee(employeeId: string) {
         let error = await API.deactivateEmployee(employeeId);
-        let employees: Employee[] = this.state.employees;
-        let employee = employees.find(elem => elem.employeeId == employeeId);
         if (!error) {
             NotificationManager.success(successes.successGenericMessage, successes.employeeDeactivated);
+            let employees: Employee[] = this.state.employees;
+            let employeeIndex = employees.findIndex(elem => elem.employeeId == employeeId);
+            let employee = employees.find(elem => elem.employeeId == employeeId);
+            if(employee && employeeIndex != -1) {
+                employee.isActive = false;
+                employees[employeeIndex] = employee;
+                this.setState({employees: employees});
+            }
         } else {
             NotificationManager.error(error, errors.errorGenericMessage);
         }

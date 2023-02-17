@@ -44,8 +44,11 @@ export class Departments extends React.Component {
         if (!errorMessage) {
             NotificationManager.success(successes.successGenericMessage, successes.departmentCreated);
             let departments = this.state.departments;
+            let employeeNb = this.state.employeeNb;
             departments.push(department);
-            this.setState({departments: departments});
+            employeeNb.push(0);
+            this.setState({departments: departments, employeeNb: employeeNb});
+            await this.fetchData();
         } else {
             NotificationManager.error(errorMessage, errors.errorGenericMessage);
         }
