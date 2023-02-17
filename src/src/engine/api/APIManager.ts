@@ -549,6 +549,11 @@ class APIManager extends Logger {
         return errorMessage ?? jobTitles;
     }
 
+    /**
+     * Converti un Timestamp firebase en string daypilot
+     * @param date le timestamp firebase à convertir
+     * @returns string daypilot Ex: (2 février 2022 à 3h15 AM) = 2022-02-16T03:15:00
+     */
     private getDayPilotDateString(date: Timestamp) : string{
         return new Date(date.seconds*1000).toISOString().slice(0,-5);
     }
@@ -582,10 +587,22 @@ class APIManager extends Logger {
 
     }
 
+    /**
+     * Converti une date de daypilot en timestamp firebase
+     * @param daypilotString string daypilot Ex: (2 février 2022 à 3h15 AM) = 2022-02-16T03:15:00
+     * @returns Timestamp firebase
+     */
     private getFirebaseTimestamp(daypilotString : string) : Timestamp{
         return new Timestamp(new Date(daypilotString).getTime()/1000, 0);
     }
 
+    /**
+     * Récupère l'horaire de la journée d'un département pour une journée
+     * @param startDay le début de la journée en string daypilot Ex: (2 février 2022 début de journée) = 2022-02-16T00:00:00
+     * @param endDay la fin de la journée en string daypilot Ex: (2 février 2022 fin de journée) = 2022-02-16T24:00:00
+     * @param departmentName le nom du département que récupérer
+     * @returns une liste de quarts de travail d'un département pour une journée
+     */
     public async getDailyScheduleForDepartment(startDay: string, endDay: string, departmentName: string): Promise<Shift[]> {
         let shifts: Shift[] = [];
         if(this.isAuthenticated){
