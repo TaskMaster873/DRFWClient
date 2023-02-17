@@ -25,7 +25,7 @@ import {
     where
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
-import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
+import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO, EmployeeDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
@@ -316,12 +316,12 @@ class APIManager extends Logger {
                 connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
                 connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
 
-                this.log("Firebase emulators loaded");
-            }
+                if (!(this.#db as any)._firestoreClient) {
+                    await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
+                    this.log("IndexedDB persistence enabled");
+                }
 
-            if (!(this.#db as any)._firestoreClient) {
-                await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
-                this.log("IndexedDB persistence enabled");
+                this.log("Firebase emulators loaded");
             }
 
             await this.enablePersistence();
