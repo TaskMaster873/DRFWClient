@@ -86,8 +86,18 @@ service cloud.firestore {
       }
 
       match /shifts/{shiftId} {
-    		allow read;
+    		allow read;allow create: if isValidShift(shiftId);
+        allow create: if isValidShift(shiftId);
+        allow update: if isValidShift(shiftId);
     	}
+      
+      function isValidShift(shiftId) {
+        let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+        let hasAllfields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'projectName', 'start']);
+        
+        return createdValidShift && hasAllfields 
+        && hasMinPermission(request.auth.uid, 3) && nameFieldTypes();
+      }
     }
     	
   }

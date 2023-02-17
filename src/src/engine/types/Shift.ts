@@ -40,6 +40,26 @@ export interface ShiftDTO {
 }
 
 /**
+ * Ceci sont les données qu'on a besoin pour afficher à la bonne place le shift
+ */
+export interface ShiftForEventCreation {
+  employeeId: string;
+  start: string;
+  end: string;
+  department: string;
+  projectName?: string;
+  employeeName:string;
+}
+
+export interface EventForShiftCreation {
+  employeeId: string;
+  start: DayPilot.Date;
+  end: DayPilot.Date;
+  department?: string;
+  projectName?: string;
+}
+
+/**
  * Event serait les shifts avec toutes les données pour l'afficher dans l'horaire
  *
  */
@@ -50,7 +70,8 @@ export interface EventForCalendar {
   end: DayPilot.date; //heure de fin
   resource?: string;//l'id de la personne qui l'a
   barColor?: string; // couleur de la barre
-  backColor?: string
+  backColor?: string;
+  employeeId?: string;
 }
 
 export interface EventForCalendarList {
