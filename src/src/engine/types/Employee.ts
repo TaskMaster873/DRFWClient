@@ -8,11 +8,23 @@ export interface EmployeeList {
     list : Employee[];
 }
 
+export interface EmployeeDTO {
+    lastName: string;
+    firstName: string;
+    email: string;
+    phoneNumber: string;
+    isActive: boolean;
+    department: string;
+    jobTitles: string[];
+    skills: string[];
+    role: number;
+}
+
 /**
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
-    employeeId?: string= "";
+    employeeId?: string = "";
     lastName: string =  "";
     firstName: string = "";
     email: string = "";
