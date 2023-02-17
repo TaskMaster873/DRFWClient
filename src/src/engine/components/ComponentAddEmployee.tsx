@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
-import {AddEmployeeProps, Employee} from "../types/Employee";
+import {AddEmployeeProps, Employee, EmployeeCreateDTO} from "../types/Employee";
 
 /**
  *
@@ -190,7 +190,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
             validated: true, error: errorType,
         });
         if (errorType === FormErrorType.NO_ERROR) {
-            let employee = new Employee({
+            let employee: EmployeeCreateDTO = {
                 firstName: this.state.firstName,
                 lastName: this.state.lastName,
                 email: this.state.email,
@@ -199,7 +199,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                 jobTitles: this.state.jobTitles,
                 skills: this.state.skills, // @ts-ignore
                 role: parseInt(this.state.role)
-            })
+            }
             this.props.onDataChange(this.state.password, employee);
 
         }

@@ -12,18 +12,18 @@ export interface EmployeeList {
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
-    employeeId?: string= "";
-    lastName: string =  "";
-    firstName: string = "";
-    email: string = "";
-    phoneNumber: string = "";
+    employeeId?: string;
+    lastName: string;
+    firstName: string;
+    email: string;
+    phoneNumber: string;
     isActive: boolean = true;
-    department: string = "";
-    jobTitles: string[] = [];
-    skills: string[] = [];
-    role: number = 0;
+    department: string;
+    jobTitles: string[];
+    skills: string[];
+    role: number;
 
-    constructor(employee: EmployeeCreateDTO) {
+    constructor(employee: EmployeeDTO) {
         this.employeeId = employee.employeeId;
 		this.firstName = employee.firstName;
         this.lastName = employee.lastName;
@@ -40,12 +40,23 @@ export class Employee {
  * Contient tous les renseignements pour créer un iduveau employé dans la bd
  */
 export interface EmployeeCreateDTO {
-    readonly employeeId?: string;
 	readonly firstName: string;
     readonly lastName: string;
     readonly email: string;
 	readonly phoneNumber: string;
 	readonly department: string;
+    readonly jobTitles: string[];
+    readonly skills: string[];
+    readonly role: number;
+}
+
+export interface EmployeeDTO {
+    readonly employeeId?: string;
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly email: string;
+    readonly phoneNumber: string;
+    readonly department: string;
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
@@ -62,6 +73,8 @@ export interface EmployeeListProps {
     employees: Employee[] | null;
     filteredList: Employee[] | null;
     department: string | null;
+    onEditEmployee: (employee) => PromiseLike<void> | Promise<void> | void;
+    onDeactivateEmployee: (employee) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface AddEmployeeProps {

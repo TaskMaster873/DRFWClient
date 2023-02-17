@@ -1,7 +1,7 @@
 import React from "react";
 import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {API} from "../api/APIManager";
-import {Employee} from "../types/Employee";
+import {EmployeeCreateDTO} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from 'react-notifications';
 
@@ -23,7 +23,7 @@ export class AddEmployee extends React.Component {
         document.title = "Ajouter un Employé - TaskMaster";
     }
 
-    public async addEmployee(password : string, employee: Employee) {
+    public async addEmployee(password : string, employee: EmployeeCreateDTO) {
         let error = await API.createEmployee(password, employee);
         if (!error) {
             NotificationManager.success(successes.successGenericMessage, successes.employeeCreated);

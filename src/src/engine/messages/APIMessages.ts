@@ -2,6 +2,7 @@ export const errors = {
     error: "Erreur",
     invalidLogin: "Les informations d'identification sont erronées",
     departmentAlreadyExists: "Le département est déjà existant",
+    employeeAlreadyExists: "L'emploi est déjà existant",
     permissionDenied: "Vous n'avez pas les autorisations requises pour effectuer cette action",
     defaultMessage: "Une erreur s'est produite, Veuillez réessayer ultérieurement",
 }

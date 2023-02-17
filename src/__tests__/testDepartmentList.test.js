@@ -139,7 +139,6 @@ function checkFieldValues(ths, trs, tds, tdLinks, list) {
     /*
         i: nombre total de "table data"
      */
-
     for (let i = 0; i < trs.length - 1; i++) {
         expect(tdLinks[i].innerHTML).toBe(list[i].name);
         expect(tds[i * ths.length + 2].innerHTML).toBe(list[i].director);
