@@ -3,7 +3,7 @@
  * Voici la doc : https://api.daypilot.org/daypilot-calendar-methods/ et https://api.daypilot.org/daypilot-calendar-properties/
  */
 
-import { EventForCalendar } from "./Shift";
+import { EventForCalendar, ShiftForEventCreation } from "./Shift";
 
 export interface CalendarAttributesForEmployeeSchedule {
     cellsMarkBusiness: boolean; //montrer le gris pâle ou non
@@ -22,9 +22,9 @@ export interface CalendarAttributesForEmployeeSchedule {
  * Ceci c'est pour le state de création d'employé
  */
 
-export interface CalendarAttributesForEmployeeCreationComponent {
+export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	startDate: string;
-	columns: Array<{ name: string; id: string }>; //name = au nom de la personne et id est son id
+	columns: ColumnsType[]; //name = au nom de la personne et id est son id
 	events: EventForCalendar[]; // shift
 	heightSpec?: HeightSpecType;
 	height?: number; //a une valeur de 300px de base
@@ -32,8 +32,17 @@ export interface CalendarAttributesForEmployeeCreationComponent {
 	cellDuration?: number // le temps que vaut une cellule 30 de base
 	viewType: ViewType; // En bref cela change la vue et ressource serait important pour les départements
 	eventDeleteHandling: EventDeleteHandlingType;
+	ListOfShifts?: ShiftForEventCreation[];
 }
 
+export class ColumnsClass {
+	
+}
+
+export interface ColumnsType {
+	name:string;
+	id:string;
+}
 /**
  * Les chois qu'on a gratuitement
  */

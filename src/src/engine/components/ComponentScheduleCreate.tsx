@@ -4,31 +4,33 @@ import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
 import {ResourceGroups} from "./ComponentFilterProjects";
 import {ScheduleGroups} from "../types/Schedule";
 import "./ComponentPopupSchedule";
-import {EventForCalendar} from "../types/Shift";
+import {EventForCalendar, ShiftForCalendar, ShiftForEventCreation} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
-import { CalendarAttributesForEmployeeCreationComponent, EventDeleteHandlingType, HeightSpecType, ViewType } from "../types/StatesForDaypilot";
+import { CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, HeightSpecType, ViewType } from "../types/StatesForDaypilot";
 
 /**
  * Ceci est le composant d'horaire
  */
-export class ComponentScheduleCreate extends React.Component {
+
+type Props = {listFetchedFromApi:ShiftForEventCreation[], /* liste d'employé*/ }
+
+export class ComponentScheduleCreate extends React.Component<Props, CalendarAttributesForEmployeeShiftCreationComponent > {
 
 	private list: Employee[] = [];
 	private listEvent: EventForCalendar[] = [];
 	private child: React.RefObject<ComponentPopupSchedule> = React.createRef();
 
-	public state:  CalendarAttributesForEmployeeCreationComponent = {
+	public state:  CalendarAttributesForEmployeeShiftCreationComponent = {
 		startDate: DayPilot.Date.today().toString(),
-		columns: [], //name = au nom de la personne et id est son id
-		events:[], // shift
+		columns: [],
+		events: [],
 		heightSpec: HeightSpecType.Full,
-		viewType: ViewType.Resources, // En bref cela change la vue et ressource serait important pour les départements
+		viewType: ViewType.Resources,
 		eventDeleteHandling: EventDeleteHandlingType.Update,
 	}
 
-	constructor(props: any) {
+	constructor(props: Props) {
 		super(props);
-		
 		//this.dateRef = React.createRef(); //DayPilot.Date.today();
 		/*this.state = {
 			startDate: DayPilot.Date.today(),
@@ -43,8 +45,9 @@ export class ComponentScheduleCreate extends React.Component {
 			return <div> Il n'y a pas d'horaire à voir</div>;
 		} else*/
 			return (
-				//<ResourceGroups groups={this.loadGroups().groups} /*onChange={this.onChange}*/ onChange={undefined} /*onChange={this.onChange}*/ />
+				
 				<div>
+					<ResourceGroups groups={this.loadGroups().groups} /*onChange={this.onChange}*/ onChange={undefined} /*onChange={this.onChange}*/ />
 					<DayPilotCalendar
 						businessBeginsHour={8}
 						businessEndsHour={20}
@@ -76,8 +79,8 @@ export class ComponentScheduleCreate extends React.Component {
 		this.setState({ events: this.listEvent });
 	};
 
-	private doColumns(): Array<{ name: string; id: string }> {
-		let listToReturn: Array<{ name: string; id: string }>;
+	private doColumns(): void{
+		let listToReturn: ColumnsType[];
 		listToReturn = [];
 		/*for (let index = 0; index < this.list.length; index++) {
 			listToReturn.push({
@@ -91,7 +94,7 @@ export class ComponentScheduleCreate extends React.Component {
 				id: index.toString(),
 			});
 		}
-		return listToReturn;
+		this.setState({columns: listToReturn} );
 	}
 
 	onTimeRangeSelected = (args: any) => {
@@ -99,12 +102,20 @@ export class ComponentScheduleCreate extends React.Component {
 		//let name = prompt("New event name:", "Event");
 		DayPilot.Calendar.clearSelection;
 	}
-	/*private loadGroups(): ScheduleGroups {
+
+	public componentDidMount(): void {
+		this.doColumns();
+		this.setState({ListOfShifts: this.props.listFetchedFromApi});
+		console.log("is:",this.state.ListOfShifts);
+
+	}
+	
+	private loadGroups(): ScheduleGroups {
 		let data: ScheduleGroups = {
 			groups: [
 				{
-					name: "Locations",
-					id: "locations",
+					name: "department",
+					id: "department",
 					resources: [
 						{ name: "Room 1", id: "R1" },
 						{ name: "Room 2", id: "R2" },
@@ -115,7 +126,7 @@ export class ComponentScheduleCreate extends React.Component {
 						{ name: "Room 7", id: "R7" },
 					],
 				},
-				{
+				/*{
 					name: "People",
 					id: "people",
 					resources: [
@@ -140,11 +151,11 @@ export class ComponentScheduleCreate extends React.Component {
 						{ name: "Tool 6", id: "T6" },
 						{ name: "Tool 7", id: "T7" },
 					],
-				},
+				},*/
 			],
 		};
 		return data;
-	}*/
+	}
 }
 	/**
 	 *
