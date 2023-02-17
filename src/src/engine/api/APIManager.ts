@@ -389,7 +389,7 @@ class APIManager extends Logger {
             let userId = userAuth?.userId;
 
             if(userId !== null && userId !== undefined && userId) {
-                console.log(userId, employee);
+                employee.employeeId = userId;
                 await setDoc(doc(this.#db, `employees`, userId), {...employee}).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
 
@@ -635,7 +635,7 @@ class APIManager extends Logger {
                         end: this.getDayPilotDateString(data.end),
                     }))
                 })
-            
+
             }
         }
         return shifts;
