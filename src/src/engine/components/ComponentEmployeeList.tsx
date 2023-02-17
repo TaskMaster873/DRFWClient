@@ -4,11 +4,11 @@ import {Employee, EmployeeListProps, employeeTableHeads} from "../types/Employee
 import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 import {API} from "../api/APIManager";
-import {SearchParams} from "../types/SearchParams";
 import {ScaleLoader} from "react-spinners";
 import {BiEdit} from "react-icons/bi"
 import {Roles} from "../types/Roles";
 import {CgUnavailable} from "react-icons/cg";
+import {SearchParams} from "../types/SearchParams";
 
 /***
  * Ce composant affiche la liste de tous les employés d'un département

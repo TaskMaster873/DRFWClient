@@ -15,6 +15,7 @@ import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import { Shift } from "../types/Shift";
 import {errors} from "../messages/APIMessages";
+import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
 
 type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
 
@@ -34,17 +35,108 @@ class APIManager extends Logger {
     #user: FirebaseAuth.User | null = null;
     #userRole: number = 0;
 
+    #worker: Worker | null = null;
+
     private emulatorLoaded: boolean = false;
     private isAuthenticated: boolean = false;
 
     public awaitLogin: Promise<void> | undefined;
     private subscribers: Array<SubscriberCallback> = [];
 
+    private tasks: Map<string, Task> = new Map<string, Task>();
+
     constructor() {
         super();
 
         this.loadFirebase();
+
+        // Stupid JEST doesn't support web workers.
+        try {
+            if(process === null || process === undefined) {
+                this.registerServiceWorker();
+            }
+        } catch(e) {
+            this.registerServiceWorker();
+        }
     }
+
+    private async registerServiceWorker(): Promise<void> {
+        try {
+            const worker = new Worker(new URL('./ServiceWorker.ts', import.meta.url));
+
+            let initMessage: ThreadMessage = {
+                type: ThreadMessageType.INIT,
+                taskId: null,
+            }
+
+            worker.postMessage(initMessage);
+
+            this.#worker = worker;
+            this.listenWorkerEvents();
+        } catch(e: any) {
+            this.error(e.message);
+        }
+    }
+
+    private async onWorkerMessage(message: MessageEvent) : Promise<void> {
+        let data = message.data as ThreadMessage;
+
+        switch(data.type) {
+            case ThreadMessageType.TASK_RESPONSE: {
+                await this.onTaskResponse(data.taskId, data.data);
+                break;
+            }
+
+            default: {
+                this.warn(`[MAIN] Unknown message type ${data.type}.`);
+            }
+        }
+    }
+
+    private generateTaskId(): string {
+        return Math.random().toString(36).substring(2);
+    }
+
+    private async requestUserCreationFromWorker(employee: EmployeeCreateDTO, password: string): Promise<CreatedAccountData> {
+        return new Promise((resolve) => {
+            let taskId = this.generateTaskId();
+            let createAccountMessage: ThreadMessage = {
+                type: ThreadMessageType.CREATE_NEW_ACCOUNT,
+                taskId: taskId,
+                data: {
+                    employee: employee,
+                    password: password,
+                }
+            }
+
+            let task: Task = {
+                callback: resolve
+            }
+
+            this.tasks.set(taskId, task);
+            this.#worker?.postMessage(createAccountMessage);
+        });
+    }
+
+    private async onTaskResponse(taskId: string | null, data: CreatedAccountData) : Promise<void> {
+        this.log(`Got response from worker for task ${taskId}`);
+
+        let task = this.tasks.get(taskId || "");
+        if(task) {
+            task.callback(data);
+
+            this.tasks.delete(taskId || "");
+        } else {
+            this.error(`Task ${taskId} not found.`);
+        }
+    }
+
+    private listenWorkerEvents(): void {
+        if(this.#worker !== null && this.#worker) {
+            this.#worker.onmessage = this.onWorkerMessage.bind(this);
+        }
+    }
+
     /**
      * Fonction retourne le nom de l'employé
      * @returns Le nom de l'employé si non défini retourne l'adresse courriel sinon Anonyme
@@ -71,9 +163,17 @@ class APIManager extends Logger {
         return this.#userRole >= permissionLevel;
     }
 
-    public getErrorMessageFromCode(error): string {
+    public getErrorMessageFromCode(error: Error | string): string {
         let errorMessage: string;
-        switch (error.code) {
+        let message: string;
+
+        if(typeof(error) === 'string') {
+            message = error;
+        } else {
+            message = error.message;
+        }
+
+        switch (message) {
             case "auth/invalid-email":
                 errorMessage = errors.invalidLogin;
                 break;
@@ -90,7 +190,7 @@ class APIManager extends Logger {
                 errorMessage = errors.defaultMessage;
                 break;
         }
-        this.error(`Erreur: ${errorMessage} Code: ${error.code} Message: ${error.message}`);
+        this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${message}`);
         return errorMessage;
     }
 
@@ -194,20 +294,22 @@ class APIManager extends Logger {
         this.#db = getFirestore(this.#app);
 
         //Should this database be emulated?
-        if (location.hostname === "localhost" && !this.emulatorLoaded) {
-            this.emulatorLoaded = true;
-            connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
-            connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
+        if('indexedDB' in window) {
+            if ('location' in window && location && location.hostname === "localhost" && !this.emulatorLoaded) {
+                this.emulatorLoaded = true;
+                connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
+                connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
 
-            this.log("Firebase emulators loaded");
+                this.log("Firebase emulators loaded");
+            }
+
+            if (!(this.#db as any)._firestoreClient) {
+                await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
+                this.log("IndexedDB persistence enabled");
+            }
+
+            await this.enablePersistence();
         }
-
-        if (!(this.#db as any)._firestoreClient) {
-            await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
-            this.log("IndexedDB persistence enabled");
-        }
-
-        await this.enablePersistence();
 
         let isAnalyticsSupported = await isSupported();
         if (isAnalyticsSupported) {
@@ -277,23 +379,29 @@ class APIManager extends Logger {
             return errors.permissionDenied;
         }
         let errorMessage: string | null = null;
-        let createdUser = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, password)
-            .catch((error: FirebaseAuth.AuthError) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-            });
-        if (this.#auth.currentUser && createdUser && !errorMessage) {
-            //Crée l'utilisateur dans le Firestore
-            await setDoc(doc(this.#db, `employees`, createdUser.user.uid), {...employee}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-                if (this.#auth.currentUser) {
-                    FirebaseAuth.deleteUser(this.#auth.currentUser)
-                }
-            })
-            if(!errorMessage){
-                //Envoie le courriel de vérification
-                errorMessage = await this.verifyEmailAddress(createdUser.user);
+        let createdUserMessageData = await this.requestUserCreationFromWorker(employee, password);
+
+
+        if(createdUserMessageData.error !== null && createdUserMessageData.error) {
+            errorMessage = this.getErrorMessageFromCode(createdUserMessageData.error);
+        } else {
+            let userAuth = createdUserMessageData.createdUser;
+            let userId = userAuth?.userId;
+
+            if(userId !== null && userId !== undefined && userId) {
+                console.log(userId, employee);
+                await setDoc(doc(this.#db, `employees`, userId), {...employee}).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+
+                    // FIREBASE LIMITATION : We can't delete the user if it has been created. Because only connected users can delete them self.
+                });
+
+                // TODO: Send verification email on login until validated.
+            } else {
+                errorMessage = `Erreur inconnue lors de la création de l'employé.`;
             }
         }
+
         return errorMessage;
     }
 
