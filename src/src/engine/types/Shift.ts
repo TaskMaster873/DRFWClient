@@ -17,7 +17,7 @@ export class Shift {
   start: string = "";
   end: string = "";
   employeeId: string = "";
-  
+
   constructor(shift: ShiftDTO) {
     this.employeeName = shift.employeeName;
     this.employeeId = shift.employeeId;
@@ -36,21 +36,21 @@ export interface ShiftDTO {
   readonly end: string;
   readonly projectName: string;
 
-  
+
 }
 
 /**
  * Event serait les shifts avec toutes les données pour l'afficher dans l'horaire
- * 
+ *
  */
 export interface EventForCalendar {
   readonly id: number; //id unique dans le tableau d'horaire
-    text?: string; // le nom de l'event
-    start: DayPilot.date;//heure de début
-    end: DayPilot.date; //heure de fin
-    resource?: string;//l'id de la personne qui l'a
-    barColor?: string; // couleur de la barre
-    backColor?: string
+  text?: string; // le nom de l'event
+  start: DayPilot.date;//heure de début
+  end: DayPilot.date; //heure de fin
+  resource?: string;//l'id de la personne qui l'a
+  barColor?: string; // couleur de la barre
+  backColor?: string
 }
 
 export interface EventForCalendarList {
