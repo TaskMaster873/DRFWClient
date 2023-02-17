@@ -2,7 +2,8 @@ import React from "react";
 import { ComponentLoading } from "../components/ComponentLoading";
 import { ComponentScheduleCreate } from "../components/ComponentScheduleCreate";
 import { ShiftForEventCreation } from "../types/Shift"
-
+import { API } from "../api/APIManager";
+import { DayPilot} from "@daypilot/daypilot-lite-react";
 
 export class CreateSchedule extends React.Component {
 	private fakeListShift  = [{
@@ -17,8 +18,10 @@ export class CreateSchedule extends React.Component {
 		list:[],
 	}
 
-	public /*async*/ componentDidMount() {
+	public async componentDidMount() {
 		document.title = "Création d'horaire - TaskMaster";
+		let shifts = await API.getDailyScheduleForDepartment("2023-03-06T00:00:00", "2023-03-07T00:00:00","bob3");
+		console.log(shifts);
 		this.setState({list: this.fakeListShift});
 		//let shifts = await API.getScheduleForOneEmployee(); // pour get tout les heures de l'employé connecté
 		//this.setState({list: shifts});

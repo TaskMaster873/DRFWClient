@@ -19,6 +19,7 @@ export class ComponentScheduleCreate extends React.Component<Props, CalendarAttr
 	private list: Employee[] = [];
 	private listEvent: EventForCalendar[] = [];
 	private child: React.RefObject<ComponentPopupSchedule> = React.createRef();
+	private calendar: React.RefObject<DayPilotCalendar> = React.createRef();
 
 	public state:  CalendarAttributesForEmployeeShiftCreationComponent = {
 		startDate: DayPilot.Date.today().toString(),
