@@ -80,6 +80,16 @@ class TaskMasterServiceWorker extends Logger {
         await this.postMessage(response);
     }
 
+    private async enablePersistence(): Promise<void> {
+        await FirebaseAuth.setPersistence(this.#auth, FirebaseAuth.inMemoryPersistence).catch((error) => {
+            // Handle Errors here.
+            const errorCode = error;
+            const errorMessage = error.message;
+
+            this.error(`Error code: ${errorCode} - ${errorMessage}`);
+        });
+    }
+
     private async createFirebaseApp() : Promise<void> {
         let start = Date.now();
         this.log(`Creating Firebase app.`);
@@ -93,6 +103,8 @@ class TaskMasterServiceWorker extends Logger {
 
             this.log("Firebase emulators loaded");
         }
+
+        await this.enablePersistence();
 
         this.log(`Firebase loaded successfully after ${Date.now() - start}ms.`);
     }

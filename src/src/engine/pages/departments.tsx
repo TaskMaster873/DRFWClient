@@ -32,10 +32,10 @@ export class Departments extends React.Component {
             if(Array.isArray(employees) && Array.isArray(employeeNb)) {
                 this.setState({employees: employees, employeeNb: employeeNb, departments: departments});
             } else {
-                console.error("Error while fetching employees or employeeNbDepartments", employees, employeeNb);
+                console.error(errors.getEmployees, employees, employeeNb);
             }
         } else {
-            console.error("Error while fetching departments", departments);
+            console.error(errors.getDepartments, departments);
         }
     }
 

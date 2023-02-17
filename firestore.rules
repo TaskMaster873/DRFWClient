@@ -21,7 +21,6 @@ service cloud.firestore {
         request.resource.data.lastName is string &&
         request.resource.data.phoneNumber is string &&
         request.resource.data.department is string &&
-        request.resource.data.isActive is bool &&
         request.resource.data.jobTitles is list &&
         request.resource.data.skills is list &&
         request.resource.data.role is number
@@ -30,7 +29,7 @@ service cloud.firestore {
       function isValidEmployee(employeeId) {
         let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
         let hasOnlyfields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email',
-        'phoneNumber', 'department', 'isActive', 'jobTitles', 'skills', 'role']);
+        'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
 
 
         return createdValidEmployee && hasOnlyfields
