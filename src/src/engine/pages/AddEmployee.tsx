@@ -19,6 +19,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public async componentDidMount() : Promise<void> {
         document.title = "Ajouter un Employé - TaskMaster";
 
+        // TODO Add error handling
         let departments = API.getDepartments();
         let roles = API.getRoles();
         let titles = API.getJobTitles();
@@ -38,7 +39,12 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
-    public async addEmployee(password : string, employee: EmployeeCreateDTO) : Promise<void> {
+    /**
+     * Add an employee to the database
+     * @param password {string} The password of the employee
+     * @param employee {EmployeeCreateDTO} The employee to add
+     */
+    readonly #addEmployee = async (password : string, employee: EmployeeCreateDTO) : Promise<void> => {
         let error = await API.createEmployee(password, employee);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
@@ -47,17 +53,13 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
-    /**
-     *
-     * @returns ComponentAddEmployee avec la liste de titre et celle de role
-     */
     public render(): JSX.Element {
         return (
             <ComponentAddEmployee
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
-                onDataChange={this.addEmployee.bind(this)}
+                onDataChange={this.#addEmployee}
             />
         );
     }
