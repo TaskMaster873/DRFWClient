@@ -30,7 +30,7 @@ export function ResetPassword() {
 
     if (mode === null || actionCode === null) {
         //La page est accédée illégalement
-        return <Navigate to="/forgot-password"></Navigate>;
+        return navigate(RoutesPath.FORGOT_PASSWORD);
     }
 
     // C'est comme "componentDidMount" d'un class component
