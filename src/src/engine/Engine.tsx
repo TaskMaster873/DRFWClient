@@ -1,22 +1,22 @@
 import React from "react";
-import {BrowserRouter as Router, Route, Routes, useParams, Params} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import "../deps/css/Engine.css";
 import "../deps/css/index.css";
 
-import {Index} from "./pages";
-import {ScheduleEmployee} from "./pages/ScheduleEmployee";
+import { Index } from "./pages";
+import { ScheduleEmployee } from "./pages/ScheduleEmployee";
 import { EmployeeWrapper } from "./pages/employees";
-import {About} from "./pages/about";
-import {Login} from "./pages/login";
-import {AddEmployee} from "./pages/addEmployee";
-import {NavigationBar} from "./components/NavigationBar";
-import {ChangePassword} from "./pages/changePassword";
-import {Departments} from "./pages/departments";
-import {Availabilities} from "./pages/availabilities";
-import {API} from "./api/APIManager";
-import {ResetPassword} from "./pages/ResetPassword";
-import {NotificationContainer} from 'react-notifications';
+import { About } from "./pages/about";
+import { Login } from "./pages/login";
+import { AddEmployee } from "./pages/addEmployee";
+import { NavigationBar } from "./components/NavigationBar";
+import { ChangePassword } from "./pages/changePassword";
+import { Departments } from "./pages/departments";
+import { Availabilities } from "./pages/availabilities";
+import { API } from "./api/APIManager";
+import { ResetPassword } from "./pages/ResetPassword";
+import { NotificationContainer } from 'react-notifications';
 import { ComponentLoading } from "./components/ComponentLoading";
 import { ForgotPassword } from "./pages/forgotPassword";
 import 'react-notifications/lib/notifications.css';
