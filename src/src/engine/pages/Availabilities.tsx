@@ -1,6 +1,7 @@
 import React from "react";
-import {Availability, AvailabilityList} from "../types/Availability";
-import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
+import { Availability } from "../types/Availability";
+import { ComponentAvailabilities } from "../components/ComponentAvailabilities";
+import { DayPilot } from "@daypilot/daypilot-lite-react";
 
 /**
  * Ceci est la page pour ajouter un employé
@@ -24,9 +25,15 @@ export class Availabilities extends React.Component {
      * @returns ComponentAddEmployee avec la liste de titre et celle de role
      */
     public render(): JSX.Element {
-        let listData: AvailabilityList = { list: this.availabilities };
+        let events = {
+            id: 0,
+            text: 'a',
+            start: DayPilot.Date,
+            end: DayPilot.Date
+        };
+
         return (
-            <ComponentAvailabilities /*{...{availabilities: listData}}*//>
+            <ComponentAvailabilities {...{events: events}} />
         );
     }
 }

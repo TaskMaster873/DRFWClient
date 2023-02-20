@@ -4,20 +4,19 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
  * Voici la doc : https://api.daypilot.org/daypilot-calendar-methods/ et https://api.daypilot.org/daypilot-calendar-properties/
  */
 
-import { EventForCalendar, ShiftForEventCreation } from "./Shift";
+import { EventForCalendar } from "./Shift";
 
-export interface CalendarAttributesForEmployeeSchedule {
+export interface DayPilotCalendarSettings {
     cellsMarkBusiness: boolean; //montrer le gris pâle ou non
-    businessWeekends: boolean; // travail possible la fin de semaine, 
+    businessWeekends: boolean; // travail possible la fin de semaine,
     headerDateFormat: string; // pour voir les jours de la semaine,
-    viewType: string; // 7 jours, 
+    viewType: string; // 7 jours,
     durationBarVisible: boolean; // la barre à gauche
     timeRangeSelectedHandling: string; // la sélection des heures
     eventResizeHandling: string; //changer la grosseur de l'event
     eventMoveHandling: string; //pouvoir le bouger
     eventDeleteHandling: string; // pouvoir le delete
 }
-
 
 /**
  * Ceci c'est pour le state de création d'employé
@@ -33,20 +32,15 @@ export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	cellDuration?: number // le temps que vaut une cellule 30 de base
 	viewType: ViewType; // En bref cela change la vue et ressource serait important pour les départements
 	eventDeleteHandling: EventDeleteHandlingType;
-	ListOfShifts: ShiftForEventCreation[];
 	isShowingModal: boolean;
 	start: DayPilot.Date;
 	end: DayPilot.Date;
 	resourceName: string;
 }
 
-export class ColumnsClass {
-	
-}
-
 export interface ColumnsType {
-	name:string;
-	id:string;
+	name: string;
+	id: string;
 }
 /**
  * Les chois qu'on a gratuitement
@@ -74,14 +68,3 @@ export enum EventDeleteHandlingType {
 	PostBack = "PostBack",
 
 }
-
-/*startDate: DayPilot.Date.today(),
-			columns: this.doColumns(),
-			//events: this.doEvents(),
-						heightSpec={"Full"}
-						height={2000}
-						cellHeight={20}
-						cellDuration={5}
-						viewType={"Resources"}
-						onTimeRangeSelected={this.onTimeRangeSelected}
-						eventDeleteHandling={"Update"}*/

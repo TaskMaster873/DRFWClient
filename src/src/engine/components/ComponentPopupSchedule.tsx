@@ -7,21 +7,19 @@ import {EventForCalendar, EventForShiftCreation} from "../types/Shift";
 type Props = { isShowing: boolean, eventAdd: any, start: DayPilot.Date, end: DayPilot.Date, resource: string};
 
 export function ComponentPopupSchedule(props: Props) {
-	console.log("props recieved", props.isShowing);
-	const [nameOfEvent, setNameOfEvent] = useState("event")
-	const [colorOfEvent, setColorOfEvent] = useState("#000000")
 	const start = props.start
 	const end = props.end
 	const resource = props.resource
-	
 
 	/**
-	 *
-	 * @param event qui est le formulaire à envoyer
+	 * Verify if the form is valid and if it is, it sends the data to the parent
+	 * @param event {React.FormEvent<HTMLFormElement>}
+	 * @returns {void}
 	 */
-	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
 		const form = event.currentTarget;
 		let isValid = form.checkValidity();
+
 		if (!isValid) {
 			event.preventDefault();
 			event.stopPropagation();

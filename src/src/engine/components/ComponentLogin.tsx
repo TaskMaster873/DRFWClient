@@ -1,39 +1,39 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {Link, Navigate} from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
-import {FormErrorType, errors, successes} from "../messages/FormMessages";
-import {API} from "../api/APIManager";
+import { FormErrorType, errors } from "../messages/FormMessages";
+import { API } from "../api/APIManager";
 
 /* === Images === */
-// @ts-ignore
 import Logo from "../../deps/images/logo.png";
-import {Routes} from "../api/routes/Routes";
-import {NotificationManager} from 'react-notifications';
+import { Routes } from "../api/routes/Routes";
+import { ComponentPropsLogin } from "../types/ComponentPropsType";
 
+interface ComponentStateLogin {
+    emailLogin: string;
+    passwordLogin: string;
+    validated: boolean;
+    error: FormErrorType;
+    isLoggedIn: boolean;
+}
 
-export class ComponentLogin extends React.Component {
-    public state: {
-        emailLogin: string;
-        passwordLogin: string;
-        validated: boolean;
-        error: FormErrorType;
-        isLoggedIn: boolean;
+export class ComponentLogin extends React.Component<ComponentPropsLogin, ComponentStateLogin> {
+    public state: ComponentStateLogin = {
+        emailLogin: "",
+        passwordLogin: "",
+        validated: false,
+        error: FormErrorType.NO_ERROR,
+        isLoggedIn: false,
     };
+
+    public props: ComponentPropsLogin;
 
     constructor(props) {
         super(props);
-        this.state = {
-            emailLogin: "",
-            passwordLogin: "",
-            validated: false,
-            error: FormErrorType.NO_ERROR,
-            isLoggedIn: false,
-        };
 
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.props = props;
         this.verifyLogin();
     }
 
@@ -48,7 +48,7 @@ export class ComponentLogin extends React.Component {
                     <div className="me-4">
                         <img
                             className="mx-auto d-block mt-5"
-                            src={Logo}
+                            src={Logo as any}
                             alt="Logo TaskMaster"
                             width={50}
                             height={60}
@@ -58,8 +58,8 @@ export class ComponentLogin extends React.Component {
                     <Form
                         noValidate
                         validated={this.state.validated}
-                        onSubmit={this.handleSubmit}
-                        onChange={this.handleChange}
+                        onSubmit={this.#handleSubmit}
+                        onChange={this.#handleChange}
                         data-error={this.state.error}
                     >
                         <Form.Group>
@@ -76,7 +76,7 @@ export class ComponentLogin extends React.Component {
                                 placeholder="Entrez votre adresse courriel"
                             />
                             <Form.Control.Feedback type="invalid" id="invalidLoginIdEmployee">
-                                {errors.invalidEmail}
+                                {errors.INVALID_EMAIL}
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group>
@@ -92,7 +92,7 @@ export class ComponentLogin extends React.Component {
                                 placeholder="Entrez votre mot de passe"
                             />
                             <Form.Control.Feedback type="invalid" id="invalidLoginPassword">
-                                {errors.requiredPassword}
+                                {errors.REQUIRED_PASSWORD}
                             </Form.Control.Feedback>
                         </Form.Group>
                         <div className="me-4 mt-4 d-block text-center mx-auto">
@@ -120,12 +120,13 @@ export class ComponentLogin extends React.Component {
         await API.awaitLogin;
 
         if (API.isAuth()) {
-            this.state.isLoggedIn = true;
-            this.setState(this.state);
+            this.setState({
+                isLoggedIn: true,
+            });
         }
     }
 
-    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+    readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
         let errorType = FormErrorType.NO_ERROR;
@@ -143,20 +144,15 @@ export class ComponentLogin extends React.Component {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let errorMessage = await API.loginWithPassword(this.state.emailLogin, this.state.passwordLogin);
+            let isLoggedIn: boolean = await this.props.onLoginRequest(this.state.emailLogin, this.state.passwordLogin);
 
-            if (errorMessage === null) {
-                this.state.isLoggedIn = true;
-                this.setState(this.state);
-
-                NotificationManager.success(successes.login, successes.successGenericMessage);
-            } else {
-                NotificationManager.error(errorMessage, errors.errorGenericMessage);
-            }
+            this.setState({...this.state, ...{
+                isLoggedIn: isLoggedIn,
+            }});
         }
     }
 
-    private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
+    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
         const name = target.id;
@@ -165,8 +161,8 @@ export class ComponentLogin extends React.Component {
             throw new Error("Id is undefined for element in form.");
         }
 
-        this.setState({
+        this.setState({...this.state, ...{
             [name]: value,
-        });
+        }});
     }
 }

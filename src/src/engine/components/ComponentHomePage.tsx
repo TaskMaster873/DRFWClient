@@ -4,9 +4,8 @@ import {LinkContainer} from "react-router-bootstrap";
 import Button from "react-bootstrap/Button";
 
 /* === Images === */
-// @ts-ignore
 import Logo from "../../deps/images/logo.png";
-import {API} from "../api/APIManager";
+import { API } from "../api/APIManager";
 
 export class ComponentHomePage extends React.Component {
     private isMounted: boolean = false;
@@ -48,7 +47,7 @@ export class ComponentHomePage extends React.Component {
                     <Container className="mt-4 mb-4 d-flex justify-content-center"> <h1> TaskMaster </h1> </Container>
                     <Container className="mt-6 mb-4 d-flex justify-content-center"><img
                         className="me-3"
-                        src={Logo}
+                        src={Logo as any}
                         alt="Logo TaskMaster"
                         width={200}
                         height={240}

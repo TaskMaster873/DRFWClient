@@ -8,9 +8,7 @@ export class Index extends React.Component {
 
   public render(): JSX.Element {
     return (
-        <div>
           <ComponentHomePage></ComponentHomePage>
-        </div>
     );
   }
 }

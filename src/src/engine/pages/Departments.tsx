@@ -7,20 +7,22 @@ import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from 'react-notifications';
 
 /**
- * Ceci est la page pour les employés
+ * Ceci est la page pour les departments
  */
-export class Departments extends React.Component {
+export class Departments extends React.Component<unknown, DepartmentListState> {
     public state: DepartmentListState = {
-        employees: [], employeeNb: [], departments: []
+        employees: [],
+        employeeNb: [],
+        departments: []
     }
 
-    public async componentDidMount() {
+    public async componentDidMount() : Promise<void> {
         document.title = "Départements - TaskMaster";
 
         await this.fetchData();
     }
 
-    public async fetchData() {
+    public async fetchData() : Promise<void> {
         let _employees = API.getEmployees();
         let departments = await API.getDepartments();
 
@@ -32,17 +34,17 @@ export class Departments extends React.Component {
             if(Array.isArray(employees) && Array.isArray(employeeNb)) {
                 this.setState({employees: employees, employeeNb: employeeNb, departments: departments});
             } else {
-                console.error(errors.getEmployees, employees, employeeNb);
+                console.error(errors.GET_EMPLOYEES, employees, employeeNb);
             }
         } else {
-            console.error(errors.getDepartments, departments);
+            console.error(errors.GET_DEPARTMENTS, departments);
         }
     }
 
-    public async addDepartment(department: Department) {
+    public addDepartment = async (department: Department) : Promise<void> => {
         let errorMessage = await API.createDepartment(department);
         if (!errorMessage) {
-            NotificationManager.success(successes.successGenericMessage, successes.departmentCreated);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
             let departments = this.state.departments;
             let employeeNb = this.state.employeeNb;
             departments.push(department);
@@ -50,7 +52,7 @@ export class Departments extends React.Component {
             this.setState({departments: departments, employeeNb: employeeNb});
             await this.fetchData();
         } else {
-            NotificationManager.error(errorMessage, errors.errorGenericMessage);
+            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
         }
     }
 
@@ -59,11 +61,13 @@ export class Departments extends React.Component {
      * @returns La liste des employés
      */
     public render(): JSX.Element {
-        return (<Container>
+        return (
+            <Container>
                 <ComponentDepartmentList employees={this.state.employees}
                                          employeeNb={this.state.employeeNb}
                                          departments={this.state.departments}
-                                         onDataChange={this.addDepartment.bind(this)}/>
-            </Container>);
+                                         onDataChange={this.addDepartment}/>
+            </Container>
+        );
     }
 }
