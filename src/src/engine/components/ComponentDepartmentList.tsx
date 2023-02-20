@@ -70,7 +70,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                     <td key={"no" + index}>{index + 1}</td>
                     <td key={"name " + index}>
                         <LinkContainer
-                            to={`${RoutesPath.EMPLOYEE}/${department.name}/employee`}>
+                            to={`${RoutesPath.DEPARTMENTS}/${department.name}/employees`}>
                             <Nav.Link className="departmentName">
                                 {department.name}
                             </Nav.Link>

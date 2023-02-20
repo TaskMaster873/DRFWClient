@@ -6,7 +6,7 @@ export enum RoutesPath {
     SCHEDULE = '/schedule',
     CREATE_SCHEDULE = '/create-schedule',
     DEPARTMENTS = '/departments',
-    EMPLOYEE_WITH_PARAM = '/:id/employee',
+    EMPLOYEE_WITH_PARAM = '/:id/employees',
     ABOUT = '/about',
     ADD_EMPLOYEE = '/add-employee',
     AVAILABILITIES = '/availabilities',

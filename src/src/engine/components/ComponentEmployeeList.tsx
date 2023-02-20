@@ -9,6 +9,7 @@ import {BiEdit} from "react-icons/bi"
 import {Roles} from "../types/Roles";
 import {CgUnavailable} from "react-icons/cg";
 import {SearchParams} from "../types/SearchParams";
+import {RoutesPath} from "../RoutesPath";
 
 /**
  * Component that display the list of employees of a department
@@ -167,7 +168,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
      */
     private renderAddEmployeeButton(): JSX.Element {
         if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
-            return (<LinkContainer to="/add-employee">
+            return (<LinkContainer to={RoutesPath.ADD_EMPLOYEE}>
                 <Button className="mt-3 mb-3">Ajouter</Button>
             </LinkContainer>);
         } else {
@@ -177,7 +178,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
 
     /**
      * Render the admin actions
-     * @param employee The employee to render the actions for
+     * @param employee {Employee} The employee to render the actions for
      * @private
      */
     private renderAdminActions(employee: Employee): JSX.Element {
