@@ -10,7 +10,7 @@ import {Params, useParams} from "react-router-dom";
 export function EmployeeWrapper(): any {
     let parameters: Readonly<Params<string>> = useParams();
     return (
-        <Employees  {...{params: parameters}}/>
+        <EmployeesInternal  {...{params: parameters}}/>
     );
 }
 
@@ -29,7 +29,7 @@ interface EmployeeState {
  * @see EmployeeProps
  * @see Employee
  */
-class Employees extends React.Component<EmployeeProps, EmployeeState> {
+class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
     public state: EmployeeState = {
         employees: []
     }
