@@ -19,7 +19,7 @@ interface ComponentStateLogin {
     isLoggedIn: boolean;
 }
 
-export class ComponentLogin extends React.Component<unknown, ComponentStateLogin> {
+export class ComponentLogin extends React.Component<ComponentPropsLogin, ComponentStateLogin> {
     public state: ComponentStateLogin = {
         emailLogin: "",
         passwordLogin: "",
