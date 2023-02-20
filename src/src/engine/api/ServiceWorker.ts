@@ -1,10 +1,10 @@
-import {Logger} from "../Logger";
-import {AccountCreationData, CreatedAccountData, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
-import {FirebaseApp, initializeApp} from "firebase/app";
-import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
+import { Logger } from "../Logger";
+import { AccountCreationData, CreatedAccountData, ThreadMessage, ThreadMessageType } from "./types/ThreadMessage";
+import { FirebaseApp, initializeApp } from "firebase/app";
+import { FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig } from "./config/FirebaseConfig";
 import * as FirebaseAuth from "firebase/auth";
-import {connectAuthEmulator} from "firebase/auth";
-import {Employee} from "../types/Employee";
+import { connectAuthEmulator } from "firebase/auth";
+import { Employee } from "../types/Employee";
 
 class TaskMasterServiceWorker extends Logger {
     public moduleName: string = 'TaskMasterServiceWorker';
@@ -20,6 +20,18 @@ class TaskMasterServiceWorker extends Logger {
         super();
 
         this.init();
+    }
+
+    public async init() : Promise<void> {
+        this.log(`Initializing TaskMasterServiceWorker.`);
+
+        this.listenToMessages();
+    }
+
+    private listenToMessages() : void {
+        this.log(`Listening to messages.`);
+
+        self.onmessage = this.onMessage.bind(this);
     }
 
     private async onMessage(message: MessageEvent) : Promise<void> {
@@ -54,7 +66,11 @@ class TaskMasterServiceWorker extends Logger {
         let employee: Employee = data.employee;
 
         let errorMessage: string | null = null;
-        let createdUser = await FirebaseAuth.createUserWithEmailAndPassword(this.#auth, employee.email, data.password).catch((error: FirebaseAuth.AuthError) => {
+        let createdUser = await FirebaseAuth.createUserWithEmailAndPassword(
+            this.#auth,
+            employee.email,
+            data.password
+        ).catch((error: FirebaseAuth.AuthError) => {
             errorMessage = error.message;
         });
 
@@ -107,18 +123,6 @@ class TaskMasterServiceWorker extends Logger {
         await this.enablePersistence();
 
         this.log(`Firebase loaded successfully after ${Date.now() - start}ms.`);
-    }
-
-    private listenToMessages() : void {
-        this.log(`Listening to messages.`);
-
-        self.onmessage = this.onMessage.bind(this);
-    }
-
-    public async init() : Promise<void> {
-        this.log(`Initializing TaskMasterServiceWorker.`);
-
-        this.listenToMessages();
     }
 }
 

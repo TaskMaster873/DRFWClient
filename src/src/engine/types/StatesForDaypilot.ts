@@ -6,18 +6,17 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
 
 import { EventForCalendar, ShiftForEventCreation } from "./Shift";
 
-export interface CalendarAttributesForEmployeeSchedule {
+export interface DayPilotCalendarSettings {
     cellsMarkBusiness: boolean; //montrer le gris pâle ou non
-    businessWeekends: boolean; // travail possible la fin de semaine, 
+    businessWeekends: boolean; // travail possible la fin de semaine,
     headerDateFormat: string; // pour voir les jours de la semaine,
-    viewType: string; // 7 jours, 
+    viewType: string; // 7 jours,
     durationBarVisible: boolean; // la barre à gauche
     timeRangeSelectedHandling: string; // la sélection des heures
     eventResizeHandling: string; //changer la grosseur de l'event
     eventMoveHandling: string; //pouvoir le bouger
     eventDeleteHandling: string; // pouvoir le delete
 }
-
 
 /**
  * Ceci c'est pour le state de création d'employé
@@ -74,14 +73,3 @@ export enum EventDeleteHandlingType {
 	PostBack = "PostBack",
 
 }
-
-/*startDate: DayPilot.Date.today(),
-			columns: this.doColumns(),
-			//events: this.doEvents(),
-						heightSpec={"Full"}
-						height={2000}
-						cellHeight={20}
-						cellDuration={5}
-						viewType={"Resources"}
-						onTimeRangeSelected={this.onTimeRangeSelected}
-						eventDeleteHandling={"Update"}*/

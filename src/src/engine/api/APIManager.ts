@@ -113,7 +113,7 @@ class APIManager extends Logger {
         return Math.random().toString(36).substring(2);
     }
 
-    private async requestUserCreationFromWorker(employee: EmployeeCreateDTO, password: string): Promise<CreatedAccountData> {
+    private requestUserCreationFromWorker(employee: EmployeeCreateDTO, password: string): Promise<CreatedAccountData> {
         return new Promise((resolve) => {
             let taskId = this.generateTaskId();
             let createAccountMessage: ThreadMessage = {
@@ -191,13 +191,13 @@ class APIManager extends Logger {
 
         switch (message) {
             case "auth/invalid-email":
-                errorMessage = errors.invalidLogin;
+                errorMessage = errors.INVALID_LOGIN;
                 break;
             case "auth/user-not-found":
-                errorMessage = errors.invalidLogin;
+                errorMessage = errors.INVALID_LOGIN;
                 break;
             case "auth/wrong-password":
-                errorMessage = errors.invalidLogin;
+                errorMessage = errors.INVALID_LOGIN;
                 break;
             case "permission-denied":
                 errorMessage = errors.permissionDenied;
@@ -435,7 +435,7 @@ class APIManager extends Logger {
         }
         let queryDepartment = query(collection(this.#db, `departments`),
             where("name", "==", department.name));
-        let errorMessage = await this.checkIfAlreadyExists(queryDepartment, errors.departmentAlreadyExists);
+        let errorMessage = await this.checkIfAlreadyExists(queryDepartment, errors.DEPARTMENT_ALREADY_EXIST);
         if (!errorMessage) {
             await addDoc(collection(this.#db, `departments`), {...department}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);

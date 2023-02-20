@@ -63,7 +63,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredDepartmentName}
+                            {errors.REQUIRED_DEPARTMENT_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="3">
@@ -73,7 +73,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
                                 <option key={`${index}`} value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredDepartmentDirector}
+                            {errors.REQUIRED_DEPARTMENT_DIRECTOR}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>

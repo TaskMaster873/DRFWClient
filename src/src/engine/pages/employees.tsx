@@ -5,12 +5,19 @@ import {Employee, EmployeeProps} from "../types/Employee";
 import {API} from "../api/APIManager";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from 'react-notifications';
+import {Params, useParams} from "react-router-dom";
 
+export function EmployeeWrapper(): any {
+    let parameters: Readonly<Params<string>> = useParams();
+    return (
+        <Employees  {...{params: parameters}}/>
+    );
+}
 
 /**
  * Page de liste les employés
  */
-export class Employees extends React.Component<EmployeeProps> {
+class Employees extends React.Component<EmployeeProps> {
     public state = {
         employees: []
     }
@@ -25,10 +32,10 @@ export class Employees extends React.Component<EmployeeProps> {
         this.setState({employees: employees});
     }
 
-    public async deactivateEmployee(employeeId: string) {
+    public async deactivateEmployee(employeeId: string) : Promise<void> {
         let error = await API.deactivateEmployee(employeeId);
         if (!error) {
-            NotificationManager.success(successes.successGenericMessage, successes.employeeDeactivated);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
             let employees: Employee[] = this.state.employees;
             let employeeIndex = employees.findIndex(elem => elem.employeeId == employeeId);
             let employee = employees.find(elem => elem.employeeId == employeeId);
@@ -38,22 +45,21 @@ export class Employees extends React.Component<EmployeeProps> {
                 this.setState({employees: employees});
             }
         } else {
-            NotificationManager.error(error, errors.errorGenericMessage);
+            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
 
-    /**
-     *
-     * @returns La liste des employés
-     */
     public render(): JSX.Element {
-        let id: any = this.props.params.id;
-        if (!id) {
-            id = null;
-        }
-        return (<Container>
-            <ComponentEmployeeList filteredList={null} employees={this.state.employees} department={id}
-                                   onEditEmployee={this.deactivateEmployee.bind(this)} onDeactivateEmployee={this.deactivateEmployee.bind(this)}/>
-        </Container>);
+        return (
+            <Container>
+                <ComponentEmployeeList
+                    filteredList={null}
+                    employees={this.state.employees}
+                    department={this.props.params.id}
+                    onEditEmployee={this.deactivateEmployee.bind(this)}
+                    onDeactivateEmployee={this.deactivateEmployee.bind(this)}
+                />
+            </Container>
+        );
     }
 }

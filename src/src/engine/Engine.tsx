@@ -5,35 +5,33 @@ import "../deps/css/Engine.css";
 import "../deps/css/index.css";
 
 import {Index} from "./pages";
-import {Schedule} from "./pages/scheduleEmployee";
-import {Employees} from "./pages/employees";
+import {ScheduleEmployee} from "./pages/ScheduleEmployee";
+import { EmployeeWrapper } from "./pages/employees";
 import {About} from "./pages/about";
 import {Login} from "./pages/login";
-import {Memes} from "./pages/memes";
 import {AddEmployee} from "./pages/addEmployee";
 import {NavigationBar} from "./components/NavigationBar";
 import {ChangePassword} from "./pages/changePassword";
 import {Departments} from "./pages/departments";
 import {Availabilities} from "./pages/availabilities";
 import {API} from "./api/APIManager";
-import {ResetPassword} from "./pages/resetPassword";
+import {ResetPassword} from "./pages/ResetPassword";
 import {NotificationContainer} from 'react-notifications';
 import { ComponentLoading } from "./components/ComponentLoading";
 import { ForgotPassword } from "./pages/forgotPassword";
 import 'react-notifications/lib/notifications.css';
 import { CreateSchedule } from "./pages/createSchedule";
 
-function EmployeeWrapper(): any {
-    let parameters: Readonly<Params<string>> = useParams();
-    return (
-        <Employees  {...{params: parameters}}/>
-    );
+interface EngineState {
+    showSpinner: boolean;
 }
 
-export class Engine extends React.Component {
-    private showSpinner: boolean = true;
+export class Engine extends React.Component<unknown, EngineState> {
+    public state: EngineState = {
+        showSpinner: true
+    };
 
-    constructor(props) {
+    constructor(props: never) {
         super(props);
     }
 
@@ -41,18 +39,14 @@ export class Engine extends React.Component {
         this.verifyLogin();
     }
 
-    public verifyLogin(): void {
-        if (API.awaitLogin) {
-            API.awaitLogin.then(() => {
-                this.showSpinner = false;
+    public async verifyLogin(): Promise<void> {
+        await API.awaitLogin;
 
-                this.forceUpdate();
-            });
-        }
+        this.setState({showSpinner: false});
     }
 
     public render(): JSX.Element {
-        if (this.showSpinner) {
+        if (this.state.showSpinner) {
             return (<React.StrictMode>
                 <ComponentLoading/>
             </React.StrictMode>);
@@ -64,13 +58,12 @@ export class Engine extends React.Component {
                         <NotificationContainer/>
                         <Routes>
                             <Route path="/" element={<Index/>}/>
-                            <Route path="/schedule" element={<Schedule/>}/>
+                            <Route path="/schedule" element={<ScheduleEmployee/>}/>
                             <Route path="/create-schedule" element={<CreateSchedule/>}/>
                             <Route path="/departments" element={<Departments/>}/>
-                            <Route path="/employees/:id" element={<EmployeeWrapper/>}/>
+                            <Route path="/employees/:id/employee" element={<EmployeeWrapper/>}/>
                             <Route path="/about" element={<About/>}/>
                             <Route path="/login" element={<Login/>}/>
-                            <Route path="/memes" element={<Memes/>}/>
                             <Route path="/add-employee" element={<AddEmployee/>}/>
                             <Route path="/availabilities" element={<Availabilities/>}/>
                             <Route path="/forgot-password" element={<ForgotPassword/>}/>

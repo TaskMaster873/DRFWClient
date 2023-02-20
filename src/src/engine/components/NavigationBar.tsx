@@ -14,32 +14,32 @@ import { errors, successes } from "../messages/FormMessages";
 /**
  * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
  */
-
-interface NavigationBarType {
+interface NavigationBarState {
     showCreateSchedule: boolean;
 }
 
-export class NavigationBar extends React.Component<any, NavigationBarType> {
+export class NavigationBar extends React.Component<unknown, NavigationBarState> {
     private _isMountedAPI: boolean = false;
 
-    public state: NavigationBarType = {
+    public state: NavigationBarState = {
         showCreateSchedule: false,
     };
+
     constructor(props) {
         super(props);
 
-        API.subscribeToEvent(this.onEvent.bind(this));
+        API.subscribeToEvent(this.onAPIEvent.bind(this));
     }
 
-    public componentDidMount() {
+    public componentDidMount() : void{
         this._isMountedAPI = true;
     }
 
-    public componentWillUnmount() {
+    public componentWillUnmount() : void {
         this._isMountedAPI = false;
     }
 
-    private async onEvent(): Promise<void> {
+    private async onAPIEvent(): Promise<void> {
         return new Promise((resolve) => {
             if (this._isMountedAPI) {
                 this.setState({
@@ -52,7 +52,6 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
             }
         });
     }
-
 
     public render(): JSX.Element {
         return (
@@ -71,9 +70,9 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
-                        {/* eslint-disable-next-line no-restricted-globals */}
-                        <Nav activeKey={location.pathname}>
-                            {this.showWhenAdmin()}
+                        <Nav activeKey={window.location.pathname}>
+                            {this.adminCommandLinks()}
+
                             <LinkContainer to="/schedule">
                                 <Nav.Link>Mon horaire</Nav.Link>
                             </LinkContainer>
@@ -90,12 +89,9 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
                                 <Nav.Link>À propos</Nav.Link>
                             </LinkContainer>
                         </Nav>
-                        {/* eslint-disable-next-line no-restricted-globals */}
-                        <Nav activeKey={location.pathname} className="ms-auto">
+
+                        <Nav className="ms-auto">
                             {this.loginButton()}
-                            <LinkContainer to="/memes">
-                                <Nav.Link>Dank memes</Nav.Link>
-                            </LinkContainer>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
@@ -122,29 +118,31 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
             );
         }
     }
+
     /**
      * 
      * @returns les pages que seulement l'admin peut voir dans le navbar
      */
-    private showWhenAdmin(): JSX.Element {
+    private adminCommandLinks(): JSX.Element {
         if (this.state.showCreateSchedule) {
-            return (<LinkContainer to="/create-schedule">
-                <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
-                </LinkContainer>)
+            return (
+                <LinkContainer to="/create-schedule">
+                    <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
+                </LinkContainer>
+            );
         } else {
-            return (<></>);
+            return (
+                <></>
+            );
         }
     }
 
-    /**
-     * Je ne sais pas si il faudrait le garder
-     */
     private async logOut(): Promise<void> {
         let error = await API.logout();
         if (!error) {
-            NotificationManager.success(successes.successGenericMessage, successes.logout);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGOUT_SUCCESS);
         } else {
-            NotificationManager.error(error, errors.errorLogout);
+            NotificationManager.error(error, errors.ERROR_LOGOUT);
         }
     }
 }

@@ -52,7 +52,7 @@ export class ComponentChangePassword extends React.Component {
                             placeholder="Entrez l'ancien mot de passe"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidOldPassword">
-                            {errors.requiredOldPassword}
+                            {errors.REQUIRED_OLD_PASSWORD}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group>
@@ -67,7 +67,7 @@ export class ComponentChangePassword extends React.Component {
                             placeholder="Entrez le nouveau mot de passe"
                         />
                         <Form.Control.Feedback type="invalid" id="invalidNewPassword">
-                            {errors.invalidNewPassword}
+                            {errors.INVALID_NEW_PASSWORD}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <div className="mt-4 me-4 d-block text-center mx-auto">
@@ -109,9 +109,9 @@ export class ComponentChangePassword extends React.Component {
         if (errorType === FormErrorType.NO_ERROR) {
             let error = await API.changePassword(this.state.oldPassword, this.state.newPassword); //voici le changement en async
             if (!error) {
-                NotificationManager.success(successes.successGenericMessage, successes.changedPassword);
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.CHANGE_PASSWORD);
             } else {
-                NotificationManager.error(error, errors.errorForm);
+                NotificationManager.error(error, errors.ERROR_FORM);
             }
         }
     }

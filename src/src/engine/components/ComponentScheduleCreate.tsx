@@ -1,5 +1,5 @@
 import React from "react";
-import {Employee, EmployeeList} from "../types/Employee";
+import {Employee, StateEmployeeList} from "../types/Employee";
 import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
 import {ResourceGroups} from "./ComponentFilterProjects";
 import {ScheduleGroups} from "../types/Schedule";

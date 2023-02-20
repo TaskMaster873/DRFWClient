@@ -1,10 +1,10 @@
 import {Department} from "./Department";
-import {Params} from "react-router-dom";
+import {Params, useParams} from "react-router-dom";
 
 /**
  * Liste d'employé
  */
-export interface EmployeeList {
+export interface StateEmployeeList {
     list : Employee[];
 }
 
@@ -74,9 +74,13 @@ export interface EmployeeProps {
 export interface EmployeeListProps {
     employees: Employee[] | null;
     filteredList: Employee[] | null;
-    department: string | null;
+    department?: string | null;
     onEditEmployee: (employee) => PromiseLike<void> | Promise<void> | void;
     onDeactivateEmployee: (employee) => PromiseLike<void> | Promise<void> | void;
+}
+
+export interface EmployeeListState {
+    filteredList: Employee[] | null;
 }
 
 export interface AddEmployeeProps {
@@ -84,4 +88,13 @@ export interface AddEmployeeProps {
     roles: string[];
     jobTitles: string[];
     onDataChange: (password, employee) => PromiseLike<void> | Promise<void> | void;
+}
+
+export type EmployeeRoleList = string[];
+export type EmployeeJobTitleList = string[];
+
+export interface AddEmployeeState {
+    departments: Department[];
+    roles: EmployeeRoleList;
+    titles: EmployeeJobTitleList;
 }

@@ -36,9 +36,9 @@ export function ComponentForgotPassword() {
             let errorMessage = await API.sendResetPassword(email);
             //Regarde si l'erreur est null
             if (!errorMessage) {
-                NotificationManager.info(info.emailSent, info.passwordReset);
+                NotificationManager.info(info.EMAIL_SENT, info.PASSWORD_RESET);
             } else {
-                NotificationManager.error(errorMessage, errors.errorGenericMessage);
+                NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
             }
         }
     };
@@ -78,7 +78,7 @@ export function ComponentForgotPassword() {
                         }}
                     />
                     <Form.Control.Feedback type="invalid" id="invalidEmail">
-                        {errors.invalidEmail}
+                        {errors.INVALID_EMAIL}
                     </Form.Control.Feedback>
                 </Form.Group>
                 <div className="mt-4 me-4 d-block text-center mx-auto">

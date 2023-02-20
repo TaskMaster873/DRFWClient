@@ -64,7 +64,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="Prénom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredFirstName}
+                            {errors.REQUIRED_FIRSTNAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
@@ -76,7 +76,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredName}
+                            {errors.REQUIRED_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
@@ -89,7 +89,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="exemple@exemple.com"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidEmail}
+                            {errors.INVALID_EMAIL}
                         </Form.Control.Feedback>
                     </Form.Group>
 
@@ -105,7 +105,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="000-000-0000"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidPhoneNumber}
+                            {errors.INVALID_PHONE_NUMBER}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
@@ -118,7 +118,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="Mot de passe"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidInitialPassword}
+                            {errors.INVALID_INITIAL_PASSWORD}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
@@ -129,7 +129,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                                 <option key={`${index}`} value={`${department.name}`}>{`${department.name}`}</option>))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredDepartmentName}
+                            {errors.REQUIRED_DEPARTMENT_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
@@ -151,7 +151,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                                 <option key={`${index}`} value={`${index}`}>{`${role}`}</option>))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredRole}
+                            {errors.REQUIRED_ROLE}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
