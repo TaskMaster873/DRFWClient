@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
-import {AddEmployeeProps, Employee, EmployeeCreateDTO} from "../types/Employee";
+import {AddEmployeeProps, EmployeeCreateDTO} from "../types/Employee";
 
 /**
  *
@@ -15,6 +15,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
     public state: {
         clientId: string; firstName: string; lastName: string; email: string; phoneNumber: string; password: string; role: number; department: string; jobTitles: string[]; skills: string[]; validated?: boolean; error: FormErrorType;
     };
+
     constructor(props: AddEmployeeProps) {
         super(props);
         this.state = {

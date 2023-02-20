@@ -26,7 +26,7 @@ import {
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
-import {Employee, EmployeeCreateDTO, EmployeeDTO} from "../types/Employee";
+import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
@@ -248,6 +248,7 @@ class APIManager extends Logger {
         await FirebaseAuth.signOut(this.#auth).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
+        this.#userRole = -1;
 
         await this.onEvent();
         return errorMessage;

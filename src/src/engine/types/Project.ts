@@ -4,5 +4,5 @@ export interface Projects {
 
 export interface Project {
     name: string;
-    startDate: Date;
+    start: Date;
 }

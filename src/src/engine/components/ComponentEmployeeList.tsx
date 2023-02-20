@@ -1,6 +1,6 @@
 import React, {CSSProperties} from "react";
 import {Button, Col, Row, Table} from "react-bootstrap";
-import {Employee, EmployeeListProps, employeeTableHeads} from "../types/Employee";
+import {adminTableHeads, Employee, EmployeeListProps, employeeTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 import {API} from "../api/APIManager";
@@ -22,7 +22,11 @@ const override: CSSProperties = {
 
 export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     public state: EmployeeListProps = {
-        employees: null, filteredList: null, department: this.props.department, onEditEmployee: this.props.onEditEmployee, onDeactivateEmployee: this.props.onDeactivateEmployee
+        employees: null,
+        filteredList: null,
+        department: this.props.department,
+        onEditEmployee: this.props.onEditEmployee,
+        onDeactivateEmployee: this.props.onDeactivateEmployee,
     }
 
     constructor(props: EmployeeListProps) {
@@ -31,7 +35,11 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
     static getDerivedStateFromProps(props: EmployeeListProps, state: EmployeeListProps): EmployeeListProps {
         return {
-            employees: props.employees, department: props.department, filteredList: state.filteredList, onEditEmployee: props.onEditEmployee, onDeactivateEmployee: props.onDeactivateEmployee
+            employees: props.employees,
+            department: props.department,
+            filteredList: state.filteredList,
+            onEditEmployee: props.onEditEmployee,
+            onDeactivateEmployee: props.onDeactivateEmployee,
         };
     }
 
@@ -40,10 +48,10 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
         let searchProps: SearchParams<Employee> = {list: list, filterList: this.updateList.bind(this)};
         return (<div className="mt-5">
-                {this.renderSearchBar(searchProps)}
-                {this.renderList()}
-                {this.renderAddEmployeeButton()}
-            </div>);
+            {this.renderSearchBar(searchProps)}
+            {this.renderList()}
+            {this.renderAddEmployeeButton()}
+        </div>);
     }
 
     private updateList(filteredList: Employee[]): void {
@@ -91,7 +99,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
                     {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
                 </td>
                 <td key={"skills " + index}>{employee.skills}</td>
-                <td key={"action " + index}>{this.renderAdminActions(employee)}</td>
+                {this.renderAdminActions(index, employee)}
             </tr>));
         } else {
             return [<tr key={"firstCol"}>
@@ -107,9 +115,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
 
         return (<Table responsive bordered hover className="text-center">
             <thead>
-            <tr key={"firstCol"}>
-                {employeeTableHeads.map((th) => (<th key={th}>{th}</th>))}
-            </tr>
+            {this.renderTableHeads()}
             </thead>
             <tbody>
             {this.getEmployeeList(list)}
@@ -118,16 +124,32 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps> {
     }
 
     private renderAddEmployeeButton(): JSX.Element | undefined {
-        if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
+        if (API.hasPermission(Roles.ADMIN)) {
             return (<LinkContainer to="/add-employee">
                 <Button className="mt-3 mb-3">Ajouter</Button>
             </LinkContainer>);
         }
     }
 
-    private renderAdminActions(employee: Employee): JSX.Element | undefined {
-        if(employee.employeeId && API.isAuth() && API.hasPermission(Roles.ADMIN)) {
-            return <div><a onClick={() => this.props.onEditEmployee(employee)}><BiEdit /></a> <a><CgUnavailable onClick={() => this.props.onDeactivateEmployee(employee.employeeId)}/></a></div>
+    private renderAdminActions(index: number, employee: Employee): JSX.Element | undefined {
+        if (employee.employeeId && API.hasPermission(Roles.ADMIN)) {
+            return <td key={`action ${index}`}><a onClick={() => this.props.onEditEmployee(employee)}><BiEdit/></a>
+                <a><CgUnavailable onClick={() => this.props.onDeactivateEmployee(employee.employeeId)}/></a></td>
+        }
+    }
+
+    private renderTableHeads(): JSX.Element {
+        if (API.hasPermission(Roles.ADMIN)) {
+            return (
+                <tr key={"firstCol"}>
+                    {adminTableHeads.map((th) => (<th key={th}>{th}</th>))}
+                </tr>);
+        } else {
+            return (
+                <tr key={"firstCol"}>
+                    {employeeTableHeads.map((th) => (<th key={th}>{th}</th>))}
+                </tr>
+            )
         }
     }
 }
