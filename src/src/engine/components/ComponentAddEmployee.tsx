@@ -3,41 +3,49 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {errors, FormErrorType} from "../messages/FormMessages";
-import {Container} from "react-bootstrap";
-import {AddEmployeeProps, EmployeeCreateDTO} from "../types/Employee";
+import { errors, FormErrorType } from "../messages/FormMessages";
+import { Container } from "react-bootstrap";
+import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
+
+interface ComponentAddEmployeeState extends Employee {
+    validated?: boolean;
+    error: FormErrorType;
+    password: string;
+}
 
 /**
- *
- * Ceci est le composant pour ajouter les employés
+ * This is the form to add an employee
+ * @param props The props of the component
+ * @constructor
+ * @category Components
+ * @subcategory Employee
+ * @hideconstructor
  */
-export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
-    public state: {
-        clientId: string; firstName: string; lastName: string; email: string; phoneNumber: string; password: string; role: number; department: string; jobTitles: string[]; skills: string[]; validated?: boolean; error: FormErrorType;
+export class ComponentAddEmployee extends React.Component<AddEmployeeProps, ComponentAddEmployeeState> {
+    public state: ComponentAddEmployeeState = {
+        employeeId: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        password: "",
+        role: 0,
+        department: "",
+        jobTitles: [],
+        skills: [],
+        validated: false,
+        error: FormErrorType.NO_ERROR,
     };
+
+    public props: AddEmployeeProps;
 
     constructor(props: AddEmployeeProps) {
         super(props);
-        this.state = {
-            clientId: "",
-            firstName: "",
-            lastName: "",
-            email: "",
-            phoneNumber: "",
-            password: "",
-            role: 0,
-            department: "",
-            jobTitles: [],
-            skills: [],
-            validated: false,
-            error: FormErrorType.NO_ERROR,
-        };
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSelect = this.handleSelect.bind(this);
+
+        this.props = props;
     }
 
-    componentDidUpdate(prevProps: AddEmployeeProps) {
+    public componentDidUpdate(prevProps: AddEmployeeProps) : void {
         if (prevProps.departments !== this.props.departments && this.props.departments.length > 0) {
             this.setState({
                 department: this.props.departments[0].name
@@ -50,8 +58,8 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
             <Form
                 noValidate
                 validated={this.state.validated}
-                onSubmit={this.handleSubmit}
-                onChange={this.handleChange}
+                onSubmit={this.#handleSubmit}
+                onChange={this.#handleChange}
                 data-error={this.state.error}
             >
                 <Row className="mb-3 mt-3">
@@ -65,7 +73,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="Prénom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredFirstName}
+                            {errors.REQUIRED_FIRSTNAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
@@ -77,7 +85,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredName}
+                            {errors.REQUIRED_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
@@ -90,7 +98,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="exemple@exemple.com"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidEmail}
+                            {errors.INVALID_EMAIL}
                         </Form.Control.Feedback>
                     </Form.Group>
 
@@ -106,7 +114,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="000-000-0000"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidPhoneNumber}
+                            {errors.INVALID_PHONE_NUMBER}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
@@ -119,18 +127,18 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                             placeholder="Mot de passe"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidInitialPassword}
+                            {errors.INVALID_INITIAL_PASSWORD}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Département</Form.Label>
                         <Form.Select required id="department" value={this.state.department}
-                                     onChange={this.handleSelect}>
+                                     onChange={this.#handleSelect}>
                             {this.props.departments.map((department, index) => (
                                 <option key={`${index}`} value={`${department.name}`}>{`${department.name}`}</option>))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredDepartmentName}
+                            {errors.REQUIRED_DEPARTMENT_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
@@ -147,12 +155,12 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                     </Form.Group>
                     <Form.Group as={Col} md="6">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required id="role" value={this.state.role} onChange={this.handleSelect}>
+                        <Form.Select required id="role" value={this.state.role} onChange={this.#handleSelect}>
                             {this.props.roles.map((role, index) => (
                                 <option key={`${index}`} value={`${index}`}>{`${role}`}</option>))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredRole}
+                            {errors.REQUIRED_ROLE}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
@@ -176,7 +184,15 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
      * TODO
      * Generate automatically a password for new employee and ask them to change it on the first login.
      */
-    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
+
+    /**
+     * Handle the form submission. Validate the form and attempt to create the employee.
+     * @param event The form submission event. Contains the form data to be validated.
+     * @private
+     * @returns {Promise<void>}
+     * @memberof CreateEmployee
+     */
+    readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
 
@@ -206,26 +222,37 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
         }
     }
 
-    private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
+    /**
+     * Handle the change of a form element. Update the state with the new value.
+     * @param event The change event. Contains the new value of the form element.
+     * @returns {void}
+     * @memberof CreateEmployee
+     * @private
+     */
+    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
-        let name = target.id;
+        let name: string = target.id;
+
         let value;
         if (target.type === "checkbox") {
             value = target.checked;
         } else {
             value = target.value;
         }
+
         if (!name) {
             throw new Error("Id is undefined for element in form.");
         }
 
-        this.setState({
+        this.setState({...this.state, ...{
             [name]: value,
-        });
+        }});
     }
 
-    private handleSelect(event: ChangeEvent<HTMLSelectElement>) {
+    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
         const target = event.target;
-        this.setState({[target.id]: target.value});
+        this.setState({...this.state, ...{
+            [target.id]: target.value
+        }});
     }
 }

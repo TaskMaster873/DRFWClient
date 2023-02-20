@@ -6,40 +6,53 @@ import { LinkContainer } from "react-router-bootstrap";
 import { NotificationManager } from 'react-notifications';
 
 /* === Images === */
-// @ts-ignore
 import Logo from "../../deps/images/logo.png";
 import { API } from "../api/APIManager";
 import { errors, successes } from "../messages/FormMessages";
 
-/**
- * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
- */
-
-interface NavigationBarType {
+interface NavigationBarState {
     showCreateSchedule: boolean;
 }
 
-export class NavigationBar extends React.Component<any, NavigationBarType> {
+/**
+ * This is the navigation bar component, it is displayed on every page. It shows the links to the different pages and the login button.
+ * @returns {JSX.Element}
+ * @constructor
+ * @category Components
+ * @subcategory Navigation
+ * @hideconstructor
+ * @see NavigationBarState
+ */
+export class NavigationBar extends React.Component<unknown, NavigationBarState> {
     private _isMountedAPI: boolean = false;
 
-    public state: NavigationBarType = {
+    public state: NavigationBarState = {
         showCreateSchedule: false,
     };
+
     constructor(props) {
         super(props);
 
-        API.subscribeToEvent(this.onEvent.bind(this));
+        API.subscribeToEvent(this.onAPIEvent.bind(this));
     }
 
-    public componentDidMount() {
+    public componentDidMount() : void{
         this._isMountedAPI = true;
     }
 
-    public componentWillUnmount() {
+    public componentWillUnmount() : void {
         this._isMountedAPI = false;
     }
 
-    private async onEvent(): Promise<void> {
+    /**
+     * This function returns the links to the admin commands if the user is an admin
+     * @returns {JSX.Element[]} The links to the admin commands
+     * @private
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     */
+    private async onAPIEvent(): Promise<void> {
         return new Promise((resolve) => {
             if (this._isMountedAPI) {
                 this.setState({
@@ -53,7 +66,6 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
         });
     }
 
-
     public render(): JSX.Element {
         return (
             <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{ fontSize: 15 }}>
@@ -62,7 +74,7 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
                         <Navbar.Brand>
                             <img
                                 className="me-3"
-                                src={Logo}
+                                src={Logo as any}
                                 alt="Logo TaskMaster"
                                 width={50}
                                 height={60}
@@ -71,9 +83,9 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
-                        {/* eslint-disable-next-line no-restricted-globals */}
-                        <Nav activeKey={location.pathname}>
-                            {this.showWhenAdmin()}
+                        <Nav activeKey={window.location.pathname}>
+                            {this.adminCommandLinks()}
+
                             <LinkContainer to="/schedule">
                                 <Nav.Link>Mon horaire</Nav.Link>
                             </LinkContainer>
@@ -90,12 +102,9 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
                                 <Nav.Link>À propos</Nav.Link>
                             </LinkContainer>
                         </Nav>
-                        {/* eslint-disable-next-line no-restricted-globals */}
-                        <Nav activeKey={location.pathname} className="ms-auto">
+
+                        <Nav className="ms-auto">
                             {this.loginButton()}
-                            <LinkContainer to="/memes">
-                                <Nav.Link>Dank memes</Nav.Link>
-                            </LinkContainer>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
@@ -104,14 +113,19 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
     }
 
     /**
-     *
-     * @returns se déconnecter si la personne est connectée
+     * If the user is logged in, it returns the logout button, otherwise it returns the login button
+     * @returns {JSX.Element} The login or logout button
+     * @private
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     * @see loginButton
      */
     private loginButton(): JSX.Element {
         if (API.isAuth()) {
             return (
                 <LinkContainer to="/login">
-                    <Nav.Link id="logoutLink" onClick={this.logOut}>Se déconnecter</Nav.Link>
+                    <Nav.Link id="logoutLink" onClick={this.#logout}>Se déconnecter</Nav.Link>
                 </LinkContainer>
             );
         } else {
@@ -122,29 +136,48 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
             );
         }
     }
+
     /**
-     * 
-     * @returns les pages que seulement l'admin peut voir dans le navbar
+     * This function returns the links to the admin commands if the user is an admin
+     * @returns {JSX.Element[]} The links to the admin commands
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     * @see adminCommandLinks
+     * @see NavigationBarState
+     * @private
      */
-    private showWhenAdmin(): JSX.Element {
+    private adminCommandLinks(): JSX.Element {
         if (this.state.showCreateSchedule) {
-            return (<LinkContainer to="/create-schedule">
-                <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
-                </LinkContainer>)
+            return (
+                <LinkContainer to="/create-schedule">
+                    <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
+                </LinkContainer>
+            );
         } else {
-            return (<></>);
+            return (
+                <></>
+            );
         }
     }
 
     /**
-     * Je ne sais pas si il faudrait le garder
+     * This function logs out the user
+     * @returns {Promise<void>} A promise that resolves when the logout is complete
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     * @see adminCommandLinks
+     * @see NavigationBarState
+     * @see API
+     * @private
      */
-    private async logOut(): Promise<void> {
+    readonly #logout = async (): Promise<void> => {
         let error = await API.logout();
         if (!error) {
-            NotificationManager.success(successes.successGenericMessage, successes.logout);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGOUT_SUCCESS);
         } else {
-            NotificationManager.error(error, errors.errorLogout);
+            NotificationManager.error(error, errors.ERROR_LOGOUT);
         }
     }
 }

@@ -1,11 +1,3 @@
-
-/**
- * Liste de disponibilitées
- */
-export interface AvailabilityList {
-    list : Availability[];
-}
-
 /**
  * Contient tout les renseignements des disponibilités de l'application web
  */

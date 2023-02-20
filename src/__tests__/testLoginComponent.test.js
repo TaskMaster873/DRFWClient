@@ -5,7 +5,7 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {Login} from "../src/engine/pages/login";
+import {Login} from "../src/engine/pages/Login";
 
 jest.mock("../src/engine/api/APIManager");
 const {API} = require("../src/engine/api/APIManager");

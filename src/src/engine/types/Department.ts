@@ -37,9 +37,3 @@ export interface DepartmentListProps {
     departments: Department[],
     onDataChange: (department) => PromiseLike<void> | Promise<void> | void;
 }
-
-export interface AddDepartmentProps {
-    employees: Employee[];
-    onDataChange: (department) => PromiseLike<void> | Promise<void> | void;
-}
-

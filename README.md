@@ -7,8 +7,6 @@
 
 TaskMaster est un gestionnaire d'horaire pour entreprise. En tant qu'application web, TaskMaster est accessible partout et permet à une entreprise de mieux gérer ses effectifs.
 
-[//]: # (TODO : Remplacez cette image par une capture d'écran de votre application.)
-
 <div align="center">
 
 ![Aperçu du Projet Synthèse](docs/Preview.png)
@@ -34,7 +32,7 @@ développement.
 ### Compiler une version de développement
 
 Clonez le dépôt. Téléchargez les dépendances *NodeJs* via la commande `npm i`. Ensuite, démarrez le programme
-en mode débogage via la commande `npm run dev`.
+en mode débogage via la commande `npm run dev`. Le projet sera déployé localement sur le port 8080. Les émulateurs locaux sont aussi déployés. L'interface utilisateur des émulateurs sont accessibles au port 9097. Les ports 9098 et 9099 sont occupés apr l'émulateur de stockage et d'authentication.
 
 ### Compiler une version stable
 
@@ -49,22 +47,14 @@ avec les étapes pour le reproduire. Les captures d'écran et les vidéos sont l
 
 ## Auteurs
 
-* **David Lawton** - *Programmeur(Front-End)*
-* **Romin Martignat** - *Programmeur(Front-End)*
-* **Félix-Antoine Belleau** - *Programmeur(Back-End)*
-* **William Blanchet Lafernière** - *Programmeur(Back-End)*
+* **David Lawton** - *Programmeur*
+* **Romin Martignat** - *Programmeur*
+* **Félix-Antoine Belleau** - *Programmeur*
+* **William Blanchet Lafernière** - *Programmeur*
 
 ## Changelog
 
 Consultez la description de [la dernière version][Releases] de l'application.
-
-## License
-
-X
-
-## Remerciements
-
-X
 
 [//]: # (Hyperliens)
 [Git]: https://git-scm.com/downloads
