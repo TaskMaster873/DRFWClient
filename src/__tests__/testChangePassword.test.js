@@ -5,7 +5,7 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {ChangePassword} from "../src/engine/pages/changePassword";
+import {ChangePassword} from "../src/engine/pages/ChangePassword.tsx";
 
 let user;
 beforeEach(async () => {

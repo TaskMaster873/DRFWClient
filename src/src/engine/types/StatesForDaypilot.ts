@@ -4,7 +4,7 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
  * Voici la doc : https://api.daypilot.org/daypilot-calendar-methods/ et https://api.daypilot.org/daypilot-calendar-properties/
  */
 
-import { EventForCalendar, ShiftForEventCreation } from "./Shift";
+import { EventForCalendar } from "./Shift";
 
 export interface DayPilotCalendarSettings {
     cellsMarkBusiness: boolean; //montrer le gris pâle ou non
@@ -32,20 +32,15 @@ export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	cellDuration?: number // le temps que vaut une cellule 30 de base
 	viewType: ViewType; // En bref cela change la vue et ressource serait important pour les départements
 	eventDeleteHandling: EventDeleteHandlingType;
-	ListOfShifts: ShiftForEventCreation[];
 	isShowingModal: boolean;
 	start: DayPilot.Date;
 	end: DayPilot.Date;
 	resourceName: string;
 }
 
-export class ColumnsClass {
-	
-}
-
 export interface ColumnsType {
-	name:string;
-	id:string;
+	name: string;
+	id: string;
 }
 /**
  * Les chois qu'on a gratuitement

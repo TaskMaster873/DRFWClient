@@ -23,3 +23,17 @@ body {
 #root {
   overflow-x: hidden;
 }
+
+.loadingBar {
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bigLoading {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

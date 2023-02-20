@@ -1,162 +1,182 @@
 import React from "react";
-import {Employee, StateEmployeeList} from "../types/Employee";
-import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
-import {ResourceGroups} from "./ComponentFilterProjects";
-import {ScheduleGroups} from "../types/Schedule";
-import "./ComponentPopupSchedule";
-import {EventForCalendar, ShiftForCalendar, ShiftForEventCreation, EventForShiftCreation} from "../types/Shift";
-import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
+import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
+
+import {EventForCalendar, EventForShiftCreation, Shift} from "../types/Shift";
+import { ComponentPopupSchedule } from "./ComponentPopupSchedule";
 import { CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, HeightSpecType, ViewType } from "../types/StatesForDaypilot";
 import { API } from "../api/APIManager";
 
-/**
- * Ceci est le composant d'horaire
- */
+type ComponentScheduleCreateProps = {
+	listOfShifts: Shift[];
+}
 
-type Props = {listFetchedFromApi:ShiftForEventCreation[], /* liste d'employé*/ }
-
-export class ComponentScheduleCreate extends React.Component<Props, CalendarAttributesForEmployeeShiftCreationComponent > {
-
-	private list: Employee[] = [];
-	private listEvent: EventForCalendar[] = [];
+export class ComponentScheduleCreate extends React.Component<ComponentScheduleCreateProps, CalendarAttributesForEmployeeShiftCreationComponent> {
 	private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
 
-	public state:  CalendarAttributesForEmployeeShiftCreationComponent = {
+	public state: CalendarAttributesForEmployeeShiftCreationComponent = {
 		startDate: DayPilot.Date.today().toString(),
 		columns: [],
 		events: [],
 		heightSpec: HeightSpecType.Full,
 		viewType: ViewType.Resources,
 		eventDeleteHandling: EventDeleteHandlingType.Update,
-		ListOfShifts: [],
 		isShowingModal: false,
 		start: "2023-02-17T00:00:00",
 		end: "2023-02-18T00:00:00",
 		resourceName: ""
 	}
 
-	constructor(props: Props) {
+	constructor(props: ComponentScheduleCreateProps) {
 		super(props);
-		this.state.ListOfShifts = props.listFetchedFromApi;
 	}
 
 	/**
-	 * 
-	 * @param event = un shift avec toutes les données pour être créé.
+	 * Called when the user clicks on the "Add Shift" button
+	 * @param args {EventForShiftCreation}
+	 * @returns {Promise<void>}
+	 * @private
+	 * @memberof ComponentScheduleCreate
 	 */
-	public ShiftAdd = async (event: EventForShiftCreation) => {
-		console.log(event);
-		this.listEvent.push({
+	readonly #shiftAdd = async (event: EventForShiftCreation): Promise<void> => {
+		const listEvent = this.state.events;
+		listEvent.push({
 			id: 1,
 			text: event.start.toString("dd MMMM yyyy ", "fr-fr") + " " + event.start.toString("hh") + "h" + event.start.toString("mm") + "-" + event.end.toString("hh") + "h" + event.end.toString("mm"),
 			start: event.start,
 			end: event.end,
 		});
+
+		console.log("You have reached CreateShift", event.start);
+
+		await API.createShift({
+			employeeId: event.employeeId,
+			start: event.start.toString("yyyy-MM-ddTHH:mm:ss"),
+			end: event.end.toString("yyyy-MM-ddTHH:mm:ss"),
+			department: "",
+			projectName: ""
+		});
+
 		this.setState({
 			isShowingModal: false,
-		})
-		console.log("You have reached CreateShift", event.start)
-		await API.createShift({
-			employeeId: event.employeeId, 
-			start: event.start.toString("yyyy-MM-ddTHH:mm:ss"), 
-			end: event.end.toString("yyyy-MM-ddTHH:mm:ss"), 
-			department:"", //missing
-			projectName:""//missing
+			events: listEvent
 		});
-		this.setState({ events: this.listEvent });
 	};
-	private popup = ()=> { 
-		return <ComponentPopupSchedule isShowing={this.state.isShowingModal} eventAdd={this.ShiftAdd} start={this.state.start} end={this.state.end} resource={this.state.resourceName}/>
+
+	private showScheduleCreationModal(): JSX.Element {
+		return (
+			<ComponentPopupSchedule
+				isShowing={this.state.isShowingModal}
+				eventAdd={this.#shiftAdd}
+				start={this.state.start}
+				end={this.state.end}
+				resource={this.state.resourceName}
+			/>
+		);
 	}
 
-	private get calendar() {
+	private get calendar(): unknown {
 		return this.calendarRef?.current.control;
 	}
-	
-	public render(): JSX.Element  {
-			return (
-				
-				
-					//<ResourceGroups groups={this.loadGroups().groups} /*onChange={this.onChange}*/ onChange={undefined} /*onChange={this.onChange}*/ />
-					<div>
-					<DayPilotCalendar
-						businessBeginsHour={8}
-						businessEndsHour={20}
-						height={2000}
-						cellHeight={20}
-						cellDuration={5}
-						onTimeRangeSelected={this.onTimeRangeSelected}
-						{...this.state}
-						ref= {this.calendarRef}
-					/>
-					{this.popup()}
-				</div>
-				
-			);
+
+	public render(): JSX.Element {
+		return (
+			//<ResourceGroups groups={this.loadGroups().groups} /*onChange={this.onChange}*/ onChange={undefined} /*onChange={this.onChange}*/ />
+			<div>
+				<DayPilotCalendar
+					businessBeginsHour={8}
+					businessEndsHour={20}
+					height={2000}
+					cellHeight={20}
+					cellDuration={5}
+					onTimeRangeSelected={this.#onTimeRangeSelected}
+					{...this.state}
+					ref={this.calendarRef}
+				/>
+				{this.showScheduleCreationModal()}
+			</div>
+		);
 	}
 
 	/**
-	 *
-	 * @returns la liste des noms d'employé formattés pour columns de DayPilotCalendar qui existe déjà
-	 *
+	 * Called when the user selects a time range in the calendar
+	 * @private
+	 * @memberof ComponentScheduleCreate
+	 * @returns {void} The list of employee names formatted for DayPilotCalendar columns
 	 */
-
-	private doColumns(): void{
+	private doColumns(): void {
 		let listToReturn: ColumnsType[];
 		listToReturn = [];
-		if(this.state.ListOfShifts.length > 0)
-		{
-			for (let index = 0; index < this.state.ListOfShifts.length; index++) {
+		if (this.props.listOfShifts.length > 0) {
+			for (let shift of this.props.listOfShifts) {
 				listToReturn.push({
-					name: this.state.ListOfShifts[index].employeeName,
-					id: /*this.state.ListOfShifts[index].employeeId*/"1",
+					name: shift.employeeName || 'Inconnu',
+					id: /*shift.employeeId*/ "1",
 				});
 			}
 		}
-		this.setState({columns: listToReturn} );
-		//this.calendar.update({columns: listToReturn});
+
+		this.setState({columns: listToReturn});
 	}
 
+	/**
+	 * Called when the user selects a time range in the calendar
+	 * @private
+	 * @memberof ComponentScheduleCreate
+	 * @returns {void} The list of employee names formatted for DayPilotCalendar columns
+	 * @param args {TimeRangeSelectedParams}
+	 * @returns {void}
+	 */
 	private loadShifts(): void {
-		let listToUpdate: EventForCalendar[] = [];
+		const listToUpdate: EventForCalendar[] = this.state.events;
 
-		if(this.state.ListOfShifts.length > 0) {
-			for (let index = 0; index < this.state.ListOfShifts.length; index++) {
-				this.listEvent.push({
+		if (this.props.listOfShifts.length > 0) {
+			for (let shift of this.props.listOfShifts) {
+
+				listToUpdate.push({
 					id: 1,
-					start: this.state.ListOfShifts[index].start,//heure de début
-  					end: this.state.ListOfShifts[index].end, //heure de fin
+					start: shift.start,//heure de début
+					end: shift.end, //heure de fin
 					resource: /*this.state.ListOfShifts[index].employeeId*/"1",
-					
 				});
 			}
 		}
-		
-		this.setState({events: this.listEvent});
+
+		this.setState({
+			events: listToUpdate
+		});
+
 		//this.calendar.update({events: listToUpdate});
-		console.log("les events:",this.state.events);
+		console.log("les events:", this.state.events);
 	}
 
-	onTimeRangeSelected = (args: any) => {
+	// TODO type this arg
+	/**
+	 * Called when the user selects a time range in the calendar
+	 * @param args {TimeRangeSelectedParams}
+	 * @private
+	 * @memberof ComponentScheduleCreate
+	 * @returns {void}
+	 */
+	readonly #onTimeRangeSelected = (args: any): void => {
 		console.log("ontime:", args);
+
 		this.setState({
 			isShowingModal: true,
 			start: args.start,
 			end: args.end,
 			resourceName: args.resource
 		})
-		//this.child.current?.saveContent(args.start, args.end, args.resource);
-		//let name = prompt("New event name:", "Event");
+
 		DayPilot.Calendar.clearSelection;
 	}
 
 	public componentDidMount(): void {
-		this.setState({ListOfShifts: this.props.listFetchedFromApi});
 		this.doColumns();
 		this.loadShifts();
-		console.log(this.state.events, this.state.columns);
 
+		console.log(this.state.events, this.state.columns);
 	}
+}
 	
 	/*private loadGroups(): ScheduleGroups {
 		let data: ScheduleGroups = {
@@ -178,7 +198,7 @@ export class ComponentScheduleCreate extends React.Component<Props, CalendarAttr
 		};
 		return data;
 	}*/
-}
+
 	/**
 	 *
 	 * @param args le groupe sélectionné

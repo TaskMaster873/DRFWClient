@@ -1,16 +1,15 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {Link, Navigate} from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 
-import {FormErrorType, errors} from "../messages/FormMessages";
-import {API} from "../api/APIManager";
+import { FormErrorType, errors } from "../messages/FormMessages";
+import { API } from "../api/APIManager";
 
 /* === Images === */
-// @ts-ignore
 import Logo from "../../deps/images/logo.png";
-import {Routes} from "../api/routes/Routes";
-import {ComponentPropsLogin} from "../types/ComponentPropsType";
+import { Routes } from "../api/routes/Routes";
+import { ComponentPropsLogin } from "../types/ComponentPropsType";
 
 interface ComponentStateLogin {
     emailLogin: string;
@@ -49,7 +48,7 @@ export class ComponentLogin extends React.Component<unknown, ComponentStateLogin
                     <div className="me-4">
                         <img
                             className="mx-auto d-block mt-5"
-                            src={Logo}
+                            src={Logo as any}
                             alt="Logo TaskMaster"
                             width={50}
                             height={60}
@@ -59,8 +58,8 @@ export class ComponentLogin extends React.Component<unknown, ComponentStateLogin
                     <Form
                         noValidate
                         validated={this.state.validated}
-                        onSubmit={this.handleSubmit}
-                        onChange={this.handleChange}
+                        onSubmit={this.#handleSubmit}
+                        onChange={this.#handleChange}
                         data-error={this.state.error}
                     >
                         <Form.Group>
@@ -127,7 +126,7 @@ export class ComponentLogin extends React.Component<unknown, ComponentStateLogin
         }
     }
 
-    readonly handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
         let errorType = FormErrorType.NO_ERROR;
@@ -153,7 +152,7 @@ export class ComponentLogin extends React.Component<unknown, ComponentStateLogin
         }
     }
 
-    readonly handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
+    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
         const name = target.id;

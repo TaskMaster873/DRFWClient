@@ -12,16 +12,16 @@ export interface StateEmployeeList {
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
-    employeeId?: string;
-    lastName: string;
-    firstName: string;
-    email: string;
-    phoneNumber: string;
-    isActive: boolean = true;
-    department: string;
-    jobTitles: string[];
-    skills: string[];
-    role: number;
+    public employeeId?: string;
+    public lastName: string;
+    public firstName: string;
+    public email: string;
+    public phoneNumber: string;
+    public isActive?: boolean = true;
+    public department: string;
+    public jobTitles: string[];
+    public skills: string[];
+    public role: number;
 
     constructor(employee: EmployeeDTO) {
         this.employeeId = employee.employeeId;
@@ -75,8 +75,8 @@ export interface EmployeeListProps {
     employees: Employee[] | null;
     filteredList: Employee[] | null;
     department?: string | null;
-    onEditEmployee: (employee) => PromiseLike<void> | Promise<void> | void;
-    onDeactivateEmployee: (employee) => PromiseLike<void> | Promise<void> | void;
+    onEditEmployee: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
+    onDeactivateEmployee: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface EmployeeListState {

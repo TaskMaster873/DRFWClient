@@ -6,18 +6,23 @@ import { LinkContainer } from "react-router-bootstrap";
 import { NotificationManager } from 'react-notifications';
 
 /* === Images === */
-// @ts-ignore
 import Logo from "../../deps/images/logo.png";
 import { API } from "../api/APIManager";
 import { errors, successes } from "../messages/FormMessages";
 
-/**
- * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
- */
 interface NavigationBarState {
     showCreateSchedule: boolean;
 }
 
+/**
+ * This is the navigation bar component, it is displayed on every page. It shows the links to the different pages and the login button.
+ * @returns {JSX.Element}
+ * @constructor
+ * @category Components
+ * @subcategory Navigation
+ * @hideconstructor
+ * @see NavigationBarState
+ */
 export class NavigationBar extends React.Component<unknown, NavigationBarState> {
     private _isMountedAPI: boolean = false;
 
@@ -39,6 +44,14 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
         this._isMountedAPI = false;
     }
 
+    /**
+     * This function returns the links to the admin commands if the user is an admin
+     * @returns {JSX.Element[]} The links to the admin commands
+     * @private
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     */
     private async onAPIEvent(): Promise<void> {
         return new Promise((resolve) => {
             if (this._isMountedAPI) {
@@ -61,7 +74,7 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
                         <Navbar.Brand>
                             <img
                                 className="me-3"
-                                src={Logo}
+                                src={Logo as any}
                                 alt="Logo TaskMaster"
                                 width={50}
                                 height={60}
@@ -100,14 +113,19 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
     }
 
     /**
-     *
-     * @returns se déconnecter si la personne est connectée
+     * If the user is logged in, it returns the logout button, otherwise it returns the login button
+     * @returns {JSX.Element} The login or logout button
+     * @private
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     * @see loginButton
      */
     private loginButton(): JSX.Element {
         if (API.isAuth()) {
             return (
                 <LinkContainer to="/login">
-                    <Nav.Link id="logoutLink" onClick={this.logOut}>Se déconnecter</Nav.Link>
+                    <Nav.Link id="logoutLink" onClick={this.#logout}>Se déconnecter</Nav.Link>
                 </LinkContainer>
             );
         } else {
@@ -120,8 +138,14 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
     }
 
     /**
-     * 
-     * @returns les pages que seulement l'admin peut voir dans le navbar
+     * This function returns the links to the admin commands if the user is an admin
+     * @returns {JSX.Element[]} The links to the admin commands
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     * @see adminCommandLinks
+     * @see NavigationBarState
+     * @private
      */
     private adminCommandLinks(): JSX.Element {
         if (this.state.showCreateSchedule) {
@@ -137,7 +161,18 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
         }
     }
 
-    private async logOut(): Promise<void> {
+    /**
+     * This function logs out the user
+     * @returns {Promise<void>} A promise that resolves when the logout is complete
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     * @see adminCommandLinks
+     * @see NavigationBarState
+     * @see API
+     * @private
+     */
+    readonly #logout = async (): Promise<void> => {
         let error = await API.logout();
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGOUT_SUCCESS);

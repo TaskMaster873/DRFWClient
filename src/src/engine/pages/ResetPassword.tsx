@@ -21,7 +21,7 @@ export function ResetPassword() {
     const navigate = useNavigate();
 
     const [searchParams] = useSearchParams();
-    const [email, setEmail] = useState("");
+    const [email] = useState("");
 
     const [emailState, setEmailState] = useState(ResetPasswordState.WAITING);
 

@@ -10,10 +10,15 @@ import {Roles} from "../types/Roles";
 import {CgUnavailable} from "react-icons/cg";
 import {SearchParams} from "../types/SearchParams";
 
-/***
- * Ce composant affiche la liste de tous les employés d'un département
- *
- * state : liste d'employés
+/**
+ * Component that display the list of employees of a department
+ * @class ComponentEmployeeList
+ * @extends {React.Component<EmployeeListProps, EmployeeListState>}
+ * @param {EmployeeListProps} props
+ * @param {EmployeeListState} state
+ * @returns {JSX.Element}
+ * @memberof ComponentEmployeeList
+ * @todo Redo the search bar
  */
 export class ComponentEmployeeList extends React.Component<EmployeeListProps, EmployeeListState> {
     public state: EmployeeListState = {
@@ -44,12 +49,26 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         );
     }
 
+    /**
+     * Update the list of employees
+     * @param filteredList
+     * @private
+     * @memberof ComponentEmployeeList
+     * @todo Redo the search bar
+     */
     private updateList(filteredList: Employee[]): void {
         this.setState({
             filteredList: filteredList
         });
     }
 
+    /**
+     * Render the list of employees
+     * @param searchProps The search bar props to pass to the search bar
+     * @private
+     * @memberof ComponentEmployeeList
+     * @todo Redo the search bar
+     */
     private renderSearchBar(searchProps: SearchParams<Employee>): JSX.Element {
         return (
             <Row>
@@ -60,12 +79,18 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         );
     }
 
+    /**
+     * Render the add employee button
+     * @param list The list of employees
+     * @private
+     * @memberof ComponentEmployeeList
+     */
     private getEmployeeList(list: Employee[] | null): JSX.Element[] {
         if (list === null) {
             return [
                 <tr key={"firstCol"}>
                     <td colSpan={9}>
-                        <div style={{height: '40vh', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <div className='loadingBar'>
                             <ScaleLoader
                                 color={"#A020F0"}
                                 loading={true}
@@ -113,6 +138,11 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         }
     }
 
+    /**
+     * Render the list of employees
+     * @private
+     * @memberof ComponentEmployeeList
+     */
     private renderList(): JSX.Element | undefined {
         let list: Employee[] | null = this.state.filteredList !== null ? this.state.filteredList : this.props.employees;
 
@@ -130,6 +160,11 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         );
     }
 
+    /**
+     * Render the add employee button
+     * @private
+     * @memberof ComponentEmployeeList
+     */
     private renderAddEmployeeButton(): JSX.Element {
         if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
             return (<LinkContainer to="/add-employee">
@@ -140,9 +175,23 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         }
     }
 
+    /**
+     * Render the admin actions
+     * @param employee The employee to render the actions for
+     * @private
+     */
     private renderAdminActions(employee: Employee): JSX.Element {
         if(employee.employeeId && API.isAuth() && API.hasPermission(Roles.ADMIN)) {
-            return <div><a onClick={() => this.props.onEditEmployee(employee)}><BiEdit /></a> <a><CgUnavailable onClick={() => this.props.onDeactivateEmployee(employee.employeeId)}/></a></div>
+            return (
+                <div>
+                    <a onClick={() => this.props.onEditEmployee(employee)}>
+                        <BiEdit />
+                    </a>
+                    <a onClick={() => this.props.onDeactivateEmployee(employee)}>
+                        <CgUnavailable />
+                    </a>
+                </div>
+            );
         } else {
             return <></>;
         }

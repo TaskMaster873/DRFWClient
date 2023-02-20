@@ -61,7 +61,7 @@ export function ComponentResetPassword(props: Props) {
             <div className="me-4">
                 <img
                     className="mx-auto d-block mt-5"
-                    src={Logo}
+                    src={Logo as any}
                     alt="Logo TaskMaster"
                     width={50}
                     height={60}

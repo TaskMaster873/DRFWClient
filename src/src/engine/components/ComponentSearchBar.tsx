@@ -3,7 +3,7 @@ import {Form} from "react-bootstrap";
 import {SearchParams} from "../types/SearchParams";
 import {Filter} from "../utils/Filter";
 
-
+// TODO: REDO THIS CLASS
 export class ComponentSearchBar<T> extends React.Component<SearchParams<T>> {
     constructor(props: SearchParams<T>) {
         super(props);

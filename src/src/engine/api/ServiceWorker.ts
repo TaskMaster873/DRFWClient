@@ -28,12 +28,23 @@ class TaskMasterServiceWorker extends Logger {
         this.listenToMessages();
     }
 
+    /**
+     * Create the listener for messages from the main thread.
+     * @private
+     */
     private listenToMessages() : void {
         this.log(`Listening to messages.`);
 
         self.onmessage = this.onMessage.bind(this);
     }
 
+    /**
+     * Listen to messages from the main thread.
+     * @param message {MessageEvent} The message from the main thread.
+     * @private
+     * @async
+     * @returns {Promise<void>}
+     */
     private async onMessage(message: MessageEvent) : Promise<void> {
         let data = message.data as ThreadMessage;
 
@@ -56,10 +67,24 @@ class TaskMasterServiceWorker extends Logger {
         }
     }
 
+    /**
+     * Post a message to the main thread.
+     * @param message {ThreadMessage} The message to post.
+     * @private
+     * @async
+     */
     private async postMessage(message: ThreadMessage) : Promise<void> {
         await self.postMessage(message);
     }
 
+    /**
+     * Create a new account in Firebase. This will also create a new employee in the database and respond with the created user.
+     * @param taskId {string | null} The task ID.
+     * @param data {AccountCreationData} The data to create the account with.
+     * @async
+     * @private
+     * @returns {Promise<void>}
+     */
     private async createNewAccount(taskId: string | null, data: AccountCreationData) : Promise<void> {
         this.log(`Creating new account for task ${taskId}`);
 
@@ -96,6 +121,12 @@ class TaskMasterServiceWorker extends Logger {
         await this.postMessage(response);
     }
 
+    /**
+     * Enable persistence for the Firebase app.
+     * @private
+     * @async
+     * @returns {Promise<void>}
+     */
     private async enablePersistence(): Promise<void> {
         await FirebaseAuth.setPersistence(this.#auth, FirebaseAuth.inMemoryPersistence).catch((error) => {
             // Handle Errors here.
@@ -106,6 +137,12 @@ class TaskMasterServiceWorker extends Logger {
         });
     }
 
+    /**
+     * Create the Firebase app.
+     * @private
+     * @returns {Promise<void>}
+     * @async
+     */
     private async createFirebaseApp() : Promise<void> {
         let start = Date.now();
         this.log(`Creating Firebase app.`);

@@ -417,14 +417,34 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async deactivateEmployee(employeeId: string): Promise<string | null> {
-        let errorMessage: string | null = null;
-        if (!this.hasPermission) {
+    public async editEmployee(employee: Employee): Promise<string | null> {
+        if (!this.hasPermission(Roles.ADMIN)) {
             return errors.permissionDenied;
         }
-        await updateDoc(doc(this.#db, `employees`, employeeId), {isActive: false}).catch((error) => {
+
+        // TODO: Update user
+        throw new Error("Not implemented");
+
+        /*let errorMessage: string | null = null;
+        await setDoc(doc(this.#db, `employees`, employee), {...employee}).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
+        return errorMessage;*/
+    }
+
+    public async deactivateEmployee(employeeId: string | null): Promise<string | null> {
+        let errorMessage: string | null = null;
+
+        if(employeeId !== null && employeeId) {
+            if (!this.hasPermission) {
+                return errors.permissionDenied;
+            }
+            await updateDoc(doc(this.#db, `employees`, employeeId), {isActive: false}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_EMPLOYEE_ID;
+        }
 
         return errorMessage;
     }

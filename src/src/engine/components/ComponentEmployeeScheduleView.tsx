@@ -39,16 +39,23 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 		this.props = props;
 	}
 
+	/**
+	 * @returns Return the calendar component
+	 */
 	get calendar() : any {
 		return this.calendarRef.current.control;
 	}
 
+	/**
+	 * @returns Return the date picker component
+	 */
 	get datePicker() : any {
 		return this.datePickerRef.current.control;
 	}
 
 	/**
 	 * Pour le moment on ne fait pas de refresh dans notre app quand il y a des changements dans la bd
+	 * donc on fait un update de la liste des shifts quand le component est monté
 	 */
 	public componentDidMount(): void {
 		let events: ShiftForCalendar[] = [];
@@ -69,7 +76,11 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 		this.datePicker.update({ events, startDate });
 	}
 
-	readonly onTimeRangeSelected = (args: any) => {
+	/**
+	 * Triggered when a date is selected in the date picker
+	 * @param args
+	 */
+	readonly #onTimeRangeSelected = (args: any): void => {
 		this.calendar.update({
 			startDate: args.day
 		});
@@ -86,7 +97,7 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 						startDate={DayPilot.Date.today()} // date de base
 						selectionDay={DayPilot.Date.today()} // date de base
 						rowsPerMonth= {"Auto"}
-						onTimeRangeSelected={this.onTimeRangeSelected}
+						onTimeRangeSelected={this.#onTimeRangeSelected}
 						ref={this.datePickerRef}
 					/>
 				</div>
