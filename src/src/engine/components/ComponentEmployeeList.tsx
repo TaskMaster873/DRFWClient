@@ -132,7 +132,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                     <td colSpan={9}>
                         <h6>Aucun employé est présent dans ce département</h6>
                     </td>
-              </tr>
+                </tr>
             ];
         }
     }
@@ -166,9 +166,13 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
     }
 
     private renderAdminActions(index: number, employee: Employee): JSX.Element | undefined {
-        if (employee.employeeId && API.hasPermission(Roles.ADMIN)) {
-            return <td key={`action ${index}`}><a onClick={() => this.props.onEditEmployee(employee)}><BiEdit/></a>
-                <a><CgUnavailable onClick={() => this.props.onDeactivateEmployee(employee.employeeId)}/></a></td>
+        if (employee.employeeId && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
+            return <td key={`action ${index}`}><a className="adminActions"
+                                                  onClick={() => this.props.onEditEmployee(employee)}><BiEdit/></a>
+                <a className="adminActions"
+                   onClick={() => this.props.onDeactivateEmployee(employee.employeeId)}><CgUnavailable/></a></td>
+        } else if (employee.employeeId && API.hasPermission(Roles.ADMIN)) {
+            return <td key={`action ${index}`}></td>;
         }
     }
 
