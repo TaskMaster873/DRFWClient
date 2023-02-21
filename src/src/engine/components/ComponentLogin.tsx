@@ -2,14 +2,12 @@ import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link, Navigate } from "react-router-dom";
-
 import { FormErrorType, errors } from "../messages/FormMessages";
 import { API } from "../api/APIManager";
-
-/* === Images === */
-import Logo from "../../deps/images/logo.png";
 import { Routes } from "../api/routes/Routes";
 import { ComponentPropsLogin } from "../types/ComponentPropsType";
+import Logo from "../../deps/images/logo.png";
+
 
 interface ComponentStateLogin {
     emailLogin: string;

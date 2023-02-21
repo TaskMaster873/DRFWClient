@@ -4,8 +4,6 @@ import Button from "react-bootstrap/Button";
 import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import { API } from "../api/APIManager";
 import {NotificationManager} from 'react-notifications';
-
-/* === Images === */
 import Logo from "../../deps/images/logo.png";
 
 interface ChangePasswordState {
