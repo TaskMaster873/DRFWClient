@@ -41,9 +41,14 @@ body {
 .adminActions {
   text-decoration: none;
   cursor: pointer;
+  color: #0a53be;
 }
 
 .adminActions > svg {
   width: 1.3em;
   height: 1.3em;
+}
+
+.noneJobTitle {
+  font-size: 0.9em;
 }

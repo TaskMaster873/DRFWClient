@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { errors, FormErrorType } from "../messages/FormMessages";
 import { Container } from "react-bootstrap";
-import {AddEmployeeProps, EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
+import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
 
 interface ComponentEditEmployeeState {
     employeeId: string;
@@ -93,8 +93,6 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.REQUIRED_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
-                </Row>
-                <Row className="mb-3">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
@@ -108,6 +106,8 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.INVALID_PHONE_NUMBER}
                         </Form.Control.Feedback>
                     </Form.Group>
+                </Row>
+                <Row className="mb-3">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Département</Form.Label>
                         <Form.Select required id="department" value={this.state.department}
@@ -119,19 +119,17 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.REQUIRED_DEPARTMENT_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
-                </Row>
-                <Row className="mb-3">
-                    <Form.Group as={Col} md="6">
+                    <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
-                        {this.props.jobTitles.map((corps) => (<Form.Check
+                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) => (<Form.Check
                             key={`${corps}`}
                             type="checkbox"
                             id={`${corps}`}
                             className="jobTitles"
                             label={`${corps}`}
-                        />))}
+                        />)) : <p className="mt-1 noneJobTitle">Aucun corps d'emplois</p>}
                     </Form.Group>
-                    <Form.Group as={Col} md="6">
+                    <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
                         <Form.Select required id="role" value={this.state.role} onChange={this.#handleSelect}>
                             {this.props.roles.map((role, index) => (
@@ -151,7 +149,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         Retour
                     </Button>
                     <Button className="mb-3 btn-lg" variant="primary" type="submit">
-                        Créer
+                        Confirmer
                     </Button>
                 </div>
             </Form>
