@@ -6,9 +6,6 @@ import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from 'react-notifications';
 import {Department} from "../types/Department";
 
-/**
- * Ceci est la page pour ajouter un employé
- */
 export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {
         departments: [],
