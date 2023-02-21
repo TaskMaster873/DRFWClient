@@ -1,17 +1,29 @@
 import React from "react";
-import { ComponentLoading } from "../components/ComponentLoading";
-import { ComponentScheduleCreate } from "../components/ComponentScheduleCreate";
-import { API } from "../api/APIManager";
-import { Shift } from "../types/Shift";
+import {ComponentLoading} from "../components/ComponentLoading";
+import {ComponentScheduleCreate} from "../components/ComponentScheduleCreate";
+import {API} from "../api/APIManager";
+import {Shift} from "../types/Shift";
+import {DayPilot} from "@daypilot/daypilot-lite-react";
+import {NotificationManager} from "react-notifications";
+import {errors} from "../messages/FormMessages";
+import {RoutesPath} from "../RoutesPath";
+
+enum ScheduleRecievedState {
+    WAITING = 0,
+    ERROR = 1,
+    OK = 2,
+}
 
 interface CreateScheduleState {
-    list: Shift[];
+    shifts: Shift[];
+    fetchState: ScheduleRecievedState;
 }
 
 export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
     public state: CreateScheduleState = {
-        list: [],
-    }
+        shifts: [],
+        fetchState: ScheduleRecievedState.WAITING,
+    };
 
     /**
      * Called when the page is loaded
@@ -22,34 +34,31 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
      * @override
      * @async
      */
-    public async componentDidMount() : Promise<void> {
+    public async componentDidMount(): Promise<void> {
         document.title = "Création d'horaire - TaskMaster";
-
-        let shifts: Shift[] = await API.getDailyScheduleForDepartment("2023-02-17T00:00:00", "2023-02-18T00:00:00","bob3");
-        console.log(shifts);
-
-        this.setState({
-            list: shifts
-        });
+        let fetchedData = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), {name:"bob3", director:"person"});
+        if (typeof fetchedData === "string") {
+            NotificationManager.error(errors.GET_SHIFTS, fetchedData);
+            this.setState({
+                fetchState: ScheduleRecievedState.ERROR
+            })
+        }
+        else {
+            this.setState({
+                shifts: fetchedData as Shift[],
+                fetchState: ScheduleRecievedState.OK,
+            });
+        }
     }
 
     public render(): JSX.Element {
-        let listData = this.state.list;
-
-        if (Array.isArray(listData)) {
-            let length = listData.length;
-
-            switch (length) {
-                case 0: //quand la liste charge
-                    return (
-                        <ComponentLoading />
-                    );
-                default:
-                    return (<ComponentScheduleCreate listOfShifts={listData} />);
-            }
-        } else {
-            return (<div></div>);
+        switch (this.state.fetchState) {
+            case ScheduleRecievedState.WAITING:
+                return <ComponentLoading />;
+            case ScheduleRecievedState.OK:
+                return <ComponentScheduleCreate shifts={this.state.shifts} />;
+            default:
+                return <ComponentScheduleCreate shifts={[]} />;
         }
-
     }
 }

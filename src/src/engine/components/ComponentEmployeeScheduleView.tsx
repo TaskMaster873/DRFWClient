@@ -7,11 +7,11 @@ interface ComponentEmployeeScheduleViewProps {
 	listOfShifts: Shift[];
 }
 
-export interface CalendarAttributesForEmployeeSchedule {
+export interface EmployeeScheduleState {
 	dayPilotSettings: DayPilotCalendarSettings;
 }
 
-export class ComponentEmployeeScheduleView extends React.Component<ComponentEmployeeScheduleViewProps, CalendarAttributesForEmployeeSchedule> {
+export class ComponentEmployeeScheduleView extends React.Component<ComponentEmployeeScheduleViewProps, EmployeeScheduleState> {
 	private calendarRef: React.RefObject<any> = React.createRef();
 	private datePickerRef: React.RefObject<any> = React.createRef();
 
@@ -19,7 +19,8 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 		listOfShifts: []
 	};
 
-	public state: CalendarAttributesForEmployeeSchedule = {
+	public state: EmployeeScheduleState = {
+		//To know more, go in types/StatesForDaypilot.ts
 		dayPilotSettings: {
 			durationBarVisible: false,
 			cellsMarkBusiness: false,
@@ -97,18 +98,27 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 				<div className='left'>
 
 					<DayPilotNavigator
+						//how many days showed at a time
 						selectMode={"week"}
+						//month showed at the same time
 						showMonths={3}
+						//when we change month, it skip to the other 3 months
 						skipMonths={3}
+						//date where it start
 						startDate={DayPilot.Date.today()}
+						//day selected in red at the beginning
 						selectionDay={DayPilot.Date.today()}
+						//no space that are not used
 						rowsPerMonth={"Auto"}
+						//when a cell is selected
 						onTimeRangeSelected={this.#onTimeRangeSelected}
+						//the ref of the datepicker
 						ref={this.datePickerRef}
 					/>
 				</div>
 				<div className='main'>
 					<DayPilotCalendar
+						//to start the calendar with the good attributes
 						{...this.state.dayPilotSettings}
 						ref={this.calendarRef}
 					/>

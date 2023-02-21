@@ -41,8 +41,12 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
     public async componentDidMount() {
         document.title = "Employés " + this.props.params.id + " - TaskMaster";
 
-        let employees : Employee[] = await API.getEmployees(this.props.params.id);
-        this.setState({employees: employees});
+        let fetchedData = await API.getEmployees(this.props.params.id);
+        if (typeof fetchedData === "string") {
+            NotificationManager.error(errors.GET_EMPLOYEES, fetchedData);
+            this.setState({employees: []});
+        }
+        else this.setState({employees: fetchedData as Employee[]});
     }
 
     /**

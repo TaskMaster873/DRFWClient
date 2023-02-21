@@ -1,14 +1,13 @@
 import React from "react";
-import { DayPilot, DayPilotCalendar } from "@daypilot/daypilot-lite-react";
-
+import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
 import {EventForCalendar, EventForShiftCreation, Shift} from "../types/Shift";
-import { ComponentPopupSchedule } from "./ComponentPopupSchedule";
-import { CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, HeightSpecType, ViewType } from "../types/StatesForDaypilot";
-import { API } from "../api/APIManager";
+import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
+import {CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, HeightSpecType, ViewType} from "../types/StatesForDaypilot";
+import {API} from "../api/APIManager";
 
 type ComponentScheduleCreateProps = {
-	listOfShifts: Shift[];
-}
+	shifts: Shift[];
+};
 
 export class ComponentScheduleCreate extends React.Component<ComponentScheduleCreateProps, CalendarAttributesForEmployeeShiftCreationComponent> {
 	private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
@@ -24,7 +23,7 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 		start: "2023-02-17T00:00:00",
 		end: "2023-02-18T00:00:00",
 		resourceName: ""
-	}
+	};
 
 	constructor(props: ComponentScheduleCreateProps) {
 		super(props);
@@ -106,8 +105,8 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	private doColumns(): void {
 		let listToReturn: ColumnsType[];
 		listToReturn = [];
-		if (this.props.listOfShifts.length > 0) {
-			for (let shift of this.props.listOfShifts) {
+		if (this.props.shifts.length > 0) {
+			for (let shift of this.props.shifts) {
 				listToReturn.push({
 					name: shift.employeeName || 'Inconnu',
 					id: /*shift.employeeId*/ "1",
@@ -129,8 +128,8 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	private loadShifts(): void {
 		const listToUpdate: EventForCalendar[] = this.state.events;
 
-		if (this.props.listOfShifts.length > 0) {
-			for (let shift of this.props.listOfShifts) {
+		if (this.props.shifts.length > 0) {
+			for (let shift of this.props.shifts) {
 
 				listToUpdate.push({
 					id: 1,
@@ -165,10 +164,10 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 			start: args.start,
 			end: args.end,
 			resourceName: args.resource
-		})
+		});
 
 		DayPilot.Calendar.clearSelection;
-	}
+	};
 
 	public componentDidMount(): void {
 		this.doColumns();
@@ -177,55 +176,55 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 		console.log(this.state.events, this.state.columns);
 	}
 }
-	
-	/*private loadGroups(): ScheduleGroups {
-		let data: ScheduleGroups = {
-			groups: [
-				{
-					name: "department",
-					id: "department",
-					resources: [
-						{ name: "Room 1", id: "R1" },
-						{ name: "Room 2", id: "R2" },
-						{ name: "Room 3", id: "R3" },
-						{ name: "Room 4", id: "R4" },
-						{ name: "Room 5", id: "R5" },
-						{ name: "Room 6", id: "R6" },
-						{ name: "Room 7", id: "R7" },
-					],
-				},
-			],
-		};
-		return data;
-	}*/
 
-	/**
-	 *
-	 * @param args le groupe sélectionné
-	 * la fonction change le groupe qui est affiché
-	 */
-	/*onChange = (args: { selected: { resources: ResourceGroups } }) => {
-		this.groupChanged(args.selected);
-	};*/
-
-	/**
-	 *
-	 * @param group étant le projet qu'on veut montrer ses employés assigné
-	 */
-	/*private groupChanged(group: { resources: ResourceGroups }): void {
-		const columns = group.resources;
-
-		const events = [
+/*private loadGroups(): ScheduleGroups {
+	let data: ScheduleGroups = {
+		groups: [
 			{
-				id: 1,
-				text: "Event 1",
-				start: DayPilot.Date.today(),
-				end: "2023-02-01T13:00:00",
-				barColor: "#fcb711",
-				resource: "R1",
+				name: "department",
+				id: "department",
+				resources: [
+					{ name: "Room 1", id: "R1" },
+					{ name: "Room 2", id: "R2" },
+					{ name: "Room 3", id: "R3" },
+					{ name: "Room 4", id: "R4" },
+					{ name: "Room 5", id: "R5" },
+					{ name: "Room 6", id: "R6" },
+					{ name: "Room 7", id: "R7" },
+				],
 			},
-			// ...
-		];
-		this.setState({ columns: columns, events: events });
-	}*/
+		],
+	};
+	return data;
+}*/
+
+/**
+ *
+ * @param args le groupe sélectionné
+ * la fonction change le groupe qui est affiché
+ */
+/*onChange = (args: { selected: { resources: ResourceGroups } }) => {
+	this.groupChanged(args.selected);
+};*/
+
+/**
+ *
+ * @param group étant le projet qu'on veut montrer ses employés assigné
+ */
+/*private groupChanged(group: { resources: ResourceGroups }): void {
+	const columns = group.resources;
+
+	const events = [
+		{
+			id: 1,
+			text: "Event 1",
+			start: DayPilot.Date.today(),
+			end: "2023-02-01T13:00:00",
+			barColor: "#fcb711",
+			resource: "R1",
+		},
+		// ...
+	];
+	this.setState({ columns: columns, events: events });
+}*/
 //}

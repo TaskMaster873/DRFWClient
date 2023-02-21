@@ -2,8 +2,6 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import {LinkContainer} from "react-router-bootstrap";
 import Button from "react-bootstrap/Button";
-
-/* === Images === */
 import Logo from "../../deps/images/logo.png";
 import { API } from "../api/APIManager";
 

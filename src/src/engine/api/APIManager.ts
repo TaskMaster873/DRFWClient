@@ -4,7 +4,11 @@ import {FirebaseApp, initializeApp} from "firebase/app";
 import {Analytics, getAnalytics, isSupported} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {confirmPasswordReset, connectAuthEmulator, verifyPasswordResetCode} from "firebase/auth";
+import {
+    confirmPasswordReset,
+    connectAuthEmulator,
+    verifyPasswordResetCode,
+} from "firebase/auth";
 import {
     addDoc,
     collection,
@@ -22,7 +26,7 @@ import {
     setDoc,
     Timestamp,
     updateDoc,
-    where
+    where,
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
@@ -30,10 +34,19 @@ import {Employee, EmployeeCreateDTO, EmployeeEditDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
-import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
+import {
+    CreatedAccountData,
+    Task,
+    ThreadMessage,
+    ThreadMessageType,
+} from "./types/ThreadMessage";
 import {Roles} from "../types/Roles";
+import {DayPilot} from "@daypilot/daypilot-lite-react";
 
-type SubscriberCallback = () => void | (() => Promise<void>) | PromiseLike<void>;
+type SubscriberCallback = () =>
+    | void
+    | (() => Promise<void>)
+    | PromiseLike<void>;
 
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
@@ -78,12 +91,14 @@ class APIManager extends Logger {
 
     private async registerServiceWorker(): Promise<void> {
         try {
-            const worker = new Worker(new URL('./ServiceWorker.ts', import.meta.url));
+            const worker = new Worker(
+                new URL("./ServiceWorker.ts", import.meta.url)
+            );
 
             let initMessage: ThreadMessage = {
                 type: ThreadMessageType.INIT,
                 taskId: null,
-            }
+            };
 
             worker.postMessage(initMessage);
 
@@ -117,7 +132,10 @@ class APIManager extends Logger {
         return Math.random().toString(36).substring(2);
     }
 
-    private requestUserCreationFromWorker(employee: EmployeeCreateDTO, password: string): Promise<CreatedAccountData> {
+    private requestUserCreationFromWorker(
+        employee: EmployeeCreateDTO,
+        password: string
+    ): Promise<CreatedAccountData> {
         return new Promise((resolve) => {
             let taskId = this.generateTaskId();
             let createAccountMessage: ThreadMessage = {
@@ -126,19 +144,22 @@ class APIManager extends Logger {
                 data: {
                     employee: employee,
                     password: password,
-                }
-            }
+                },
+            };
 
             let task: Task = {
-                callback: resolve
-            }
+                callback: resolve,
+            };
 
             this.tasks.set(taskId, task);
             this.#worker?.postMessage(createAccountMessage);
         });
     }
 
-    private async onTaskResponse(taskId: string | null, data: CreatedAccountData): Promise<void> {
+    private async onTaskResponse(
+        taskId: string | null,
+        data: CreatedAccountData
+    ): Promise<void> {
         this.log(`Got response from worker for task ${taskId}`);
 
         let task = this.tasks.get(taskId || "");
@@ -187,7 +208,7 @@ class APIManager extends Logger {
         let errorMessage: string;
         let message: string;
 
-        if (typeof (error) === 'string') {
+        if (typeof error === "string") {
             message = error;
         } else {
             message = error.message;
@@ -210,20 +231,29 @@ class APIManager extends Logger {
                 errorMessage = errors.DEFAULT;
                 break;
         }
-        this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${message}`);
+        this.error(
+            `Erreur: ${errorMessage} Code: ${error} Message: ${message}`
+        );
         return errorMessage;
     }
 
-    public async loginWithPassword(email: string, password: string): Promise<string | null> {
+    public async loginWithPassword(
+        email: string,
+        password: string
+    ): Promise<string | null> {
         await API.awaitLogin;
 
         let errorMessage: string | null = null;
-        let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(this.#auth, email, password).catch((error) => {
+        let userCredentials = await FirebaseAuth.signInWithEmailAndPassword(
+            this.#auth,
+            email,
+            password
+        ).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
 
         if (userCredentials !== null && userCredentials) {
-            console.log('credentials', userCredentials);
+            console.log("credentials", userCredentials);
 
             if (userCredentials.user !== null && userCredentials.user) {
                 this.#user = userCredentials.user;
@@ -238,16 +268,17 @@ class APIManager extends Logger {
 
     public async sendResetPassword(email: string): Promise<string | null> {
         let errorMessage: string | null = null;
-        await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
-        });
+        await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch(
+            (error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            }
+        );
 
         return errorMessage;
     }
 
-
     public async logout(): Promise<string | null> {
-        this.log('Logging out...');
+        this.log("Logging out...");
         let errorMessage: string | null = null;
         await FirebaseAuth.signOut(this.#auth).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
@@ -258,7 +289,9 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    private async verifyEmailAddress(user: FirebaseAuth.User): Promise<string | null> {
+    private async verifyEmailAddress(
+        user: FirebaseAuth.User
+    ): Promise<string | null> {
         let errorMessage: string | null = null;
         await FirebaseAuth.sendEmailVerification(user).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
@@ -270,33 +303,41 @@ class APIManager extends Logger {
         let resolved = false;
 
         this.awaitLogin = new Promise(async (resolve) => {
-            FirebaseAuth.onAuthStateChanged(this.#auth, async (user: FirebaseAuth.User | null) => {
-                this.log('Auth state changed!');
+            FirebaseAuth.onAuthStateChanged(
+                this.#auth,
+                async (user: FirebaseAuth.User | null) => {
+                    this.log("Auth state changed!");
 
-                if (user === null || !user) {
-                    this.isAuthenticated = false;
-                } else {
-                    this.isAuthenticated = true;
-                    this.#user = user;
-                    this.#userRole = await this.getCurrentEmployeeRole(user.uid);
+                    if (user === null || !user) {
+                        this.isAuthenticated = false;
+                    } else {
+                        this.isAuthenticated = true;
+                        this.#user = user;
+                        this.#userRole = await this.getCurrentEmployeeRole(
+                            user.uid
+                        );
 
-                    console.log('user', user);
-                    console.log('userRole', this.#userRole);
+                        console.log("user", user);
+                        console.log("userRole", this.#userRole);
+                    }
+
+                    if (!resolved) {
+                        resolved = true;
+                        resolve();
+                    }
                 }
-
-                if (!resolved) {
-                    resolved = true;
-                    resolve();
-                }
-            });
+            );
         });
 
         await this.awaitLogin;
-        this.log('Login resolved!');
+        this.log("Login resolved!");
     }
 
     private async enablePersistence(): Promise<void> {
-        await FirebaseAuth.setPersistence(this.#auth, FirebaseAuth.browserSessionPersistence).catch((error) => {
+        await FirebaseAuth.setPersistence(
+            this.#auth,
+            FirebaseAuth.browserSessionPersistence
+        ).catch((error) => {
             // Handle Errors here.
             const errorCode = error;
             const errorMessage = error.message;
@@ -315,14 +356,28 @@ class APIManager extends Logger {
         this.#db = getFirestore(this.#app);
 
         //Should this database be emulated?
-        if ('indexedDB' in window) {
-            if ('location' in window && location && location.hostname === "localhost" && !this.emulatorLoaded) {
+        if ("indexedDB" in window) {
+            if (
+                "location" in window &&
+                location &&
+                location.hostname === "localhost" &&
+                !this.emulatorLoaded
+            ) {
                 this.emulatorLoaded = true;
-                connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
-                connectFirestoreEmulator(this.#db, "localhost", FIRESTORE_EMULATOR_PORT);
+                connectAuthEmulator(
+                    this.#auth,
+                    "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT
+                );
+                connectFirestoreEmulator(
+                    this.#db,
+                    "localhost",
+                    FIRESTORE_EMULATOR_PORT
+                );
 
                 if (!(this.#db as any)._firestoreClient) {
-                    await enableIndexedDbPersistence(this.#db).catch((err) => console.log(err.message));
+                    await enableIndexedDbPersistence(this.#db).catch((err) =>
+                        console.log(err.message)
+                    );
                     this.log("IndexedDB persistence enabled");
                 }
 
@@ -350,10 +405,14 @@ class APIManager extends Logger {
      * @param actionCode Le code de réinitialisation de mot de passe
      * @returns Soit le courriel ou rien
      */
-    public async verifyResetPassword(actionCode: string): Promise<string | void> {
-        return await verifyPasswordResetCode(this.#auth, actionCode).catch((error) => {
-            this.getErrorMessageFromCode(error);
-        });
+    public async verifyResetPassword(
+        actionCode: string
+    ): Promise<string | void> {
+        return await verifyPasswordResetCode(this.#auth, actionCode).catch(
+            (error) => {
+                this.getErrorMessageFromCode(error);
+            }
+        );
     }
 
     /**
@@ -362,54 +421,84 @@ class APIManager extends Logger {
      * @param newPassword Le nouveau mot de passe
      * @returns null si la réinitialisation a réussie, et le message d'erreur si elle n'a pas réussie
      */
-    public async applyResetPassword(actionCode: string, newPassword: string): Promise<string | null> {
+    public async applyResetPassword(
+        actionCode: string,
+        newPassword: string
+    ): Promise<string | null> {
         let errorMessage: string | null = null;
-        await confirmPasswordReset(this.#auth, actionCode, newPassword).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
-        })
+        await confirmPasswordReset(this.#auth, actionCode, newPassword).catch(
+            (error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            }
+        );
         return errorMessage;
     }
 
-    public async changePassword(oldPassword: string, newPassword: string): Promise<string | null> {
+    public async changePassword(
+        oldPassword: string,
+        newPassword: string
+    ): Promise<string | null> {
         let errorMessage: string | null = null;
         const user = this.#auth.currentUser;
         if (user !== null && user) {
             if (this.elementExist(user.email)) {
-                let email = user.email || '';
+                let email = user.email || "";
 
-                const credential = FirebaseAuth.EmailAuthProvider.credential(email, oldPassword);
+                const credential = FirebaseAuth.EmailAuthProvider.credential(
+                    email,
+                    oldPassword
+                );
 
-                let isOk = await FirebaseAuth.updatePassword(user, newPassword).catch((error) => {
+                let isOk = await FirebaseAuth.updatePassword(
+                    user,
+                    newPassword
+                ).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
                 });
 
-                console.log('change password', isOk);
+                console.log("change password", isOk);
 
                 // Prompt the user to re-provide their sign-in credentials
-                let reAuth = await FirebaseAuth.reauthenticateWithCredential(user, credential).catch((error) => {
+                let reAuth = await FirebaseAuth.reauthenticateWithCredential(
+                    user,
+                    credential
+                ).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
                 });
-                console.log('reauth', reAuth);
+                console.log("reauth", reAuth);
             }
         }
         return errorMessage;
     }
 
-    public async createEmployee(password: string, employee: EmployeeCreateDTO): Promise<string | null> {
+    public async createEmployee(
+        password: string,
+        employee: EmployeeCreateDTO
+    ): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
         let errorMessage: string | null = null;
-        let createdUserMessageData = await this.requestUserCreationFromWorker(employee, password);
+        let createdUserMessageData = await this.requestUserCreationFromWorker(
+            employee,
+            password
+        );
 
-        if (createdUserMessageData.error !== null && createdUserMessageData.error) {
-            errorMessage = this.getErrorMessageFromCode(createdUserMessageData.error);
+        if (
+            createdUserMessageData.error !== null &&
+            createdUserMessageData.error
+        ) {
+            errorMessage = this.getErrorMessageFromCode(
+                createdUserMessageData.error
+            );
         } else {
             let userAuth = createdUserMessageData.createdUser;
             let userId = userAuth?.userId;
 
             if (userId !== null && userId !== undefined && userId) {
-                await setDoc(doc(this.#db, `employees`, userId), {...employee}).catch((error) => {
+                await setDoc(doc(this.#db, `employees`, userId), {
+                    ...employee,
+                }).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
                     // FIREBASE LIMITATION : We can't delete the user if it has been created. Because only connected users can delete them self.
                 });
@@ -454,17 +543,26 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async createDepartment(department: DepartmentCreateDTO): Promise<string | null> {
+    public async createDepartment(
+        department: DepartmentCreateDTO
+    ): Promise<string | null> {
         if (!this.hasPermission) {
             return errors.PERMISSION_DENIED;
         }
-        let queryDepartment = query(collection(this.#db, `departments`),
-            where("name", "==", department.name));
-        let errorMessage = await this.checkIfAlreadyExists(queryDepartment, errors.DEPARTMENT_ALREADY_EXIST);
+        let queryDepartment = query(
+            collection(this.#db, `departments`),
+            where("name", "==", department.name)
+        );
+        let errorMessage = await this.checkIfAlreadyExists(
+            queryDepartment,
+            errors.DEPARTMENT_ALREADY_EXIST
+        );
         if (!errorMessage) {
-            await addDoc(collection(this.#db, `departments`), {...department}).catch((error) => {
+            await addDoc(collection(this.#db, `departments`), {
+                ...department,
+            }).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
-            })
+            });
         }
         return errorMessage;
     }
@@ -488,109 +586,128 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         let snaps = await getDocs(query).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
-        })
+        });
         if (snaps && snaps.docs.length > 0) {
             errorMessage = error;
         }
         return errorMessage;
     }
 
-    public async getEmployees(department?: string): Promise<Employee[]> {
+    public async getEmployees(department?: string): Promise<Employee[] | string> {
         let errorMessage: string | null = null;
-        let employees: Employee[] = []
+        let employees: Employee[] = [];
         let queryDepartment = query(collection(this.#db, `employees`));
         if (department) {
-            queryDepartment = query(collection(this.#db, `employees`),
-                where("department", "==", department));
+            queryDepartment = query(
+                collection(this.#db, `employees`),
+                where("department", "==", department)
+            );
         }
 
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
-        })
+        });
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 let data = doc.data();
-                employees.push(new Employee({
-                    employeeId: doc.id,
-                    firstName: data.firstName,
-                    lastName: data.lastName,
-                    email: data.email,
-                    isActive: data.isActive,
-                    phoneNumber: data.phoneNumber,
-                    department: data.department,
-                    jobTitles: data.jobTitles,
-                    skills: data.skills,
-                    role: data.role
-                }))
-            })
+                employees.push(
+                    new Employee({
+                        employeeId: doc.id,
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        email: data.email,
+                        isActive: data.isActive,
+                        phoneNumber: data.phoneNumber,
+                        department: data.department,
+                        jobTitles: data.jobTitles,
+                        skills: data.skills,
+                        role: data.role,
+                    })
+                );
+            });
         }
-        return employees;
+        return errorMessage ?? employees;
     }
 
     public async getDepartments(): Promise<Department[]> {
         let errorMessage: string | null = null;
-        let departments: Department[] = []
+        let departments: Department[] = [];
         let queryDepartment = query(collection(this.#db, `departments`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
-        })
+        });
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
-                departments.push(new Department({name: doc.data().name, director: doc.data().director}))
-            })
+                departments.push(
+                    new Department({
+                        name: doc.data().name,
+                        director: doc.data().director,
+                    })
+                );
+            });
         }
         return departments;
     }
 
-    public async getEmployeeNbDepartments(departments: Department[]): Promise<number[] | string> {
+    public async getEmployeeNbDepartments(
+        departments: Department[]
+    ): Promise<number[] | string> {
         return new Promise((resolve) => {
             let errorMessage: string | null = null;
-            let employeeNb: number[] = []
+            let employeeNb: number[] = [];
 
             let promises: Promise<void | QuerySnapshot<DocumentData>>[] = [];
 
             for (const department of departments) {
-                let queryEmployees = query(collection(this.#db, `employees`), where("department", "==", department.name));
+                let queryEmployees = query(
+                    collection(this.#db, `employees`),
+                    where("department", "==", department.name)
+                );
                 let snaps = getDocs(queryEmployees);
 
                 promises.push(snaps);
             }
 
-            Promise.all(promises).then((values) => {
-                for (let snapId in values) {
-                    let snaps = values[snapId];
-                    if (snaps !== null && snaps) {
-                        employeeNb.push(snaps.docs.length);
+            Promise.all(promises)
+                .then((values) => {
+                    for (let snapId in values) {
+                        let snaps = values[snapId];
+                        if (snaps !== null && snaps) {
+                            employeeNb.push(snaps.docs.length);
+                        }
                     }
-                }
-            }).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-            }).finally(() => {
-                resolve(errorMessage ?? employeeNb);
-            });
+                })
+                .catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+                })
+                .finally(() => {
+                    resolve(errorMessage ?? employeeNb);
+                });
         });
     }
 
     public async getRoles(): Promise<string[] | string> {
         let errorMessage: string | null = null;
-        let roles: string[] = []
+        let roles: string[] = [];
         let queryDepartment = query(collection(this.#db, `roles`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
-        })
+        });
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
-                roles.push(doc.data().name)
-            })
+                roles.push(doc.data().name);
+            });
         }
         return errorMessage ?? roles;
     }
 
     public async getCurrentEmployeeRole(uid: string): Promise<number> {
         let employeeRole: number = 0;
-        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
-            this.getErrorMessageFromCode(error);
-        })
+        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
+            (error) => {
+                this.getErrorMessageFromCode(error);
+            }
+        );
         if (employee && employee) {
             let employeeData = employee.data();
             if (employeeData) {
@@ -605,50 +722,62 @@ class APIManager extends Logger {
 
     public async getJobTitles(): Promise<string[] | string> {
         let errorMessage: string | null = null;
-        let jobTitles: string[] = []
+        let jobTitles: string[] = [];
         let queryDepartment = query(collection(this.#db, `jobTitles`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
-        })
+        });
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
-                jobTitles.push(doc.data().name)
-            })
+                jobTitles.push(doc.data().name);
+            });
         }
         return errorMessage ?? jobTitles;
     }
 
     /**
-     * Converti un Timestamp firebase en string daypilot
-     * @param date le timestamp firebase à convertir
-     * @returns string daypilot Ex: (2 février 2022 à 3h15 AM) = 2022-02-16T03:15:00
+     * Convert firebase timestamp to daypilot string
+     * @param date the firebase timestamp to convert
+     * @returns string daypilot Ex: (February 2, 2022 at 3:15 AM) = 2022-02-16T03:15:00
      */
     private getDayPilotDateString(date: Timestamp): string {
         return new Date(date.seconds * 1000).toISOString().slice(0, -5);
     }
 
-    public async getScheduleForOneEmployee(): Promise<Shift[]> {
+    public async getCurrentEmployeeSchedule(): Promise<Shift[] | string> {
+        return await this.getScheduleForOneEmployee(this.#user?.uid);
+    }
+
+    public async getScheduleForOneEmployee(idEmployee?: string): Promise<Shift[] | string> {
+        let errorMessage: string | null = null;
         let shifts: Shift[] = [];
         if (this.isAuthenticated) {
-            let queryShifts = query(collection(this.#db, `shifts`), where("employeeId", "==", this.#user?.uid));
-            let snaps = await getDocs(queryShifts).catch((e) => {
-                console.log("error");
-                this.error(e);
-            })
-            if (snaps) {
-                snaps.docs.forEach((doc) => {
-                    let data = doc.data();
-                    shifts.push(new Shift({
-                        employeeId: data.employeeId,
-                        department: data.department,
-                        projectName: data.projectName,
-                        start: this.getDayPilotDateString(data.start),
-                        end: this.getDayPilotDateString(data.end),
-                    }))
-                })
-            }
+
+                let queryShifts = query(
+                    collection(this.#db, `shifts`),
+                    where("employeeId", "==", idEmployee)
+                );
+                let snaps = await getDocs(queryShifts).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+                });
+                if (snaps) {
+                    snaps.docs.forEach((doc) => {
+                        let data = doc.data();
+                        shifts.push(
+                            new Shift({
+                                employeeId: data.employeeId,
+                                department: data.department,
+                                projectName: data.projectName,
+                                start: this.getDayPilotDateString(data.start),
+                                end: this.getDayPilotDateString(data.end),
+                            })
+                        );
+                    });
+                }
+                return errorMessage ?? shifts;
+        } else {
+            return errorMessage ?? shifts;
         }
-        return shifts;
     }
 
     /**
@@ -664,45 +793,56 @@ class APIManager extends Logger {
      * Récupère l'horaire de la journée d'un département pour une journée
      * @param startDay le début de la journée en string daypilot Ex: (2 février 2022 début de journée) = 2022-02-16T00:00:00
      * @param endDay la fin de la journée en string daypilot Ex: (2 février 2022 fin de journée) = 2022-02-16T24:00:00
-     * @param departmentName le nom du département que récupérer
+     * @param department le nom du département que récupérer
      * @returns une liste de quarts de travail d'un département pour une journée
      */
-    public async getDailyScheduleForDepartment(startDay: string, endDay: string, departmentName: string): Promise<Shift[]> {
+    public async getDailyScheduleForDepartment(day: DayPilot.Date, department: Department): Promise<Shift[] | string> {
+        let errorMessage: string | null = null;
         let shifts: Shift[] = [];
-        if (this.isAuthenticated) {
-            //Convert string datetimes to Timestamps
-            let convertedStartDay: Timestamp = this.getFirebaseTimestamp(startDay);
-            let convertedEndDay: Timestamp = this.getFirebaseTimestamp(endDay);
-            //Get employees by department
-            let employees: Employee[] = await this.getEmployees(departmentName);
-            let queryShifts = query(collection(this.#db, `shifts`), where("department", "==", departmentName), where("end", ">", convertedStartDay), where("end", "<", convertedEndDay));
-            let snaps = await getDocs(queryShifts).catch((e) => {
-                this.error(e);
-            })
-            if (snaps) {
-                snaps.docs.forEach((doc) => {
-                    let data = doc.data();
-                    //Get employee name if present
-                    let fetchedEmployeeName = "Unknown"
-                    employees.forEach(element => {
-                        if (element.employeeId == data.employeeId) {
-                            fetchedEmployeeName = element.firstName + " " + element.lastName;
-                        }
-                    });
-                    //Build shift objects
-                    shifts.push(new Shift({
-                        employeeName: fetchedEmployeeName,
-                        employeeId: data.employeeId,
-                        department: data.department,
-                        projectName: data.projectName,
-                        start: this.getDayPilotDateString(data.start),
-                        end: this.getDayPilotDateString(data.end),
-                    }))
-                })
-
+        //Validate permissions
+        if (!this.isAuthenticated) return errors.PERMISSION_DENIED;
+        if (!this.hasPermission(4)) {
+            //TODO: pass if user is director
+            return errors.PERMISSION_DENIED;
+        }
+        //Convert Daypilot datetimes to Timestamps
+        let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
+        let convertedEndDay: Timestamp = this.getFirebaseTimestamp(day.addDays(1));
+        //Get employees by department
+        let fetchedData = await this.getEmployees(department.name);
+        if (typeof fetchedData === "string") return fetchedData;
+        let employees = fetchedData as Employee[];
+        //Query shifts
+        let queryShifts = query(
+            collection(this.#db, `shifts`),
+            where("department", "==", department.name),
+            where("end", ">", convertedStartDay),
+            where("end", "<", convertedEndDay)
+            );
+        let snaps = await getDocs(queryShifts).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        });
+        //Parse recieved data
+        if (snaps) {
+            for (let doc of snaps.docs) {
+                let shift = doc.data();
+                //Get employee name if present
+                let fetchedEmployeeName = "Unknown";
+                for (let employee of employees)
+                    if (employee.employeeId == shift.employeeId)
+                        fetchedEmployeeName = employee.firstName + " " + employee.lastName;
+                //Push shift object
+                shifts.push(new Shift({
+                    employeeName: fetchedEmployeeName,
+                    employeeId: shift.employeeId,
+                    department: shift.department,
+                    projectName: shift.projectName,
+                    start: this.getDayPilotDateString(shift.start),
+                    end: this.getDayPilotDateString(shift.end),
+                }));
             }
         }
-        return shifts;
+        return errorMessage ?? shifts;
     }
 
     /**
@@ -711,18 +851,19 @@ class APIManager extends Logger {
      * @returns un booléen pour savoir si il est créé
      */
     public async createShift(shift: Shift): Promise<boolean> {
-        let isCreated: boolean = false
+        let isCreated: boolean = false;
         //Check if user has permission
-        if (!this.hasPermission(2)) {//Gestionnaire
+        if (!this.hasPermission(2)) {
+            //Gestionnaire
             return false;
         }
         //Get Employee Name and department
-        console.log("CreateShift", shift)
-        let queryEmployee = doc(this.#db, `employees`, shift.employeeId)
+        console.log("CreateShift", shift);
+        let queryEmployee = doc(this.#db, `employees`, shift.employeeId);
 
         let snaps = await getDoc(queryEmployee).catch((error) => {
             this.getErrorMessageFromCode(error);
-        })
+        });
         if (snaps) {
             let data = snaps.data();
             if (data) {
@@ -730,11 +871,13 @@ class APIManager extends Logger {
                 shift.department = data.department;
             }
         }
-        shift.projectName = "testing"
+        shift.projectName = "testing";
         //Create Shift
-        let success = await addDoc(collection(this.#db, `shifts`), {...shift}).catch((error) => {
+        let success = await addDoc(collection(this.#db, `shifts`), {
+            ...shift,
+        }).catch((error) => {
             this.getErrorMessageFromCode(error);
-        })
+        });
         if (success) isCreated = true;
         return isCreated;
     }
@@ -742,7 +885,7 @@ class APIManager extends Logger {
 
 }
 
-export const API = new APIManager;
+export const API = new APIManager();
 
 // @ts-ignore
 window.API = API;
