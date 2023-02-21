@@ -54,17 +54,25 @@ export interface EventForShiftCreation {
 }
 
 /**
- * Event serait les shifts avec toutes les données pour l'afficher dans l'horaire
+ * Event would be the shifts with all the data to display it in the schedule
  *
  */
 export interface EventForCalendar {
-    readonly id: number; //id unique dans le tableau d'horaire
-    text?: string; // le nom de l'event
-    start: DayPilot.date;//heure de début
-    end: DayPilot.date; //heure de fin
-    resource?: string;//l'id de la personne qui l'a
-    barColor?: string; // couleur de la barre
+    /** unique id in schedule board */
+    readonly id: number; 
+    /** what is written in the calendar */ 
+    text?: string; 
+    /** time where it start */
+    start: DayPilot.date;
+    /** end of the event */
+    end: DayPilot.date; 
+    /** the column where it will be */
+    resource?: string;
+    /** color of de bar */
+    barColor?: string; 
+    /** color of what's remaining */
     backColor?: string;
+    /** id of the employee that has the shift */
     employeeId?: string;
 }
 
