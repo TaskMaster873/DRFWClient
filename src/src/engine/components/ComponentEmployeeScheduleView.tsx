@@ -75,7 +75,7 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 	/**
 	 * 
 	 * @param time 
-	 * @returns time in good format
+	 * @returns time in good format in ISO 8601
 	 */
 	private parseDateToString(time: string): string {
 		return DayPilot.Date.parse(time, "yyyy-MM-ddTHH:mm:ss").toString("H:mm");
