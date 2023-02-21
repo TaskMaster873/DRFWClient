@@ -1,7 +1,5 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
-
-/* === Images === */
 import Logo from "../../deps/images/logo.png";
 
 export class ComponentAbout extends React.Component {

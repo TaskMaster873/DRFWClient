@@ -41,6 +41,7 @@ import {
     ThreadMessageType,
 } from "./types/ThreadMessage";
 import {Roles} from "../types/Roles";
+import {DayPilot} from "@daypilot/daypilot-lite-react";
 
 type SubscriberCallback = () =>
     | void
@@ -581,7 +582,7 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async getEmployees(department?: string): Promise<Employee[]> {
+    public async getEmployees(department?: string): Promise<Employee[] | string> {
         let errorMessage: string | null = null;
         let employees: Employee[] = [];
         let queryDepartment = query(collection(this.#db, `employees`));
@@ -614,7 +615,7 @@ class APIManager extends Logger {
                 );
             });
         }
-        return employees;
+        return errorMessage ?? employees;
     }
 
     public async getDepartments(): Promise<Department[]> {
@@ -781,57 +782,56 @@ class APIManager extends Logger {
      * Récupère l'horaire de la journée d'un département pour une journée
      * @param startDay le début de la journée en string daypilot Ex: (2 février 2022 début de journée) = 2022-02-16T00:00:00
      * @param endDay la fin de la journée en string daypilot Ex: (2 février 2022 fin de journée) = 2022-02-16T24:00:00
-     * @param departmentName le nom du département que récupérer
+     * @param department le nom du département que récupérer
      * @returns une liste de quarts de travail d'un département pour une journée
      */
-    public async getDailyScheduleForDepartment(
-        startDay: string,
-        endDay: string,
-        departmentName: string
-    ): Promise<Shift[]> {
+    public async getDailyScheduleForDepartment(day: DayPilot.Date, department: Department): Promise<Shift[] | string> {
+        let errorMessage: string | null = null;
         let shifts: Shift[] = [];
-        if (this.isAuthenticated) {
-            //Convert string datetimes to Timestamps
-            let convertedStartDay: Timestamp =
-                this.getFirebaseTimestamp(startDay);
-            let convertedEndDay: Timestamp = this.getFirebaseTimestamp(endDay);
-            //Get employees by department
-            let employees: Employee[] = await this.getEmployees(departmentName);
-            let queryShifts = query(
-                collection(this.#db, `shifts`),
-                where("department", "==", departmentName),
-                where("end", ">", convertedStartDay),
-                where("end", "<", convertedEndDay)
+        //Validate permissions
+        if (!this.isAuthenticated) return errors.PERMISSION_DENIED;
+        if (!this.hasPermission(4)) {
+            //TODO: pass if user is director
+            return errors.PERMISSION_DENIED;
+        }
+        //Convert Daypilot datetimes to Timestamps
+        let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
+        let convertedEndDay: Timestamp = this.getFirebaseTimestamp(day.addDays(1));
+        //Get employees by department
+        let fetchedData = await this.getEmployees(department.name);
+        if (typeof fetchedData === "string") return fetchedData;
+        let employees = fetchedData as Employee[];
+        //Query shifts
+        let queryShifts = query(
+            collection(this.#db, `shifts`), 
+            where("department", "==", department.name), 
+            where("end", ">", convertedStartDay), 
+            where("end", "<", convertedEndDay)
             );
-            let snaps = await getDocs(queryShifts).catch((e) => {
-                this.error(e);
-            });
-            if (snaps) {
-                snaps.docs.forEach((doc) => {
-                    let data = doc.data();
-                    //Get employee name if present
-                    let fetchedEmployeeName = "Unknown";
-                    employees.forEach((element) => {
-                        if (element.employeeId == data.employeeId) {
-                            fetchedEmployeeName =
-                                element.firstName + " " + element.lastName;
-                        }
-                    });
-                    //Build shift objects
-                    shifts.push(
-                        new Shift({
-                            employeeName: fetchedEmployeeName,
-                            employeeId: data.employeeId,
-                            department: data.department,
-                            projectName: data.projectName,
-                            start: this.getDayPilotDateString(data.start),
-                            end: this.getDayPilotDateString(data.end),
-                        })
-                    );
-                });
+        let snaps = await getDocs(queryShifts).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        });
+        //Parse recieved data
+        if (snaps) {
+            for (let doc of snaps.docs) {
+                let shift = doc.data();
+                //Get employee name if present
+                let fetchedEmployeeName = "Unknown";
+                for (let employee of employees)
+                    if (employee.employeeId == shift.employeeId)
+                        fetchedEmployeeName = employee.firstName + " " + employee.lastName;
+                //Push shift object
+                shifts.push(new Shift({
+                    employeeName: fetchedEmployeeName,
+                    employeeId: shift.employeeId,
+                    department: shift.department,
+                    projectName: shift.projectName,
+                    start: this.getDayPilotDateString(shift.start),
+                    end: this.getDayPilotDateString(shift.end),
+                }));
             }
         }
-        return shifts;
+        return errorMessage ?? shifts;
     }
 
     /**

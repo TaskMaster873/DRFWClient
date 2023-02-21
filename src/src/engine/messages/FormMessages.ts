@@ -25,7 +25,7 @@ export const errors = {
     INVALID_ACTION_CODE: "L'hyperlien de réinitialisation de mot de passe est invalide ou expiré. Essayez à nouveau.",
     GET_SHIFTS: "Une erreur s'est produite lors de la récupération des données d'horaire.",
     GET_DEPARTMENTS: "Une erreur s'est produite lors de la récupération des données des départements",
-    GET_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données des employés"
+    GET_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données des employés",
 }
 
 export const successes = {

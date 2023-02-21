@@ -4,11 +4,10 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { LinkContainer } from "react-router-bootstrap";
 import { NotificationManager } from 'react-notifications';
-
-/* === Images === */
-import Logo from "../../deps/images/logo.png";
 import { API } from "../api/APIManager";
 import { errors, successes } from "../messages/FormMessages";
+import Logo from "../../deps/images/logo.png";
+
 
 interface NavigationBarState {
     showCreateSchedule: boolean;
