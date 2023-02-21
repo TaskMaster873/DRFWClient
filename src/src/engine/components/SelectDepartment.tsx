@@ -31,9 +31,6 @@ export class SelectDepartment extends React.Component<Props, State> {
             errorType = FormErrorType.INVALID_FORM;
         }
 
-        event.preventDefault();
-        event.stopPropagation();
-
         this.setState({
             currentDepartmentIndex: event.target.value,
             validated: true,

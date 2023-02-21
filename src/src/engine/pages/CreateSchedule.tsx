@@ -10,7 +10,7 @@ import {RoutesPath} from "../RoutesPath";
 import {Department} from "../types/Department";
 import {SelectDepartment} from "../components/SelectDepartment";
 import {Container} from "react-bootstrap";
-import {department} from "../../../Constants/testConstants";
+import {Employee} from "../types/Employee";
 
 enum ScheduleRecievedState {
     WAITING = 0,
@@ -20,6 +20,7 @@ enum ScheduleRecievedState {
 
 interface CreateScheduleState {
     departments: Department[];
+    employees: Employee[];
     shifts: Shift[];
     fetchState: ScheduleRecievedState;
 }
@@ -27,6 +28,7 @@ interface CreateScheduleState {
 export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
     public state: CreateScheduleState = {
         departments: [],
+        employees: [],
         shifts: [],
         fetchState: ScheduleRecievedState.WAITING,
     };
@@ -42,34 +44,38 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
      */
     public async componentDidMount(): Promise<void> {
         document.title = "Création d'horaire - TaskMaster";
+
         let fetchedDepartments = await API.getDepartments();
         if (typeof fetchedDepartments === "string") {
-            NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
             this.setState({
                 fetchState: ScheduleRecievedState.ERROR
-            });
+            })
             return;
         }
         else {
-            this.setState({
-                departments: fetchedDepartments,
-            });
-            this.#changeDepartment(fetchedDepartments[0])
+            await this.#changeDepartment(fetchedDepartments[0], fetchedDepartments);
         }
     }
 
-    readonly #changeDepartment = async (department: Department) => {
-        console.log("changing", department)
-        let fetchedData = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), department);
-        if (typeof fetchedData === "string") {
-            NotificationManager.error(errors.GET_SHIFTS, fetchedData);
-            this.setState({
-                fetchState: ScheduleRecievedState.ERROR
-            });
+    readonly #changeDepartment = async (currentDepartment: Department, departments?: Department[]) => {
+        console.trace("changing", currentDepartment);
+        let fetchType = ScheduleRecievedState.WAITING
+        //Get all employees of this department
+        let fetchedEmployees = await API.getEmployees(currentDepartment.name);
+        if (typeof fetchedEmployees === "string") {
+            fetchType = ScheduleRecievedState.ERROR;
+            return;
         }
+
+        //Get all daily shifts of this department
+        let fetchedShifts = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), currentDepartment);
+        if (typeof fetchedShifts === "string") fetchType = ScheduleRecievedState.ERROR;
         else {
+            console.log("employees there", fetchedEmployees)
             this.setState({
-                shifts: fetchedData as Shift[],
+                departments: departments || this.state.departments,
+                employees: fetchedEmployees,
+                shifts: fetchedShifts,
                 fetchState: ScheduleRecievedState.OK,
             });
         }
@@ -77,23 +83,23 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
 
 
     public render(): JSX.Element {
+        console.log("fetchstatus", this.state)
         switch (this.state.fetchState) {
             case ScheduleRecievedState.WAITING:
                 return <ComponentLoading />;
             case ScheduleRecievedState.OK:
-                if(this.state.departments.length > 1){
+                if (this.state.departments.length > 1) {
                     return (
                         <Container>
                             <SelectDepartment departments={this.state.departments} changeDepartment={this.#changeDepartment} />
-                            <ComponentScheduleCreate shifts={this.state.shifts} />
+                            <ComponentScheduleCreate shifts={this.state.shifts} employees={this.state.employees} />
                         </Container>
                     );
-                }else{
-                    return <ComponentScheduleCreate shifts={this.state.shifts} />
+                } else {
+                    return <ComponentScheduleCreate shifts={this.state.shifts} employees={this.state.employees} />;
                 }
-                
             default:
-                return <ComponentScheduleCreate shifts={[]} />;
+                return <ComponentScheduleCreate shifts={[]} employees={[]} />;
         }
     }
 }

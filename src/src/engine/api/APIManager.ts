@@ -798,10 +798,6 @@ class APIManager extends Logger {
         //Convert Daypilot datetimes to Timestamps
         let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
         let convertedEndDay: Timestamp = this.getFirebaseTimestamp(day.addDays(1));
-        //Get employees by department
-        let fetchedData = await this.getEmployees(department.name);
-        if (typeof fetchedData === "string") return fetchedData;
-        let employees = fetchedData as Employee[];
         //Query shifts
         let queryShifts = query(
             collection(this.#db, `shifts`), 
@@ -816,14 +812,8 @@ class APIManager extends Logger {
         if (snaps) {
             for (let doc of snaps.docs) {
                 let shift = doc.data();
-                //Get employee name if present
-                let fetchedEmployeeName = "Unknown";
-                for (let employee of employees)
-                    if (employee.employeeId == shift.employeeId)
-                        fetchedEmployeeName = employee.firstName + " " + employee.lastName;
                 //Push shift object
                 shifts.push(new Shift({
-                    employeeName: fetchedEmployeeName,
                     employeeId: shift.employeeId,
                     department: shift.department,
                     projectName: shift.projectName,
@@ -857,7 +847,6 @@ class APIManager extends Logger {
         if (snaps) {
             let data = snaps.data();
             if (data) {
-                shift.employeeName = data.employeeName;
                 shift.department = data.department;
             }
         }
