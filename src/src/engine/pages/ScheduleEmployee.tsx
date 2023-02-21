@@ -40,10 +40,9 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
 
     }
 
+    // I did this function if we need to do something before the return (if there is some changes)
     async #loadShiftsFromAPI(): Promise<Shift[] | string> {
-        let shifts = await API.getCurrentEmployeeSchedule();
-        return shifts;
-
+        return await API.getCurrentEmployeeSchedule();
     }
 
     public render(): JSX.Element {
