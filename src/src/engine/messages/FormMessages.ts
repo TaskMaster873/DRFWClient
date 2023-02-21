@@ -23,6 +23,7 @@ export const errors = {
     SERVER_ERROR: "Une erreur s'est produite, veuillez réessayer plus tard",
     REQUIRED_DEPARTMENT_DIRECTOR: "Le directeur de département est requis",
     INVALID_ACTION_CODE: "L'hyperlien de réinitialisation de mot de passe est invalide ou expiré. Essayez à nouveau.",
+    GET_SHIFTS: "Une erreur s'est produite lors de la récupération des données d'horaire.",
     GET_DEPARTMENTS: "Une erreur s'est produite lors de la récupération des données des départements",
     GET_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données des employés",
     GET_SHIFTS: "Une erreur s'est produite lors de la récupération des quarts de travail"
