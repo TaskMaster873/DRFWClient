@@ -16,13 +16,13 @@ enum ScheduleRecievedState {
 
 interface CreateScheduleState {
     shifts: Shift[];
-    shiftsState: ScheduleRecievedState;
+    fetchState: ScheduleRecievedState;
 }
 
 export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
     public state: CreateScheduleState = {
         shifts: [],
-        shiftsState: ScheduleRecievedState.WAITING,
+        fetchState: ScheduleRecievedState.WAITING,
     };
 
     /**
@@ -38,21 +38,21 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         document.title = "Création d'horaire - TaskMaster";
         let fetchedData = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), {name:"bob3", director:"person"});
         if (typeof fetchedData === "string") {
-            NotificationManager.error(errors.GET_SHIFTS, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.GET_SHIFTS, fetchedData);
             this.setState({
-                shiftsState: ScheduleRecievedState.ERROR
+                fetchState: ScheduleRecievedState.ERROR
             })
         }
         else {
             this.setState({
                 shifts: fetchedData as Shift[],
-                shiftsState: ScheduleRecievedState.OK,
+                fetchState: ScheduleRecievedState.OK,
             });
         }
     }
 
     public render(): JSX.Element {
-        switch (this.state.shiftsState) {
+        switch (this.state.fetchState) {
             case ScheduleRecievedState.WAITING:
                 return <ComponentLoading />;
             case ScheduleRecievedState.OK:
