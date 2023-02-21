@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import { errors, FormErrorType } from "../messages/FormMessages";
 import { Container } from "react-bootstrap";
 import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
+import {RegexUtil} from "../utils/RegexValidator";
 
 interface ComponentAddEmployeeState extends Employee {
     validated?: boolean;
@@ -94,8 +95,9 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="email"
                             required
                             type="email"
-                            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-                            placeholder="exemple@exemple.com"
+                            
+                            pattern={RegexUtil.emailGoodRegex}
+                            placeholder="exemple@exemple.ca"
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.INVALID_EMAIL}
@@ -110,8 +112,9 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="phoneNumber"
                             required
                             type="tel"
-                            pattern="^(\+?1 ?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$"
-                            placeholder="000-000-0000"
+                            //TODO Really need to work with the const
+                            pattern="1 \(([0-9]{3})\)-([0-9]{3})-([0-9]{4})$"
+                            placeholder="0 (000)-000-0000"
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.INVALID_PHONE_NUMBER}
@@ -123,7 +126,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="password"
                             required
                             type="password"
-                            pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
+                            pattern={RegexUtil.goodPasswordRegex}
                             placeholder="Mot de passe"
                         />
                         <Form.Control.Feedback type="invalid">
