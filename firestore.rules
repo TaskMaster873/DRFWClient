@@ -1,124 +1,138 @@
 rules_version = '2';
 service cloud.firestore {
-    match /databases/{database}/documents {
-        match /{document=**} {
+  match /databases/{database}/documents {
+    match /{document=**} {
 
-            function getCurrentEmployeeRole(id) {
-                return get(/databases/$(database)/documents/employees/$(id)).data.role;
-            }
+      function getCurrentEmployeeRole(id) {
+        return get(/databases/$(database)/documents/employees/$(id)).data.role;
+      }
 
-            match /employees/{employeeId} {
-                allow read;
-                allow create: if isValidEmployee(employeeId);
-                allow update: if isValidEmployee(employeeId);
-            }
+      match /employees/{employeeId} {
+        allow read;
+        allow create: if isValidEmployee(employeeId);
+        allow update:  if isValidUpdateEmployee(employeeId);
+      }
 
-            function hasEmployeeFields() {
-                return request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'isActive', 'skills', 'role']);
-            }
+      function employeeFieldTypes() {
+        return request.resource.data.firstName is string &&
+               request.resource.data.lastName is string &&
+               request.resource.data.phoneNumber is string &&
+               request.resource.data.email is string &&
+               request.resource.data.email.matches('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$') &&
+               request.resource.data.department is string &&
+               request.resource.data.jobTitles is list &&
+               request.resource.data.skills is list &&
+               request.resource.data.role is number &&
+               getCurrentEmployeeRole(request.auth.uid) > request.resource.data.role
+      }
 
-            function employeeFieldTypes() {
-                return request.resource.data.firstName is string &&
-                       request.resource.data.lastName is string &&
-                       request.resource.data.phoneNumber is string &&
-                       request.resource.data.email is string &&
-                       request.resource.data.email.matches('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$') &&
-                       request.resource.data.department is string &&
-                       request.resource.data.jobTitles is list &&
-                       request.resource.data.skills is list &&
-                       request.resource.data.role is number &&
-                       getCurrentEmployeeRole(request.auth.uid) > request.resource.data.role
-            }
+      function isValidEmployee(employeeId) {
+        let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
+        let hasOnlyFields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email',
+                                                                 'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
 
-            function isValidEmployee(employeeId) {
-                let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
 
-                return createdValidEmployee && hasEmployeeFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && employeeFieldTypes();
-            }
+        return createdValidEmployee && hasOnlyFields
+               && getCurrentEmployeeRole(request.auth.uid) >= 3 && employeeFieldTypes();
+      }
 
-            function departmentFieldTypes() {
-                return request.resource.data.name is string &&
-                       request.resource.data.director is string
-            }
+      function employeeActiveFieldType() {
+        return request.resource.data.isActive is bool;
+      }
 
-            match /departments/{departmentId} {
-                allow read;
-                allow create: if isValidDepartment(departmentId);
 
-            }
+      function isValidUpdateEmployee(employeeId) {
+        let validEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
+        let hasFields = (request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email',
+                                                              'phoneNumber', 'department', 'jobTitles', 'skills', 'role'])
+                         || request.resource.data.keys().hasOnly(['isActive']));
 
-            function isValidDepartment(departmentId) {
-                let createdValidDepartment = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
-                let hasFields = request.resource.data.keys().hasOnly(['name', 'director']);
+        return validEmployee && hasFields && getCurrentEmployeeRole(request.auth.uid) >= 3
+               && ((hasFields && employeeFieldTypes()) || (request.resource.data.keys().hasOnly(['isActive']) && employeeActiveFieldType()));
+      }
 
-                return createdValidDepartment && hasFields && request.auth != null
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && departmentFieldTypes();
-            }
+      function departmentFieldTypes() {
+        return request.resource.data.name is string &&
+               request.resource.data.director is string
+      }
 
-            function nameFieldTypes() {
-                return request.resource.data.name is string
-            }
+      match /departments/{departmentId} {
+        allow read;
+        allow create: if isValidDepartment(departmentId);
 
-            match /roles/{roleId} {
-                allow read;
-                allow create: if isValidRole(roleId);
-            }
+      }
 
-            function isValidRole(roleId) {
-                let createdValidRole = existsAfter(/databases/$(database)/documents/roles/$(roleId));
-                let hasFields = request.resource.data.keys().hasOnly(['name']);
+      function isValidDepartment(departmentId) {
+        let createdValidDepartment = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
+        let hasFields = request.resource.data.keys().hasOnly(['name', 'director']);
 
-                return createdValidRole && hasFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
-            }
+        return createdValidDepartment && hasFields && request.auth != null
+               && getCurrentEmployeeRole(request.auth.uid) >= 3 && departmentFieldTypes();
+      }
 
-            match /jobTitles/{jobTitleId} {
-                allow read;
-                allow create: if isValidJobTitle(jobTitleId);
-            }
+      function nameFieldTypes() {
+        return request.resource.data.name is string
+      }
 
-            function isValidJobTitle(jobTitleId) {
-                let createdValidJobTitle = existsAfter(/databases/$(database)/documents/jobTitles/$(jobTitleId));
-                let hasFields = request.resource.data.keys().hasOnly(['name']);
+      match /roles/{roleId} {
+        allow read;
+        allow create: if isValidRole(roleId);
+      }
 
-                return createdValidJobTitle && hasFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
-            }
+      function isValidRole(roleId) {
+        let createdValidRole = existsAfter(/databases/$(database)/documents/roles/$(roleId));
+        let hasFields = request.resource.data.keys().hasOnly(['name']);
 
-            match /shifts/{shiftId} {
-                allow read;
-                allow create: if isValidShift(shiftId);
-                allow update: if isValidShift(shiftId);
-            }
+        return createdValidRole && hasFields
+               && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+      }
 
-            function isValidShift(shiftId) {
-                let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
-                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'projectName', 'start']);
+      match /jobTitles/{jobTitleId} {
+        allow read;
+        allow create: if isValidJobTitle(jobTitleId);
+      }
 
-                return createdValidShift && hasFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
-            }
+      function isValidJobTitle(jobTitleId) {
+        let createdValidJobTitle = existsAfter(/databases/$(database)/documents/jobTitles/$(jobTitleId));
+        let hasFields = request.resource.data.keys().hasOnly(['name']);
 
-            match /projects/{projectId} {
-                allow read;
-                allow create: if isValidProject(projectId);
-                allow update: if isValidProject(projectId);
-            }
+        return createdValidJobTitle && hasFields
+               && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+      }
 
-            function projectFieldTypes() {
-                return request.resource.data.name is string &&
-                       request.resource.data.start is timestamp
-            }
+      match /shifts/{shiftId} {
+        allow read;
+        allow create: if isValidShift(shiftId);
+        allow update: if isValidShift(shiftId);
+      }
 
-            function isValidProject(projectId) {
-                let createdValidProject = existsAfter(/databases/$(database)/documents/projects/$(projectId));
-                let hasFields = request.resource.data.keys().hasOnly(['name', 'start']);
+      function isValidShift(shiftId) {
+        let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+        let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'projectName', 'start']);
 
-                return createdValidProject && hasFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && projectFieldTypes();
-            }
-        }
+        return createdValidShift && hasFields
+               && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+      }
 
+      match /projects/{projectId} {
+        allow read;
+        allow create: if isValidProject(projectId);
+        allow update: if isValidProject(projectId);
+      }
+
+      function projectFieldTypes() {
+        return request.resource.data.name is string &&
+               request.resource.data.start is timestamp
+      }
+
+      function isValidProject(projectId) {
+        let createdValidProject = existsAfter(/databases/$(database)/documents/projects/$(projectId));
+        let hasFields = request.resource.data.keys().hasOnly(['name', 'start']);
+
+        return createdValidProject && hasFields
+               && getCurrentEmployeeRole(request.auth.uid) >= 3 && projectFieldTypes();
+      }
     }
+
+  }
 }
