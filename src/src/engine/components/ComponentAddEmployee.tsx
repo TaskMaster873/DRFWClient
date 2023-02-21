@@ -95,8 +95,8 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="email"
                             required
                             type="email"
-                            //TODO Really need to work with the const
-                            pattern="1 \(([0-9]{3})\)-([0-9]{3})-([0-9]{4})$"
+                            
+                            pattern={RegexUtil.emailGoodRegex}
                             placeholder="exemple@exemple.ca"
                         />
                         <Form.Control.Feedback type="invalid">
@@ -112,7 +112,8 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="phoneNumber"
                             required
                             type="tel"
-                            pattern={RegexUtil.phoneNumberRegex}
+                            //TODO Really need to work with the const
+                            pattern="1 \(([0-9]{3})\)-([0-9]{3})-([0-9]{4})$"
                             placeholder="0 (000)-000-0000"
                         />
                         <Form.Control.Feedback type="invalid">
