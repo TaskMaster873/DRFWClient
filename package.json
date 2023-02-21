@@ -52,7 +52,7 @@
     "emulator": "firebase emulators:start --import=./emulatorSave",
     "export": "firebase emulators:export ./emulatorSave",
     "test": "jest --config=jest.config.js --coverage --ci",
-    "testWatch": "jest --config=jest.config.js --coverage --watchAll"
+    "testWatch": "jest --config=jest.config.js --coverage"
   },
   "resolutions": {
     "glob-parent": "^6.0.2",
