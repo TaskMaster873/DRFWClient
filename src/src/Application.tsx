@@ -6,11 +6,15 @@ import { Engine } from "./engine/Engine";
 export class Application {
     private rootElem: HTMLElement | null = null;
     private root: ReactDOM.Root | null = null;
-
-    constructor() {
-
-    }
     
+    public start() {
+        this.registerEvents();
+    }
+
+    private registerEvents() {
+        this.renderCore();
+    }
+
     private defineRoot(): void {
         if(this.rootElem === null || !this.rootElem) {
             this.rootElem = document.createElement("div");
@@ -21,21 +25,7 @@ export class Application {
             document.body.appendChild(this.rootElem);
         }
     }
-
-    private registerEvents() {
-        this.renderCore();
-    }
-
-    private elementExists(element: any): boolean {
-        return element !== null && element !== undefined;
-    }
-
-    public unmount(): void {
-        if (this.elementExists(this.root)) {
-            this.root?.unmount();
-        }
-    }
-
+    
     private renderCore(): void {
         this.defineRoot();
         
@@ -52,7 +42,14 @@ export class Application {
         }
     }
 
-    public start() {
-        this.registerEvents();
+    private elementExists(element: any): boolean {
+        return element !== null && element !== undefined;
     }
+
+    public unmount(): void {
+        if (this.elementExists(this.root)) {
+            this.root?.unmount();
+        }
+    }
+
 }

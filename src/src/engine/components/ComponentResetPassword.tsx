@@ -1,20 +1,18 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {errors, FormErrorType, info, successes} from "../messages/FormMessages";
-import { API } from "../api/APIManager";
-import { NotificationManager } from "react-notifications";
-import { useNavigate } from "react-router-dom";
-
-/* === Images === */
-// @ts-ignore
-import Logo from "../../deps/images/logo.png";
+import {API} from "../api/APIManager";
+import {NotificationManager} from "react-notifications";
+import {useNavigate} from "react-router-dom";
 import {RoutesPath} from "../RoutesPath";
+import {Container} from "react-bootstrap";
+import Logo from "../../deps/images/logo.png";
 
 type Props = {
     actionCode: string,
-    email: string
-}
+    email: string;
+};
 
 /***
  * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un nouveau
@@ -46,77 +44,67 @@ export function ComponentResetPassword(props: Props) {
             if (!error) {
                 NotificationManager.info(successes.RESET_PASSWORD, successes.SUCCESS_GENERIC_MESSAGE);
             } else {
-                NotificationManager.error(
-                    error,
-                    errors.ERROR_GENERIC_MESSAGE
-                );
+                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
             }
-
             navigate(RoutesPath.LOGIN);
         }
     };
 
     return (
-        <div className="auth-form">
-            <div className="me-4">
-                <img
-                    className="mx-auto d-block mt-5"
-                    src={Logo as any}
-                    alt="Logo TaskMaster"
-                    width={50}
-                    height={60}
-                />
-                <h4 id="email" className="text-center mt-4 mb-4">
-                    Réinitialisation de mot de passe pour {props.email}
-                </h4>
-            </div>
-            <Form
-                noValidate
-                validated={validated}
-                onSubmit={handleSubmit}
-                data-error={error}
-            >
-                <Form.Group>
-                    <Form.Label htmlFor="password" className="mt-2">
-                        Nouveau mot de passe
-                    </Form.Label>
-                    <Form.Control
-                        required
-                        id="newPassword"
-                        name="newPassword"
-                        className="row mt-1"
-                        type="password"
-                        pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
-                        placeholder="Entrez votre nouveau mot de passe"
-                        onChange={(e) => {
-                            setNewPassword(e.target.value);
-                        }}
+        <Container>
+            <div className="auth-form">
+                <div className="me-4">
+                    <img
+                        className="mx-auto d-block mt-5"
+                        src={Logo as any}
+                        alt="Logo TaskMaster"
+                        width={50}
+                        height={60}
                     />
-                    <Form.Control.Feedback type="invalid" id="invalidPassword">
-                        {errors.INVALID_NEW_PASSWORD}
-                    </Form.Control.Feedback>
-                </Form.Group>
-                <div className="mt-4 me-4 d-block text-center mx-auto">
-                    <Button
-                        onClick={() => history.back()}
-                        className="me-4 mt-4"
-                        size="lg"
-                        variant="secondary"
-                    >
-                        Retour
-                    </Button>
-                    <Button
-                        id="submitResetPassword"
-                        className="mt-4"
-                        size="lg"
-                        variant="primary"
-                        type="submit"
-                        value="Submit"
-                    >
-                        Confirmer
-                    </Button>
+                    <h4 id="email" className="text-center mt-4 mb-4">
+                        Réinitialisation de mot de passe pour {props.email}
+                    </h4>
                 </div>
-            </Form>
-        </div>
+                <Form
+                    noValidate
+                    validated={validated}
+                    onSubmit={handleSubmit}
+                    data-error={error}
+                >
+                    <Form.Group>
+                        <Form.Label htmlFor="password" className="mt-2">
+                            Nouveau mot de passe
+                        </Form.Label>
+                        <Form.Control
+                            required
+                            id="newPassword"
+                            name="newPassword"
+                            className="row mt-1"
+                            type="password"
+                            pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
+                            placeholder="Entrez votre nouveau mot de passe"
+                            onChange={(e) => {
+                                setNewPassword(e.target.value);
+                            }}
+                        />
+                        <Form.Control.Feedback type="invalid" id="invalidPassword">
+                            {errors.INVALID_NEW_PASSWORD}
+                        </Form.Control.Feedback>
+                    </Form.Group>
+                    <div className="mt-4 me-4 d-block text-center mx-auto">
+                        <Button
+                            id="submitResetPassword"
+                            className="mt-4"
+                            size="lg"
+                            variant="primary"
+                            type="submit"
+                            value="Submit"
+                        >
+                            Confirmer
+                        </Button>
+                    </div>
+                </Form>
+            </div>
+        </Container>
     );
 }
