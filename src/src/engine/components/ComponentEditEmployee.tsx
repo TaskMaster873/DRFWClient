@@ -5,12 +5,19 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { errors, FormErrorType } from "../messages/FormMessages";
 import { Container } from "react-bootstrap";
-import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
+import {AddEmployeeProps, EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
 
-interface ComponentAddEmployeeState extends Employee {
+interface ComponentEditEmployeeState {
+    employeeId: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    department: string;
+    jobTitles: string[];
+    skills: string[];
+    role: number;
     validated?: boolean;
     error: FormErrorType;
-    password: string;
 }
 
 /**
@@ -21,31 +28,29 @@ interface ComponentAddEmployeeState extends Employee {
  * @subcategory Employee
  * @hideconstructor
  */
-export class ComponentAddEmployee extends React.Component<AddEmployeeProps, ComponentAddEmployeeState> {
-    public state: ComponentAddEmployeeState = {
+export class ComponentEditEmployee extends React.Component<EditEmployeeProps, ComponentEditEmployeeState> {
+    public state: ComponentEditEmployeeState = {
         employeeId: "",
         firstName: "",
         lastName: "",
-        email: "",
         phoneNumber: "",
-        password: "",
-        role: 0,
         department: "",
         jobTitles: [],
         skills: [],
         validated: false,
+        role: 0,
         error: FormErrorType.NO_ERROR,
     };
 
-    public props: AddEmployeeProps;
+    public props: EditEmployeeProps;
 
-    constructor(props: AddEmployeeProps) {
+    constructor(props: EditEmployeeProps) {
         super(props);
 
         this.props = props;
     }
 
-    public componentDidUpdate(prevProps: AddEmployeeProps) : void {
+    public componentDidUpdate(prevProps: EditEmployeeProps) : void {
         if (prevProps.departments !== this.props.departments && this.props.departments.length > 0) {
             this.setState({
                 department: this.props.departments[0].name
@@ -88,20 +93,6 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             {errors.REQUIRED_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} md="4">
-                        <Form.Label>Adresse courriel</Form.Label>
-                        <Form.Control
-                            id="email"
-                            required
-                            type="email"
-                            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-                            placeholder="exemple@exemple.com"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.INVALID_EMAIL}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-
                 </Row>
                 <Row className="mb-3">
                     <Form.Group as={Col} md="4">
@@ -115,19 +106,6 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.INVALID_PHONE_NUMBER}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group as={Col} md="4">
-                        <Form.Label>Mot de passe initial</Form.Label>
-                        <Form.Control
-                            id="password"
-                            required
-                            type="password"
-                            pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
-                            placeholder="Mot de passe"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.INVALID_INITIAL_PASSWORD}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
@@ -207,17 +185,16 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
             validated: true, error: errorType,
         });
         if (errorType === FormErrorType.NO_ERROR) {
-            let employee: EmployeeCreateDTO = {
+            let employee: EmployeeEditDTO = {
                 firstName: this.state.firstName,
                 lastName: this.state.lastName,
-                email: this.state.email,
                 phoneNumber: this.state.phoneNumber,
                 department: this.state.department,
                 jobTitles: this.state.jobTitles,
                 skills: this.state.skills, // @ts-ignore
                 role: parseInt(this.state.role)
             }
-            this.props.onAddEmployee(this.state.password, employee);
+            this.props.onEditEmployee(this.state.employeeId, employee);
         }
     }
 
@@ -244,14 +221,14 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         }
 
         this.setState({...this.state, ...{
-            [name]: value,
-        }});
+                [name]: value,
+            }});
     }
 
     readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
         const target = event.target;
         this.setState({...this.state, ...{
-            [target.id]: target.value
-        }});
+                [target.id]: target.value
+            }});
     }
 }

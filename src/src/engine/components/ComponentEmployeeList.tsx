@@ -1,5 +1,5 @@
 import React, {CSSProperties} from "react";
-import {Button, Col, Row, Table} from "react-bootstrap";
+import {Button, Col, Modal, Row, Table} from "react-bootstrap";
 import {Employee, EmployeeListProps, EmployeeListState, employeeTableHeads, adminTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
@@ -7,9 +7,9 @@ import {API} from "../api/APIManager";
 import {ScaleLoader} from "react-spinners";
 import {BiEdit} from "react-icons/bi"
 import {Roles} from "../types/Roles";
-import {CgUnavailable} from "react-icons/cg";
+import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {SearchParams} from "../types/SearchParams";
-import {RoutesPath} from "../RoutesPath";
+import {Link} from "react-router-dom";
 
 /**
  * Component that display the list of employees of a department
@@ -38,7 +38,6 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
 
     public render(): JSX.Element {
         let list: Employee[] = this.props.employees !== null ? this.props.employees : [];
-
         // TODO: REDO THIS
         let searchProps: SearchParams<Employee> = {list: list, filterList: this.updateList.bind(this)};
         return (
@@ -167,10 +166,14 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
 
     private renderAdminActions(index: number, employee: Employee): JSX.Element | undefined {
         if (employee.employeeId && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
-            return <td key={`action ${index}`}><a className="adminActions"
-                                                  onClick={() => this.props.onEditEmployee(employee)}><BiEdit/></a>
-                <a className="adminActions"
-                   onClick={() => this.props.onDeactivateEmployee(employee.employeeId)}><CgUnavailable/></a></td>
+            let component: JSX.Element = <CgUnavailable/>;
+            if (!employee.isActive) {
+                component = <CgCheckO/>
+            }
+            return <td key={`action ${index}`}><LinkContainer to="/edit-employee"
+                                                              className="adminActions mx-1"><BiEdit/></LinkContainer>
+                <a className="adminActions ms-1 mx-1"
+                   onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a></td>
         } else if (employee.employeeId && API.hasPermission(Roles.ADMIN)) {
             return <td key={`action ${index}`}></td>;
         }

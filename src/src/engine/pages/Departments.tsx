@@ -56,6 +56,27 @@ export class Departments extends React.Component<unknown, DepartmentListState> {
         }
     }
 
+    public editDepartment = async (department: Department) : Promise<void> => {
+        let errorMessage = await API.editDepartment(department);
+        if (!errorMessage) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
+            let departments = this.state.departments;
+            let oldDepartment = departments.find(elem => elem.departmentId == department.departmentId);
+            if(oldDepartment) {
+                let employeeIndex = departments.findIndex(elem => elem.departmentId == department.departmentId);
+                if (department && employeeIndex != -1) {
+                    departments[employeeIndex] = department;
+                    this.setState({departments: departments});
+                }
+            }
+            departments.push(department);
+            this.setState({departments: departments});
+            await this.fetchData();
+        } else {
+            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+
     /**
      *
      * @returns La liste des employés
@@ -66,7 +87,8 @@ export class Departments extends React.Component<unknown, DepartmentListState> {
                 <ComponentDepartmentList employees={this.state.employees}
                                          employeeNb={this.state.employeeNb}
                                          departments={this.state.departments}
-                                         onDataChange={this.addDepartment}/>
+                                         onAddDepartment={this.addDepartment}
+                                        onEditDepartment={this.editDepartment}/>
             </Container>
         );
     }

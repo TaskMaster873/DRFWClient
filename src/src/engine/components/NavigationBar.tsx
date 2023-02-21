@@ -147,16 +147,12 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
      * @see NavigationBarState
      * @private
      */
-    private adminCommandLinks(): JSX.Element {
+    private adminCommandLinks(): JSX.Element | undefined {
         if (this.state.showCreateSchedule) {
             return (
                 <LinkContainer to="/create-schedule">
                     <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
                 </LinkContainer>
-            );
-        } else {
-            return (
-                <></>
             );
         }
     }

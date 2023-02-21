@@ -1,12 +1,18 @@
 import React from "react";
-import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {API} from "../api/APIManager";
-import {AddEmployeeState, EmployeeCreateDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
+import {
+    AddEmployeeState,
+    EmployeeCreateDTO,
+    EmployeeEditDTO,
+    EmployeeJobTitleList,
+    EmployeeRoleList
+} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from 'react-notifications';
 import {Department} from "../types/Department";
+import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
 
-export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
+export class EditEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {
         departments: [],
         roles: [],
@@ -14,7 +20,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     }
 
     public async componentDidMount() : Promise<void> {
-        document.title = "Ajouter un Employé - TaskMaster";
+        document.title = "Modifier un Employé - TaskMaster";
 
         // TODO Add error handling
         let departments = API.getDepartments();
@@ -27,8 +33,6 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
             EmployeeJobTitleList | string
         ] = await Promise.all([departments, roles, titles]);
 
-        console.log(params);
-
         if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2])) {
             this.setState({departments: params[0], roles: params[1], titles: params[2]});
         } else {
@@ -37,14 +41,14 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     }
 
     /**
-     * Add an employee to the database
-     * @param password {string} The password of the employee
-     * @param employee {EmployeeCreateDTO} The employee to add
+     * Edit an employee in the database
+     * @param employeeId
+     * @param employee {EmployeeCreateDTO} The employee to edit
      */
-    readonly #addEmployee = async (password : string, employee: EmployeeCreateDTO) : Promise<void> => {
-        let error = await API.createEmployee(password, employee);
+    readonly #editEmployee = async (employeeId: string, employee: EmployeeEditDTO) : Promise<void> => {
+        let error = await API.editEmployee(employeeId, employee);
         if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_EDITED);
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
@@ -52,11 +56,11 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
 
     public render(): JSX.Element {
         return (
-            <ComponentAddEmployee
+            <ComponentEditEmployee
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
-                onAddEmployee={this.#addEmployee}
+                onEditEmployee={this.#editEmployee}
             />
         );
     }

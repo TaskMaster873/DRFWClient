@@ -7,6 +7,7 @@ import { LinkContainer } from "react-router-bootstrap";
 import { ScaleLoader } from "react-spinners";
 import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
+import {ComponentEditDepartment} from "./ComponentEditDepartment";
 
 const override: CSSProperties = {
 
@@ -27,8 +28,8 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                     {this.departmentList()}
                     </tbody>
                 </Table>
-
                 {this.renderAddDepartmentComponent()}
+                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.onEditDepartment} />
             </div>
         );
     }
@@ -97,8 +98,14 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
      * @throws {Error} If the parent function is not defined
      */
     readonly onDataChange = async (department: Department): Promise<void> => {
-        if (this.props.onDataChange !== null && this.props.onDataChange) {
-            await this.props.onDataChange(department);
+        if (this.props.onAddDepartment !== null && this.props.onAddDepartment) {
+            await this.props.onAddDepartment(department);
+        }
+    }
+
+    readonly onEditDepartment = async (department: Department): Promise<void> => {
+        if (this.props.onEditDepartment !== null && this.props.onEditDepartment) {
+            await this.props.onEditDepartment(department);
         }
     }
 
@@ -111,7 +118,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
     private renderAddDepartmentComponent(): JSX.Element {
         if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
             return (
-                <ComponentAddDepartment employees={this.props.employees} onDataChange={this.onDataChange}/>
+                <ComponentAddDepartment employees={this.props.employees} onAddDepartment={this.onDataChange}/>
             );
         } else {
             return <></>;

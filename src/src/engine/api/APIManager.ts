@@ -26,7 +26,7 @@ import {
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
-import {Employee, EmployeeCreateDTO} from "../types/Employee";
+import {Employee, EmployeeCreateDTO, EmployeeEditDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
@@ -422,13 +422,13 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async editEmployee(employee: Employee): Promise<string | null> {
+    public async editEmployee(employeeId: string, employee: EmployeeEditDTO): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
         let errorMessage: string | null = null;
-        if (employee.employeeId) {
-            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {...employee}).catch((error) => {
+        if (employeeId) {
+            await updateDoc(doc(this.#db, `employees`, employeeId), {...employee}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
         } else {
@@ -437,14 +437,14 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async deactivateEmployee(employeeId: string | null): Promise<string | null> {
+    public async changeEmployeeActivation(employee: Employee): Promise<string | null> {
         let errorMessage: string | null = null;
 
-        if (employeeId !== null && employeeId) {
+        if (employee.employeeId) {
             if (!this.hasPermission) {
                 return errors.PERMISSION_DENIED;
             }
-            await updateDoc(doc(this.#db, `employees`, employeeId), {isActive: false}).catch((error) => {
+            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {isActive: employee.isActive}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
         } else {
@@ -465,6 +465,21 @@ class APIManager extends Logger {
             await addDoc(collection(this.#db, `departments`), {...department}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             })
+        }
+        return errorMessage;
+    }
+
+    public async editDepartment(department: Department): Promise<string | null> {
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        let errorMessage: string | null = null;
+        if (department.departmentId) {
+            await updateDoc(doc(this.#db, `departments`, department.departmentId), {...department}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_EMPLOYEE_ID;
         }
         return errorMessage;
     }
@@ -723,6 +738,8 @@ class APIManager extends Logger {
         if (success) isCreated = true;
         return isCreated;
     }
+
+
 }
 
 export const API = new APIManager;

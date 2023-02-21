@@ -41,5 +41,9 @@ body {
 .adminActions {
   text-decoration: none;
   cursor: pointer;
+}
 
+.adminActions > svg {
+  width: 1.3em;
+  height: 1.3em;
 }

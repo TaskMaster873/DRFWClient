@@ -36,6 +36,7 @@ export const successes = {
     LOGOUT_SUCCESS: "Vous êtes maintenant déconnecté !",
     CHANGE_PASSWORD: "Le changement de mot de passe a bien été effectué !",
     RESET_PASSWORD: "Le mot de passe a bien été mis à jour !",
+    EMPLOYEE_ACTIVATED: "L'employé a bien été activé !",
     EMPLOYEE_DEACTIVATED: "L'employé a bien été désactivé !",
     EMPLOYEE_EDITED: `L'employé a bien été modifié !`,
 }

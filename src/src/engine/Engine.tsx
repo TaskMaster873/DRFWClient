@@ -10,6 +10,7 @@ import { EmployeeWrapper } from "./pages/Employees";
 import { About } from "./pages/About";
 import { Login } from "./pages/Login";
 import { AddEmployee } from "./pages/AddEmployee";
+import { EditEmployee } from "./pages/EditEmployee";
 import { NavigationBar } from "./components/NavigationBar";
 import { ChangePassword } from "./pages/ChangePassword";
 import { Departments } from "./pages/Departments";
@@ -66,6 +67,7 @@ export class Engine extends React.Component<unknown, EngineState> {
                             <Route path={RoutesPath.ABOUT} element={<About/>}/>
                             <Route path={RoutesPath.LOGIN} element={<Login/>}/>
                             <Route path={RoutesPath.ADD_EMPLOYEE} element={<AddEmployee/>}/>
+                            <Route path={RoutesPath.EDIT_EMPLOYEE} element={<EditEmployee />}/>
                             <Route path={RoutesPath.AVAILABILITIES} element={<Availabilities/>}/>
                             <Route path={RoutesPath.FORGOT_PASSWORD} element={<ForgotPassword/>}/>
                             <Route path={RoutesPath.RESET_PASSWORD} element={<ResetPassword/>}/>
