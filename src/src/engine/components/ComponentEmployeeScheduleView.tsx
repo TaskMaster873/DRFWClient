@@ -2,6 +2,7 @@ import React from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
 import {Shift, ShiftForCalendar} from '../types/Shift';
 import {DayPilotCalendarSettings} from '../types/StatesForDaypilot';
+import {Converter} from '../utils/DateConverter';
 
 interface ComponentEmployeeScheduleViewProps {
 	listOfShifts: Shift[];
@@ -59,8 +60,8 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 		let startDate = DayPilot.Date.today();
 
 		for (let shift of this.props.listOfShifts) {
-			let convertedStartTime = this.parseDateToString(shift.start);
-			let convertedEndTime = this.parseDateToString(shift.end);
+			let convertedStartTime = Converter.convertTimestampToDayPilotDate(shift.start);
+			let convertedEndTime = Converter.convertTimestampToDayPilotDate(shift.end);
 
 			events.push({
 				text: `${convertedStartTime} à ${convertedEndTime}\nProjet: ${shift.projectName}`,
@@ -73,14 +74,6 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 		this.datePicker.update({events, startDate});
 	}
 
-	/**
-	 * 
-	 * @param time 
-	 * @returns time in good format in ISO 8601
-	 */
-	private parseDateToString(time: string): string {
-		return DayPilot.Date.parse(time, "yyyy-MM-ddTHH:mm:ss").toString("H:mm");
-	}
 
 	/**
 	 * Triggered when a date is selected in the date picker
