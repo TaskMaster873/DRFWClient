@@ -20,7 +20,7 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         document.title = "Horaire - TaskMaster";
 
         // TODO - Pass an employee id?
-        let shifts = await API.getScheduleForOneEmployee();
+        let shifts = await API.getCurrentEmployeeSchedule();
 
         // TODO - Check for possible errors?
         this.setState({ list: shifts });
