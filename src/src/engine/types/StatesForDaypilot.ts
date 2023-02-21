@@ -7,15 +7,24 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
 import { EventForCalendar } from "./Shift";
 
 export interface DayPilotCalendarSettings {
-    cellsMarkBusiness: boolean; //montrer le gris pâle ou non
-    businessWeekends: boolean; // travail possible la fin de semaine,
-    headerDateFormat: string; // pour voir les jours de la semaine,
-    viewType: string; // 7 jours,
-    durationBarVisible: boolean; // la barre à gauche
-    timeRangeSelectedHandling: string; // la sélection des heures
-    eventResizeHandling: string; //changer la grosseur de l'event
-    eventMoveHandling: string; //pouvoir le bouger
-    eventDeleteHandling: string; // pouvoir le delete
+	/** show the color for hours that are not business hours */
+    cellsMarkBusiness: boolean;
+	/** same as cellMarkBusiness but for the weekend  */
+    businessWeekends: boolean; 
+	/** what we see in the header */
+    headerDateFormat: string; 
+	/** how it show the shifts */
+    viewType: string; 
+	/** show the bar of duration  */
+    durationBarVisible: boolean; 
+	/** event daypilot when we click on cells */
+    timeRangeSelectedHandling: string; 
+	/** if we can resize events */
+    eventResizeHandling: string;
+	/** if wwe can drag event or not */
+    eventMoveHandling: string; 
+	/** if we can delete the events */
+    eventDeleteHandling: string; 
 }
 
 /**
@@ -23,18 +32,31 @@ export interface DayPilotCalendarSettings {
  */
 
 export interface CalendarAttributesForEmployeeShiftCreationComponent {
+	/** date of the start */
 	startDate: string;
-	columns: ColumnsType[]; //name = au nom de la personne et id est son id
-	events: EventForCalendar[]; // shift
+	/** the columns */
+	columns: ColumnsType[]; 
+	/** the shifts */
+	events: EventForCalendar[]; 
+	/** height */
 	heightSpec?: HeightSpecType;
-	height?: number; //a une valeur de 300px de base
-	cellHeight?: number; // 30px de base
-	cellDuration?: number // le temps que vaut une cellule 30 de base
-	viewType: ViewType; // En bref cela change la vue et ressource serait important pour les départements
+	/** hardcoded height, so not important */
+	height?: number; 
+	/** hardcoded height, so not important */
+	cellHeight?: number; 
+	/** precision in minutes of cells (minimum 15min) in lite version */
+	cellDuration?: number 
+	/** the type of view of data */
+	viewType: ViewType; 
+	/** if we can delete or not in the calendar */
 	eventDeleteHandling: EventDeleteHandlingType;
+	/** is the popup child active or not */
 	isShowingModal: boolean;
+	/** start of the calendar */
 	start: DayPilot.Date;
+	/** end of the calendar */
 	end: DayPilot.Date;
+	/** for the popup */
 	resourceName: string;
 }
 
@@ -43,7 +65,7 @@ export interface ColumnsType {
 	id: string;
 }
 /**
- * Les chois qu'on a gratuitement
+ * The choices we have for free
  */
 export enum HeightSpecType {
 	BusinessHours = "BusinessHours" ,
@@ -51,7 +73,7 @@ export enum HeightSpecType {
 }
 
 /**
- * La façon que le calendrier s'afficher
+ * The choices we have for free
  */
 export enum ViewType {
 	Day = "Day",
@@ -62,8 +84,10 @@ export enum ViewType {
 }
 
 export enum EventDeleteHandlingType {
-	Update = "Update", //peut delete
-	Disabled = "Disabled", // désactivé
+	/** We can delete */
+	Update = "Update", 
+	/** We cannot delete */
+	Disabled = "Disabled", 
 	CallBack = "CallBack",
 	PostBack = "PostBack",
 
