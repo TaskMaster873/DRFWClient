@@ -95,8 +95,8 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="email"
                             required
                             type="email"
-                            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-                            placeholder="exemple@exemple.com"
+                            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{2,}$"
+                            placeholder="exemple@exemple.ca"
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.INVALID_EMAIL}
