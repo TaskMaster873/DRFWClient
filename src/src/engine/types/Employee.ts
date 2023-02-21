@@ -79,7 +79,7 @@ export interface EmployeeListProps {
     filteredList: Employee[] | null;
     department?: string | null;
     onEditEmployee: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
-    onDeactivateEmployee: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
+    onDeactivateEmployee: (employeeId: string | undefined) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface EmployeeListState {
