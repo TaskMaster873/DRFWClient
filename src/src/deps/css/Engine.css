@@ -37,3 +37,9 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+.adminActions {
+  text-decoration: none;
+  cursor: pointer;
+
+}

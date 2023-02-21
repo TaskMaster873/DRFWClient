@@ -25,7 +25,7 @@ import {
     where
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
-import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
+import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
@@ -92,6 +92,10 @@ class APIManager extends Logger {
         } catch (e: any) {
             this.error(e.message);
         }
+    }
+
+    public get userRole() {
+        return this.#userRole;
     }
 
     private async onWorkerMessage(message: MessageEvent): Promise<void> {
@@ -200,10 +204,10 @@ class APIManager extends Logger {
                 errorMessage = errors.INVALID_LOGIN;
                 break;
             case "permission-denied":
-                errorMessage = errors.permissionDenied;
+                errorMessage = errors.PERMISSION_DENIED;
                 break;
             default:
-                errorMessage = errors.defaultMessage;
+                errorMessage = errors.DEFAULT;
                 break;
         }
         this.error(`Erreur: ${errorMessage} Code: ${error} Message: ${message}`);
@@ -393,7 +397,7 @@ class APIManager extends Logger {
 
     public async createEmployee(password: string, employee: EmployeeCreateDTO): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
-            return errors.permissionDenied;
+            return errors.PERMISSION_DENIED;
         }
         let errorMessage: string | null = null;
         let createdUserMessageData = await this.requestUserCreationFromWorker(employee, password);
@@ -420,25 +424,25 @@ class APIManager extends Logger {
 
     public async editEmployee(employee: Employee): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
-            return errors.permissionDenied;
+            return errors.PERMISSION_DENIED;
         }
-
-        // TODO: Update user
-        throw new Error("Not implemented");
-
-        /*let errorMessage: string | null = null;
-        await setDoc(doc(this.#db, `employees`, employee), {...employee}).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
-        });
-        return errorMessage;*/
+        let errorMessage: string | null = null;
+        if (employee.employeeId) {
+            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {...employee}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_EMPLOYEE_ID;
+        }
+        return errorMessage;
     }
 
     public async deactivateEmployee(employeeId: string | null): Promise<string | null> {
         let errorMessage: string | null = null;
 
-        if(employeeId !== null && employeeId) {
+        if (employeeId !== null && employeeId) {
             if (!this.hasPermission) {
-                return errors.permissionDenied;
+                return errors.PERMISSION_DENIED;
             }
             await updateDoc(doc(this.#db, `employees`, employeeId), {isActive: false}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
@@ -452,7 +456,7 @@ class APIManager extends Logger {
 
     public async createDepartment(department: DepartmentCreateDTO): Promise<string | null> {
         if (!this.hasPermission) {
-            return errors.permissionDenied;
+            return errors.PERMISSION_DENIED;
         }
         let queryDepartment = query(collection(this.#db, `departments`),
             where("name", "==", department.name));
@@ -611,30 +615,25 @@ class APIManager extends Logger {
     public async getScheduleForOneEmployee(): Promise<Shift[]> {
         let shifts: Shift[] = [];
         if (this.isAuthenticated) {
-            return new Promise(async (resolve) => {
-                let queryShifts = query(collection(this.#db, `shifts`), where("employeeId", "==", this.#user?.uid));
-                let snaps = await getDocs(queryShifts).catch((e) => {
-                    console.log("error");
-                    this.error(e);
+            let queryShifts = query(collection(this.#db, `shifts`), where("employeeId", "==", this.#user?.uid));
+            let snaps = await getDocs(queryShifts).catch((e) => {
+                console.log("error");
+                this.error(e);
+            })
+            if (snaps) {
+                snaps.docs.forEach((doc) => {
+                    let data = doc.data();
+                    shifts.push(new Shift({
+                        employeeId: data.employeeId,
+                        department: data.department,
+                        projectName: data.projectName,
+                        start: this.getDayPilotDateString(data.start),
+                        end: this.getDayPilotDateString(data.end),
+                    }))
                 })
-                if (snaps) {
-                    snaps.docs.forEach((doc) => {
-                        let data = doc.data();
-                        shifts.push(new Shift({
-                            employeeId: data.employeeId,
-                            department: data.department,
-                            projectName: data.projectName,
-                            start: this.getDayPilotDateString(data.start),
-                            end: this.getDayPilotDateString(data.end),
-                        }))
-                    })
-                }
-                resolve(shifts);
-            });
-        } else {
-            return shifts;
+            }
         }
-
+        return shifts;
     }
 
     /**
@@ -690,19 +689,20 @@ class APIManager extends Logger {
         }
         return shifts;
     }
+
     /**
-     * 
+     *
      * @param shift est un shift avec toutes les données pour le créer
      * @returns un booléen pour savoir si il est créé
      */
     public async createShift(shift: Shift): Promise<boolean> {
         let isCreated: boolean = false
         //Check if user has permission
-        if(!this.hasPermission(2)) {//Gestionnaire
+        if (!this.hasPermission(2)) {//Gestionnaire
             return false;
         }
         //Get Employee Name and department
-        console.log("CreateShift",shift)
+        console.log("CreateShift", shift)
         let queryEmployee = doc(this.#db, `employees`, shift.employeeId)
 
         let snaps = await getDoc(queryEmployee).catch((error) => {
@@ -710,7 +710,7 @@ class APIManager extends Logger {
         })
         if (snaps) {
             let data = snaps.data();
-            if(data) { 
+            if (data) {
                 shift.employeeName = data.employeeName;
                 shift.department = data.department;
             }
@@ -720,7 +720,7 @@ class APIManager extends Logger {
         let success = await addDoc(collection(this.#db, `shifts`), {...shift}).catch((error) => {
             this.getErrorMessageFromCode(error);
         })
-        if(success) isCreated = true;
+        if (success) isCreated = true;
         return isCreated;
     }
 }
