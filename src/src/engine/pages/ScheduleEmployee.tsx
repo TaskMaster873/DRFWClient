@@ -1,11 +1,20 @@
 import React from "react";
-import { ComponentEmployeeScheduleView } from "../components/ComponentEmployeeScheduleView";
-import { Shift } from "../types/Shift";
-import { API } from "../api/APIManager";
-import { ComponentLoading } from "../components/ComponentLoading";
+import {ComponentEmployeeScheduleView} from "../components/ComponentEmployeeScheduleView";
+import {Shift} from "../types/Shift";
+import {API} from "../api/APIManager";
+import {ComponentLoading} from "../components/ComponentLoading";
+import {NotificationManager} from "react-notifications";
+import {errors} from "../messages/FormMessages";
 
 interface ScheduleState {
     list: Shift[];
+    fetchState: enumStateOfFetching;
+}
+
+enum enumStateOfFetching {
+    WAITING = 0,
+    ERROR = 1,
+    OK = 2,
 }
 
 /**
@@ -14,34 +23,42 @@ interface ScheduleState {
 export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
     public state: ScheduleState = {
         list: [],
-    }
+        fetchState: enumStateOfFetching.WAITING,
+    };
 
-    public async componentDidMount() : Promise<void> {
+    public async componentDidMount(): Promise<void> {
         document.title = "Horaire - TaskMaster";
 
-        // TODO - Pass an employee id?
-        let shifts = await API.getCurrentEmployeeSchedule();
+        let shifts = await this.#loadShiftsFromAPI();
+        if (typeof shifts === "string") {
 
-        // TODO - Check for possible errors?
-        this.setState({ list: shifts });
+            this.setState({fetchState: enumStateOfFetching.ERROR});
+            NotificationManager.error(errors.GET_SHIFTS, errors.ERROR_GENERIC_MESSAGE);
+        } else {
+            this.setState({list: shifts, fetchState: enumStateOfFetching.OK});
+        }
+
+    }
+
+    async #loadShiftsFromAPI(): Promise<Shift[] | string> {
+        let shifts = await API.getCurrentEmployeeSchedule();
+        return shifts;
+
     }
 
     public render(): JSX.Element {
         let listData: Shift[] = this.state.list;
-        if (Array.isArray(listData)) {
+        if (this.state.fetchState === enumStateOfFetching.WAITING) {
+            return (
+                <ComponentLoading />
+            );
+        } else if (this.state.fetchState === enumStateOfFetching.OK) {
+            return (<ComponentEmployeeScheduleView listOfShifts={listData} />);
 
-            // TODO - REFACTOR THIS
-            let length = listData.length;
-            switch (length) {
-                case 0: //quand la liste charge
-                    return (
-                        <ComponentLoading />
-                    );
-                default:
-                    return (<ComponentEmployeeScheduleView listOfShifts={listData} />);
-            }
         } else {
-            return (<div></div>);
+            return (<ComponentEmployeeScheduleView listOfShifts={[]}/>);
+
         }
+
     }
 }

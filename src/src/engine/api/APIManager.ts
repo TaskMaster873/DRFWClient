@@ -1,7 +1,7 @@
-import { Logger } from "../Logger";
+import {Logger} from "../Logger";
 
-import { FirebaseApp, initializeApp } from "firebase/app";
-import { Analytics, getAnalytics, isSupported } from "firebase/analytics";
+import {FirebaseApp, initializeApp} from "firebase/app";
+import {Analytics, getAnalytics, isSupported} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
 import {
@@ -29,12 +29,21 @@ import {
     where,
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
-import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
+import {
+    firebaseConfig,
+    FIREBASE_AUTH_EMULATOR_PORT,
+    FIRESTORE_EMULATOR_PORT,
+} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
-import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
+import {
+    CreatedAccountData,
+    Task,
+    ThreadMessage,
+    ThreadMessageType,
+} from "./types/ThreadMessage";
 import {Roles} from "../types/Roles";
 
 type SubscriberCallback = () =>
@@ -723,23 +732,21 @@ class APIManager extends Logger {
         return new Date(date.seconds * 1000).toISOString().slice(0, -5);
     }
 
-    public async getCurrentEmployeeSchedule(): Promise<Shift[]> {
+    public async getCurrentEmployeeSchedule(): Promise<Shift[] | string> {
         return await this.getScheduleForOneEmployee(this.#user?.uid);
     }
 
-    public async getScheduleForOneEmployee(
-        idEmployee?: string
-    ): Promise<Shift[]> {
+    public async getScheduleForOneEmployee(idEmployee?: string): Promise<Shift[] | string> {
+        let errorMessage: string | null = null;
         let shifts: Shift[] = [];
         if (this.isAuthenticated) {
-            return new Promise(async (resolve) => {
+            
                 let queryShifts = query(
                     collection(this.#db, `shifts`),
                     where("employeeId", "==", idEmployee)
                 );
-                let snaps = await getDocs(queryShifts).catch((e) => {
-                    console.log("error");
-                    this.error(e);
+                let snaps = await getDocs(queryShifts).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
                 });
                 if (snaps) {
                     snaps.docs.forEach((doc) => {
@@ -755,10 +762,9 @@ class APIManager extends Logger {
                         );
                     });
                 }
-                resolve(shifts);
-            });
+                return errorMessage ?? shifts;
         } else {
-            return shifts;
+            return errorMessage ?? shifts;
         }
     }
 
