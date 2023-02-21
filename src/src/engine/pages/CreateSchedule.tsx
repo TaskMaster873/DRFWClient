@@ -7,6 +7,10 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {NotificationManager} from "react-notifications";
 import {errors} from "../messages/FormMessages";
 import {RoutesPath} from "../RoutesPath";
+import {Department} from "../types/Department";
+import {SelectDepartment} from "../components/SelectDepartment";
+import {Container} from "react-bootstrap";
+import {department} from "../../../Constants/testConstants";
 
 enum ScheduleRecievedState {
     WAITING = 0,
@@ -15,12 +19,14 @@ enum ScheduleRecievedState {
 }
 
 interface CreateScheduleState {
+    departments: Department[];
     shifts: Shift[];
     fetchState: ScheduleRecievedState;
 }
 
 export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
     public state: CreateScheduleState = {
+        departments: [],
         shifts: [],
         fetchState: ScheduleRecievedState.WAITING,
     };
@@ -36,12 +42,30 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
      */
     public async componentDidMount(): Promise<void> {
         document.title = "Création d'horaire - TaskMaster";
-        let fetchedData = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), {name:"bob3", director:"person"});
+        let fetchedDepartments = await API.getDepartments();
+        if (typeof fetchedDepartments === "string") {
+            NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
+            this.setState({
+                fetchState: ScheduleRecievedState.ERROR
+            });
+            return;
+        }
+        else {
+            this.setState({
+                departments: fetchedDepartments,
+            });
+            this.#changeDepartment(fetchedDepartments[0])
+        }
+    }
+
+    readonly #changeDepartment = async (department: Department) => {
+        console.log("changing", department)
+        let fetchedData = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), department);
         if (typeof fetchedData === "string") {
             NotificationManager.error(errors.GET_SHIFTS, fetchedData);
             this.setState({
                 fetchState: ScheduleRecievedState.ERROR
-            })
+            });
         }
         else {
             this.setState({
@@ -49,14 +73,25 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
                 fetchState: ScheduleRecievedState.OK,
             });
         }
-    }
+    };
+
 
     public render(): JSX.Element {
         switch (this.state.fetchState) {
             case ScheduleRecievedState.WAITING:
                 return <ComponentLoading />;
             case ScheduleRecievedState.OK:
-                return <ComponentScheduleCreate shifts={this.state.shifts} />;
+                if(this.state.departments.length > 1){
+                    return (
+                        <Container>
+                            <SelectDepartment departments={this.state.departments} changeDepartment={this.#changeDepartment} />
+                            <ComponentScheduleCreate shifts={this.state.shifts} />
+                        </Container>
+                    );
+                }else{
+                    return <ComponentScheduleCreate shifts={this.state.shifts} />
+                }
+                
             default:
                 return <ComponentScheduleCreate shifts={[]} />;
         }

@@ -618,7 +618,7 @@ class APIManager extends Logger {
         return errorMessage ?? employees;
     }
 
-    public async getDepartments(): Promise<Department[]> {
+    public async getDepartments(): Promise<Department[] | string> {
         let errorMessage: string | null = null;
         let departments: Department[] = [];
         let queryDepartment = query(collection(this.#db, `departments`));
@@ -626,16 +626,17 @@ class APIManager extends Logger {
             errorMessage = this.getErrorMessageFromCode(error);
         });
         if (snaps) {
-            snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
+            for(let doc of snaps.docs){
+                let data = doc.data();
                 departments.push(
                     new Department({
-                        name: doc.data().name,
-                        director: doc.data().director,
+                        name: data.name,
+                        director: data.director,
                     })
                 );
-            });
+            }
         }
-        return departments;
+        return errorMessage ?? departments;
     }
 
     public async getEmployeeNbDepartments(
