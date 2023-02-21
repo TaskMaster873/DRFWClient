@@ -7,7 +7,7 @@ import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from 'react-notifications';
 import {Params, useParams} from "react-router-dom";
 
-export function EmployeeWrapper(): any {
+export function EmployeeWrapper(): JSX.Element {
     let parameters: Readonly<Params<string>> = useParams();
     return (
         <EmployeesInternal  {...{params: parameters}}/>
@@ -47,25 +47,21 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
 
     /**
      * Used to deactivate an employee if the user clicks on the deactivate button
-     * @param employeeObj {Employee} The employee to deactivate
      * @private
      * @return {Promise<void>} A promise that resolves when the employee is deactivated
+     * @param employeeId
      */
-    readonly #deactivateEmployee = async(employeeObj: Employee) : Promise<void> => {
-        let employeeId = employeeObj?.employeeId;
-
-        if (employeeObj !== null && employeeObj) {
-            let error = await API.deactivateEmployee(employeeId || null);
+    readonly #deactivateEmployee = async(employeeId: string | undefined) : Promise<void> => {
+        if (employeeId) {
+            let error = await API.deactivateEmployee(employeeId);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
 
                 let employees: Employee[] = this.state.employees;
-                let employeeIndex = employees.findIndex(elem => elem.employeeId == employeeId);
                 let employee = employees.find(elem => elem.employeeId == employeeId);
-                if(employee && employeeIndex != -1) {
+                if(employee) {
                     employee.isActive = false;
-                    employees[employeeIndex] = employee;
-                    this.setState({employees: employees});
+                    this.refreshList(employee, employees);
                 }
             }
         } else {
@@ -82,19 +78,19 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
     readonly #onEditEmployee = async (employeeObj: Employee) : Promise<void> => {
         let error = await API.editEmployee(employeeObj);
         if (!error) {
-            let employeeId = employeeObj.employeeId;
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_EDITED);
-
             let employees: Employee[] = this.state.employees;
-            let employeeIndex = employees.findIndex(elem => elem.employeeId == employeeId);
-            let employee = employees.find(elem => elem.employeeId == employeeId);
-            if(employee && employeeIndex != -1) {
-                employee.isActive = false;
-                employees[employeeIndex] = employee;
-                this.setState({employees: employees});
-            }
+            this.refreshList(employeeObj, employees);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_EDITED);
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+
+    private refreshList(employee: Employee, employees: Employee[]) {
+        let employeeIndex = employees.findIndex(elem => elem.employeeId == employee.employeeId);
+        if (employee && employeeIndex != -1) {
+            employees[employeeIndex] = employee;
+            this.setState({employees: employees});
         }
     }
 

@@ -64,8 +64,11 @@ export interface EmployeeDTO {
     readonly role: number;
 }
 
-export let employeeTableHeads : string[] =
+export let adminTableHeads : string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
+
+export let employeeTableHeads : string[] =
+    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
 
 export interface EmployeeProps {
     params: Readonly<Params>;
@@ -76,7 +79,7 @@ export interface EmployeeListProps {
     filteredList: Employee[] | null;
     department?: string | null;
     onEditEmployee: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
-    onDeactivateEmployee: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
+    onDeactivateEmployee: (employeeId: string | undefined) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface EmployeeListState {

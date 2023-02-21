@@ -1,5 +1,5 @@
 
 export interface Project {
     name: string;
-    startDate: Date;
+    start: Date;
 }

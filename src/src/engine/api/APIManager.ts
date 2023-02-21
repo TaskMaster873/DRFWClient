@@ -28,23 +28,14 @@ import {
     updateDoc,
     where,
 } from "firebase/firestore";
-import { FirebasePerformance, getPerformance } from "firebase/performance";
-import {
-    firebaseConfig,
-    FIREBASE_AUTH_EMULATOR_PORT,
-    FIRESTORE_EMULATOR_PORT,
-} from "./config/FirebaseConfig";
-import { Employee, EmployeeCreateDTO, EmployeeDTO } from "../types/Employee";
-import { Department, DepartmentCreateDTO } from "../types/Department";
-import { Shift } from "../types/Shift";
-import { errors } from "../messages/APIMessages";
-import {
-    CreatedAccountData,
-    Task,
-    ThreadMessage,
-    ThreadMessageType,
-} from "./types/ThreadMessage";
-import { Roles } from "../types/Roles";
+import {FirebasePerformance, getPerformance} from "firebase/performance";
+import {firebaseConfig, FIREBASE_AUTH_EMULATOR_PORT, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
+import {Employee, EmployeeCreateDTO} from "../types/Employee";
+import {Department, DepartmentCreateDTO} from "../types/Department";
+import {Shift} from "../types/Shift";
+import {errors} from "../messages/APIMessages";
+import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
+import {Roles} from "../types/Roles";
 
 type SubscriberCallback = () =>
     | void
@@ -282,6 +273,7 @@ class APIManager extends Logger {
         await FirebaseAuth.signOut(this.#auth).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
+        this.#userRole = -1;
 
         await this.onEvent();
         return errorMessage;
