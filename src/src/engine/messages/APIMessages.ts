@@ -2,7 +2,7 @@ export const errors = {
     INVALID_LOGIN: "Les informations d'identification sont erronées",
     DEPARTMENT_ALREADY_EXIST: "Le département est déjà existant",
     employeeAlreadyExists: "L'emploi est déjà existant",
-    permissionDenied: "Vous n'avez pas les autorisations requises pour effectuer cette action",
+    PERMISSION_DENIED: "Vous n'avez pas les autorisations requises pour effectuer cette action",
     defaultMessage: "Une erreur s'est produite, Veuillez réessayer ultérieurement",
     INVALID_EMPLOYEE_ID: "L'identifiant de l'employé est invalide",
 }
