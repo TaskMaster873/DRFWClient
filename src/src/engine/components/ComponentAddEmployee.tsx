@@ -95,7 +95,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="email"
                             required
                             type="email"
-                            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{2,}$"
+                            pattern={RegexUtil.emailGoodRegex}
                             placeholder="exemple@exemple.ca"
                         />
                         <Form.Control.Feedback type="invalid">
@@ -111,7 +111,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="phoneNumber"
                             required
                             type="tel"
-                            pattern="^(\+?1 ?)\(([0-9]{3})\)[-\. ]?([0-9]{3})[-\. ]?([0-9]{4})$"
+                            pattern="1 \(([0-9]{3})\)-([0-9]{3})-([0-9]{4})$"
                             placeholder="0 (000)-000-0000"
                         />
                         <Form.Control.Feedback type="invalid">
@@ -124,7 +124,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             id="password"
                             required
                             type="password"
-                            pattern='^.*(?=.{6,})(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!&$%@? "]).*$'
+                            pattern={RegexUtil.goodPasswordRegex}
                             placeholder="Mot de passe"
                         />
                         <Form.Control.Feedback type="invalid">
