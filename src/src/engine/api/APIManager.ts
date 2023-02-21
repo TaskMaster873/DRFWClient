@@ -29,11 +29,7 @@ import {
     where,
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
-import {
-    firebaseConfig,
-    FIREBASE_AUTH_EMULATOR_PORT,
-    FIRESTORE_EMULATOR_PORT,
-} from "./config/FirebaseConfig";
+import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
@@ -110,6 +106,10 @@ class APIManager extends Logger {
         } catch (e: any) {
             this.error(e.message);
         }
+    }
+
+    public get userRole() {
+        return this.#userRole;
     }
 
     private async onWorkerMessage(message: MessageEvent): Promise<void> {
@@ -224,10 +224,10 @@ class APIManager extends Logger {
                 errorMessage = errors.INVALID_LOGIN;
                 break;
             case "permission-denied":
-                errorMessage = errors.permissionDenied;
+                errorMessage = errors.PERMISSION_DENIED;
                 break;
             default:
-                errorMessage = errors.defaultMessage;
+                errorMessage = errors.DEFAULT;
                 break;
         }
         this.error(
@@ -475,7 +475,7 @@ class APIManager extends Logger {
         employee: EmployeeCreateDTO
     ): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
-            return errors.permissionDenied;
+            return errors.PERMISSION_DENIED;
         }
         let errorMessage: string | null = null;
         let createdUserMessageData = await this.requestUserCreationFromWorker(
@@ -512,17 +512,17 @@ class APIManager extends Logger {
 
     public async editEmployee(employee: Employee): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
-            return errors.permissionDenied;
+            return errors.PERMISSION_DENIED;
         }
-
-        // TODO: Update user
-        throw new Error("Not implemented");
-
-        /*let errorMessage: string | null = null;
-        await setDoc(doc(this.#db, `employees`, employee), {...employee}).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
-        });
-        return errorMessage;*/
+        let errorMessage: string | null = null;
+        if (employee.employeeId) {
+            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {...employee}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_EMPLOYEE_ID;
+        }
+        return errorMessage;
     }
 
     public async deactivateEmployee(
@@ -532,7 +532,7 @@ class APIManager extends Logger {
 
         if (employeeId !== null && employeeId) {
             if (!this.hasPermission) {
-                return errors.permissionDenied;
+                return errors.PERMISSION_DENIED;
             }
             await updateDoc(doc(this.#db, `employees`, employeeId), {
                 isActive: false,
@@ -550,7 +550,7 @@ class APIManager extends Logger {
         department: DepartmentCreateDTO
     ): Promise<string | null> {
         if (!this.hasPermission) {
-            return errors.permissionDenied;
+            return errors.PERMISSION_DENIED;
         }
         let queryDepartment = query(
             collection(this.#db, `departments`),
@@ -740,7 +740,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         let shifts: Shift[] = [];
         if (this.isAuthenticated) {
-            
+
                 let queryShifts = query(
                     collection(this.#db, `shifts`),
                     where("employeeId", "==", idEmployee)
@@ -833,6 +833,7 @@ class APIManager extends Logger {
         }
         return shifts;
     }
+
     /**
      *
      * @param shift est un shift avec toutes les données pour le créer
