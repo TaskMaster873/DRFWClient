@@ -4,28 +4,18 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
  * Voici la doc : https://api.daypilot.org/daypilot-calendar-methods/ et https://api.daypilot.org/daypilot-calendar-properties/
  */
 
-import { EventForCalendar, ShiftForEventCreation } from "./Shift";
+import { EventForCalendar } from "./Shift";
 
 export interface DayPilotCalendarSettings {
-    /** montrer le gris pâle ou non */
-    cellsMarkBusiness: boolean;
-	/** travail possible la fin de semaine */
-	businessWeekends: boolean;
-	/** pour voir les jours de la semaine */
-    headerDateFormat: string;
-	/** change le type */
-    viewType: string;
- 	/** la barre à gauche de couleur */ 
-    durationBarVisible: boolean;
-	/** la sélection des heures en cliquant les cellules */
-    timeRangeSelectedHandling: string;
-	/** changer la grosseur de l'event */
-    eventResizeHandling: string;
-	/** pouvoir le bouger */
-    eventMoveHandling: string;
-	/** pouvoir le delete */
-    eventDeleteHandling: string;
-
+    cellsMarkBusiness: boolean; //montrer le gris pâle ou non
+    businessWeekends: boolean; // travail possible la fin de semaine,
+    headerDateFormat: string; // pour voir les jours de la semaine,
+    viewType: string; // 7 jours,
+    durationBarVisible: boolean; // la barre à gauche
+    timeRangeSelectedHandling: string; // la sélection des heures
+    eventResizeHandling: string; //changer la grosseur de l'event
+    eventMoveHandling: string; //pouvoir le bouger
+    eventDeleteHandling: string; // pouvoir le delete
 }
 
 /**
@@ -33,52 +23,29 @@ export interface DayPilotCalendarSettings {
  */
 
 export interface CalendarAttributesForEmployeeShiftCreationComponent {
-	/** La journée qui est affichée */
 	startDate: string;
-	/** name = au nom de la personne et id est son id */
-	columns: ColumnsType[];
-	/** ce sont les shifts, daypilot appelle ça en event et events = à leur event.list */
-	events: EventForCalendar[];
-	/** La hauteur */
+	columns: ColumnsType[]; //name = au nom de la personne et id est son id
+	events: EventForCalendar[]; // shift
 	heightSpec?: HeightSpecType;
-	/** a une valeur de 300px de base */
-	height?: number;
-	/** 30px de base  */
-	cellHeight?: number;
-	/** le temps que vaut une cellule 30 de base, la précision en bref du calendrier en minutes */
-	cellDuration?: number
-	/** En bref cela change la vue et ressource serait important pour les départements */
-	viewType: ViewType;
-	/** si on veut ou non pouvoir enlever les shifts ou non */
+	height?: number; //a une valeur de 300px de base
+	cellHeight?: number; // 30px de base
+	cellDuration?: number // le temps que vaut une cellule 30 de base
+	viewType: ViewType; // En bref cela change la vue et ressource serait important pour les départements
 	eventDeleteHandling: EventDeleteHandlingType;
-	/** Donnée pour afficher les shifts */
-	ListOfShifts: ShiftForEventCreation[];
-	/** Si il affiche le popup */
 	isShowingModal: boolean;
-	/** jour d'affichage */
 	start: DayPilot.Date;
-	/** fin d'affichage */
 	end: DayPilot.Date;
-	/** nom des colonnes */
 	resourceName: string;
 }
 
-export class ColumnsClass {
-
-}
-
-/**
- * Ceci sert à faire afficher les colonnes pour le ViewType Resources
- */
 export interface ColumnsType {
 	name: string;
 	id: string;
 }
 /**
- * Les choix qu'on a gratuitement pour la hauteur
+ * Les chois qu'on a gratuitement
  */
 export enum HeightSpecType {
-
 	BusinessHours = "BusinessHours" ,
 	Full = "Full",
 }
@@ -91,15 +58,12 @@ export enum ViewType {
 	Week  = "Week",
 	WorkWeek  = "WorkWeek",
 	Days = "Days",
-	/** Afficher plusieurs personnes à la fois */
 	Resources  = "Resources"
 }
 
 export enum EventDeleteHandlingType {
-	/** peut delete et cela met à jour le calendrier */
-	Update = "Update",
-	/** Désactiver la suppression */
-	Disabled = "Disabled",
+	Update = "Update", //peut delete
+	Disabled = "Disabled", // désactivé
 	CallBack = "CallBack",
 	PostBack = "PostBack",
 

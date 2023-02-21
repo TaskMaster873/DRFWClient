@@ -58,22 +58,14 @@ export interface EventForShiftCreation {
  *
  */
 export interface EventForCalendar {
-  /** id unique dans le tableau d'horaire*/
-  readonly id: number;
-  /** le nom de l'event  */
-  text?: string;
-  /** heure de début */
-  start: DayPilot.date;
-  /** heure de fin */
-  end: DayPilot.date;
-  /** l'id de la personne qui l'a */
-  resource?: string;
-  /** couleur de la barre */
-  barColor?: string;
-  /** couleur de base */
-  backColor?: string;
-  /** l'id de l'employé pour mieux afficher */
-  employeeId?: string;
+    readonly id: number; //id unique dans le tableau d'horaire
+    text?: string; // le nom de l'event
+    start: DayPilot.date;//heure de début
+    end: DayPilot.date; //heure de fin
+    resource?: string;//l'id de la personne qui l'a
+    barColor?: string; // couleur de la barre
+    backColor?: string;
+    employeeId?: string;
 }
 
 export interface EventForCalendarList {
