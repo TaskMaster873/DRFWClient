@@ -55,7 +55,7 @@ export interface EventForShiftCreation {
  */
 export interface EventForCalendar {
     /** unique id in schedule board */
-    readonly id: number; 
+    readonly id: string; 
     /** what is written in the calendar */ 
     text?: string; 
     /** time where it start */

@@ -2,7 +2,7 @@ import React from "react";
 import {ComponentLoading} from "../components/ComponentLoading";
 import {ComponentScheduleCreate} from "../components/ComponentScheduleCreate";
 import {API} from "../api/APIManager";
-import {Shift} from "../types/Shift";
+import {EventForCalendar, EventForShiftCreation, Shift} from "../types/Shift";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {NotificationManager} from "react-notifications";
 import {errors} from "../messages/FormMessages";
@@ -19,6 +19,7 @@ enum ScheduleRecievedState {
 }
 
 interface CreateScheduleState {
+    currentDepartment: Department | null;
     departments: Department[];
     employees: Employee[];
     shifts: Shift[];
@@ -27,6 +28,7 @@ interface CreateScheduleState {
 
 export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
     public state: CreateScheduleState = {
+        currentDepartment: null,
         departments: [],
         employees: [],
         shifts: [],
@@ -73,6 +75,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         else {
             console.log("employees there", fetchedEmployees)
             this.setState({
+                currentDepartment: currentDepartment,
                 departments: departments || this.state.departments,
                 employees: fetchedEmployees,
                 shifts: fetchedShifts,
@@ -80,6 +83,29 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
             });
         }
     };
+
+    readonly #addShift = async (shiftEvent:EventForShiftCreation) => {
+        let success = await API.createShift({
+			employeeId: shiftEvent.employeeId,
+			start: shiftEvent.start,
+			end: shiftEvent.end,
+			department: this.state.currentDepartment ? this.state.currentDepartment.name : "",
+			projectName: ""
+		});
+    }
+
+    private getEventsForCalendarFromShifts(shifts: Shift[]): EventForCalendar[] {
+        let events: EventForCalendar[] = []
+        for(let shift of shifts){
+            events.push({
+                id: "",
+                start: shift.start,
+                end: shift.end,
+                resource: shift.employeeId
+            })
+        }
+        return events;
+    }
 
 
     public render(): JSX.Element {
@@ -92,14 +118,14 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
                     return (
                         <Container>
                             <SelectDepartment departments={this.state.departments} changeDepartment={this.#changeDepartment} />
-                            <ComponentScheduleCreate shifts={this.state.shifts} employees={this.state.employees} />
+                            <ComponentScheduleCreate events={this.getEventsForCalendarFromShifts(this.state.shifts)} employees={this.state.employees} addShift={this.#addShift}/>
                         </Container>
                     );
                 } else {
-                    return <ComponentScheduleCreate shifts={this.state.shifts} employees={this.state.employees} />;
+                    return <ComponentScheduleCreate events={this.getEventsForCalendarFromShifts(this.state.shifts)} employees={this.state.employees} addShift={this.#addShift}/>;
                 }
             default:
-                return <ComponentScheduleCreate shifts={[]} employees={[]} />;
+                return <ComponentScheduleCreate events={[]} employees={[]} addShift={this.#addShift}/>;
         }
     }
 }

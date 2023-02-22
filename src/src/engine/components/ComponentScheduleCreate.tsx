@@ -3,18 +3,16 @@ import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
 import {EventForCalendar, EventForShiftCreation, Shift} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 import {CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, HeightSpecType, ViewType} from "../types/StatesForDaypilot";
-import {API} from "../api/APIManager";
 import {Employee} from "../types/Employee";
 
 type ComponentScheduleCreateProps = {
-	shifts: Shift[];
+	events: EventForCalendar[];
 	employees: Employee[];
+	addShift: (shift: Shift) => {};
 };
 
 export class ComponentScheduleCreate extends React.Component<ComponentScheduleCreateProps, CalendarAttributesForEmployeeShiftCreationComponent> {
-	private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
 	public state: CalendarAttributesForEmployeeShiftCreationComponent = {
-		events: [],
 		isShowingModal: false,
 		start: "2023-02-17T00:00:00",
 		end: "2023-02-18T00:00:00",
@@ -23,7 +21,6 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 
 	constructor(props: ComponentScheduleCreateProps) {
 		super(props);
-		console.log("employees", props.employees)
 	}
 
 	/**
@@ -34,26 +31,16 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	 * @memberof ComponentScheduleCreate
 	 */
 	readonly #shiftAdd = async (event: EventForShiftCreation): Promise<void> => {
-		const listEvent = this.state.events;
-		listEvent.push({
-			id: 1,
-			text: event.start.toString("dd MMMM yyyy ", "fr-fr") + " " + event.start.toString("hh") + "h" + event.start.toString("mm") + "-" + event.end.toString("hh") + "h" + event.end.toString("mm"),
-			start: event.start,
-			end: event.end,
-		});
-
-		console.log("You have reached CreateShift", event.start);
-
-		let success = await API.createShift({
+		let success = await this.props.addShift({
 			employeeId: event.employeeId,
 			start: event.start.toString("yyyy-MM-ddTHH:mm:ss"),
 			end: event.end.toString("yyyy-MM-ddTHH:mm:ss"),
 			department: "",
 			projectName: ""
 		});
+
 		this.setState({
 			isShowingModal: false,
-			events: listEvent
 		});
 	};
 
@@ -70,6 +57,7 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	}
 
 	public render(): JSX.Element {
+		console.log("IM UP TO DATE", this.props);
 		return (
 			//<ResourceGroups groups={this.loadGroups().groups} /*onChange={this.onChange}*/ onChange={undefined} /*onChange={this.onChange}*/ />
 			<div>
@@ -82,11 +70,10 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 					onTimeRangeSelected={this.#onTimeRangeSelected}
 					startDate={DayPilot.Date.today()}
 					columns={this.getEmployeeColumns()}
-					events={this.getShiftEvents()}
+					events={this.props.events}
 					heightSpec={HeightSpecType.Full}
 					viewType={ViewType.Resources}
 					eventDeleteHandling={EventDeleteHandlingType.Update}
-					ref={this.calendarRef}
 				/>
 				{this.showScheduleCreationModal()}
 			</div>
@@ -110,31 +97,8 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 				});
 			}
 		}
+		console.log("MY COLUMNS", listToReturn);
 		return listToReturn;
-	}
-
-	/**
-	 * Called when the user selects a time range in the calendar
-	 * @private
-	 * @memberof ComponentScheduleCreate
-	 * @returns {void} The list of employee names formatted for DayPilotCalendar columns
-	 * @param args {TimeRangeSelectedParams}
-	 * @returns {void}
-	 */
-	private getShiftEvents(): EventForCalendar[] {
-		let list : EventForCalendar[] = [];
-
-		if (this.props.shifts.length > 0) {
-			for (let shift of this.props.shifts) {
-				list.push({
-					id: 1,
-					start: shift.start,//heure de début
-					end: shift.end, //heure de fin
-					resource: shift.employeeId,
-				});
-			}
-		}
-		return list;
 	}
 
 	// TODO type this arg

@@ -37,7 +37,7 @@ export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	/** the columns */
 	//columns: ColumnsType[]; 
 	/** the shifts */
-	events: EventForCalendar[]; 
+	//events: EventForCalendar[]; 
 	/** height */
 	heightSpec?: HeightSpecType;
 	/** hardcoded height, so not important */
