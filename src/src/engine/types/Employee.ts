@@ -107,6 +107,8 @@ export interface EditEmployeeProps {
     departments: Department[];
     roles: string[];
     jobTitles: string[];
+    employeeId?: string | null;
+    editedEmployee: EmployeeEditDTO | undefined;
     onEditEmployee: (employeeId: string, employee: EmployeeEditDTO) => PromiseLike<void> | Promise<void> | void;
 
 }
@@ -118,4 +120,5 @@ export interface AddEmployeeState {
     departments: Department[];
     roles: EmployeeRoleList;
     titles: EmployeeJobTitleList;
+    editedEmployee?: EmployeeEditDTO;
 }

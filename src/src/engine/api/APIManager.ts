@@ -186,6 +186,8 @@ class APIManager extends Logger {
         return this.#user?.displayName || this.#user?.email || "Anonyme";
     }
 
+
+
     private async onEvent(): Promise<void> {
         for (let subscriber of this.subscribers) {
             await subscriber();
@@ -629,6 +631,29 @@ class APIManager extends Logger {
         return errorMessage ?? employees;
     }
 
+    public async getEmployeeById(employeeId: string): Promise<EmployeeEditDTO | string> {
+        let errorMessage: string | null = null;
+
+        let snap = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        })
+
+        if (snap && snap.exists()) {
+            return <EmployeeEditDTO>{
+                firstName: snap.data().firstName,
+                lastName: snap.data().lastName,
+                department: snap.data().department,
+                phoneNumber: snap.data().phoneNumber,
+                jobTitles: snap.data().jobTitles,
+                skills: snap.data().skills,
+                role: snap.data().role
+            };
+        } else {
+            errorMessage = errors.EMPLOYEE_NOT_FOUND
+        }
+        return errorMessage;
+    }
+
     public async getDepartments(): Promise<Department[]> {
         let errorMessage: string | null = null;
         let departments: Department[] = [];
@@ -881,6 +906,7 @@ class APIManager extends Logger {
         if (success) isCreated = true;
         return isCreated;
     }
+
 
 
 }

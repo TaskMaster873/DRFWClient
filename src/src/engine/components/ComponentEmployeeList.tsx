@@ -1,5 +1,5 @@
-import React, {CSSProperties} from "react";
-import {Button, Col, Modal, Row, Table} from "react-bootstrap";
+import React from "react";
+import {Button, Col, Row, Table} from "react-bootstrap";
 import {Employee, EmployeeListProps, EmployeeListState, employeeTableHeads, adminTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
@@ -9,7 +9,7 @@ import {BiEdit} from "react-icons/bi"
 import {Roles} from "../types/Roles";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {SearchParams} from "../types/SearchParams";
-import {Link} from "react-router-dom";
+import {RoutesPath} from "../RoutesPath";
 
 /**
  * Component that display the list of employees of a department
@@ -170,7 +170,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
             if (!employee.isActive) {
                 component = <CgCheckO/>
             }
-            return <td key={`action ${index}`}><LinkContainer to="/edit-employee"
+            return <td key={`action ${index}`}><LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.employeeId}`}
                                                               className="adminActions mx-1"><BiEdit/></LinkContainer>
                 <a className="adminActions ms-1 mx-1"
                    onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a></td>

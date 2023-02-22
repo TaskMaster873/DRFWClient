@@ -3,12 +3,12 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { errors, FormErrorType } from "../messages/FormMessages";
-import { Container } from "react-bootstrap";
+import {errors, FormErrorType} from "../messages/FormMessages";
+import {Container} from "react-bootstrap";
 import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
+import {Department} from "../types/Department";
 
 interface ComponentEditEmployeeState {
-    employeeId: string;
     firstName: string;
     lastName: string;
     phoneNumber: string;
@@ -30,15 +30,14 @@ interface ComponentEditEmployeeState {
  */
 export class ComponentEditEmployee extends React.Component<EditEmployeeProps, ComponentEditEmployeeState> {
     public state: ComponentEditEmployeeState = {
-        employeeId: "",
-        firstName: "",
-        lastName: "",
-        phoneNumber: "",
-        department: "",
-        jobTitles: [],
-        skills: [],
+        firstName: this.props.editedEmployee?.firstName || "",
+        lastName: this.props.editedEmployee?.lastName || "",
+        phoneNumber: this.props.editedEmployee?.phoneNumber || "",
+        department: this.props.editedEmployee?.department || "",
+        jobTitles: this.props.editedEmployee?.jobTitles || [],
+        skills: this.props.editedEmployee?.skills || [],
+        role: this.props.editedEmployee?.role || 0,
         validated: false,
-        role: 0,
         error: FormErrorType.NO_ERROR,
     };
 
@@ -46,20 +45,11 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
 
     constructor(props: EditEmployeeProps) {
         super(props);
-
         this.props = props;
     }
 
-    public componentDidUpdate(prevProps: EditEmployeeProps) : void {
-        if (prevProps.departments !== this.props.departments && this.props.departments.length > 0) {
-            this.setState({
-                department: this.props.departments[0].name
-            });
-        }
-    }
-
     public render(): JSX.Element {
-        return (<Container>
+        return <Container>
             <Form
                 noValidate
                 validated={this.state.validated}
@@ -72,10 +62,12 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     <Form.Group as={Col} md="4">
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control
+                            name="firstName"
                             id="firstName"
                             required
                             type="text"
                             placeholder="Prénom"
+                            defaultValue={this.props.editedEmployee?.firstName}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.REQUIRED_FIRSTNAME}
@@ -84,10 +76,12 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     <Form.Group as={Col} md="4">
                         <Form.Label>Nom</Form.Label>
                         <Form.Control
+                            name="lastName"
                             id="lastName"
                             required
                             type="text"
                             placeholder="Nom"
+                            defaultValue={this.props.editedEmployee?.lastName}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.REQUIRED_NAME}
@@ -96,11 +90,13 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     <Form.Group as={Col} md="4">
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
+                            name="phoneNumber"
                             id="phoneNumber"
                             required
                             type="tel"
                             pattern="^(\+?1 ?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$"
-                            placeholder="000-000-0000"
+                            placeholder="(000) 000-0000"
+                            defaultValue={this.props.editedEmployee?.phoneNumber}
                         />
                         <Form.Control.Feedback type="invalid">
                             {errors.INVALID_PHONE_NUMBER}
@@ -110,10 +106,9 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 <Row className="mb-3">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Département</Form.Label>
-                        <Form.Select required id="department" value={this.state.department}
-                                     onChange={this.#handleSelect}>
-                            {this.props.departments.map((department, index) => (
-                                <option key={`${index}`} value={`${department.name}`}>{`${department.name}`}</option>))}
+                        <Form.Select required name="department" id="department" value={this.props.editedEmployee?.department} onChange={this.#handleSelect}>
+                            {this.props.departments.map((department: Department, index: number) =>
+                                <option key={index} value={department.name}>{department.name}</option>)}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
                             {errors.REQUIRED_DEPARTMENT_NAME}
@@ -121,19 +116,22 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
-                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) => (<Form.Check
-                            key={`${corps}`}
+                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) => <Form.Check
+                            name={corps}
+                            key={corps}
                             type="checkbox"
-                            id={`${corps}`}
+                            id={corps}
                             className="jobTitles"
                             label={`${corps}`}
-                        />)) : <p className="mt-1 noneJobTitle">Aucun corps d'emplois</p>}
+                            value={this.props.editedEmployee?.jobTitles}
+                        />) : <p className="mt-1 noneJobTitle">Aucun corps d'emplois</p>}
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required id="role" value={this.state.role} onChange={this.#handleSelect}>
-                            {this.props.roles.map((role, index) => (
-                                <option key={`${index}`} value={`${index}`}>{`${role}`}</option>))}
+                        <Form.Select required name="role" id="role" value={this.state.role} onChange={this.#handleSelect}
+                                     defaultValue={this.props.editedEmployee?.role}>
+                            {this.props.roles.map((role: string, index: number) => <option key={index}
+                                                                           value={index}>{role}</option>)}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
                             {errors.REQUIRED_ROLE}
@@ -153,7 +151,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Button>
                 </div>
             </Form>
-        </Container>);
+        </Container>;
     }
 
     /**
@@ -175,6 +173,11 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         event.preventDefault();
         event.stopPropagation();
 
+        let eventTarget: any = event.target;
+        const formData = new FormData(eventTarget),
+        formDataObj = Object.fromEntries(formData.entries())
+        console.log(formDataObj)
+
         let errorType = FormErrorType.NO_ERROR;
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
@@ -182,7 +185,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         this.setState({
             validated: true, error: errorType,
         });
-        if (errorType === FormErrorType.NO_ERROR) {
+        if (errorType === FormErrorType.NO_ERROR && this.props.employeeId) {
             let employee: EmployeeEditDTO = {
                 firstName: this.state.firstName,
                 lastName: this.state.lastName,
@@ -192,7 +195,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 skills: this.state.skills, // @ts-ignore
                 role: parseInt(this.state.role)
             }
-            this.props.onEditEmployee(this.state.employeeId, employee);
+            this.props.onEditEmployee(this.props.employeeId, employee);
         }
     }
 
@@ -218,15 +221,20 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
             throw new Error("Id is undefined for element in form.");
         }
 
-        this.setState({...this.state, ...{
+        this.setState({
+            ...this.state, ...{
                 [name]: value,
-            }});
+            }
+        });
     }
 
-    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
+    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
         const target = event.target;
-        this.setState({...this.state, ...{
+        this.setState({
+            ...this.state, ...{
                 [target.id]: target.value
-            }});
+            }
+        });
+        console.log(this.state);
     }
 }

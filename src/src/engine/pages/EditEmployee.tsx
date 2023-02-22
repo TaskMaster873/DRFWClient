@@ -2,21 +2,29 @@ import React from "react";
 import {API} from "../api/APIManager";
 import {
     AddEmployeeState,
-    EmployeeCreateDTO,
     EmployeeEditDTO,
-    EmployeeJobTitleList,
+    EmployeeJobTitleList, EmployeeProps,
     EmployeeRoleList
 } from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from 'react-notifications';
 import {Department} from "../types/Department";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
+import {Params, useParams} from "react-router-dom";
 
-export class EditEmployee extends React.Component<unknown, AddEmployeeState> {
+export function EditEmployeeWrapper(): JSX.Element {
+    let parameters: Readonly<Params<string>> = useParams();
+    return (
+        <EditEmployeeInternal  {...{params: parameters}}/>
+    );
+}
+
+export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmployeeState> {
     public state: AddEmployeeState = {
         departments: [],
         roles: [],
-        titles: []
+        titles: [],
+        editedEmployee: undefined
     }
 
     public async componentDidMount() : Promise<void> {
@@ -26,17 +34,24 @@ export class EditEmployee extends React.Component<unknown, AddEmployeeState> {
         let departments = API.getDepartments();
         let roles = API.getRoles();
         let titles = API.getJobTitles();
+        let editedEmployee;
+        if(this.props.params.id) {
+            editedEmployee = API.getEmployeeById(this.props.params.id);
+        } else {
+            NotificationManager.error(errors.INVALID_EMPLOYEE_ID_PARAMETER, errors.ERROR_GENERIC_MESSAGE);
+        }
 
         let params: [
             Department[],
             EmployeeRoleList | string,
-            EmployeeJobTitleList | string
-        ] = await Promise.all([departments, roles, titles]);
+            EmployeeJobTitleList | string,
+            EmployeeEditDTO | string | undefined
+        ] = await Promise.all([departments, roles, titles, editedEmployee]);
 
-        if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2])) {
-            this.setState({departments: params[0], roles: params[1], titles: params[2]});
+        if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && params[3] && typeof(params[3]) !== "string") {
+            this.setState({departments: params[0], roles: params[1], titles: params[2], editedEmployee: params[3]});
         } else {
-            console.error(errors.GET_DEPARTMENTS);
+            console.error(errors.GET_EDIT_EMPLOYEES);
         }
     }
 
@@ -60,6 +75,8 @@ export class EditEmployee extends React.Component<unknown, AddEmployeeState> {
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
+                editedEmployee={this.state.editedEmployee}
+                employeeId={this.props.params.id}
                 onEditEmployee={this.#editEmployee}
             />
         );
