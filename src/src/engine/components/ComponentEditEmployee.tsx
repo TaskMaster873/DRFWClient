@@ -9,13 +9,6 @@ import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 
 interface ComponentEditEmployeeState {
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    department: string;
-    jobTitles: string[];
-    skills: string[];
-    role: number;
     validated?: boolean;
     error: FormErrorType;
 }
@@ -30,13 +23,6 @@ interface ComponentEditEmployeeState {
  */
 export class ComponentEditEmployee extends React.Component<EditEmployeeProps, ComponentEditEmployeeState> {
     public state: ComponentEditEmployeeState = {
-        firstName: this.props.editedEmployee?.firstName || "",
-        lastName: this.props.editedEmployee?.lastName || "",
-        phoneNumber: this.props.editedEmployee?.phoneNumber || "",
-        department: this.props.editedEmployee?.department || "",
-        jobTitles: this.props.editedEmployee?.jobTitles || [],
-        skills: this.props.editedEmployee?.skills || [],
-        role: this.props.editedEmployee?.role || 0,
         validated: false,
         error: FormErrorType.NO_ERROR,
     };
@@ -128,7 +114,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required name="role" id="role" value={this.state.role} onChange={this.#handleSelect}
+                        <Form.Select required name="role" id="role" value={this.props.editedEmployee?.role} onChange={this.#handleSelect}
                                      defaultValue={this.props.editedEmployee?.role}>
                             {this.props.roles.map((role: string, index: number) => <option key={index}
                                                                            value={index}>{role}</option>)}
@@ -174,8 +160,8 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         event.stopPropagation();
 
         let eventTarget: any = event.target;
-        const formData = new FormData(eventTarget),
-        formDataObj = Object.fromEntries(formData.entries())
+        let formData = new FormData(eventTarget);
+        let formDataObj: EmployeeEditDTO = Object.fromEntries(formData.entries()) as unknown as EmployeeEditDTO;
         console.log(formDataObj)
 
         let errorType = FormErrorType.NO_ERROR;
@@ -183,17 +169,18 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
             errorType = FormErrorType.INVALID_FORM;
         }
         this.setState({
-            validated: true, error: errorType,
+            validated: true,
+            error: errorType
         });
         if (errorType === FormErrorType.NO_ERROR && this.props.employeeId) {
             let employee: EmployeeEditDTO = {
-                firstName: this.state.firstName,
-                lastName: this.state.lastName,
-                phoneNumber: this.state.phoneNumber,
-                department: this.state.department,
-                jobTitles: this.state.jobTitles,
-                skills: this.state.skills, // @ts-ignore
-                role: parseInt(this.state.role)
+                firstName: formDataObj.firstName,
+                lastName: formDataObj.lastName,
+                phoneNumber: formDataObj.phoneNumber,
+                department: formDataObj.department,
+                jobTitles: formDataObj.jobTitles ?? [],
+                skills: formDataObj.skills ?? [], // @ts-ignore
+                role: parseInt(formDataObj.role)
             }
             this.props.onEditEmployee(this.props.employeeId, employee);
         }
