@@ -5,14 +5,10 @@ import React, { Component } from 'react';
 import { colorRGB } from '../messages/ColorForAvailability'
 import { DayPilot, DayPilotCalendar, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
 import "../../deps/css/navigator_default.css";
+import {EmployeeAvailabilities} from '../types/EmployeeAvailabilities';
 
 interface ComponentAvailabilitiesProps {
-    events: {
-        id: number,
-        text: string,
-        start: DayPilot.Date,
-        end: DayPilot.Date
-    }
+    employeeAvailabilities: EmployeeAvailabilities,
 }
 
 interface ComponentAvailabilitiesState {
@@ -46,7 +42,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
      * @param args Contains the date selected by the user
      * @returns void
      */
-    private onTimeRangeSelectedNavigator = (args: DayPilotArgumentTimeRange) => {
+    #onTimeRangeSelectedNavigator = (args: DayPilotArgumentTimeRange): void => {
         this.calendar.update({
             startDate: args.day,
         });
@@ -62,7 +58,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         skipMonths={3}
                         startDate={"2023-03-07"}
                         selectionDay={"2023-03-07"}
-                        onTimeRangeSelected={this.onTimeRangeSelectedNavigator}
+                        onTimeRangeSelected={this.#onTimeRangeSelectedNavigator}
                         ref={this.datePickerRef}
                     />
                 </div>
@@ -75,7 +71,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         viewType= {"Week"}
                         businessBeginsHour= {0}
                         businessEndsHour= {24}
-                        onTimeRangeSelected= {this.onTimeRangeSelectedCalendar}
+                        onTimeRangeSelected= {this.#onTimeRangeSelectedCalendar}
                         eventDeleteHandling= {"Update"}
                         allowEventOverlap= {false}
                         durationBarVisible= {true}
@@ -91,68 +87,14 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         // TODO changer ce que la méthode fait
 
         const dp = this.calendar;
-        const form = [
-            {
-                type: 'searchable',
-                id: 'searchable1',
-                name: 'Searchable 1',
-                options: [
-                    {
-                        name: 'Rouge',
-                        id: 'rouge',
-                    },
-                    {
-                        name: 'Vert',
-                        id: 'vert',
-                    },
-                    {
-                        name: 'Bleu',
-                        id: 'bleu',
-                    },
-                    {
-                        name: 'Mauve',
-                        id: 'mauve',
-                    },
-                    {
-                        name: 'Jaune',
-                        id: 'jaune',
-                    },
-                    {
-                        name: 'Orange',
-                        id: 'orange',
-                    },
-                ],
-            },
-        ];
 
         const data = {};
 
-        const modal = await DayPilot.Modal.form(form, data);
-        console.log(modal.result.searchable1);
-
-        if (!modal.result) {
-            return;
-        }
-
-        let rgb = this.colorRGBHandling(modal.result.searchable1);
 
         const e = args.e;
-        e.data.backColor = rgb;
         dp.events.update(e);
     };
 
-    /**
-     * 
-     * @param colorInRGB = à une string en non rgb
-     * @returns une string qui est la valeur rgb de la couleur choisie
-     */
-    private colorRGBHandling(colorInRGB: string): string {
-        if (colorInRGB.startsWith("r")) {
-            console.log("okokdfok")
-            return colorRGB.redRGB;
-        }
-        return "";
-    }
     get calendar() {
         return this.calendarRef.current.control;
     }
@@ -200,7 +142,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.datePicker.update({ events: events });
     }
 
-    private onTimeRangeSelectedCalendar = (args: DayPilotArgumentTimeRange): void => {
+    #onTimeRangeSelectedCalendar = (args: DayPilotArgumentTimeRange): void => {
         let event = this.calendar.events.list;
         console.log("les events", event);
 
@@ -218,12 +160,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.calendar.update();
 
         console.log("yo, tu es call");
-
-        this.changeColorToGray(args);
-    }
-
-    private changeColorToGray = (args: DayPilotArgumentTimeRange): void => {
-
     }
 }
 
