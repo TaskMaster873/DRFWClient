@@ -776,7 +776,7 @@ class APIManager extends Logger {
      * @returns Timestamp firebase
      */
     private getFirebaseTimestamp(daypilotString: string): Timestamp {
-        return new Timestamp(new Date(daypilotString).getTime() / 1000, 0);
+        return new Timestamp(Date.parse(daypilotString) / 1000, 0);
     }
 
     /**
@@ -830,35 +830,28 @@ class APIManager extends Logger {
      * @param shift est un shift avec toutes les données pour le créer
      * @returns un booléen pour savoir si il est créé
      */
-    public async createShift(shift: Shift): Promise<boolean> {
-        let isCreated: boolean = false;
+    public async createShift(shift: Shift): Promise<void | string> {
         //Check if user has permission
         if (!this.hasPermission(2)) {
             //Gestionnaire
-            return false;
+            return errors.PERMISSION_DENIED;
         }
-        //Get Employee Name and department
-        console.log("CreateShift", shift);
-        let queryEmployee = doc(this.#db, `employees`, shift.employeeId);
-
-        let snaps = await getDoc(queryEmployee).catch((error) => {
-            this.getErrorMessageFromCode(error);
-        });
-        if (snaps) {
-            let data = snaps.data();
-            if (data) {
-                shift.department = data.department;
-            }
-        }
-        shift.projectName = "testing";
+        let errorMessage : string | null = null;
+        console.log(shift)
         //Create Shift
-        let success = await addDoc(collection(this.#db, `shifts`), {
-            ...shift,
+        await addDoc(collection(this.#db, `shifts`), {
+            ...{
+                department: shift.department,
+                employeeId: shift.employeeId,
+                end: this.getFirebaseTimestamp(shift.end),
+                projectName: shift.projectName,
+                start: this.getFirebaseTimestamp(shift.start)
+            },
         }).catch((error) => {
-            this.getErrorMessageFromCode(error);
+            errorMessage = this.getErrorMessageFromCode(error);
         });
-        if (success) isCreated = true;
-        return isCreated;
+        if(errorMessage) return errorMessage;
+        return;
     }
 }
 

@@ -97,7 +97,7 @@ service cloud.firestore {
                 let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'projectName', 'start']);
 
                 return createdValidShift && hasFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
 
             match /projects/{projectId} {
