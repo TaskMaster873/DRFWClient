@@ -60,7 +60,7 @@ export class Engine extends React.Component<unknown, EngineState> {
                         <NavigationBar/>
                         <NotificationContainer/>
                         <Routes>
-                            <Route path={RoutesPath.INDEX} element={<Index/>}/>
+                            <Route path={RoutesPath.INDEX} element={<Index />}/>
                             <Route path={RoutesPath.SCHEDULE} element={API.isAuth() ? <ScheduleEmployee/> : <Navigate to={RoutesPath.INDEX}/>}/>
                             <Route path={RoutesPath.CREATE_SCHEDULE} element={API.hasPermission(Roles.ADMIN) ? <CreateSchedule/> : <Navigate to={RoutesPath.INDEX}/>}/>
                             <Route path={RoutesPath.DEPARTMENTS} element={<Departments/>}/>
