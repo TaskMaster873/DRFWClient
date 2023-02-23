@@ -43,9 +43,8 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 onSubmit={this.#handleSubmit}
                 data-error={this.state.error}
             >
-                <Row className="mb-3 mt-3">
-
-                    <Form.Group as={Col} md="4">
+                <Row className="mb-4 mt-5">
+                    <Form.Group as={Col} md="3">
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control
                             name="firstName"
@@ -59,7 +58,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.REQUIRED_FIRSTNAME}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} md="4">
+                    <Form.Group as={Col} md="3">
                         <Form.Label>Nom</Form.Label>
                         <Form.Control
                             name="lastName"
@@ -73,7 +72,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.REQUIRED_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} md="4">
+                    <Form.Group as={Col} md="3">
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
                             name="phoneNumber"
@@ -88,9 +87,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.INVALID_PHONE_NUMBER}
                         </Form.Control.Feedback>
                     </Form.Group>
-                </Row>
-                <Row className="mb-3">
-                    <Form.Group as={Col} md="4">
+                    <Form.Group as={Col} md="3">
                         <Form.Label>Département</Form.Label>
                         <Form.Select required name="department" id="department" defaultValue={this.props.editedEmployee?.department}>
                             {this.props.departments.map((department: Department, index: number) =>
@@ -100,6 +97,8 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.REQUIRED_DEPARTMENT_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
+                </Row>
+                <Row className="mb-5">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
                         {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) =>
@@ -142,7 +141,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
-                <div className="d-flex justify-content-center">
+                <div className="d-flex justify-content-center mt-5">
                     <Button
                         onClick={() => history.back()}
                         className="mb-3 me-4 btn-lg"

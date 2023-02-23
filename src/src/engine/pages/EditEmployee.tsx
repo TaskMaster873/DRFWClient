@@ -49,7 +49,6 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
             EmployeeSkillList | string,
             EmployeeEditDTO | string | undefined
         ] = await Promise.all([departments, roles, titles, skills, editedEmployee]);
-        console.log(skills);
 
         if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray(params[3]) && params[4] && typeof(params[4]) !== "string") {
             this.setState({departments: params[0], roles: params[1], titles: params[2], skills: params[3], editedEmployee: params[4]});
