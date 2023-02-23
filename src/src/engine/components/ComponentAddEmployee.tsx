@@ -64,8 +64,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 onChange={this.#handleChange}
                 data-error={this.state.error}
             >
-                <Row className="mb-3 mt-3">
-
+                <Row className="mb-4 mt-5">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control
@@ -106,7 +105,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     </Form.Group>
 
                 </Row>
-                <Row className="mb-3">
+                <Row className="mb-4">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
@@ -146,7 +145,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
-                <Row className="mb-3">
+                <Row className="mb-4">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
                         {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) =>
@@ -185,7 +184,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
-                <div className="d-flex justify-content-center">
+                <div className="d-flex justify-content-center mt-5">
                     <Button
                         onClick={() => history.back()}
                         className="mb-3 me-4 btn-lg"
@@ -253,20 +252,30 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         const target = event.target;
         let name: string = target.id;
 
-        let value;
         if (target.type === "checkbox") {
-            value = target.checked;
+            if(target.checked) {
+                let array = this.state[name];
+                array.push(target.value);
+                this.setState({...this.state, ...{
+                        [name]: array,
+                    }})
+            }
+            this.setState({...this.state, ...{
+                    [name]: target.value,
+                }});
         } else {
-            value = target.value;
+            if (!name) {
+                throw new Error("Id is undefined for element in form.");
+            }
+            this.setState({...this.state, ...{
+                    [name]: target.value,
+            }});
         }
 
-        if (!name) {
-            throw new Error("Id is undefined for element in form.");
-        }
 
-        this.setState({...this.state, ...{
-            [name]: value,
-        }});
+
+
+        console.log(this.state);
     }
 
     readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
