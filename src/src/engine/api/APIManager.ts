@@ -51,16 +51,13 @@ type SubscriberCallback = () =>
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
-    // @ts-ignore
-    #app: FirebaseApp;
-    // @ts-ignore
-    #analytics: Analytics;
-    // @ts-ignore
-    #auth: FirebaseAuth.Auth;
-    // @ts-ignore
-    #performance: FirebasePerformance;
-    // @ts-ignore
-    #db: Firestore;
+
+    #app!: FirebaseApp;
+    #analytics!: Analytics;
+    #auth!: FirebaseAuth.Auth;
+    #performance!: FirebasePerformance;
+    #db!: Firestore;
+
     #user: FirebaseAuth.User | null = null;
     #userRole: number = 0;
 

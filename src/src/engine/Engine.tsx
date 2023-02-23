@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import "../deps/css/Engine.css";
 import "../deps/css/index.css";
 
 import { Index } from "./pages";
