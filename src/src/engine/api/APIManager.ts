@@ -204,6 +204,10 @@ class APIManager extends Logger {
         return this.#userRole >= permissionLevel;
     }
 
+    public hasLowerPermission(permissionLevel: Roles): boolean {
+        return this.#userRole > permissionLevel;
+    }
+
     public getErrorMessageFromCode(error: Error | string): string {
         let errorMessage: string;
         let message: string;
@@ -637,15 +641,7 @@ class APIManager extends Logger {
         })
 
         if (snap && snap.exists()) {
-            return <EmployeeEditDTO>{
-                firstName: snap.data().firstName,
-                lastName: snap.data().lastName,
-                department: snap.data().department,
-                phoneNumber: snap.data().phoneNumber,
-                jobTitles: snap.data().jobTitles,
-                skills: snap.data().skills,
-                role: snap.data().role
-            };
+            return snap.data() as EmployeeEditDTO;
         } else {
             errorMessage = errors.EMPLOYEE_NOT_FOUND
         }
@@ -662,10 +658,7 @@ class APIManager extends Logger {
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 departments.push(
-                    new Department({
-                        name: doc.data().name,
-                        director: doc.data().director,
-                    })
+                    doc.data() as Department
                 );
             });
         }
@@ -814,8 +807,7 @@ class APIManager extends Logger {
 
     /**
      * Récupère l'horaire de la journée d'un département pour une journée
-     * @param startDay le début de la journée en string daypilot Ex: (2 février 2022 début de journée) = 2022-02-16T00:00:00
-     * @param endDay la fin de la journée en string daypilot Ex: (2 février 2022 fin de journée) = 2022-02-16T24:00:00
+     * @param day
      * @param department le nom du département que récupérer
      * @returns une liste de quarts de travail d'un département pour une journée
      */

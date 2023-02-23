@@ -7,6 +7,7 @@ import { errors, FormErrorType } from "../messages/FormMessages";
 import { Container } from "react-bootstrap";
 import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
 import {RegexUtil} from "../utils/RegexValidator";
+import {API} from "../api/APIManager";
 
 interface ComponentAddEmployeeState extends Employee {
     validated?: boolean;
@@ -159,8 +160,11 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="6">
                         <Form.Label>Rôle de l'employé</Form.Label>
                         <Form.Select required id="role" value={this.state.role} onChange={this.#handleSelect}>
-                            {this.props.roles.map((role, index) => (
-                                <option key={`${index}`} value={`${index}`}>{`${role}`}</option>))}
+                            {this.props.roles.map((role, index) => {
+                                if(API.hasLowerPermission(index)) {
+                                    return <option key={index} value={index}>{role}</option>
+                                }
+                            })}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
                             {errors.REQUIRED_ROLE}

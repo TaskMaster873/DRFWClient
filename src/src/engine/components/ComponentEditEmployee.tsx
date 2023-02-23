@@ -119,7 +119,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         <Form.Select required name="role" id="role" value={this.props.editedEmployee?.role} onChange={this.#handleSelect}
                                      defaultValue={this.props.editedEmployee?.role}>
                             {this.props.roles.map((role: string, index: number) => {
-                                if(API.hasPermission(parseInt(role))) {
+                                if(API.hasLowerPermission(index)) {
                                     return <option key={index} value={index}>{role}</option>
                                 }
                             }
