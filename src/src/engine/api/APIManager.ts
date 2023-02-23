@@ -186,8 +186,6 @@ class APIManager extends Logger {
         return this.#user?.displayName || this.#user?.email || "Anonyme";
     }
 
-
-
     private async onEvent(): Promise<void> {
         for (let subscriber of this.subscribers) {
             await subscriber();
@@ -202,7 +200,7 @@ class APIManager extends Logger {
         return this.isAuthenticated;
     }
 
-    public hasPermission(permissionLevel: number): boolean {
+    public hasPermission(permissionLevel: Roles): boolean {
         return this.#userRole >= permissionLevel;
     }
 
