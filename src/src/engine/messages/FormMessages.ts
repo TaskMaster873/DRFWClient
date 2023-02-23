@@ -26,6 +26,7 @@ export const errors = {
     GET_SHIFTS: "Une erreur s'est produite lors de la récupération des données d'horaire.",
     GET_DEPARTMENTS: "Une erreur s'est produite lors de la récupération des données des départements",
     GET_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données des employés",
+    CREATE_SHIFT: "Une erreur s'est produite lors de la création du quart de travail.",
 }
 
 export const successes = {

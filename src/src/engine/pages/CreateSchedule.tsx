@@ -8,8 +8,11 @@ import {Department} from "../types/Department";
 import {SelectDepartment} from "../components/SelectDepartment";
 import {Container} from "react-bootstrap";
 import {Employee} from "../types/Employee";
+import {NotificationManager} from 'react-notifications';
+import {errors} from "../messages/FormMessages";
 
-enum ScheduleRecievedState {
+
+enum FetchState {
     WAITING = 0,
     ERROR = 1,
     OK = 2,
@@ -20,7 +23,7 @@ interface CreateScheduleState {
     departments: Department[];
     employees: Employee[];
     shifts: Shift[];
-    fetchState: ScheduleRecievedState;
+    fetchState: FetchState;
 }
 
 export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
@@ -29,7 +32,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         departments: [],
         employees: [],
         shifts: [],
-        fetchState: ScheduleRecievedState.WAITING,
+        fetchState: FetchState.WAITING,
     };
 
     /**
@@ -46,32 +49,43 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
 
         let fetchedDepartments = await API.getDepartments();
         if (typeof fetchedDepartments === "string") {
-            this.setState({
-                fetchState: ScheduleRecievedState.ERROR
-            });
-            return;
+            NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments)
+            this.setState({fetchState: FetchState.ERROR});
         }
         else {
             await this.#changeDepartment(fetchedDepartments[0], fetchedDepartments);
         }
     }
 
+    /**
+     * Change employees, shifts to a new current department and refresh state down the function chain (Start of function chain)
+     * @param currentDepartment 
+     * @param departments 
+     */
     readonly #changeDepartment = async (currentDepartment: Department, departments?: Department[]): Promise<void> => {
         //Get all employees of this department
         let fetchedEmployees = await API.getEmployees(currentDepartment.name);
         if (typeof fetchedEmployees === "string") {
-            this.setState({fetchState: ScheduleRecievedState.ERROR});
+            NotificationManager.error(errors.GET_EMPLOYEES, fetchedEmployees)
+            this.setState({fetchState: FetchState.ERROR});
         }
         else {
             this.#getShifts(currentDepartment, departments, fetchedEmployees);
         }
     };
 
-    readonly #getShifts = async (currentDepartment: Department, departments?: Department[], employees?: Employee[]) => {
+    /**
+     * Fetch shifts and refresh state with all data (End of function chain)
+     * @param currentDepartment The department to fetch the shifts from
+     * @param departments OPTIONAL. The departments to set in state
+     * @param employees OPTIONAL. The employees to set in state
+     */
+    readonly #getShifts = async (currentDepartment: Department, departments?: Department[], employees?: Employee[]): Promise<void> => {
         //Get all daily shifts of this department
         let fetchedShifts = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), currentDepartment);
         if (typeof fetchedShifts === "string") {
-            this.setState({fetchState: ScheduleRecievedState.ERROR});
+            NotificationManager.error(errors.GET_SHIFTS, fetchedShifts)
+            this.setState({fetchState: FetchState.ERROR});
         }
         else {
             this.setState({
@@ -79,13 +93,19 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
                 departments: departments || this.state.departments,
                 employees: employees || this.state.employees,
                 shifts: fetchedShifts,
-                fetchState: ScheduleRecievedState.OK,
+                fetchState: FetchState.OK,
             });
         }
     };
 
-    readonly #addShift = async (shiftEvent: EventForShiftCreation) => {
+    
+    /**
+     * Adds a shift to the DB and refreshes the state (Halfway through the function chain)
+     * @param shiftEvent The shift to add
+     */
+    readonly #addShift = async (shiftEvent: EventForShiftCreation): Promise<void> => {
         let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
+        //Create Shift
         let success = await API.createShift({
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
@@ -93,11 +113,19 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
             department: this.state.currentDepartment ? this.state.currentDepartment.name : "",
             projectName: ""
         });
-        if (typeof success === "string") this.setState({fetchState: ScheduleRecievedState.ERROR});
+        if (typeof success === "string") {
+            NotificationManager.error(errors.CREATE_SHIFT, success)
+            this.setState({fetchState: FetchState.ERROR});
+        }
         //Refresh shifts
         else await this.#getShifts(currentDepartment, this.state.departments, this.state.employees);
     };
 
+    /**
+     * Converts the shift into events for the Daypilot calendar
+     * @param shifts the Shift objects to convert
+     * @returns the converted shifts
+     */
     private getEventsForCalendarFromShifts(shifts: Shift[]): EventForCalendar[] {
         let events: EventForCalendar[] = [];
         for (let shift of shifts) {
@@ -111,12 +139,11 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         return events;
     }
 
-
     public render(): JSX.Element {
         switch (this.state.fetchState) {
-            case ScheduleRecievedState.WAITING:
+            case FetchState.WAITING:
                 return <ComponentLoading />;
-            case ScheduleRecievedState.OK:
+            case FetchState.OK:
                 if (this.state.departments.length > 1) {
                     return (
                         <Container>
