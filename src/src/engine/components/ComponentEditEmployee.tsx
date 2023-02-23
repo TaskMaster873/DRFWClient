@@ -41,7 +41,6 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 noValidate
                 validated={this.state.validated}
                 onSubmit={this.#handleSubmit}
-                onChange={this.#handleChange}
                 data-error={this.state.error}
             >
                 <Row className="mb-3 mt-3">
@@ -93,7 +92,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 <Row className="mb-3">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Département</Form.Label>
-                        <Form.Select required name="department" id="department" value={this.props.editedEmployee?.department} onChange={this.#handleSelect}>
+                        <Form.Select required name="department" id="department" defaultValue={this.props.editedEmployee?.department}>
                             {this.props.departments.map((department: Department, index: number) =>
                                 <option key={index} value={department.name}>{department.name}</option>)}
                         </Form.Select>
@@ -110,13 +109,26 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             type="checkbox"
                             id={corps}
                             className="jobTitles"
-                            label={`${corps}`}
+                            label={corps}
                             value={this.props.editedEmployee?.jobTitles}
-                        />) : <p className="mt-1 noneJobTitle">Aucun corps d'emplois</p>}
+                        />) : <p className="mt-1 noneFormOptions">Aucun corps d'emplois</p>}
+                    </Form.Group>
+                    <Form.Group as={Col} md="4">
+                        <Form.Label>Compétences</Form.Label>
+                        {this.props.skills.length != 0 ? this.props.skills.map((skill) =>
+                            <Form.Check
+                                name={skill}
+                                key={skill}
+                                type="checkbox"
+                                id={skill}
+                                className="skills"
+                                label={skill}
+                                defaultValue={this.props.editedEmployee?.skills}
+                            />) : <p className="mt-1 noneFormOptions">Aucune compétences</p>}
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required name="role" id="role" value={this.props.editedEmployee?.role} onChange={this.#handleSelect}
+                        <Form.Select required name="role" id="role"
                                      defaultValue={this.props.editedEmployee?.role}>
                             {this.props.roles.map((role: string, index: number) => {
                                 if(API.hasLowerPermission(index)) {
@@ -168,6 +180,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         let eventTarget: any = event.target;
         let formData = new FormData(eventTarget);
         let formDataObj: EmployeeEditDTO = Object.fromEntries(formData.entries()) as unknown as EmployeeEditDTO;
+        console.log(formDataObj);
 
         let errorType = FormErrorType.NO_ERROR;
         if (!isValid) {
@@ -189,44 +202,5 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
             }
             this.props.onEditEmployee(this.props.employeeId, employee);
         }
-    }
-
-    /**
-     * Handle the change of a form element. Update the state with the new value.
-     * @param event The change event. Contains the new value of the form element.
-     * @returns {void}
-     * @memberof CreateEmployee
-     * @private
-     */
-    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
-        const target = event.target;
-        let name: string = target.id;
-
-        let value;
-        if (target.type === "checkbox") {
-            value = target.checked;
-        } else {
-            value = target.value;
-        }
-
-        if (!name) {
-            throw new Error("Id is undefined for element in form.");
-        }
-
-        this.setState({
-            ...this.state, ...{
-                [name]: value,
-            }
-        });
-    }
-
-    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
-        const target = event.target;
-        this.setState({
-            ...this.state, ...{
-                [target.id]: target.value
-            }
-        });
-        console.log(this.state);
     }
 }

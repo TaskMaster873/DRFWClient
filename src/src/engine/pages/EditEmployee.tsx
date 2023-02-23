@@ -4,7 +4,7 @@ import {
     AddEmployeeState,
     EmployeeEditDTO,
     EmployeeJobTitleList, EmployeeProps,
-    EmployeeRoleList
+    EmployeeRoleList, EmployeeSkillList
 } from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from 'react-notifications';
@@ -24,6 +24,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         departments: [],
         roles: [],
         titles: [],
+        skills: [],
         editedEmployee: undefined
     }
 
@@ -33,6 +34,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         let departments = API.getDepartments();
         let roles = API.getRoles();
         let titles = API.getJobTitles();
+        let skills = API.getSkills();
         let editedEmployee;
         if(this.props.params.id) {
             editedEmployee = API.getEmployeeById(this.props.params.id);
@@ -44,11 +46,13 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
             Department[],
             EmployeeRoleList | string,
             EmployeeJobTitleList | string,
+            EmployeeSkillList | string,
             EmployeeEditDTO | string | undefined
-        ] = await Promise.all([departments, roles, titles, editedEmployee]);
+        ] = await Promise.all([departments, roles, titles, skills, editedEmployee]);
+        console.log(skills);
 
-        if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && params[3] && typeof(params[3]) !== "string") {
-            this.setState({departments: params[0], roles: params[1], titles: params[2], editedEmployee: params[3]});
+        if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray(params[3]) && params[4] && typeof(params[4]) !== "string") {
+            this.setState({departments: params[0], roles: params[1], titles: params[2], skills: params[3], editedEmployee: params[4]});
         } else {
             console.error(errors.GET_EDIT_EMPLOYEES);
         }
@@ -74,6 +78,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
+                skills={this.state.skills}
                 editedEmployee={this.state.editedEmployee}
                 employeeId={this.props.params.id}
                 onEditEmployee={this.#editEmployee}

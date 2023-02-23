@@ -147,17 +147,31 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     </Form.Group>
                 </Row>
                 <Row className="mb-3">
-                    <Form.Group as={Col} md="6">
+                    <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
-                        {this.props.jobTitles.map((corps) => (<Form.Check
-                            key={`${corps}`}
-                            type="checkbox"
-                            id={`${corps}`}
-                            className="jobTitles"
-                            label={`${corps}`}
-                        />))}
+                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) =>
+                            <Form.Check
+                                name={corps}
+                                key={corps}
+                                type="checkbox"
+                                id={corps}
+                                className="jobTitles"
+                                label={corps}
+                            />) : <p className="mt-1 noneJobTitle">Aucun corps d'emplois</p>}
                     </Form.Group>
-                    <Form.Group as={Col} md="6">
+                    <Form.Group as={Col} md="4">
+                        <Form.Label>Compétences</Form.Label>
+                        {this.props.skills.length != 0 ? this.props.skills.map((skill) =>
+                            <Form.Check
+                                name={skill}
+                                key={skill}
+                                type="checkbox"
+                                id={skill}
+                                className="skills"
+                                label={skill}
+                            />) : <p className="mt-1 noneJobTitle">Aucune compétences</p>}
+                    </Form.Group>
+                    <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
                         <Form.Select required id="role" value={this.state.role} onChange={this.#handleSelect}>
                             {this.props.roles.map((role, index) => {

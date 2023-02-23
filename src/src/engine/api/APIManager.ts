@@ -739,8 +739,8 @@ class APIManager extends Logger {
     public async getJobTitles(): Promise<string[] | string> {
         let errorMessage: string | null = null;
         let jobTitles: string[] = [];
-        let queryDepartment = query(collection(this.#db, `jobTitles`));
-        let snaps = await getDocs(queryDepartment).catch((error) => {
+        let queryJobTitles = query(collection(this.#db, `jobTitles`));
+        let snaps = await getDocs(queryJobTitles).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
         if (snaps) {
@@ -749,6 +749,21 @@ class APIManager extends Logger {
             });
         }
         return errorMessage ?? jobTitles;
+    }
+
+    public async getSkills(): Promise<string[] | string> {
+        let errorMessage: string | null = null;
+        let skills: string[] = [];
+        let querySkills = query(collection(this.#db, `skills`));
+        let snaps = await getDocs(querySkills).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        });
+        if (snaps) {
+            snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
+                skills.push(doc.data().name);
+            });
+        }
+        return errorMessage ?? skills;
     }
 
     /**
@@ -896,9 +911,6 @@ class APIManager extends Logger {
         if (success) isCreated = true;
         return isCreated;
     }
-
-
-
 }
 
 export const API = new APIManager();

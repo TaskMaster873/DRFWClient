@@ -100,6 +100,7 @@ export interface AddEmployeeProps {
     departments: Department[];
     roles: string[];
     jobTitles: string[];
+    skills: string[];
     onAddEmployee: (password : string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
 }
 
@@ -108,6 +109,7 @@ export interface EditEmployeeProps {
     roles: string[];
     jobTitles: string[];
     employeeId?: string | null;
+    skills: string[];
     editedEmployee: EmployeeEditDTO | undefined;
     onEditEmployee: (employeeId: string, employee: EmployeeEditDTO) => PromiseLike<void> | Promise<void> | void;
 
@@ -115,10 +117,12 @@ export interface EditEmployeeProps {
 
 export type EmployeeRoleList = string[];
 export type EmployeeJobTitleList = string[];
+export type EmployeeSkillList = string[];
 
 export interface AddEmployeeState {
     departments: Department[];
     roles: EmployeeRoleList;
     titles: EmployeeJobTitleList;
+    skills: EmployeeSkillList;
     editedEmployee?: EmployeeEditDTO;
 }
