@@ -9,10 +9,6 @@ import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
 
-const override: CSSProperties = {
-
-};
-
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
     public render(): JSX.Element {
         return (
