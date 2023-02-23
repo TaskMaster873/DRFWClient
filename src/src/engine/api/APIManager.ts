@@ -731,7 +731,9 @@ class APIManager extends Logger {
      * @returns string daypilot Ex: (February 2, 2022 at 3:15 AM) = 2022-02-16T03:15:00
      */
     private getDayPilotDateString(date: Timestamp): string {
-        return new Date(date.seconds * 1000).toISOString().slice(0, -5);
+        //Take UTC timestamp, remove timezone offset, convert to ISO format
+        let myDate = new Date((date.seconds - new Date().getTimezoneOffset() * 60) * 1000).toISOString();
+        return myDate.slice(0, -5);
     }
 
     public async getCurrentEmployeeSchedule(): Promise<Shift[] | string> {
