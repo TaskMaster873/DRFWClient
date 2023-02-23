@@ -58,7 +58,6 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 
 	public render(): JSX.Element {
 		return (
-			//<ResourceGroups groups={this.loadGroups().groups} /*onChange={this.onChange}*/ onChange={undefined} /*onChange={this.onChange}*/ />
 			<div>
 				<DayPilotCalendar
 					businessBeginsHour={8}
