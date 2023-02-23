@@ -865,19 +865,18 @@ class APIManager extends Logger {
         }
         let errorMessage : string | null = null;
         //Create Shift
-        await addDoc(collection(this.#db, `shifts`), {
-            ...{
+        await addDoc(collection(this.#db, `shifts`),
+            {
                 department: shift.department,
                 employeeId: shift.employeeId,
                 end: this.getFirebaseTimestamp(shift.end),
                 projectName: shift.projectName,
                 start: this.getFirebaseTimestamp(shift.start)
             },
-        }).catch((error) => {
+        ).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
         if(errorMessage) return errorMessage;
-        return;
     }
 
 

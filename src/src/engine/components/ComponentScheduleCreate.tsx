@@ -85,8 +85,7 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	 * @returns {void} The list of employee names formatted for DayPilotCalendar columns
 	 */
 	private getEmployeeColumns(): ColumnsType[] {
-		let listToReturn: ColumnsType[];
-		listToReturn = [];
+		let listToReturn: ColumnsType[] = [];
 		if (this.props.employees.length > 0) {
 			for (let employee of this.props.employees) {
 				listToReturn.push({
