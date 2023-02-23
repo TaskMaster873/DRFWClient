@@ -1,7 +1,7 @@
 export enum RoutesPath {
     LOGIN = '/login',
     FORGOT_PASSWORD = '/forgot-password',
-    EMPLOYEE = '/employees',
+    EMPLOYEES = '/employees',
     INDEX = '/',
     SCHEDULE = '/schedule',
     CREATE_SCHEDULE = '/create-schedule',
@@ -9,6 +9,8 @@ export enum RoutesPath {
     EMPLOYEE_WITH_PARAM = '/:id/employees',
     ABOUT = '/about',
     ADD_EMPLOYEE = '/add-employee',
+    EDIT_EMPLOYEE = '/edit-employee/',
+    EDIT_EMPLOYEE_WITH_PARAM = '/edit-employee/:id',
     AVAILABILITIES = '/availabilities',
     RESET_PASSWORD = '/reset-password',
     CHANGE_PASSWORD = '/change-password',

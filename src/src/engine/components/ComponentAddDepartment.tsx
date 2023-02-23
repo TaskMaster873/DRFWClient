@@ -18,7 +18,7 @@ interface AddDepartmentState {
 
 interface AddDepartmentProps {
     employees: Employee[];
-    onDataChange: (department) => PromiseLike<void> | Promise<void> | void;
+    onAddDepartment: (department) => PromiseLike<void> | Promise<void> | void;
 }
 
 /**
@@ -96,18 +96,6 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
     }
 
     /**
-     * Function that is called when the data is changed. This update the state of the parent component.
-     * @param department The department to update
-     * @private
-     */
-
-    private async onDataChange(department: Department) : Promise<void> {
-        if(this.props.onDataChange !== null && this.props.onDataChange) {
-            await this.props.onDataChange(department);
-        }
-    }
-
-    /**
      * Function that is called when the form is submitted.
      * @param event The event that triggered the function
      * @private
@@ -131,7 +119,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
 
         if (errorType === FormErrorType.NO_ERROR) {
             let department = new Department({name: this.state.name, director: this.state.director});
-            await this.onDataChange(department);
+            await this.props.onAddDepartment(department);
 
         }
     }

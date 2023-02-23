@@ -26,6 +26,8 @@ export const errors = {
     GET_SHIFTS: "Une erreur s'est produite lors de la récupération des données d'horaire.",
     GET_DEPARTMENTS: "Une erreur s'est produite lors de la récupération des données des départements",
     GET_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données des employés",
+    GET_EDIT_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données de l'employé à éditer",
+    INVALID_EMPLOYEE_ID_PARAMETER: "L'identifiant de l'employé en paramètre est invalide"
 }
 
 export const successes = {
@@ -37,6 +39,7 @@ export const successes = {
     LOGOUT_SUCCESS: "Vous êtes maintenant déconnecté !",
     CHANGE_PASSWORD: "Le changement de mot de passe a bien été effectué !",
     RESET_PASSWORD: "Le mot de passe a bien été mis à jour !",
+    EMPLOYEE_ACTIVATED: "L'employé a bien été activé !",
     EMPLOYEE_DEACTIVATED: "L'employé a bien été désactivé !",
     EMPLOYEE_EDITED: `L'employé a bien été modifié !`,
 }

@@ -30,7 +30,7 @@ import {
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
-import {Employee, EmployeeCreateDTO} from "../types/Employee";
+import {Employee, EmployeeCreateDTO, EmployeeEditDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
@@ -200,8 +200,12 @@ class APIManager extends Logger {
         return this.isAuthenticated;
     }
 
-    public hasPermission(permissionLevel: number): boolean {
+    public hasPermission(permissionLevel: Roles): boolean {
         return this.#userRole >= permissionLevel;
+    }
+
+    public hasLowerPermission(permissionLevel: Roles): boolean {
+        return this.#userRole > permissionLevel;
     }
 
     public getErrorMessageFromCode(error: Error | string): string {
@@ -511,13 +515,13 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async editEmployee(employee: Employee): Promise<string | null> {
+    public async editEmployee(employeeId: string, employee: EmployeeEditDTO): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
         let errorMessage: string | null = null;
-        if (employee.employeeId) {
-            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {...employee}).catch((error) => {
+        if (employeeId) {
+            await updateDoc(doc(this.#db, `employees`, employeeId), {...employee}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
         } else {
@@ -526,18 +530,14 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async deactivateEmployee(
-        employeeId: string | null
-    ): Promise<string | null> {
+    public async changeEmployeeActivation(employee: Employee): Promise<string | null> {
         let errorMessage: string | null = null;
 
-        if (employeeId !== null && employeeId) {
+        if (employee.employeeId) {
             if (!this.hasPermission) {
                 return errors.PERMISSION_DENIED;
             }
-            await updateDoc(doc(this.#db, `employees`, employeeId), {
-                isActive: false,
-            }).catch((error) => {
+            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {isActive: employee.isActive}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
         } else {
@@ -567,6 +567,21 @@ class APIManager extends Logger {
             }).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
+        }
+        return errorMessage;
+    }
+
+    public async editDepartment(department: Department): Promise<string | null> {
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        let errorMessage: string | null = null;
+        if (department.departmentId) {
+            await updateDoc(doc(this.#db, `departments`, department.departmentId), {...department}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_EMPLOYEE_ID;
         }
         return errorMessage;
     }
@@ -618,6 +633,21 @@ class APIManager extends Logger {
         return errorMessage ?? employees;
     }
 
+    public async getEmployeeById(employeeId: string): Promise<EmployeeEditDTO | string> {
+        let errorMessage: string | null = null;
+
+        let snap = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        })
+
+        if (snap && snap.exists()) {
+            return snap.data() as EmployeeEditDTO;
+        } else {
+            errorMessage = errors.EMPLOYEE_NOT_FOUND
+        }
+        return errorMessage;
+    }
+
     public async getDepartments(): Promise<Department[]> {
         let errorMessage: string | null = null;
         let departments: Department[] = [];
@@ -628,10 +658,7 @@ class APIManager extends Logger {
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 departments.push(
-                    new Department({
-                        name: doc.data().name,
-                        director: doc.data().director,
-                    })
+                    doc.data() as Department
                 );
             });
         }
@@ -780,8 +807,7 @@ class APIManager extends Logger {
 
     /**
      * Récupère l'horaire de la journée d'un département pour une journée
-     * @param startDay le début de la journée en string daypilot Ex: (2 février 2022 début de journée) = 2022-02-16T00:00:00
-     * @param endDay la fin de la journée en string daypilot Ex: (2 février 2022 fin de journée) = 2022-02-16T24:00:00
+     * @param day
      * @param department le nom du département que récupérer
      * @returns une liste de quarts de travail d'un département pour une journée
      */
@@ -803,9 +829,9 @@ class APIManager extends Logger {
         let employees = fetchedData as Employee[];
         //Query shifts
         let queryShifts = query(
-            collection(this.#db, `shifts`), 
-            where("department", "==", department.name), 
-            where("end", ">", convertedStartDay), 
+            collection(this.#db, `shifts`),
+            where("department", "==", department.name),
+            where("end", ">", convertedStartDay),
             where("end", "<", convertedEndDay)
             );
         let snaps = await getDocs(queryShifts).catch((error) => {
@@ -870,6 +896,9 @@ class APIManager extends Logger {
         if (success) isCreated = true;
         return isCreated;
     }
+
+
+
 }
 
 export const API = new APIManager();

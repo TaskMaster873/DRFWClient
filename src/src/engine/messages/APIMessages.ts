@@ -5,6 +5,9 @@ export const errors = {
     EMPLOYEE_ALREADY_EXISTS: "L'emploi est déjà existant",
     PERMISSION_DENIED: "Vous n'avez pas les autorisations requises pour effectuer cette action",
     INVALID_EMPLOYEE_ID: "L'identifiant de l'employé est invalide",
+    INVALID_DEPARTMENT_ID: "L'identifiant du département est invalide",
+    EMPLOYEE_NOT_FOUND: "L'employé spécifié n'a pas été trouvé"
+
 }
 
 export const successes = {
