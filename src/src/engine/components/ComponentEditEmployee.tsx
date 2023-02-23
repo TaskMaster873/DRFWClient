@@ -184,8 +184,8 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 phoneNumber: formDataObj.phoneNumber,
                 department: formDataObj.department,
                 jobTitles: formDataObj.jobTitles ?? [],
-                skills: formDataObj.skills ?? [], // @ts-ignore
-                role: parseInt(formDataObj.role)
+                skills: formDataObj.skills ?? [],
+                role: formDataObj.role
             }
             this.props.onEditEmployee(this.props.employeeId, employee);
         }

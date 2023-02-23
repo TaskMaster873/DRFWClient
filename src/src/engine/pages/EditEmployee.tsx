@@ -30,7 +30,6 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     public async componentDidMount() : Promise<void> {
         document.title = "Modifier un Employé - TaskMaster";
 
-        // TODO Add error handling
         let departments = API.getDepartments();
         let roles = API.getRoles();
         let titles = API.getJobTitles();

@@ -81,7 +81,7 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
         </Modal>
     }
 
-    private modalVisibility(visible: boolean) {
+    private modalVisibility(visible: boolean): void {
         this.setState({showModal: visible});
     }
 
@@ -129,7 +129,7 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
         }
 
         this.setState({
-            ...{}, ...{
+            ...this.state, ...{
                 [name]: value,
             }
         });

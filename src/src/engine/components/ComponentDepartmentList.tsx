@@ -29,7 +29,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                     </tbody>
                 </Table>
                 {this.renderAddDepartmentComponent()}
-                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.onEditDepartment} />
+                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.#onEditDepartment} />
             </div>
         );
     }
@@ -97,13 +97,13 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
      * @returns {Promise<void>}
      * @throws {Error} If the parent function is not defined
      */
-    readonly onDataChange = async (department: Department): Promise<void> => {
+    readonly #onDataChange = async (department: Department): Promise<void> => {
         if (this.props.onAddDepartment !== null && this.props.onAddDepartment) {
             await this.props.onAddDepartment(department);
         }
     }
 
-    readonly onEditDepartment = async (department: Department): Promise<void> => {
+    readonly #onEditDepartment = async (department: Department): Promise<void> => {
         if (this.props.onEditDepartment !== null && this.props.onEditDepartment) {
             await this.props.onEditDepartment(department);
         }
@@ -118,7 +118,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
     private renderAddDepartmentComponent(): JSX.Element {
         if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
             return (
-                <ComponentAddDepartment employees={this.props.employees} onAddDepartment={this.onDataChange}/>
+                <ComponentAddDepartment employees={this.props.employees} onAddDepartment={this.#onDataChange}/>
             );
         } else {
             return <></>;
