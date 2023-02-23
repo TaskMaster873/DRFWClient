@@ -33,11 +33,11 @@ export interface DayPilotCalendarSettings {
 
 export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	/** date of the start */
-	startDate: string;
+	//startDate: string;
 	/** the columns */
-	columns: ColumnsType[]; 
+	//columns: ColumnsType[]; 
 	/** the shifts */
-	events: EventForCalendar[]; 
+	//events: EventForCalendar[]; 
 	/** height */
 	heightSpec?: HeightSpecType;
 	/** hardcoded height, so not important */
@@ -47,9 +47,9 @@ export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	/** precision in minutes of cells (minimum 15min) in lite version */
 	cellDuration?: number 
 	/** the type of view of data */
-	viewType: ViewType; 
+	//viewType: ViewType; 
 	/** if we can delete or not in the calendar */
-	eventDeleteHandling: EventDeleteHandlingType;
+	//eventDeleteHandling: EventDeleteHandlingType;
 	/** is the popup child active or not */
 	isShowingModal: boolean;
 	/** start of the calendar */

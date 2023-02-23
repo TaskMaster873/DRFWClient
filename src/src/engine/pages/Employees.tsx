@@ -53,40 +53,29 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
      * Used to deactivate an employee if the user clicks on the deactivate button
      * @private
      * @return {Promise<void>} A promise that resolves when the employee is deactivated
-     * @param employeeId
+     * @param employee
      */
-    readonly #deactivateEmployee = async(employeeId: string | undefined) : Promise<void> => {
-        if (employeeId) {
-            let error = await API.deactivateEmployee(employeeId);
+    readonly #changeEmployeeActivation = async(employee: Employee) : Promise<void> => {
+        if (employee) {
+            employee.isActive = !employee.isActive;
+            let error = await API.changeEmployeeActivation(employee);
             if (!error) {
-                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
-
                 let employees: Employee[] = this.state.employees;
-                let employee = employees.find(elem => elem.employeeId == employeeId);
-                if(employee) {
-                    employee.isActive = false;
-                    this.refreshList(employee, employees);
+                let oldEmployee = employees.find(elem => elem.employeeId == employee.employeeId);
+                if(oldEmployee) {
+                    oldEmployee.isActive = employee.isActive;
+                    this.refreshList(oldEmployee, employees);
+                    if(employee.isActive) {
+                        NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_ACTIVATED);
+                    } else {
+                        NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
+                    }
                 }
+            } else {
+                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
             }
         } else {
             NotificationManager.error(errors.SERVER_ERROR, errors.ERROR_GENERIC_MESSAGE);
-        }
-    }
-
-    /**
-     * Used to edit an employee if the user clicks on the edit button
-     * @param employeeObj {Employee} The employee to edit
-     * @private
-     * @return {Promise<void>} A promise that resolves when the employee is edited
-     */
-    readonly #onEditEmployee = async (employeeObj: Employee) : Promise<void> => {
-        let error = await API.editEmployee(employeeObj);
-        if (!error) {
-            let employees: Employee[] = this.state.employees;
-            this.refreshList(employeeObj, employees);
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_EDITED);
-        } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
 
@@ -105,8 +94,7 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
                     filteredList={null}
                     employees={this.state.employees}
                     department={this.props.params.id}
-                    onEditEmployee={this.#onEditEmployee}
-                    onDeactivateEmployee={this.#deactivateEmployee}
+                    onEmployeeActivationChange={this.#changeEmployeeActivation}
                 />
             </Container>
         );
