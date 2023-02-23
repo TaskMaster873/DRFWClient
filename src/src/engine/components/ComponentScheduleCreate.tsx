@@ -31,7 +31,7 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	 * @memberof ComponentScheduleCreate
 	 */
 	readonly #shiftAdd = async (event: EventForShiftCreation): Promise<void> => {
-		let success = await this.props.addShift({
+		await this.props.addShift({
 			employeeId: event.employeeId,
 			start: event.start.toString("yyyy-MM-ddTHH:mm:ss"),
 			end: event.end.toString("yyyy-MM-ddTHH:mm:ss"),
@@ -57,7 +57,6 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	}
 
 	public render(): JSX.Element {
-		console.log("IM UP TO DATE", this.props);
 		return (
 			//<ResourceGroups groups={this.loadGroups().groups} /*onChange={this.onChange}*/ onChange={undefined} /*onChange={this.onChange}*/ />
 			<div>
@@ -97,7 +96,6 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 				});
 			}
 		}
-		console.log("MY COLUMNS", listToReturn);
 		return listToReturn;
 	}
 
@@ -110,8 +108,6 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	 * @returns {void}
 	 */
 	readonly #onTimeRangeSelected = (args: any): void => {
-		console.log("ontime:", args);
-
 		this.setState({
 			isShowingModal: true,
 			start: args.start,

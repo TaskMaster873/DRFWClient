@@ -839,7 +839,6 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
         let errorMessage : string | null = null;
-        console.log(shift)
         //Create Shift
         await addDoc(collection(this.#db, `shifts`), {
             ...{
