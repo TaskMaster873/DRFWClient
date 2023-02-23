@@ -7,6 +7,7 @@ import {errors, FormErrorType} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
 import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
 import {Department} from "../types/Department";
+import {API} from "../api/APIManager";
 
 interface ComponentEditEmployeeState {
     validated?: boolean;
@@ -102,7 +103,8 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
-                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) => <Form.Check
+                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) =>
+                            <Form.Check
                             name={corps}
                             key={corps}
                             type="checkbox"
@@ -116,8 +118,12 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         <Form.Label>Rôle de l'employé</Form.Label>
                         <Form.Select required name="role" id="role" value={this.props.editedEmployee?.role} onChange={this.#handleSelect}
                                      defaultValue={this.props.editedEmployee?.role}>
-                            {this.props.roles.map((role: string, index: number) => <option key={index}
-                                                                           value={index}>{role}</option>)}
+                            {this.props.roles.map((role: string, index: number) => {
+                                if(API.hasPermission(parseInt(role))) {
+                                    return <option key={index} value={index}>{role}</option>
+                                }
+                            }
+                            )}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
                             {errors.REQUIRED_ROLE}
@@ -162,7 +168,6 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         let eventTarget: any = event.target;
         let formData = new FormData(eventTarget);
         let formDataObj: EmployeeEditDTO = Object.fromEntries(formData.entries()) as unknown as EmployeeEditDTO;
-        console.log(formDataObj)
 
         let errorType = FormErrorType.NO_ERROR;
         if (!isValid) {
