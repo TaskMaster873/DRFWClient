@@ -9,7 +9,7 @@ import {BiEdit} from "react-icons/bi"
 import {Roles} from "../types/Roles";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {SearchParams} from "../types/SearchParams";
-import {RoutesPath} from "../RoutesPath";
+import {RoutePaths} from "../api/routes/RoutePaths";
 
 /**
  * Component that display the list of employees of a department
@@ -170,7 +170,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
             if (!employee.isActive) {
                 component = <CgCheckO/>
             }
-            return <td key={`action ${index}`}><LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.employeeId}`}
+            return <td key={`action ${index}`}><LinkContainer to={`${RoutePaths.EDIT_EMPLOYEE}${employee.employeeId}`}
                                                               className="adminActions mx-1"><BiEdit/></LinkContainer>
                 <a className="adminActions ms-1 mx-1"
                    onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a></td>

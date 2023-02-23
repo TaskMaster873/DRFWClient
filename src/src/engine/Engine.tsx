@@ -22,7 +22,7 @@ import {ComponentLoading} from "./components/ComponentLoading";
 import {ForgotPassword} from "./pages/ForgotPassword";
 import 'react-notifications/lib/notifications.css';
 import {CreateSchedule} from "./pages/CreateSchedule";
-import {RoutesPath} from "./RoutesPath";
+import {RoutePaths} from "./api/routes/RoutePaths";
 import {Roles} from "./types/Roles";
 
 interface EngineState {
@@ -36,6 +36,13 @@ export class Engine extends React.Component<unknown, EngineState> {
 
     constructor(props: never) {
         super(props);
+    }
+
+    readonly ProtectedRoute = ({auth, children}): any => {
+        if(auth) {
+            return children;
+        }
+        return <Navigate to={RoutePaths.INDEX} replace/>
     }
 
     public componentDidMount(): void {
@@ -60,19 +67,19 @@ export class Engine extends React.Component<unknown, EngineState> {
                         <NavigationBar/>
                         <NotificationContainer/>
                         <Routes>
-                            <Route path={RoutesPath.INDEX} element={<Index />}/>
-                            <Route path={RoutesPath.SCHEDULE} element={API.isAuth() ? <ScheduleEmployee/> : <Navigate to={RoutesPath.INDEX}/>}/>
-                            <Route path={RoutesPath.CREATE_SCHEDULE} element={API.hasPermission(Roles.ADMIN) ? <CreateSchedule/> : <Navigate to={RoutesPath.INDEX}/>}/>
-                            <Route path={RoutesPath.DEPARTMENTS} element={<Departments/>}/>
-                            <Route path={`${RoutesPath.DEPARTMENTS}${RoutesPath.EMPLOYEE_WITH_PARAM}`} element={<EmployeeWrapper/>}/>
-                            <Route path={RoutesPath.ABOUT} element={<About/>}/>
-                            <Route path={RoutesPath.LOGIN} element={API.isAuth() ? <Navigate to={RoutesPath.INDEX}/> : <Login/>}/>
-                            <Route path={RoutesPath.ADD_EMPLOYEE} element={API.hasPermission(Roles.ADMIN) ? <AddEmployee/> : <Navigate to={RoutesPath.INDEX}/>}/>
-                            <Route path={RoutesPath.EDIT_EMPLOYEE_WITH_PARAM} element={API.hasPermission(Roles.ADMIN) ? <EditEmployeeWrapper /> : <Navigate to={RoutesPath.INDEX}/>}/>
-                            <Route path={RoutesPath.AVAILABILITIES} element={<Availabilities/>}/>
-                            <Route path={RoutesPath.FORGOT_PASSWORD} element={<ForgotPassword/>}/>
-                            <Route path={RoutesPath.RESET_PASSWORD} element={<ResetPassword/>}/>
-                            <Route path={RoutesPath.CHANGE_PASSWORD} element={<ChangePassword/>}/>
+                            <Route path={RoutePaths.INDEX} element={<Index />}/>
+                            <Route path={RoutePaths.SCHEDULE} element={<this.ProtectedRoute auth={API.isAuth()}><ScheduleEmployee/></this.ProtectedRoute>}/>
+                            <Route path={RoutePaths.CREATE_SCHEDULE} element={<this.ProtectedRoute auth={API.hasPermission(Roles.ADMIN)}><CreateSchedule/></this.ProtectedRoute>}/>
+                            <Route path={RoutePaths.DEPARTMENTS} element={<Departments/>}/>
+                            <Route path={`${RoutePaths.DEPARTMENTS}${RoutePaths.EMPLOYEE_WITH_PARAM}`} element={<EmployeeWrapper/>}/>
+                            <Route path={RoutePaths.ABOUT} element={<About/>}/>
+                            <Route path={RoutePaths.LOGIN} element={<this.ProtectedRoute auth={!API.isAuth()}><Login/></this.ProtectedRoute>}/>
+                            <Route path={RoutePaths.ADD_EMPLOYEE} element={<this.ProtectedRoute auth={API.hasPermission(Roles.ADMIN)}><AddEmployee/></this.ProtectedRoute>}/>
+                            <Route path={RoutePaths.EDIT_EMPLOYEE_WITH_PARAM} element={<this.ProtectedRoute auth={API.hasPermission(Roles.ADMIN)}><EditEmployeeWrapper /></this.ProtectedRoute>}/>
+                            <Route path={RoutePaths.AVAILABILITIES} element={<this.ProtectedRoute auth={!API.isAuth()}><Availabilities/></this.ProtectedRoute>}/>
+                            <Route path={RoutePaths.FORGOT_PASSWORD} element={<ForgotPassword/>}/>
+                            <Route path={RoutePaths.RESET_PASSWORD} element={<ResetPassword/>}/>
+                            <Route path={RoutePaths.CHANGE_PASSWORD} element={<ChangePassword/>}/>
                         </Routes>
                     </Router>
                 </React.StrictMode>

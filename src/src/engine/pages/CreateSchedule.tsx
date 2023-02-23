@@ -6,7 +6,7 @@ import {Shift} from "../types/Shift";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {NotificationManager} from "react-notifications";
 import {errors} from "../messages/FormMessages";
-import {RoutesPath} from "../RoutesPath";
+import {RoutePaths} from "../api/routes/RoutePaths";
 
 enum ScheduleRecievedState {
     WAITING = 0,

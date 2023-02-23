@@ -5,7 +5,7 @@ import {errors, FormErrorType, info, successes} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
 import {NotificationManager} from "react-notifications";
 import {useNavigate} from "react-router-dom";
-import {RoutesPath} from "../RoutesPath";
+import {RoutePaths} from "../api/routes/RoutePaths";
 import {Container} from "react-bootstrap";
 import Logo from "../../deps/images/logo.png";
 
@@ -46,7 +46,7 @@ export function ComponentResetPassword(props: Props) {
             } else {
                 NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
             }
-            navigate(RoutesPath.LOGIN);
+            navigate(RoutePaths.LOGIN);
         }
     };
 

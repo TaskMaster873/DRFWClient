@@ -6,7 +6,7 @@ import { API } from "../api/APIManager";
 import { LinkContainer } from "react-router-bootstrap";
 import { ScaleLoader } from "react-spinners";
 import { Roles } from "../types/Roles";
-import {RoutesPath} from "../RoutesPath";
+import {RoutePaths} from "../api/routes/RoutePaths";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
 
 const override: CSSProperties = {
@@ -71,7 +71,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                     <td key={"no" + index}>{index + 1}</td>
                     <td key={"name " + index}>
                         <LinkContainer
-                            to={`${RoutesPath.DEPARTMENTS}/${department.name}/employees`}>
+                            to={`${RoutePaths.DEPARTMENTS}/${department.name}/employees`}>
                             <Nav.Link className="departmentName">
                                 {department.name}
                             </Nav.Link>
