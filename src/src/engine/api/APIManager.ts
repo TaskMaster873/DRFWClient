@@ -43,7 +43,9 @@ import {
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 
-type SubscriberCallback = () =>
+// what is this?
+type SubscriberCallback =
+    () =>
     | void
     | (() => Promise<void>)
     | PromiseLike<void>;
