@@ -1,6 +1,12 @@
 import React, {CSSProperties, MouseEventHandler} from "react";
 import { Nav, Table } from "react-bootstrap";
-import {Department, DepartmentListProps, DepartmentListState, departmentTableHeads} from "../types/Department";
+import {
+    Department,
+    DepartmentListProps,
+    DepartmentListState,
+    DepartmentModifyDTO,
+    departmentTableHeads
+} from "../types/Department";
 import { ComponentAddDepartment } from "./ComponentAddDepartment";
 import { API } from "../api/APIManager";
 import { LinkContainer } from "react-router-bootstrap";
@@ -122,9 +128,9 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
         }
     }
 
-    readonly #onEditDepartment = async (department: Department): Promise<void> => {
+    readonly #onEditDepartment = async (departmentId: string, department: DepartmentModifyDTO): Promise<void> => {
         if (this.props.onEditDepartment !== null && this.props.onEditDepartment) {
-            await this.props.onEditDepartment(department);
+            await this.props.onEditDepartment(departmentId, department);
         }
     }
 

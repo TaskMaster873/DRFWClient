@@ -49,7 +49,7 @@ export interface DepartmentListProps {
     employeeNb: number[],
     departments: Department[],
     onAddDepartment: (department) => PromiseLike<void> | Promise<void> | void;
-    onEditDepartment: (department) => PromiseLike<void> | Promise<void> | void;
+    onEditDepartment: (departmentId: string, department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
 }
 
 

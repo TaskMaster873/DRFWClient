@@ -810,6 +810,7 @@ class APIManager extends Logger {
 
     /**
      * This method is used to edit a department.
+     * @param departmentId
      * @param department The department data.
      * @method editDepartment
      * @async
@@ -817,18 +818,28 @@ class APIManager extends Logger {
      * @memberof APIManager
      * @returns {Promise<string | null>} Null if the department was edited successfully, and the error message if it was not.
      */
-    public async editDepartment(department: Department): Promise<string | null> {
+    public async editDepartment(departmentId: string, department: DepartmentModifyDTO): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        let errorMessage: string | null = null;
-        if (department.departmentId) {
-            await updateDoc(doc(this.#db, `departments`, department.departmentId), {...department}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-            });
-        } else {
-            errorMessage = errors.INVALID_DEPARTMENT_ID;
+        let queryDepartment = query(
+            collection(this.#db, `departments`),
+            where("name", "==", department.name)
+        );
+        let errorMessage = await this.checkIfAlreadyExists(
+            queryDepartment,
+            errors.DEPARTMENT_ALREADY_EXIST
+        );
+        if(!errorMessage) {
+            if (departmentId) {
+                await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+                });
+            } else {
+                errorMessage = errors.INVALID_DEPARTMENT_ID;
+            }
         }
+
         return errorMessage;
     }
 

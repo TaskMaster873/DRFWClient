@@ -9,7 +9,7 @@ import {Employee} from "../types/Employee";
 
 export interface DepartmentEditProps {
     employees: Employee[],
-    onEditDepartment: (department: Department) => PromiseLike<void> | Promise<void> | void;
+    onEditDepartment: (departmentId: string, department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
     departmentToEdit?: Department;
     cancelEdit: () => PromiseLike<void> | Promise<void> | void;
 }
@@ -96,7 +96,6 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
         let eventTarget: any = event.target;
         let formData = new FormData(eventTarget);
         let formDataObj: Department = Object.fromEntries(formData.entries()) as unknown as Department;
-        formDataObj.departmentId = this.props.departmentToEdit?.departmentId;
 
         let errorType = FormErrorType.NO_ERROR;
         if (!isValid) {
@@ -108,8 +107,8 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
             error: errorType,
         });
 
-        if (errorType === FormErrorType.NO_ERROR) {
-            await this.props.onEditDepartment(formDataObj);
+        if (errorType === FormErrorType.NO_ERROR && this.props.departmentToEdit?.departmentId) {
+            await this.props.onEditDepartment(this.props.departmentToEdit?.departmentId, formDataObj);
         }
     }
 }
