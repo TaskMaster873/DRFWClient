@@ -121,4 +121,5 @@ export interface AddEmployeeState {
     roles: EmployeeRoleList;
     titles: EmployeeJobTitleList;
     editedEmployee?: EmployeeEditDTO;
+    redirectTo: string | null;
 }

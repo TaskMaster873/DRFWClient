@@ -3,11 +3,10 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { LinkContainer } from "react-router-bootstrap";
-import { NotificationManager } from 'react-notifications';
 import { API } from "../api/APIManager";
 import { errors, successes } from "../messages/FormMessages";
 import Logo from "../../deps/images/logo.png";
-
+import {NotificationManager} from "../api/NotificationManager";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faClock, faClipboard, faBuilding } from '@fortawesome/free-solid-svg-icons';
