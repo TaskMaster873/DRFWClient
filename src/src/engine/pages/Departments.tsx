@@ -7,6 +7,7 @@ import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
+import {Container} from "react-bootstrap";
 
 /**
  * Ceci est la page pour les departments
@@ -136,13 +137,15 @@ export class Departments extends React.Component<unknown, DepartmentListState> {
         }
 
         return (
-            <ComponentDepartmentList
-                employees={this.state.employees}
-                employeeNb={this.state.employeeNb}
-                departments={this.state.departments}
-                onAddDepartment={this.addDepartment}
-                onEditDepartment={this.editDepartment}
-            />
+            <Container>
+                <ComponentDepartmentList
+                    employees={this.state.employees}
+                    employeeNb={this.state.employeeNb}
+                    departments={this.state.departments}
+                    onAddDepartment={this.addDepartment}
+                    onEditDepartment={this.editDepartment}
+                />
+            </Container>
         );
     }
 }

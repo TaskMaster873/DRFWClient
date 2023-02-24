@@ -19,7 +19,7 @@ export class Login extends React.Component {
         if (errorMessage === null) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGIN_SUCCESS);
         } else {
-            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errorMessage);
         }
 
         return errorMessage === null;
