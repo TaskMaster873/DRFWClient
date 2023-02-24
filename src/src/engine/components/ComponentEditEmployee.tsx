@@ -8,6 +8,7 @@ import {Container} from "react-bootstrap";
 import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {API} from "../api/APIManager";
+import {RegexUtil} from "../utils/RegexValidator";
 
 interface ComponentEditEmployeeState {
     validated?: boolean;
@@ -81,7 +82,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             id="phoneNumber"
                             required
                             type="tel"
-                            pattern="^(\+?1 ?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$"
+                            pattern={RegexUtil.phoneNumberRegex}
                             placeholder="(000) 000-0000"
                             defaultValue={this.props.editedEmployee?.phoneNumber}
                         />
