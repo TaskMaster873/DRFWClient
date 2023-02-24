@@ -1,6 +1,6 @@
 import React from "react";
 import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
-import {EventForCalendar, EventForShiftCreation, Shift} from "../types/Shift";
+import {EventForCalendar, EventForShiftCreation, EventForShiftEdit, Shift} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 import {CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, EventManipulationType, HeightSpecType, ViewType} from "../types/StatesForDaypilot";
 import {Employee} from "../types/Employee";
@@ -8,12 +8,14 @@ import {Employee} from "../types/Employee";
 type ComponentScheduleCreateProps = {
 	events: EventForCalendar[];
 	employees: Employee[];
-	addShift: (shiftEvent: EventForShiftCreation) => {};
+	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
+	editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
 };
 
 export class ComponentScheduleCreate extends React.Component<ComponentScheduleCreateProps, CalendarAttributesForEmployeeShiftCreationComponent> {
 	public state: CalendarAttributesForEmployeeShiftCreationComponent = {
 		isShowingModal: false,
+		currentEventId: "",
 		start: "2023-02-17T00:00:00",
 		end: "2023-02-18T00:00:00",
 		resourceName: "",
@@ -34,6 +36,8 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 					cellHeight={20}
 					cellDuration={5}
 					onTimeRangeSelected={this.#onTimeRangeSelected}
+					onEventClick={this.#onEventClick}
+					onEventMoved={this.#onEventMoved}
 					startDate={DayPilot.Date.today()}
 					columns={this.getEmployeeColumns()}
 					events={this.props.events}
@@ -45,6 +49,8 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 					hideModal={this.#hideModal}
 					isShown={this.state.isShowingModal}
 					eventAdd={this.props.addShift}
+					eventEdit={this.props.editShift}
+					id={this.state.currentEventId}
 					start={this.state.start}
 					end={this.state.end}
 					resource={this.state.resourceName}
@@ -82,6 +88,7 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	 * @returns {void}
 	 */
 	readonly #onTimeRangeSelected = (args: any): void => {
+		console.log(args)
 		this.setState({
 			isShowingModal: true,
 			start: args.start,
@@ -91,6 +98,28 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 		});
 
 		DayPilot.Calendar.clearSelection;
+	};
+
+	readonly #onEventClick = (args: any): void => {
+		this.setState({
+			isShowingModal: true,
+			currentEventId: args.e.data.id,
+			start: args.e.data.start,
+			end: args.e.data.end,
+			resourceName: args.e.data.resource,
+			taskType: EventManipulationType.EDIT,
+		});
+	};
+
+	readonly #onEventMoved = async (args: any): Promise<void> => {
+		console.log("called?")
+		let eventToSend: EventForShiftEdit = {
+			id: args.e.data.id,
+			employeeId: args.NewResource,
+			start: args.NewStart,
+			end: args.NewEnd,
+		};
+		await this.props.editShift(eventToSend)
 	};
 
 	readonly #hideModal = () => {

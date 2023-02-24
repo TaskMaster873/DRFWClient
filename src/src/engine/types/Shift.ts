@@ -18,30 +18,44 @@ export interface ShiftForCalendar {
  * @description This class is used to create a Shift that will be used in the calendar
  */
 export class Shift {
-    public projectName: string = "";
+    public id: string = "";
     public department: string = "";
     public start: string = "";
     public end: string = "";
     public employeeId: string = "";
 
     constructor(shift: ShiftDTO) {
+        this.id = shift.id;
         this.employeeId = shift.employeeId;
         this.department = shift.department;
-        this.projectName = shift.projectName;
         this.start = shift.start;
         this.end = shift.end;
     }
 }
 
-export interface ShiftDTO {
+export interface ShiftCreateDTO {
     readonly employeeId: string;
     readonly department: string;
     readonly start: string;
     readonly end: string;
-    readonly projectName: string;
+}
+
+export interface ShiftDTO {
+    readonly id: string;
+    readonly employeeId: string;
+    readonly department: string;
+    readonly start: string;
+    readonly end: string;
 }
 
 export interface EventForShiftCreation {
+    employeeId: string;
+    start: DayPilot.Date;
+    end: DayPilot.Date;
+}
+
+export interface EventForShiftEdit {
+    id: string;
     employeeId: string;
     start: DayPilot.Date;
     end: DayPilot.Date;

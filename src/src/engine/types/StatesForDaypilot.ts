@@ -52,6 +52,8 @@ export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	//eventDeleteHandling: EventDeleteHandlingType;
 	/** is the popup child active or not */
 	isShowingModal: boolean;
+    /** Shift id and Daypilot marker */
+    currentEventId: string;
 	/** start of the calendar */
 	start: DayPilot.Date;
 	/** end of the calendar */
@@ -64,7 +66,7 @@ export interface CalendarAttributesForEmployeeShiftCreationComponent {
 
 export enum EventManipulationType {
 	CREATE = "Créer",
-	MODIFY = "Modifier"
+	EDIT = "Modifier"
 }
 
 export interface ColumnsType {

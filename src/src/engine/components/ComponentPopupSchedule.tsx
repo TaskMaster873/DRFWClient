@@ -3,14 +3,16 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import {DayPilot} from "@daypilot/daypilot-lite-react";
-import {EventForShiftCreation} from "../types/Shift";
+import {EventForShiftCreation, EventForShiftEdit} from "../types/Shift";
 import {errors, FormErrorType} from '../messages/FormMessages';
 import {EventManipulationType} from '../types/StatesForDaypilot';
 
 type Props = {
-	eventAdd: (shiftEvent: EventForShiftCreation) => {};
+	eventAdd: (shiftEvent: EventForShiftCreation) => Promise<void>;
+	eventEdit: (shiftEvent: EventForShiftEdit) => Promise<void>;
 	hideModal: () => void;
 	isShown: boolean;
+	id: string,
 	start: DayPilot.Date;
 	end: DayPilot.Date;
 	resource: string;
@@ -47,16 +49,36 @@ export function ComponentPopupSchedule(props: Props) {
 		setError(errorType);
 
 		if (errorType === FormErrorType.NO_ERROR) {
-			let eventToReturn: EventForShiftCreation = {
-				employeeId: props.resource,
-				start: start ?? props.start,
-				end: end ?? props.end,
-			};
-			console.log("eventCréé =", eventToReturn);
 			setDisabled(true);
-			await props.eventAdd(eventToReturn);
+			switch (props.taskType) {
+				case EventManipulationType.EDIT:
+					await sendEditEvent();
+					break;
+				default:
+					await sendCreateEvent();
+					break;
+			}
 			closeModal();
 		}
+	};
+
+	const sendCreateEvent = async () => {
+		let eventToReturn: EventForShiftCreation = {
+			employeeId: props.resource,
+			start: start ?? props.start,
+			end: end ?? props.end,
+		};
+		await props.eventAdd(eventToReturn);
+	};
+
+	const sendEditEvent = async () => {
+		let eventToReturn: EventForShiftEdit = {
+			id: props.id,
+			employeeId: props.resource,
+			start: start ?? props.start,
+			end: end ?? props.end,
+		};
+		await props.eventEdit(eventToReturn);
 	};
 
 	const closeModal = () => {
