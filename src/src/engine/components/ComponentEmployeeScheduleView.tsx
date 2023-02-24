@@ -60,8 +60,8 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 		let startDate = DayPilot.Date.today();
 
 		for (let shift of this.props.shifts) {
-			let convertedStartTime = Converter.convertTimestampToDayPilotDate(shift.start);
-			let convertedEndTime = Converter.convertTimestampToDayPilotDate(shift.end);
+			let convertedStartTime = ManagerDate.convertTimestampToDayPilotDate(shift.start);
+			let convertedEndTime = ManagerDate.convertTimestampToDayPilotDate(shift.end);
 
 			events.push({
 				text: `${convertedStartTime} à ${convertedEndTime}\nProjet: ${shift.projectName}`,
