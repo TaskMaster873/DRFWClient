@@ -28,6 +28,9 @@ export class Department {
 }
 
 export let departmentTableHeads : string[] =
+    ["#", "Nom", "Directeur/Gérant", "Nombre d'employés"];
+
+export let departmentAdminTableHeads : string[] =
     ["#", "Nom", "Directeur/Gérant", "Nombre d'employés", "Actions"];
 
 /**
