@@ -31,7 +31,7 @@ export const errors = {
     INVALID_EMPLOYEE_ID_PARAMETER: "L'identifiant de l'employé en paramètre est invalide",
     EMPLOYEE_NOT_FOUND: "L'employée n'a pas été trouvé.",
     SORRY: "Oops!",
-    NO_PERMISSION: "Vous n'avez pas les permissions néssésaire pour visiter cette page."
+    NO_PERMISSION: "Vous n'avez pas les permissions nécessaires pour visiter cette page."
 }
 
 export const successes = {

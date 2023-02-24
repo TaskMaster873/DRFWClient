@@ -1,7 +1,7 @@
 import React, {CSSProperties, MouseEventHandler} from "react";
 import { Nav, Table } from "react-bootstrap";
 import {
-    Department,
+    Department, departmentAdminTableHeads,
     DepartmentListProps,
     DepartmentListState,
     DepartmentModifyDTO,
@@ -15,6 +15,7 @@ import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
 import {BiEdit} from "react-icons/bi";
+import {employeeAdminTableHeads, employeeTableHeads} from "../types/Employee";
 
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
 
@@ -28,9 +29,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                 <h3>Liste des départements</h3>
                 <Table responsive bordered hover className="text-center">
                     <thead>
-                    <tr key={"firstCol"}>
-                        {departmentTableHeads.map((th) => (<th key={th}>{th}</th>))}
-                    </tr>
+                        {this.renderTableHeads()}
                     </thead>
                     <tbody>
                     {this.departmentList()}
@@ -97,6 +96,21 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
         }
     }
 
+    private renderTableHeads(): JSX.Element {
+        if (API.hasPermission(Roles.ADMIN)) {
+            return (
+                <tr key={"firstCol"}>
+                    {departmentAdminTableHeads.map((th) => (<th key={th}>{th}</th>))}
+                </tr>);
+        } else {
+            return (
+                <tr key={"firstCol"}>
+                    {departmentTableHeads.map((th) => (<th key={th}>{th}</th>))}
+                </tr>
+            )
+        }
+    }
+
     private renderAdminActions(index: number, department: Department): JSX.Element | undefined {
         if (API.hasPermission(Roles.ADMIN)) {
             return (
@@ -153,6 +167,4 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
             return <></>;
         }
     }
-
-
 }
