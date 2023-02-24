@@ -5,7 +5,7 @@ import {Department} from "../types/Department";
 
 interface Props {
     departments: Department[];
-    changeDepartment: (department: Department) => {};
+    changeDepartment: (department: Department) => void;
 }
 
 interface State {

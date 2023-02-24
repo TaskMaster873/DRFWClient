@@ -4,8 +4,8 @@ import {ComponentEmployeeList} from "../components/ComponentEmployeeList";
 import {Employee, EmployeeProps} from "../types/Employee";
 import {API} from "../api/APIManager";
 import {errors, successes} from "../messages/FormMessages";
-import {NotificationManager} from 'react-notifications';
 import {Params, useParams} from "react-router-dom";
+import {NotificationManager} from "../api/NotificationManager";
 
 export function EmployeeWrapper(): JSX.Element {
     let parameters: Readonly<Params<string>> = useParams();
@@ -15,7 +15,7 @@ export function EmployeeWrapper(): JSX.Element {
 }
 
 interface EmployeeState {
-    employees: Employee[];
+    employees: Employee[] | null;
 }
 
 /**
@@ -31,7 +31,7 @@ interface EmployeeState {
  */
 class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
     public state: EmployeeState = {
-        employees: []
+        employees: null
     }
 
     constructor(props: EmployeeProps) {
@@ -44,7 +44,10 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
         let fetchedData = await API.getEmployees(this.props.params.id);
         if (typeof fetchedData === "string") {
             NotificationManager.error(errors.GET_EMPLOYEES, fetchedData);
-            this.setState({employees: []});
+
+            this.setState({
+                employees: []
+            });
         }
         else this.setState({employees: fetchedData as Employee[]});
     }
@@ -58,18 +61,28 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
     readonly #changeEmployeeActivation = async(employee: Employee) : Promise<void> => {
         if (employee) {
             employee.isActive = !employee.isActive;
+
             let error = await API.changeEmployeeActivation(employee);
             if (!error) {
-                let employees: Employee[] = this.state.employees;
-                let oldEmployee = employees.find(elem => elem.employeeId == employee.employeeId);
-                if(oldEmployee) {
-                    oldEmployee.isActive = employee.isActive;
-                    this.refreshList(oldEmployee, employees);
-                    if(employee.isActive) {
-                        NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_ACTIVATED);
+                let employees: Employee[] | null = this.state.employees;
+                if(employees) {
+                    let oldEmployee = employees.find(elem => elem.employeeId == employee.employeeId);
+
+                    if(oldEmployee) {
+                        oldEmployee.isActive = employee.isActive;
+
+                        this.refreshList(oldEmployee, employees);
+
+                        if(employee.isActive) {
+                            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_ACTIVATED);
+                        } else {
+                            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
+                        }
                     } else {
-                        NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
+                        NotificationManager.error(errors.SERVER_ERROR, errors.EMPLOYEE_NOT_FOUND);
                     }
+                } else {
+                    NotificationManager.error(errors.SERVER_ERROR, errors.ERROR_GENERIC_MESSAGE);
                 }
             } else {
                 NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);

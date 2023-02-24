@@ -1,7 +1,6 @@
 export enum RoutesPath {
     LOGIN = '/login',
     FORGOT_PASSWORD = '/forgot-password',
-    EMPLOYEES = '/employees',
     INDEX = '/',
     SCHEDULE = '/schedule',
     CREATE_SCHEDULE = '/create-schedule',
