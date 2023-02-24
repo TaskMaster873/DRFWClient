@@ -6,6 +6,7 @@ import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {Login} from "../src/engine/pages/Login";
+import {act} from "react-dom/test-utils";
 
 jest.mock("../src/engine/api/APIManager");
 const {API} = require("../src/engine/api/APIManager");
@@ -13,7 +14,9 @@ const {API} = require("../src/engine/api/APIManager");
 let user;
 beforeEach(async () => {
     user = userEvent.setup();
-    render(<MemoryRouter><Login/></MemoryRouter>);
+    act(() => {
+        render(<MemoryRouter><Login/></MemoryRouter>);
+    });
 });
 
 test("should render form inputs", async () => {
@@ -64,7 +67,9 @@ test("Valid email and password should submit form", async () => {
     await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputPassword, testConstants.validPassword);
 
-    fireEvent.submit(form);
+    act(() => {
+        fireEvent.submit(form);
+    });
 
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputPassword.value).toBe(testConstants.validPassword);

@@ -75,7 +75,7 @@ export interface EmployeeEditDTO {
     readonly role: number;
 }
 
-export let adminTableHeads : string[] =
+export let employeeAdminTableHeads : string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
 
 export let employeeTableHeads : string[] =
