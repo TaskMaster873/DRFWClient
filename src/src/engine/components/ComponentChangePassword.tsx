@@ -59,13 +59,14 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
                           onChange={this.#handleChange}
                           data-error={this.state.error}>
                         <Form.Group>
-                            <Form.Label htmlFor="newPassword" className="mt-2">Ancien mot de passe</Form.Label>
+                            <Form.Label htmlFor="oldPassword" className="mt-2">Ancien mot de passe</Form.Label>
                             <Form.Control
                                 required
                                 name="oldPassword"
                                 id="oldPassword"
                                 className="row mt-1"
                                 type="password"
+                                pattern={RegexUtil.goodPasswordRegex}
                                 placeholder="Entrez l'ancien mot de passe"
                             />
                             <Form.Control.Feedback type="invalid" id="invalidOldPassword">

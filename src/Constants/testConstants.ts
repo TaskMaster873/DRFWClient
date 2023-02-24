@@ -6,11 +6,11 @@ export const testConstants = {
     validFirstName: "Alfred",
     validName: "Montmagny",
     validPhoneNumber: "418-666-6666",
-    validPassword: "Jf3$E12",
+    validPassword: "HWDIj23iew!",
     invalidEmail: "a@a",
     invalidPhoneNumber: "41-92-006",
     invalidPassword: "44ab",
-    validNewPassword: "U51hy&6"
+    validNewPassword: "HWDIj23ie1w!"
 };
 
 export const testPopupConstant = {

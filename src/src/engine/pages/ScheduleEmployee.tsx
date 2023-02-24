@@ -102,11 +102,9 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
                 <ComponentLoading />
             );
         } else if (this.state.fetchState === enumStateOfFetching.OK) {
-            return (<ComponentEmployeeScheduleView shifts={listData} />);
-
+            return (<ComponentEmployeeScheduleView shifts={listData}/>);
         } else {
             return (<ComponentEmployeeScheduleView shifts={[]}/>);
         }
-
     }
 }
