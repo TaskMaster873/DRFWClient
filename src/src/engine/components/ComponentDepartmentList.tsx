@@ -8,6 +8,9 @@ import { ScaleLoader } from "react-spinners";
 import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
+import {Employee} from "../types/Employee";
+import {CgCheckO, CgUnavailable} from "react-icons/cg";
+import {BiEdit} from "react-icons/bi";
 
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
     public render(): JSX.Element {
@@ -79,8 +82,21 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                     <td key={"employeeNb " + index}>
                         {this.props.employeeNb[index]}
                     </td>
+                    {this.renderAdminActions(index, department)}
                 </tr>
             ));
+        }
+    }
+
+    private renderAdminActions(index: number, department: Department): JSX.Element | undefined {
+        if (department.departmentId && API.hasPermission(Roles.ADMIN)) {
+            return (
+                <td key={`action ${index}`}>
+                    <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${department.departmentId}`} className="adminActions mx-1">
+                        <BiEdit/>
+                    </LinkContainer>
+                </td>
+            );
         }
     }
 
