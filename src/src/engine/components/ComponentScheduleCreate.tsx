@@ -121,7 +121,6 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 	 * @returns {void}
 	 */
 	readonly #onTimeRangeSelected = (args: any): void => {
-		console.log(args)
 		this.setState({
 			isShowingModal: true,
 			start: args.start,
@@ -147,9 +146,9 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 	readonly #onEventMoved = async (args: any): Promise<void> => {
 		let eventToSend: EventForShiftEdit = {
 			id: args.e.data.id,
-			employeeId: args.NewResource,
-			start: args.NewStart,
-			end: args.NewEnd,
+			employeeId: args.newResource,
+			start: args.newStart,
+			end: args.newEnd,
 		};
 		await this.props.editShift(eventToSend)
 	};

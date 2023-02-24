@@ -27,42 +27,6 @@ export interface DayPilotCalendarSettings {
     eventDeleteHandling: string; 
 }
 
-/**
- * Ceci c'est pour le state de création d'employé
- */
-
-export interface CalendarAttributesForEmployeeShiftCreationComponent {
-	/** date of the start */
-	//startDate: string;
-	/** the columns */
-	//columns: ColumnsType[]; 
-	/** the shifts */
-	//events: EventForCalendar[]; 
-	/** height */
-	heightSpec?: HeightSpecType;
-	/** hardcoded height, so not important */
-	height?: number; 
-	/** hardcoded height, so not important */
-	cellHeight?: number; 
-	/** precision in minutes of cells (minimum 15min) in lite version */
-	cellDuration?: number 
-	/** the type of view of data */
-	//viewType: ViewType; 
-	/** if we can delete or not in the calendar */
-	//eventDeleteHandling: EventDeleteHandlingType;
-	/** is the popup child active or not */
-	isShowingModal: boolean;
-    /** Shift id and Daypilot marker */
-    currentEventId: string;
-	/** start of the calendar */
-	start: DayPilot.Date;
-	/** end of the calendar */
-	end: DayPilot.Date;
-	/** for the popup */
-	resourceName: string;
-    /** Popup taskType */
-    taskType: EventManipulationType;
-}
 
 export enum EventManipulationType {
 	CREATE = "Créer",

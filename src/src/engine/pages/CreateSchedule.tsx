@@ -52,7 +52,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         document.title = "Création d'horaire - TaskMaster";
 
         let isLoggedIn: boolean = await this.verifyLogin();
-        if(isLoggedIn) {
+        if (isLoggedIn) {
             let fetchedDepartments = await API.getDepartments();
             if (typeof fetchedDepartments === "string") {
                 NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
@@ -195,7 +195,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         let events: EventForCalendar[] = [];
         for (let shift of shifts) {
             events.push({
-                id: "",
+                id: shift.id,
                 start: shift.start,
                 end: shift.end,
                 resource: shift.employeeId
@@ -205,7 +205,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
     }
 
     public render(): JSX.Element {
-        if(this.state.redirectTo) {
+        if (this.state.redirectTo) {
             return (<Navigate to={this.state.redirectTo}></Navigate>);
         }
 
@@ -216,33 +216,33 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
                 if (this.state.departments.length > 1) {
                     return (
                         <Container>
-                            <SelectDepartment 
-                                departments={this.state.departments} 
+                            <SelectDepartment
+                                departments={this.state.departments}
                                 changeDepartment={this.#changeDepartment}
                             />
                             <ComponentScheduleCreate
-                                events={this.getEventsForCalendarFromShifts(this.state.shifts)} 
-                                employees={this.state.employees} 
-                                addShift={this.#addShift} 
-                                editShift={this.#editShift} 
+                                events={this.getEventsForCalendarFromShifts(this.state.shifts)}
+                                employees={this.state.employees}
+                                addShift={this.#addShift}
+                                editShift={this.#editShift}
                             />
                         </Container>
                     );
                 } else {
-                    return <ComponentScheduleCreate 
-                                events={this.getEventsForCalendarFromShifts(this.state.shifts)} 
-                                employees={this.state.employees} 
-                                addShift={this.#addShift} 
-                                editShift={this.#editShift} 
-                            />;
+                    return <ComponentScheduleCreate
+                        events={this.getEventsForCalendarFromShifts(this.state.shifts)}
+                        employees={this.state.employees}
+                        addShift={this.#addShift}
+                        editShift={this.#editShift}
+                    />;
                 }
             default:
-                return <ComponentScheduleCreate 
-                            events={[]} 
-                            employees={[]} 
-                            addShift={this.#addShift} 
-                            editShift={this.#editShift} 
-                        />;
+                return <ComponentScheduleCreate
+                    events={[]}
+                    employees={[]}
+                    addShift={this.#addShift}
+                    editShift={this.#editShift}
+                />;
         }
     }
 }
