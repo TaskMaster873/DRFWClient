@@ -22,7 +22,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         let titles = API.getJobTitles();
 
         let params: [
-            Department[],
+            Department[] | string,
             EmployeeRoleList | string,
             EmployeeJobTitleList | string
         ] = await Promise.all([departments, roles, titles]);
@@ -56,7 +56,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
-                onDataChange={this.#addEmployee}
+                onAddEmployee={this.#addEmployee}
             />
         );
     }

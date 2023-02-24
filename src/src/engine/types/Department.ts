@@ -1,4 +1,5 @@
 import {Employee} from "./Employee";
+import {FormErrorType} from "../messages/FormMessages";
 
 export interface DepartmentListState {
     employees: Employee[],
@@ -10,10 +11,12 @@ export interface DepartmentListState {
  * Contient tous les renseignements des employés de l'application web
  */
 export class Department {
-    name: string;
-    director: string;
+    public departmentId?: string;
+    public name: string;
+    public director: string;
 
-    constructor(department: DepartmentCreateDTO) {
+    constructor(department: DepartmentDTO) {
+        this.departmentId = department.departmentId;
 		this.name = department.name;
         this.director = department.director;
 	}
@@ -28,12 +31,20 @@ export let departmentTableHeads : string[] =
 export interface DepartmentCreateDTO {
 	readonly name: string;
     readonly director: string;
+}
 
+export interface DepartmentDTO {
+    readonly departmentId?: string;
+    readonly name: string;
+    readonly director: string;
 }
 
 export interface DepartmentListProps {
     employees: Employee[],
     employeeNb: number[],
     departments: Department[],
-    onDataChange: (department) => PromiseLike<void> | Promise<void> | void;
+    onAddDepartment: (department) => PromiseLike<void> | Promise<void> | void;
+    onEditDepartment: (department) => PromiseLike<void> | Promise<void> | void;
 }
+
+

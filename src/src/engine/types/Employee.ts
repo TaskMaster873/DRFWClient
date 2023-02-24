@@ -64,6 +64,17 @@ export interface EmployeeDTO {
     readonly role: number;
 }
 
+
+export interface EmployeeEditDTO {
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly phoneNumber: string;
+    readonly department: string;
+    readonly jobTitles: string[];
+    readonly skills: string[];
+    readonly role: number;
+}
+
 export let adminTableHeads : string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
 
@@ -78,8 +89,7 @@ export interface EmployeeListProps {
     employees: Employee[] | null;
     filteredList: Employee[] | null;
     department?: string | null;
-    onEditEmployee: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
-    onDeactivateEmployee: (employeeId: string | undefined) => PromiseLike<void> | Promise<void> | void;
+    onEmployeeActivationChange: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface EmployeeListState {
@@ -90,7 +100,17 @@ export interface AddEmployeeProps {
     departments: Department[];
     roles: string[];
     jobTitles: string[];
-    onDataChange: (password, employee) => PromiseLike<void> | Promise<void> | void;
+    onAddEmployee: (password : string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
+}
+
+export interface EditEmployeeProps {
+    departments: Department[];
+    roles: string[];
+    jobTitles: string[];
+    employeeId?: string | null;
+    editedEmployee: EmployeeEditDTO | undefined;
+    onEditEmployee: (employeeId: string, employee: EmployeeEditDTO) => PromiseLike<void> | Promise<void> | void;
+
 }
 
 export type EmployeeRoleList = string[];
@@ -100,4 +120,5 @@ export interface AddEmployeeState {
     departments: Department[];
     roles: EmployeeRoleList;
     titles: EmployeeJobTitleList;
+    editedEmployee?: EmployeeEditDTO;
 }

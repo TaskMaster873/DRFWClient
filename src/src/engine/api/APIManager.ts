@@ -30,7 +30,7 @@ import {
 } from "firebase/firestore";
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
-import {Employee, EmployeeCreateDTO} from "../types/Employee";
+import {Employee, EmployeeCreateDTO, EmployeeEditDTO} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
@@ -199,8 +199,12 @@ class APIManager extends Logger {
         return this.isAuthenticated;
     }
 
-    public hasPermission(permissionLevel: number): boolean {
+    public hasPermission(permissionLevel: Roles): boolean {
         return this.#userRole >= permissionLevel;
+    }
+
+    public hasLowerPermission(permissionLevel: Roles): boolean {
+        return this.#userRole > permissionLevel;
     }
 
     public getErrorMessageFromCode(error: Error | string): string {
@@ -510,13 +514,13 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async editEmployee(employee: Employee): Promise<string | null> {
+    public async editEmployee(employeeId: string, employee: EmployeeEditDTO): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
         let errorMessage: string | null = null;
-        if (employee.employeeId) {
-            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {...employee}).catch((error) => {
+        if (employeeId) {
+            await updateDoc(doc(this.#db, `employees`, employeeId), {...employee}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
         } else {
@@ -525,18 +529,14 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async deactivateEmployee(
-        employeeId: string | null
-    ): Promise<string | null> {
+    public async changeEmployeeActivation(employee: Employee): Promise<string | null> {
         let errorMessage: string | null = null;
 
-        if (employeeId !== null && employeeId) {
+        if (employee.employeeId) {
             if (!this.hasPermission) {
                 return errors.PERMISSION_DENIED;
             }
-            await updateDoc(doc(this.#db, `employees`, employeeId), {
-                isActive: false,
-            }).catch((error) => {
+            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {isActive: employee.isActive}).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
         } else {
@@ -566,6 +566,21 @@ class APIManager extends Logger {
             }).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
+        }
+        return errorMessage;
+    }
+
+    public async editDepartment(department: Department): Promise<string | null> {
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        let errorMessage: string | null = null;
+        if (department.departmentId) {
+            await updateDoc(doc(this.#db, `departments`, department.departmentId), {...department}).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_EMPLOYEE_ID;
         }
         return errorMessage;
     }
@@ -617,6 +632,21 @@ class APIManager extends Logger {
         return errorMessage ?? employees;
     }
 
+    public async getEmployeeById(employeeId: string): Promise<EmployeeEditDTO | string> {
+        let errorMessage: string | null = null;
+
+        let snap = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        })
+
+        if (snap && snap.exists()) {
+            return snap.data() as EmployeeEditDTO;
+        } else {
+            errorMessage = errors.EMPLOYEE_NOT_FOUND
+        }
+        return errorMessage;
+    }
+
     public async getDepartments(): Promise<Department[]> {
         let errorMessage: string | null = null;
         let departments: Department[] = [];
@@ -625,16 +655,13 @@ class APIManager extends Logger {
             errorMessage = this.getErrorMessageFromCode(error);
         });
         if (snaps) {
-            snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
+            for(let doc of snaps.docs){
                 departments.push(
-                    new Department({
-                        name: doc.data().name,
-                        director: doc.data().director,
-                    })
+                    doc.data() as Department
                 );
-            });
+            }
         }
-        return departments;
+        return errorMessage ?? departments;
     }
 
     public async getEmployeeNbDepartments(
@@ -729,7 +756,9 @@ class APIManager extends Logger {
      * @returns string daypilot Ex: (February 2, 2022 at 3:15 AM) = 2022-02-16T03:15:00
      */
     private getDayPilotDateString(date: Timestamp): string {
-        return new Date(date.seconds * 1000).toISOString().slice(0, -5);
+        //Take UTC timestamp, remove timezone offset, convert to ISO format
+        let myDate = new Date((date.seconds - new Date().getTimezoneOffset() * 60) * 1000).toISOString();
+        return myDate.slice(0, -5);
     }
 
     public async getCurrentEmployeeSchedule(): Promise<Shift[] | string> {
@@ -774,13 +803,12 @@ class APIManager extends Logger {
      * @returns Timestamp firebase
      */
     private getFirebaseTimestamp(daypilotString: string): Timestamp {
-        return new Timestamp(new Date(daypilotString).getTime() / 1000, 0);
+        return new Timestamp(Date.parse(daypilotString) / 1000, 0);
     }
 
     /**
      * Récupère l'horaire de la journée d'un département pour une journée
-     * @param startDay le début de la journée en string daypilot Ex: (2 février 2022 début de journée) = 2022-02-16T00:00:00
-     * @param endDay la fin de la journée en string daypilot Ex: (2 février 2022 fin de journée) = 2022-02-16T24:00:00
+     * @param day
      * @param department le nom du département que récupérer
      * @returns une liste de quarts de travail d'un département pour une journée
      */
@@ -796,15 +824,11 @@ class APIManager extends Logger {
         //Convert Daypilot datetimes to Timestamps
         let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
         let convertedEndDay: Timestamp = this.getFirebaseTimestamp(day.addDays(1));
-        //Get employees by department
-        let fetchedData = await this.getEmployees(department.name);
-        if (typeof fetchedData === "string") return fetchedData;
-        let employees = fetchedData as Employee[];
         //Query shifts
         let queryShifts = query(
-            collection(this.#db, `shifts`), 
-            where("department", "==", department.name), 
-            where("end", ">", convertedStartDay), 
+            collection(this.#db, `shifts`),
+            where("department", "==", department.name),
+            where("end", ">", convertedStartDay),
             where("end", "<", convertedEndDay)
             );
         let snaps = await getDocs(queryShifts).catch((error) => {
@@ -814,14 +838,8 @@ class APIManager extends Logger {
         if (snaps) {
             for (let doc of snaps.docs) {
                 let shift = doc.data();
-                //Get employee name if present
-                let fetchedEmployeeName = "Unknown";
-                for (let employee of employees)
-                    if (employee.employeeId == shift.employeeId)
-                        fetchedEmployeeName = employee.firstName + " " + employee.lastName;
                 //Push shift object
                 shifts.push(new Shift({
-                    employeeName: fetchedEmployeeName,
                     employeeId: shift.employeeId,
                     department: shift.department,
                     projectName: shift.projectName,
@@ -838,37 +856,30 @@ class APIManager extends Logger {
      * @param shift est un shift avec toutes les données pour le créer
      * @returns un booléen pour savoir si il est créé
      */
-    public async createShift(shift: Shift): Promise<boolean> {
-        let isCreated: boolean = false;
+    public async createShift(shift: Shift): Promise<void | string> {
         //Check if user has permission
         if (!this.hasPermission(2)) {
             //Gestionnaire
-            return false;
+            return errors.PERMISSION_DENIED;
         }
-        //Get Employee Name and department
-        console.log("CreateShift", shift);
-        let queryEmployee = doc(this.#db, `employees`, shift.employeeId);
-
-        let snaps = await getDoc(queryEmployee).catch((error) => {
-            this.getErrorMessageFromCode(error);
-        });
-        if (snaps) {
-            let data = snaps.data();
-            if (data) {
-                shift.employeeName = data.employeeName;
-                shift.department = data.department;
-            }
-        }
-        shift.projectName = "testing";
+        let errorMessage : string | null = null;
         //Create Shift
-        let success = await addDoc(collection(this.#db, `shifts`), {
-            ...shift,
-        }).catch((error) => {
-            this.getErrorMessageFromCode(error);
+        await addDoc(collection(this.#db, `shifts`),
+            {
+                department: shift.department,
+                employeeId: shift.employeeId,
+                end: this.getFirebaseTimestamp(shift.end),
+                projectName: shift.projectName,
+                start: this.getFirebaseTimestamp(shift.start)
+            },
+        ).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
         });
-        if (success) isCreated = true;
-        return isCreated;
+        if(errorMessage) return errorMessage;
     }
+
+
+
 }
 
 export const API = new APIManager();

@@ -10,7 +10,6 @@ export interface ShiftForCalendar {
  * Shift class
  * @class Shift
  * @classdesc Shift class
- * @property {string} employeeName - Employee name
  * @property {string} projectName - Project name
  * @property {string} department - Department name
  * @property {string} start - Start date
@@ -19,7 +18,6 @@ export interface ShiftForCalendar {
  * @description This class is used to create a Shift that will be used in the calendar
  */
 export class Shift {
-    public employeeName?: string;
     public projectName: string = "";
     public department: string = "";
     public start: string = "";
@@ -27,7 +25,6 @@ export class Shift {
     public employeeId: string = "";
 
     constructor(shift: ShiftDTO) {
-        this.employeeName = shift.employeeName;
         this.employeeId = shift.employeeId;
         this.department = shift.department;
         this.projectName = shift.projectName;
@@ -37,7 +34,6 @@ export class Shift {
 }
 
 export interface ShiftDTO {
-    readonly employeeName?: string;
     readonly employeeId: string;
     readonly department: string;
     readonly start: string;
@@ -59,7 +55,7 @@ export interface EventForShiftCreation {
  */
 export interface EventForCalendar {
     /** unique id in schedule board */
-    readonly id: number; 
+    readonly id: string; 
     /** what is written in the calendar */ 
     text?: string; 
     /** time where it start */
