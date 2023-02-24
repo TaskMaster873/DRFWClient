@@ -55,16 +55,20 @@ export function ComponentPopupSchedule(props: Props) {
 			console.log("eventCréé =", eventToReturn);
 			setDisabled(true);
 			await props.eventAdd(eventToReturn);
-			props.hideModal()
-			setDisabled(false);
-			setValidated(false);
-			setError(FormErrorType.NO_ERROR);
+			closeModal();
 		}
+	};
+
+	const closeModal = () => {
+		props.hideModal();
+		setDisabled(false);
+		setValidated(false);
+		setError(FormErrorType.NO_ERROR);
 	};
 
 	return (
 		<Modal show={props.isShown} >
-			<Modal.Header closeButton onClick={() => props.hideModal()}>
+			<Modal.Header closeButton onClick={() => closeModal()}>
 				<Modal.Title>{props.taskType} un quart de travail</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={(e) => handleSubmit(e)} validated={validated} data-error={error}>
@@ -81,8 +85,8 @@ export function ComponentPopupSchedule(props: Props) {
 							onChange={(e) => {setStart(e.target.value);}}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidStartDate">
-                            {errors.INVALID_DATE}
-                        </Form.Control.Feedback>
+							{errors.INVALID_DATE}
+						</Form.Control.Feedback>
 					</Form.Group>
 					<Form.Group className="mb-3">
 						<Form.Label >End moment</Form.Label>
@@ -96,12 +100,12 @@ export function ComponentPopupSchedule(props: Props) {
 							onChange={(e) => setEnd(e.target.value)}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidEndDate">
-                            {errors.INVALID_DATE}
-                        </Form.Control.Feedback>
+							{errors.INVALID_DATE}
+						</Form.Control.Feedback>
 					</Form.Group>
 				</Modal.Body>
 				<Modal.Footer>
-					<Button variant="secondary" onClick={() => props.hideModal()} >
+					<Button variant="secondary" onClick={() => closeModal()} >
 						Annuler
 					</Button>
 					<Button variant="primary" type="submit" disabled={disabled}>
