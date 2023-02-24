@@ -1,6 +1,6 @@
 import React, {CSSProperties} from "react";
 import { Nav, Table } from "react-bootstrap";
-import { Department, DepartmentListProps, departmentTableHeads } from "../types/Department";
+import {Department, DepartmentListProps, DepartmentListState, departmentTableHeads} from "../types/Department";
 import { ComponentAddDepartment } from "./ComponentAddDepartment";
 import { API } from "../api/APIManager";
 import { LinkContainer } from "react-router-bootstrap";
@@ -8,11 +8,12 @@ import { ScaleLoader } from "react-spinners";
 import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
-import {Employee} from "../types/Employee";
-import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {BiEdit} from "react-icons/bi";
 
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
+
+    public state : DepartmentListState
+
     public render(): JSX.Element {
         return (
             <div className="mt-5">
@@ -28,7 +29,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                     </tbody>
                 </Table>
                 {this.renderAddDepartmentComponent()}
-                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.#onEditDepartment} />
+                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.#onEditDepartment} departmentToEdit={} />
             </div>
         );
     }
@@ -92,9 +93,9 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
         if (department.departmentId && API.hasPermission(Roles.ADMIN)) {
             return (
                 <td key={`action ${index}`}>
-                    <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${department.departmentId}`} className="adminActions mx-1">
+                    <a onClick={this.props.onEditDepartment(department)} className="adminActions mx-1">
                         <BiEdit/>
-                    </LinkContainer>
+                    </a>
                 </td>
             );
         }
