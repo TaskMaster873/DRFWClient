@@ -1244,6 +1244,15 @@ class APIManager extends Logger {
         if (errorMessage) return errorMessage;
     }
 
+    /**
+     * This method is used to edit a shift. If the request was not successful, it will return an error message.
+     * @method editShift
+     * @async
+     * @public
+     * @memberof APIManager
+     * @param {Shift} shift The shift to edit.
+     * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
+     */
     public async editShift(shift: Shift): Promise<void | string> {
         //Check if user has permission
         if (!this.hasPermission(2)) {
