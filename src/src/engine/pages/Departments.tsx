@@ -1,7 +1,7 @@
 import React from "react";
 import {ComponentDepartmentList} from "../components/ComponentDepartmentList";
 import {API} from "../api/APIManager";
-import {Department, DepartmentListState} from "../types/Department";
+import {Department, DepartmentListState, DepartmentsState} from "../types/Department";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
@@ -12,8 +12,8 @@ import {Container} from "react-bootstrap";
 /**
  * Ceci est la page pour les departments
  */
-export class Departments extends React.Component<unknown, DepartmentListState> {
-    public state: DepartmentListState = {
+export class Departments extends React.Component<unknown, DepartmentsState> {
+    public state: DepartmentsState = {
         employees: [],
         employeeNb: [],
         departments: [],

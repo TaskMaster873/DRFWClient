@@ -1,4 +1,4 @@
-import React, {CSSProperties} from "react";
+import React, {CSSProperties, MouseEventHandler} from "react";
 import { Nav, Table } from "react-bootstrap";
 import {Department, DepartmentListProps, DepartmentListState, departmentTableHeads} from "../types/Department";
 import { ComponentAddDepartment } from "./ComponentAddDepartment";
@@ -12,7 +12,9 @@ import {BiEdit} from "react-icons/bi";
 
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
 
-    public state : DepartmentListState
+    public state: DepartmentListState = {
+        editedDepartment: undefined
+    }
 
     public render(): JSX.Element {
         return (
@@ -29,7 +31,8 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                     </tbody>
                 </Table>
                 {this.renderAddDepartmentComponent()}
-                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.#onEditDepartment} departmentToEdit={} />
+                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.#onEditDepartment}
+                                         departmentToEdit={this.state.editedDepartment} cancelEdit={this.#onCancelEdit} />
             </div>
         );
     }
@@ -45,7 +48,6 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
             /**
              * If there is no department and the data is not loaded yet, we display a loading bar
              */
-
             return [
                 <tr key={"noDepartment"}>
                     <td colSpan={4}>
@@ -90,15 +92,19 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
     }
 
     private renderAdminActions(index: number, department: Department): JSX.Element | undefined {
-        if (department.departmentId && API.hasPermission(Roles.ADMIN)) {
+        if (API.hasPermission(Roles.ADMIN)) {
             return (
                 <td key={`action ${index}`}>
-                    <a onClick={this.props.onEditDepartment(department)} className="adminActions mx-1">
+                    <a onClick={() => this.onEditMode(department)} className="adminActions mx-1">
                         <BiEdit/>
                     </a>
                 </td>
             );
         }
+    }
+
+    private onEditMode(department: Department): void {
+        this.setState({editedDepartment: department});
     }
 
     /**
@@ -122,6 +128,10 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
         }
     }
 
+    readonly #onCancelEdit = (): void => {
+        this.setState({editedDepartment: undefined});
+    }
+
     /**
      * Render the component to add a department if the user is an admin
      * @private
@@ -137,4 +147,6 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
             return <></>;
         }
     }
+
+
 }
