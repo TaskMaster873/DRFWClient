@@ -1254,9 +1254,8 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
 
         //Edit Shift
-        await setDoc(doc(this.#db, `shifts`),
+        await setDoc(doc(this.#db, `shifts`, shift.id),
             {
-                id: shift.id,
                 department: shift.department,
                 employeeId: shift.employeeId,
                 end: this.getFirebaseTimestamp(shift.end),

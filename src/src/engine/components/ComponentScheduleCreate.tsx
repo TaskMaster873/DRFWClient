@@ -2,18 +2,51 @@ import React from "react";
 import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
 import {EventForCalendar, EventForShiftCreation, EventForShiftEdit, Shift} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
-import {CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, EventManipulationType, HeightSpecType, ViewType} from "../types/StatesForDaypilot";
 import {Employee} from "../types/Employee";
+import {HeightSpecType, EventManipulationType, ViewType, EventDeleteHandlingType, ColumnsType} from "../types/StatesForDaypilot";
 
-type ComponentScheduleCreateProps = {
+type Props = {
 	events: EventForCalendar[];
 	employees: Employee[];
 	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
 	editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
 };
 
-export class ComponentScheduleCreate extends React.Component<ComponentScheduleCreateProps, CalendarAttributesForEmployeeShiftCreationComponent> {
-	public state: CalendarAttributesForEmployeeShiftCreationComponent = {
+type State = {
+	/** date of the start */
+	//startDate: string;
+	/** the columns */
+	//columns: ColumnsType[]; 
+	/** the shifts */
+	//events: EventForCalendar[]; 
+	/** height */
+	heightSpec?: HeightSpecType;
+	/** hardcoded height, so not important */
+	height?: number; 
+	/** hardcoded height, so not important */
+	cellHeight?: number; 
+	/** precision in minutes of cells (minimum 15min) in lite version */
+	cellDuration?: number 
+	/** the type of view of data */
+	//viewType: ViewType; 
+	/** if we can delete or not in the calendar */
+	//eventDeleteHandling: EventDeleteHandlingType;
+	/** is the popup child active or not */
+	isShowingModal: boolean;
+    /** Shift id and Daypilot marker */
+    currentEventId: string;
+	/** start of the calendar */
+	start: DayPilot.Date;
+	/** end of the calendar */
+	end: DayPilot.Date;
+	/** for the popup */
+	resourceName: string;
+    /** Popup taskType */
+    taskType: EventManipulationType;
+}
+
+export class ComponentScheduleCreate extends React.Component<Props, State> {
+	public state: State = {
 		isShowingModal: false,
 		currentEventId: "",
 		start: "2023-02-17T00:00:00",
@@ -22,7 +55,7 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 		taskType: EventManipulationType.CREATE,
 	};
 
-	constructor(props: ComponentScheduleCreateProps) {
+	constructor(props: Props) {
 		super(props);
 	}
 
@@ -112,7 +145,6 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 	};
 
 	readonly #onEventMoved = async (args: any): Promise<void> => {
-		console.log("called?")
 		let eventToSend: EventForShiftEdit = {
 			id: args.e.data.id,
 			employeeId: args.NewResource,
