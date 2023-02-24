@@ -5,7 +5,7 @@ import {DayPilotCalendarSettings} from '../types/StatesForDaypilot';
 import {Converter} from '../utils/DateConverter';
 
 interface ComponentEmployeeScheduleViewProps {
-	listOfShifts: Shift[];
+	shifts: Shift[];
 }
 
 export interface EmployeeScheduleState {
@@ -17,7 +17,7 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 	private datePickerRef: React.RefObject<any> = React.createRef();
 
 	public props: ComponentEmployeeScheduleViewProps = {
-		listOfShifts: []
+		shifts: []
 	};
 
 	public state: EmployeeScheduleState = {
@@ -59,7 +59,7 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 		let events: ShiftForCalendar[] = [];
 		let startDate = DayPilot.Date.today();
 
-		for (let shift of this.props.listOfShifts) {
+		for (let shift of this.props.shifts) {
 			let convertedStartTime = Converter.convertTimestampToDayPilotDate(shift.start);
 			let convertedEndTime = Converter.convertTimestampToDayPilotDate(shift.end);
 
