@@ -64,6 +64,8 @@ export function ComponentPopupSchedule(props: Props) {
 		setDisabled(false);
 		setValidated(false);
 		setError(FormErrorType.NO_ERROR);
+		setStart(null);
+		setEnd(null);
 	};
 
 	return (
