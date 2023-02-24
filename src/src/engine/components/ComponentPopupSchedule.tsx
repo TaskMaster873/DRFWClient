@@ -62,6 +62,9 @@ export function ComponentPopupSchedule(props: Props) {
 		}
 	};
 
+	/**
+	 * Sends a shift creation object to the page
+	 */
 	const sendCreateEvent = async () => {
 		let eventToReturn: EventForShiftCreation = {
 			employeeId: props.resource,
@@ -71,6 +74,9 @@ export function ComponentPopupSchedule(props: Props) {
 		await props.eventAdd(eventToReturn);
 	};
 
+	/**
+	 * Send a shift edit object to the page
+	 */
 	const sendEditEvent = async () => {
 		let eventToReturn: EventForShiftEdit = {
 			id: props.id,
@@ -81,6 +87,9 @@ export function ComponentPopupSchedule(props: Props) {
 		await props.eventEdit(eventToReturn);
 	};
 
+	/**
+	 * Hides the modal window and resets its data
+	 */
 	const closeModal = () => {
 		props.hideModal();
 		setDisabled(false);

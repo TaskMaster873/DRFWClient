@@ -13,27 +13,9 @@ type Props = {
 };
 
 type State = {
-	/** date of the start */
-	//startDate: string;
-	/** the columns */
-	//columns: ColumnsType[]; 
-	/** the shifts */
-	//events: EventForCalendar[]; 
-	/** height */
-	heightSpec?: HeightSpecType;
-	/** hardcoded height, so not important */
-	height?: number; 
-	/** hardcoded height, so not important */
-	cellHeight?: number; 
-	/** precision in minutes of cells (minimum 15min) in lite version */
-	cellDuration?: number 
-	/** the type of view of data */
-	//viewType: ViewType; 
-	/** if we can delete or not in the calendar */
-	//eventDeleteHandling: EventDeleteHandlingType;
 	/** is the popup child active or not */
 	isShowingModal: boolean;
-    /** Shift id and Daypilot marker */
+    /** Shift id and serves as a unique DayPilot marker */
     currentEventId: string;
 	/** start of the calendar */
 	start: DayPilot.Date;
@@ -67,7 +49,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 					businessEndsHour={20}
 					height={2000}
 					cellHeight={20}
-					cellDuration={5}
+					cellDuration={30}
 					onTimeRangeSelected={this.#onTimeRangeSelected}
 					onEventClick={this.#onEventClick}
 					onEventMoved={this.#onEventMoved}
@@ -132,6 +114,10 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 		DayPilot.Calendar.clearSelection;
 	};
 
+	/**
+	 * When you click an event in order to modify its details, this function is called
+	 * @param args info on the clicked event
+	 */
 	readonly #onEventClick = (args: any): void => {
 		this.setState({
 			isShowingModal: true,
@@ -143,6 +129,10 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 		});
 	};
 
+	/**
+	 * When you drag an event in order to modify its position, this function is called
+	 * @param args info on the dragged event
+	 */
 	readonly #onEventMoved = async (args: any): Promise<void> => {
 		let eventToSend: EventForShiftEdit = {
 			id: args.e.data.id,
@@ -153,6 +143,9 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 		await this.props.editShift(eventToSend)
 	};
 
+	/**
+	 * When you close the modal window, this function is called in order to hide it
+	 */
 	readonly #hideModal = () => {
 		this.setState({
 			isShowingModal: false
