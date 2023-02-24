@@ -322,7 +322,7 @@ class APIManager extends Logger {
      * @param error The error to parse.
      * @returns {string} The human-readable error message.
      */
-    public getErrorMessageFromCode(error: Error | string): string {
+    private getErrorMessageFromCode(error: Error | string): string {
         let errorMessage: string;
         let message: string;
 

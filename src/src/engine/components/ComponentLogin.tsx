@@ -9,7 +9,6 @@ import { ComponentPropsLogin } from "../types/ComponentPropsType";
 import Logo from "../../deps/images/logo.png";
 import {RoutesPath} from "../RoutesPath";
 
-
 interface ComponentStateLogin {
     emailLogin: string;
     passwordLogin: string;

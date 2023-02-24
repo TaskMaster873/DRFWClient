@@ -51,9 +51,8 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
     public async componentDidMount(): Promise<void> {
         document.title = "Création d'horaire - TaskMaster";
 
-        await this.verifyLogin();
-
-        if(API.isAuth()) {
+        let isLoggedIn: boolean = await this.verifyLogin();
+        if(isLoggedIn) {
             let fetchedDepartments = await API.getDepartments();
             if (typeof fetchedDepartments === "string") {
                 NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
@@ -61,9 +60,16 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
             } else {
                 await this.#changeDepartment(fetchedDepartments[0], fetchedDepartments);
             }
+        } else {
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
     }
 
+    /**
+     * Verify if the user has the permission to access this page
+     * @param role
+     * @private
+     */
     private verifyPermissions(role: Roles): boolean {
         return API.hasPermission(role);
     }
@@ -72,12 +78,18 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
      * Verify if the user is logged in
      * @private
      */
-    private async verifyLogin(): Promise<void> {
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        if (!API.isAuth()) {
+        let hasPerms = this.verifyPermissions(Roles.MANAGER);
+        if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
+        } else {
+            isLoggedIn = true;
         }
+
+        return isLoggedIn;
     }
 
     /**

@@ -10,8 +10,10 @@ import {
 import {errors, successes} from "../messages/FormMessages";
 import {Department} from "../types/Department";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
-import {Params, useParams} from "react-router-dom";
+import {Navigate, Params, useParams} from "react-router-dom";
 import {NotificationManager} from "../api/NotificationManager";
+import {Roles} from "../types/Roles";
+import {RoutesPath} from "../RoutesPath";
 
 export function EditEmployeeWrapper(): JSX.Element {
     let parameters: Readonly<Params<string>> = useParams();
@@ -29,7 +31,8 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         departments: [],
         roles: [],
         titles: [],
-        editedEmployee: undefined
+        editedEmployee: undefined,
+        redirectTo: null
     }
 
     /**
@@ -40,28 +43,71 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     public async componentDidMount() : Promise<void> {
         document.title = "Modifier un Employé - TaskMaster";
 
-        let departments = API.getDepartments();
-        let roles = API.getRoles();
-        let titles = API.getJobTitles();
+        let isLoggedIn: boolean = await this.verifyLogin();
+        if(isLoggedIn) {
+            let departments = API.getDepartments();
+            let roles = API.getRoles();
+            let titles = API.getJobTitles();
 
-        if(this.props.params.id) {
-            let editedEmployee = API.getEmployeeById(this.props.params.id);
+            if(this.props.params.id) {
+                let editedEmployee = API.getEmployeeById(this.props.params.id);
 
-            let params: [
-                Department[] | string,
-                EmployeeRoleList | string,
-                EmployeeJobTitleList | string,
-                EmployeeEditDTO | string
-            ] = await Promise.all([departments, roles, titles, editedEmployee]);
+                let params: [
+                        Department[] | string,
+                        EmployeeRoleList | string,
+                        EmployeeJobTitleList | string,
+                        EmployeeEditDTO | string
+                ] = await Promise.all([departments, roles, titles, editedEmployee]);
 
-            if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && params[3] && typeof(params[3]) !== "string") {
-                this.setState({departments: params[0], roles: params[1], titles: params[2], editedEmployee: params[3]});
+                if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && params[3] && typeof(params[3]) !== "string") {
+                    this.setState({departments: params[0], roles: params[1], titles: params[2], editedEmployee: params[3]});
+                } else {
+                    NotificationManager.error(errors.GET_EDIT_EMPLOYEES, errors.ERROR_GENERIC_MESSAGE);
+                }
             } else {
-                NotificationManager.error(errors.GET_EDIT_EMPLOYEES, errors.ERROR_GENERIC_MESSAGE);
+                NotificationManager.error(errors.INVALID_EMPLOYEE_ID_PARAMETER, errors.ERROR_GENERIC_MESSAGE);
             }
         } else {
-            NotificationManager.error(errors.INVALID_EMPLOYEE_ID_PARAMETER, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
+    }
+
+    /**
+     * Verify if the user has the permission to access this page
+     * @param role
+     * @private
+     */
+    private verifyPermissions(role: Roles): boolean {
+        return API.hasPermission(role);
+    }
+
+    /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
+        await API.awaitLogin;
+
+        let hasPerms = this.verifyPermissions(Roles.ADMIN);
+        if (!API.isAuth() || !hasPerms) {
+            this.redirectTo(RoutesPath.INDEX);
+        } else {
+            isLoggedIn = true;
+        }
+
+        return isLoggedIn;
+    }
+
+    /**
+     * Redirect to a path
+     * @param path
+     * @private
+     */
+    private redirectTo(path: string): void {
+        this.setState({
+            redirectTo: path
+        });
     }
 
     /**
@@ -79,6 +125,10 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     }
 
     public render(): JSX.Element {
+        if(this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        }
+
         return (
             <ComponentEditEmployee
                 departments={this.state.departments}

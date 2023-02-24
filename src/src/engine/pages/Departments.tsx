@@ -1,10 +1,12 @@
 import React from "react";
-import {Container} from "react-bootstrap";
 import {ComponentDepartmentList} from "../components/ComponentDepartmentList";
 import {API} from "../api/APIManager";
 import {Department, DepartmentListState} from "../types/Department";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
+import {Roles} from "../types/Roles";
+import {RoutesPath} from "../RoutesPath";
+import {Navigate} from "react-router-dom";
 
 /**
  * Ceci est la page pour les departments
@@ -13,13 +15,58 @@ export class Departments extends React.Component<unknown, DepartmentListState> {
     public state: DepartmentListState = {
         employees: [],
         employeeNb: [],
-        departments: []
+        departments: [],
+        redirectTo: null
     }
 
     public async componentDidMount() : Promise<void> {
         document.title = "Départements - TaskMaster";
 
-        await this.fetchData();
+        let isLoggedIn: boolean = await this.verifyLogin();
+
+        if(isLoggedIn) {
+            await this.fetchData();
+        } else {
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
+        }
+    }
+
+    /**
+     * Verify if the user has the permission to access this page
+     * @param role
+     * @private
+     */
+    private verifyPermissions(role: Roles): boolean {
+        return API.hasPermission(role);
+    }
+
+    /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
+        await API.awaitLogin;
+
+        let hasPerms = this.verifyPermissions(Roles.EMPLOYEE);
+        if (!API.isAuth() || !hasPerms) {
+            this.redirectTo(RoutesPath.INDEX);
+        } else {
+            isLoggedIn = true;
+        }
+
+        return isLoggedIn;
+    }
+
+    /**
+     * Redirect to a path
+     * @param path
+     * @private
+     */
+    private redirectTo(path: string): void {
+        this.setState({
+            redirectTo: path
+        });
     }
 
     public async fetchData() : Promise<void> {
@@ -82,14 +129,20 @@ export class Departments extends React.Component<unknown, DepartmentListState> {
      * @returns La liste des employés
      */
     public render(): JSX.Element {
+        if(this.state.redirectTo) {
+            return (
+                <Navigate to={this.state.redirectTo}></Navigate>
+            );
+        }
+
         return (
-            <Container>
-                <ComponentDepartmentList employees={this.state.employees}
-                                         employeeNb={this.state.employeeNb}
-                                         departments={this.state.departments}
-                                         onAddDepartment={this.addDepartment}
-                                        onEditDepartment={this.editDepartment}/>
-            </Container>
+            <ComponentDepartmentList
+                employees={this.state.employees}
+                employeeNb={this.state.employeeNb}
+                departments={this.state.departments}
+                onAddDepartment={this.addDepartment}
+                onEditDepartment={this.editDepartment}
+            />
         );
     }
 }

@@ -39,6 +39,10 @@ code {
     background-color: #20232a;
 }
 
+.vh-90 {
+    height: 90vh;
+}
+
 #root {
     overflow-x: hidden;
 }

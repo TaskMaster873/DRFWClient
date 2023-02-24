@@ -5,35 +5,79 @@ import {AddEmployeeState, EmployeeCreateDTO, EmployeeJobTitleList, EmployeeRoleL
 import {errors, successes} from "../messages/FormMessages";
 import {Department} from "../types/Department";
 import {NotificationManager} from "../api/NotificationManager";
+import {Roles} from "../types/Roles";
+import {RoutesPath} from "../RoutesPath";
+import {Navigate} from "react-router-dom";
 
 export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {
         departments: [],
         roles: [],
-        titles: []
+        titles: [],
+        redirectTo: null
     }
 
     public async componentDidMount() : Promise<void> {
         document.title = "Ajouter un Employé - TaskMaster";
 
-        // TODO Add error handling
-        let departments = API.getDepartments();
-        let roles = API.getRoles();
-        let titles = API.getJobTitles();
+        let isLoggedIn: boolean = await this.verifyLogin();
+        if(isLoggedIn) {
+            let departments = API.getDepartments();
+            let roles = API.getRoles();
+            let titles = API.getJobTitles();
 
-        let params: [
-            Department[] | string,
-            EmployeeRoleList | string,
-            EmployeeJobTitleList | string
-        ] = await Promise.all([departments, roles, titles]);
+            let params: [
+                    Department[] | string,
+                    EmployeeRoleList | string,
+                    EmployeeJobTitleList | string
+            ] = await Promise.all([departments, roles, titles]);
 
-        console.log(params);
-
-        if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2])) {
-            this.setState({departments: params[0], roles: params[1], titles: params[2]});
+            if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2])) {
+                this.setState({departments: params[0], roles: params[1], titles: params[2]});
+            } else {
+                NotificationManager.error(errors.GET_DEPARTMENTS, errors.SERVER_ERROR);
+            }
         } else {
-            console.error(errors.GET_DEPARTMENTS);
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
+    }
+
+    /**
+     * Verify if the user has the permission to access this page
+     * @param role
+     * @private
+     */
+    private verifyPermissions(role: Roles): boolean {
+        return API.hasPermission(role);
+    }
+
+    /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
+        await API.awaitLogin;
+
+        let hasPerms = this.verifyPermissions(Roles.ADMIN);
+        if (!API.isAuth() || !hasPerms) {
+            this.redirectTo(RoutesPath.INDEX);
+        } else {
+            isLoggedIn = true;
+        }
+
+        return isLoggedIn;
+    }
+
+    /**
+     * Redirect to a path
+     * @param path
+     * @private
+     */
+    private redirectTo(path: string): void {
+        this.setState({
+            redirectTo: path
+        });
     }
 
     /**
@@ -51,6 +95,10 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     }
 
     public render(): JSX.Element {
+        if(this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        }
+
         return (
             <ComponentAddEmployee
                 departments={this.state.departments}

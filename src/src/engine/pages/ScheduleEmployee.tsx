@@ -7,6 +7,7 @@ import {errors} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {RoutesPath} from "../RoutesPath";
 import { Navigate } from "react-router-dom";
+import {Roles} from "../types/Roles";
 
 interface ScheduleState {
     list: Shift[];
@@ -33,28 +34,52 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
     public async componentDidMount(): Promise<void> {
         document.title = "Horaire - TaskMaster";
 
-        await this.verifyLogin();
-
-        if(API.isAuth()) {
+        let isLoggedIn: boolean = await this.verifyLogin();
+        if(isLoggedIn) {
             let shifts = await this.loadShiftsFromAPI();
             if (typeof shifts === "string") {
-
                 this.setState({fetchState: enumStateOfFetching.ERROR});
                 NotificationManager.error(errors.GET_SHIFTS, errors.ERROR_GENERIC_MESSAGE);
             } else {
                 this.setState({list: shifts, fetchState: enumStateOfFetching.OK});
             }
+        } else {
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
     }
 
-    private async verifyLogin(): Promise<void> {
+    /**
+     * Verify if the user has the permission to access this page
+     * @param role
+     * @private
+     */
+    private verifyPermissions(role: Roles): boolean {
+        return API.hasPermission(role);
+    }
+
+    /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        if (!API.isAuth()) {
+        let hasPerms = this.verifyPermissions(Roles.EMPLOYEE);
+        if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
+        } else {
+            isLoggedIn = true;
         }
+
+        return isLoggedIn;
     }
 
+    /**
+     * Redirect to a path
+     * @param path
+     * @private
+     */
     private redirectTo(path: string): void {
         this.setState({
             redirectTo: path
@@ -81,7 +106,6 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
 
         } else {
             return (<ComponentEmployeeScheduleView listOfShifts={[]}/>);
-
         }
 
     }

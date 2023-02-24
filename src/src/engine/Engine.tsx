@@ -1,5 +1,5 @@
 import React from "react";
-import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
 //#region CSS
 import "../deps/css/index.css";
@@ -25,9 +25,9 @@ import {ForgotPassword} from "./pages/ForgotPassword";
 
 import {CreateSchedule} from "./pages/CreateSchedule";
 import {RoutesPath} from "./RoutesPath";
-import {Roles} from "./types/Roles";
 
 import { ReactNotifications } from 'react-notifications-component';
+import {RouteNotFound} from "./pages/RouteNotFound";
 
 interface EngineState {
     showSpinner: boolean;
@@ -59,27 +59,26 @@ export class Engine extends React.Component<unknown, EngineState> {
             </React.StrictMode>);
         } else {
             return (
-                <React.StrictMode>
-                    <Router>
-                        <NavigationBar/>
-                        <ReactNotifications />
-                        <Routes>
-                            <Route path={RoutesPath.INDEX} element={<Index/>}/>
-                            <Route path={RoutesPath.SCHEDULE} element={<ScheduleEmployee/>}/>
-                            <Route path={RoutesPath.CREATE_SCHEDULE} element={ ? <CreateSchedule/> : <Navigate to={RoutesPath.INDEX}/>}/>
-                            <Route path={RoutesPath.DEPARTMENTS} element={<Departments/>}/>
-                            <Route path={`${RoutesPath.DEPARTMENTS}${RoutesPath.EMPLOYEE_WITH_PARAM}`} element={<EmployeeWrapper/>}/>
-                            <Route path={RoutesPath.ABOUT} element={<About/>}/>
-                            <Route path={RoutesPath.LOGIN} element={<Login/>}/>
-                            <Route path={RoutesPath.ADD_EMPLOYEE} element={API.hasPermission(Roles.ADMIN) ? <AddEmployee/> : <Navigate to={RoutesPath.INDEX}/>}/>
-                            <Route path={RoutesPath.EDIT_EMPLOYEE_WITH_PARAM} element={API.hasPermission(Roles.ADMIN) ? <EditEmployeeWrapper /> : <Navigate to={RoutesPath.INDEX}/>}/>
-                            <Route path={RoutesPath.AVAILABILITIES} element={<Availabilities/>}/>
-                            <Route path={RoutesPath.FORGOT_PASSWORD} element={<ForgotPassword/>}/>
-                            <Route path={RoutesPath.RESET_PASSWORD} element={<ResetPassword/>}/>
-                            <Route path={RoutesPath.CHANGE_PASSWORD} element={<ChangePassword/>}/>
-                        </Routes>
-                    </Router>
-                </React.StrictMode>
+                <Router>
+                    <NavigationBar/>
+                    <ReactNotifications />
+                    <Routes>
+                        <Route path={RoutesPath.INDEX} element={<Index/>}/>
+                        <Route path={RoutesPath.SCHEDULE} element={<ScheduleEmployee/>}/>
+                        <Route path={RoutesPath.CREATE_SCHEDULE} element={<CreateSchedule/>}/>
+                        <Route path={RoutesPath.DEPARTMENTS} element={<Departments/>}/>
+                        <Route path={`${RoutesPath.DEPARTMENTS}${RoutesPath.EMPLOYEE_WITH_PARAM}`} element={<EmployeeWrapper/>}/>
+                        <Route path={RoutesPath.ABOUT} element={<About/>}/>
+                        <Route path={RoutesPath.LOGIN} element={<Login/>}/>
+                        <Route path={RoutesPath.ADD_EMPLOYEE} element={<AddEmployee/>}/>
+                        <Route path={RoutesPath.EDIT_EMPLOYEE_WITH_PARAM} element={<EditEmployeeWrapper/>}/>
+                        <Route path={RoutesPath.AVAILABILITIES} element={<Availabilities/>}/>
+                        <Route path={RoutesPath.FORGOT_PASSWORD} element={<ForgotPassword/>}/>
+                        <Route path={RoutesPath.RESET_PASSWORD} element={<ResetPassword/>}/>
+                        <Route path={RoutesPath.CHANGE_PASSWORD} element={<ChangePassword/>}/>
+                        <Route path='*' element={<RouteNotFound/>}/>
+                    </Routes>
+                </Router>
             );
         }
     }

@@ -2,9 +2,10 @@ import {Employee} from "./Employee";
 import {FormErrorType} from "../messages/FormMessages";
 
 export interface DepartmentListState {
-    employees: Employee[],
-    employeeNb: number[],
-    departments: Department[]
+    employees: Employee[];
+    employeeNb: number[];
+    departments: Department[];
+    redirectTo: string | null;
 }
 
 /**
