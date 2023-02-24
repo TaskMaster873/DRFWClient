@@ -3,12 +3,15 @@ import {ComponentEmployeeScheduleView} from "../components/ComponentEmployeeSche
 import {Shift} from "../types/Shift";
 import {API} from "../api/APIManager";
 import {ComponentLoading} from "../components/ComponentLoading";
-import {NotificationManager} from "react-notifications";
 import {errors} from "../messages/FormMessages";
+import {NotificationManager} from "../api/NotificationManager";
+import {RoutesPath} from "../RoutesPath";
+import { Navigate } from "react-router-dom";
 
 interface ScheduleState {
     list: Shift[];
     fetchState: enumStateOfFetching;
+    redirectTo: string | null;
 }
 
 enum enumStateOfFetching {
@@ -24,28 +27,50 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
     public state: ScheduleState = {
         list: [],
         fetchState: enumStateOfFetching.WAITING,
+        redirectTo: null
     };
 
     public async componentDidMount(): Promise<void> {
         document.title = "Horaire - TaskMaster";
 
-        let shifts = await this.#loadShiftsFromAPI();
-        if (typeof shifts === "string") {
+        await this.verifyLogin();
 
-            this.setState({fetchState: enumStateOfFetching.ERROR});
-            NotificationManager.error(errors.GET_SHIFTS, errors.ERROR_GENERIC_MESSAGE);
-        } else {
-            this.setState({list: shifts, fetchState: enumStateOfFetching.OK});
+        if(API.isAuth()) {
+            let shifts = await this.loadShiftsFromAPI();
+            if (typeof shifts === "string") {
+
+                this.setState({fetchState: enumStateOfFetching.ERROR});
+                NotificationManager.error(errors.GET_SHIFTS, errors.ERROR_GENERIC_MESSAGE);
+            } else {
+                this.setState({list: shifts, fetchState: enumStateOfFetching.OK});
+            }
         }
+    }
 
+    private async verifyLogin(): Promise<void> {
+        await API.awaitLogin;
+
+        if (!API.isAuth()) {
+            this.redirectTo(RoutesPath.INDEX);
+        }
+    }
+
+    private redirectTo(path: string): void {
+        this.setState({
+            redirectTo: path
+        });
     }
 
     // I did this function if we need to do something before the return (if there is some changes)
-    async #loadShiftsFromAPI(): Promise<Shift[] | string> {
+    private async loadShiftsFromAPI(): Promise<Shift[] | string> {
         return await API.getCurrentEmployeeSchedule();
     }
 
     public render(): JSX.Element {
+        if(this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        }
+
         let listData: Shift[] = this.state.list;
         if (this.state.fetchState === enumStateOfFetching.WAITING) {
             return (

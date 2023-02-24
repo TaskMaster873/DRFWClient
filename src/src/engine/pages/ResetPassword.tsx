@@ -3,9 +3,9 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 import {API} from "../api/APIManager";
 import {ComponentLoading} from "../components/ComponentLoading";
 import {ComponentResetPassword} from "../components/ComponentResetPassword";
-import {NotificationManager} from "react-notifications";
 import {errors} from "../messages/FormMessages";
 import {RoutesPath} from "../RoutesPath";
+import {NotificationManager} from "../api/NotificationManager";
 
 enum ResetPasswordState {
     WAITING = 0,
@@ -44,8 +44,7 @@ export function ResetPassword() {
         if (!email) {
             NotificationManager.error(errors.INVALID_ACTION_CODE, errors.ERROR_GENERIC_MESSAGE);
             navigate(RoutesPath.FORGOT_PASSWORD);
-        }
-        else{
+        } else {
             setEmail(email);
             setEmailState(email ? ResetPasswordState.OK : ResetPasswordState.ERROR);
         }

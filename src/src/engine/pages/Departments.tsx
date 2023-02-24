@@ -4,7 +4,7 @@ import {ComponentDepartmentList} from "../components/ComponentDepartmentList";
 import {API} from "../api/APIManager";
 import {Department, DepartmentListState} from "../types/Department";
 import {errors, successes} from "../messages/FormMessages";
-import {NotificationManager} from 'react-notifications';
+import {NotificationManager} from "../api/NotificationManager";
 
 /**
  * Ceci est la page pour les departments
@@ -45,10 +45,10 @@ export class Departments extends React.Component<unknown, DepartmentListState> {
         let errorMessage = await API.createDepartment(department);
         if (!errorMessage) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
+
             let departments = this.state.departments;
             let employeeNb = this.state.employeeNb;
-            departments.push(department);
-            employeeNb.push(0);
+
             this.setState({departments: departments, employeeNb: employeeNb});
             await this.fetchData();
         } else {

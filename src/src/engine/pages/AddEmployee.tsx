@@ -3,8 +3,8 @@ import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {API} from "../api/APIManager";
 import {AddEmployeeState, EmployeeCreateDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
-import {NotificationManager} from 'react-notifications';
 import {Department} from "../types/Department";
+import {NotificationManager} from "../api/NotificationManager";
 
 export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {

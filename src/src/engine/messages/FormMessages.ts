@@ -28,7 +28,8 @@ export const errors = {
     GET_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données des employés",
     CREATE_SHIFT: "Une erreur s'est produite lors de la création du quart de travail.",
     GET_EDIT_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données de l'employé à éditer",
-    INVALID_EMPLOYEE_ID_PARAMETER: "L'identifiant de l'employé en paramètre est invalide"
+    INVALID_EMPLOYEE_ID_PARAMETER: "L'identifiant de l'employé en paramètre est invalide",
+    EMPLOYEE_NOT_FOUND: "L'employée n'a pas été trouvé."
 }
 
 export const successes = {

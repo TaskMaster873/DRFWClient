@@ -7,6 +7,7 @@ import { API } from "../api/APIManager";
 import { Routes } from "../api/routes/Routes";
 import { ComponentPropsLogin } from "../types/ComponentPropsType";
 import Logo from "../../deps/images/logo.png";
+import {RoutesPath} from "../RoutesPath";
 
 
 interface ComponentStateLogin {
@@ -32,7 +33,10 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
         super(props);
 
         this.props = props;
-        this.verifyLogin();
+    }
+
+    public async componentDidMount() : Promise<void> {
+        await this.verifyLogin();
     }
 
     public render(): JSX.Element {
@@ -94,7 +98,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                             </Form.Control.Feedback>
                         </Form.Group>
                         <div className="me-4 mt-4 d-block text-center mx-auto">
-                            <Link className="d-block" to="/forgot-password">
+                            <Link className="d-block" to={RoutesPath.FORGOT_PASSWORD}>
                                 Mot de passe oublié ?
                             </Link>
                             <Button

@@ -28,9 +28,10 @@ import {
     updateDoc,
     where,
 } from "firebase/firestore";
+
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
-import {Employee, EmployeeCreateDTO, EmployeeEditDTO} from "../types/Employee";
+import {Employee, EmployeeCreateDTO, EmployeeEditDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
 import {Department, DepartmentCreateDTO} from "../types/Department";
 import {Shift} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
@@ -40,20 +41,45 @@ import {
     ThreadMessage,
     ThreadMessageType,
 } from "./types/ThreadMessage";
+
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 
-// what is this?
 type SubscriberCallback =
     () =>
     | void
     | (() => Promise<void>)
     | PromiseLike<void>;
 
+/**
+ * The APIManager is responsible for all communication with the Firebase API.
+ * It is a singleton class, this allows us to have a single instance of the APIManager and use it throughout the application.
+ * This class is also responsible for handling the authentication of the user.
+ * @class APIManager
+ * @extends Logger
+ * @property {string} moduleName - The name of the module.
+ * @property {string} logColor - The color of the log messages.
+ * @property {FirebaseApp} #app - The FirebaseApp instance.
+ * @property {Analytics} #analytics - The Analytics instance.
+ * @property {FirebaseAuth.Auth} #auth - The FirebaseAuth instance.
+ * @property {FirebasePerformance} #performance - The FirebasePerformance instance.
+ * @property {Firestore} #db - The Firestore instance.
+ * @property {FirebaseAuth.User | null} #user - The current user.
+ * @property {number} #userRole - The current user's role.
+ * @property {Worker | null} #worker - The worker thread used to create users.
+ * @property {boolean} emulatorLoaded - Whether the emulator has been loaded.
+ * @property {boolean} isAuthenticated - Whether the user is authenticated.
+ * @property {Promise<void> | undefined} awaitLogin - A promise that resolves when the user is authenticated.
+ * @property {Array<SubscriberCallback>} subscribers - An array of callbacks that are called when the user is authenticated.
+ * @property {Map<string, Task>} tasks - A map of tasks that are currently being executed.
+ */
 class APIManager extends Logger {
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
 
+    /**
+     * Firebase related properties.
+     */
     #app!: FirebaseApp;
     #analytics!: Analytics;
     #auth!: FirebaseAuth.Auth;
@@ -63,6 +89,10 @@ class APIManager extends Logger {
     #user: FirebaseAuth.User | null = null;
     #userRole: number = 0;
 
+    /**
+     * Global variables of APIManager.
+     * @private
+     */
     #worker: Worker | null = null;
 
     private emulatorLoaded: boolean = false;
@@ -88,6 +118,67 @@ class APIManager extends Logger {
         }
     }
 
+    //#region GETTERS
+    /**
+     * Return the current user role.
+     * @readonly
+     * @type {number}
+     * @memberof APIManager
+     * @returns {number} The current user role.
+     */
+    public get userRole() : number {
+        return this.#userRole;
+    }
+
+    /**
+     * This method return the current employee name.
+     * @readonly
+     * @type {string}
+     * @memberof APIManager
+     * @returns {string} The current employee name.
+     */
+    public getEmployeeName(): string {
+        return this.#user?.displayName || this.#user?.email || "Anonyme";
+    }
+
+    /**
+     * This method return if the user is authenticated or not.
+     * @returns {boolean} True if the user is authenticated, false otherwise.
+     * @memberof APIManager
+     * @method isAuth
+     */
+    public isAuth(): boolean {
+        return this.isAuthenticated;
+    }
+
+    /**
+     * This method return if the current user has the given permissions.
+     * @param permissionLevel The permission level to check.
+     * @returns {boolean} True if the user has the given permissions, false otherwise.
+     */
+    public hasPermission(permissionLevel: Roles): boolean {
+        return this.#userRole >= permissionLevel;
+    }
+
+    /**
+     * This method return if the current user has a lower permission than the given one.
+     * @param permissionLevel The permission level to check.
+     * @returns {boolean} True if the user has a lower permission than the given one, false otherwise.
+     */
+    public hasLowerPermission(permissionLevel: Roles): boolean {
+        return this.#userRole > permissionLevel;
+    }
+
+    //#endregion
+
+    /**
+     * Create a new service worker and listen for messages.
+     * @private
+     * @async
+     * @method registerServiceWorker
+     * @returns {Promise<void>}
+     * @memberof APIManager
+     */
     private async registerServiceWorker(): Promise<void> {
         try {
             const worker = new Worker(
@@ -108,10 +199,14 @@ class APIManager extends Logger {
         }
     }
 
-    public get userRole() {
-        return this.#userRole;
-    }
-
+    /**
+     * This function is used to process the messages received from the web worker.
+     * @param message
+     * @private
+     * @async
+     * @method onWorkerMessage
+     * @returns {Promise<void>}
+     */
     private async onWorkerMessage(message: MessageEvent): Promise<void> {
         let data = message.data as ThreadMessage;
 
@@ -127,10 +222,24 @@ class APIManager extends Logger {
         }
     }
 
+    /**
+     * Used to generate unique task IDs for the web worker.
+     * @private
+     */
     private generateTaskId(): string {
         return Math.random().toString(36).substring(2);
     }
 
+    /**
+     * This function is used to send a message to the web worker to create a new user.
+     * @param {EmployeeCreateDTO} employee The employee data of the new user.
+     * @param {string} password The password of the new user.
+     * @private
+     * @async
+     * @method requestUserCreationFromWorker
+     * @returns {Promise<CreatedAccountData>}
+     * @memberof APIManager
+     */
     private requestUserCreationFromWorker(
         employee: EmployeeCreateDTO,
         password: string
@@ -155,6 +264,15 @@ class APIManager extends Logger {
         });
     }
 
+    /**
+     * This function is used to process the response from the web worker.
+     * @param {string | null} taskId
+     * @param {CreatedAccountData} data
+     * @private
+     * @async
+     * @method onTaskResponse
+     * @returns {Promise<void>}
+     */
     private async onTaskResponse(
         taskId: string | null,
         data: CreatedAccountData
@@ -171,6 +289,10 @@ class APIManager extends Logger {
         }
     }
 
+    /**
+     * Listen for messages from the web worker.
+     * @private
+     */
     private listenWorkerEvents(): void {
         if (this.#worker !== null && this.#worker) {
             this.#worker.onmessage = this.onWorkerMessage.bind(this);
@@ -178,35 +300,28 @@ class APIManager extends Logger {
     }
 
     /**
-     * Fonction retourne le nom de l'employé
-     * @returns Le nom de l'employé si non défini retourne l'adresse courriel sinon Anonyme
+     * This method call all the subscribers to the login/logout event.
+     * @private
      */
-    public getEmployeeName(): string {
-        return this.#user?.displayName || this.#user?.email || "Anonyme";
-    }
-
     private async onEvent(): Promise<void> {
         for (let subscriber of this.subscribers) {
             await subscriber();
         }
     }
 
+    /**
+     * This method is used to subscribe to the login/logout event.
+     * @param subscriber
+     */
     public subscribeToEvent(subscriber: SubscriberCallback): void {
         this.subscribers.push(subscriber);
     }
 
-    public isAuth(): boolean {
-        return this.isAuthenticated;
-    }
-
-    public hasPermission(permissionLevel: Roles): boolean {
-        return this.#userRole >= permissionLevel;
-    }
-
-    public hasLowerPermission(permissionLevel: Roles): boolean {
-        return this.#userRole > permissionLevel;
-    }
-
+    /**
+     * This method parse firebase error codes and return a human-readable error message.
+     * @param error The error to parse.
+     * @returns {string} The human-readable error message.
+     */
     public getErrorMessageFromCode(error: Error | string): string {
         let errorMessage: string;
         let message: string;
@@ -240,6 +355,16 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method is used to authenticate the user with his email and password.
+     * @param email The email to use.
+     * @param password The password to use.
+     * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
+     * @memberof APIManager
+     * @method loginWithPassword
+     * @async
+     * @public
+     */
     public async loginWithPassword(
         email: string,
         password: string
@@ -269,6 +394,13 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method send a reset password email to the given email.
+     * @param email The email to send the reset password email to.
+     * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
+     * @memberof APIManager
+     * @method sendResetPassword
+     */
     public async sendResetPassword(email: string): Promise<string | null> {
         let errorMessage: string | null = null;
         await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch(
@@ -280,18 +412,38 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method logout the current user.
+     * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
+     * @memberof APIManager
+     * @method logout
+     */
     public async logout(): Promise<string | null> {
-        this.log("Logging out...");
+        this.log("Logging out user...");
         let errorMessage: string | null = null;
-        await FirebaseAuth.signOut(this.#auth).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
-        });
-        this.#userRole = -1;
 
-        await this.onEvent();
+        if(this.isAuth()) {
+            await FirebaseAuth.signOut(this.#auth).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
+
+            this.#userRole = -1;
+
+            await this.onEvent();
+        }
+
         return errorMessage;
     }
 
+    /**
+     * This method is used to trigger an email verification.
+     * @param user The user to verify.
+     * @private
+     * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
+     * @memberof APIManager
+     * @method verifyEmailAddress
+     * @async
+     */
     private async verifyEmailAddress(
         user: FirebaseAuth.User
     ): Promise<string | null> {
@@ -302,6 +454,14 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method is used to create all the listeners needed for the API and firebase.
+     * @private
+     * @memberof APIManager
+     * @method listenEvents
+     * @async
+     * @returns {Promise<void>} Nothing.
+     */
     private async listenEvents(): Promise<void> {
         let resolved = false;
 
@@ -336,6 +496,14 @@ class APIManager extends Logger {
         this.log("Login resolved!");
     }
 
+    /**
+     * This method is used to enable the browser session persistence.
+     * @private
+     * @memberof APIManager
+     * @method enablePersistence
+     * @async
+     * @returns {Promise<void>} Nothing.
+     */
     private async enablePersistence(): Promise<void> {
         await FirebaseAuth.setPersistence(
             this.#auth,
@@ -349,6 +517,14 @@ class APIManager extends Logger {
         });
     }
 
+    /**
+     * This method is used to load the firebase sdk. It also initializes everything related to the emulator when needed.
+     * @private
+     * @memberof APIManager
+     * @method loadFirebase
+     * @async
+     * @returns {Promise<void>} Nothing.
+     */
     private async loadFirebase(): Promise<void> {
         this.#app = initializeApp(firebaseConfig);
 
@@ -358,7 +534,6 @@ class APIManager extends Logger {
         this.#performance = getPerformance(this.#app);
         this.#db = getFirestore(this.#app);
 
-        //Should this database be emulated?
         if ("indexedDB" in window) {
             if (
                 "location" in window &&
@@ -399,30 +574,42 @@ class APIManager extends Logger {
         await loginAwait;
     }
 
+    /**
+     * This method is used to verify that an element is not null or undefined.
+     * @param element The element to verify.
+     * @private
+     * @returns {boolean} True if the element is not null or undefined, false otherwise.
+     */
     private elementExist(element: any): boolean {
         return element !== undefined && element !== null;
     }
 
     /**
-     * Valide le code de réinitialisation de mot de passe
-     * @param actionCode Le code de réinitialisation de mot de passe
-     * @returns Soit le courriel ou rien
+     * This method is used to verify the reset password code.
+     * @param actionCode The reset password code.
+     * @private
+     * @returns {Promise<string | false>} The email address if the code is valid, false otherwise.
      */
     public async verifyResetPassword(
         actionCode: string
-    ): Promise<string | void> {
-        return await verifyPasswordResetCode(this.#auth, actionCode).catch(
-            (error) => {
-                this.getErrorMessageFromCode(error);
-            }
-        );
+    ): Promise<string | false> {
+        let errorMessage: string | null = null;
+        let email = await verifyPasswordResetCode(this.#auth, actionCode).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        });
+
+        return (errorMessage || !email) ? false : email;
     }
 
     /**
-     * Valide le code de réinitialisation de mot de passe et applique le nouveau mot de passe
-     * @param actionCode Le code de réinitialisation de mot de passe
-     * @param newPassword Le nouveau mot de passe
-     * @returns null si la réinitialisation a réussie, et le message d'erreur si elle n'a pas réussie
+     * This method is used to apply the new password to the account.
+     * @param actionCode The reset password code.
+     * @param newPassword The new password.
+     * @returns {Promise<string | null>} Null if the reset password was successful, and the error message if it was not.
+     * @memberof APIManager
+     * @method applyResetPassword
+     * @async
+     * @public
      */
     public async applyResetPassword(
         actionCode: string,
@@ -437,6 +624,16 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method is used to change the password of the current user.
+     * @param oldPassword The old password.
+     * @param newPassword The new password.
+     * @returns {Promise<string | null>} Null if the password was changed successfully, and the error message if it was not.
+     * @memberof APIManager
+     * @method changePassword
+     * @async
+     * @public
+     */
     public async changePassword(
         oldPassword: string,
         newPassword: string
@@ -452,28 +649,40 @@ class APIManager extends Logger {
                     oldPassword
                 );
 
-                let isOk = await FirebaseAuth.updatePassword(
+                await FirebaseAuth.updatePassword(
                     user,
                     newPassword
                 ).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
                 });
 
-                console.log("change password", isOk);
+                if(!errorMessage) {
+                    // Prompt the user to re-provide their sign-in credentials
+                    let reAuth = await FirebaseAuth.reauthenticateWithCredential(
+                        user,
+                        credential
+                    ).catch((error) => {
+                        errorMessage = this.getErrorMessageFromCode(error);
+                    });
 
-                // Prompt the user to re-provide their sign-in credentials
-                let reAuth = await FirebaseAuth.reauthenticateWithCredential(
-                    user,
-                    credential
-                ).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
-                });
-                console.log("reauth", reAuth);
+                    this.#user = reAuth?.user || null;
+                }
             }
         }
+
         return errorMessage;
     }
 
+    /**
+     * This method is used to create a new employee. This method calls the worker to create the user. If the user is created successfully, it will create the employee in the database.
+     * @param password The password of the new employee.
+     * @param employee The employee data.
+     * @returns {Promise<string | null>} Null if the employee was created successfully, and the error message if it was not.
+     * @memberof APIManager
+     * @method createEmployee
+     * @async
+     * @public
+     */
     public async createEmployee(
         password: string,
         employee: EmployeeCreateDTO
@@ -514,6 +723,16 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method is used to edit an employee.
+     * @param employeeId The id of the employee to edit.
+     * @param employee The employee data.
+     * @method editEmployee
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the employee was edited successfully, and the error message if it was not.
+     */
     public async editEmployee(employeeId: string, employee: EmployeeEditDTO): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
@@ -529,6 +748,15 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method is used to change the activation status of an employee.
+     * @param employee The employee to change the activation status.
+     * @method changeEmployeeActivation
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the employee was edited successfully, and the error message if it was not.
+     */
     public async changeEmployeeActivation(employee: Employee): Promise<string | null> {
         let errorMessage: string | null = null;
 
@@ -546,6 +774,15 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method is used to create a new department.
+     * @param department The department data.
+     * @method createDepartment
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the department was created successfully, and the error message if it was not.
+     */
     public async createDepartment(
         department: DepartmentCreateDTO
     ): Promise<string | null> {
@@ -570,6 +807,15 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method is used to edit a department.
+     * @param department The department data.
+     * @method editDepartment
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the department was edited successfully, and the error message if it was not.
+     */
     public async editDepartment(department: Department): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
@@ -585,7 +831,17 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    private async checkIfAlreadyExists(query, error: string) {
+    /**
+     * Check if a document already exists.
+     * @param query The query to check.
+     * @param error The error message to return if the document already exists.
+     * @method checkIfAlreadyExists
+     * @async
+     * @private
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the document does not exist, and the error message if it does.
+     */
+    private async checkIfAlreadyExists(query, error: string) : Promise<string | null> {
         let errorMessage: string | null = null;
         let snaps = await getDocs(query).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
@@ -596,10 +852,20 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    /**
+     * This method is used to get all the employees. If a department is specified, it will only return the employees of that department.
+     * @method getEmployees
+     * @param department The department to get the employees from. If not specified, it will return all the employees.
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<Employee[] | string>} The employees if the request was successful, and the error message if it was not.
+     */
     public async getEmployees(department?: string): Promise<Employee[] | string> {
         let errorMessage: string | null = null;
         let employees: Employee[] = [];
         let queryDepartment = query(collection(this.#db, `employees`));
+
         if (department) {
             queryDepartment = query(
                 collection(this.#db, `employees`),
@@ -610,6 +876,7 @@ class APIManager extends Logger {
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
+
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 let data = doc.data();
@@ -632,6 +899,15 @@ class APIManager extends Logger {
         return errorMessage ?? employees;
     }
 
+    /**
+     * This method is used to get an employee by its ID. If the employee does not exist, it will return an error message.
+     * @param employeeId The ID of the employee.
+     * @method getEmployeeById
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<EmployeeEditDTO | string>} The employee if the request was successful, and the error message if it was not.
+     */
     public async getEmployeeById(employeeId: string): Promise<EmployeeEditDTO | string> {
         let errorMessage: string | null = null;
 
@@ -647,13 +923,22 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async getDepartments(): Promise<Department[]> {
+    /**
+     * This method is used to get all the departments.
+     * @method getDepartments
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<Department[] | string>} The departments if the request was successful, and the error message if it was not.
+     */
+    public async getDepartments(): Promise<Department[] | string> {
         let errorMessage: string | null = null;
         let departments: Department[] = [];
         let queryDepartment = query(collection(this.#db, `departments`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
+
         if (snaps) {
             for(let doc of snaps.docs){
                 departments.push(
@@ -661,9 +946,19 @@ class APIManager extends Logger {
                 );
             }
         }
+
         return errorMessage ?? departments;
     }
 
+    /**
+     * This method is used to get the number of employees in each department.
+     * @method getEmployeeNbDepartments
+     * @param departments The departments to get the number of employees from.
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<number[] | string>} The number of employees in each department if the request was successful, and the error message if it was not.
+     */
     public async getEmployeeNbDepartments(
         departments: Department[]
     ): Promise<number[] | string> {
@@ -683,39 +978,55 @@ class APIManager extends Logger {
                 promises.push(snaps);
             }
 
-            Promise.all(promises)
-                .then((values) => {
-                    for (let snapId in values) {
-                        let snaps = values[snapId];
-                        if (snaps !== null && snaps) {
-                            employeeNb.push(snaps.docs.length);
-                        }
+            Promise.all(promises).then((values) => {
+                for (let snapId in values) {
+                    let snaps = values[snapId];
+                    if (snaps !== null && snaps) {
+                        employeeNb.push(snaps.docs.length);
                     }
-                })
-                .catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
-                })
-                .finally(() => {
-                    resolve(errorMessage ?? employeeNb);
-                });
+                }
+            }).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            }).finally(() => {
+                resolve(errorMessage ?? employeeNb);
+            });
         });
     }
 
-    public async getRoles(): Promise<string[] | string> {
+    /**
+     * This method is used to get the role list. If the request was not successful, it will return an error message.
+     * @method getRoles
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<EmployeeRoleList | string>} The roles if the request was successful, and the error message if it was not.
+     */
+    public async getRoles(): Promise<EmployeeRoleList | string> {
         let errorMessage: string | null = null;
         let roles: string[] = [];
         let queryDepartment = query(collection(this.#db, `roles`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
+
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                 roles.push(doc.data().name);
             });
         }
+
         return errorMessage ?? roles;
     }
 
+    /**
+     * This method is used to get the current employee's role. If the request was not successful, it will return an error message.
+     * @param uid The ID of the employee.
+     * @method getCurrentEmployeeRole
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
+     */
     public async getCurrentEmployeeRole(uid: string): Promise<number> {
         let employeeRole: number = 0;
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
@@ -735,7 +1046,15 @@ class APIManager extends Logger {
         return employeeRole;
     }
 
-    public async getJobTitles(): Promise<string[] | string> {
+    /**
+     * This method is used to get the job titles list. If the request was not successful, it will return an error message.
+     * @method getJobTitles
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<EmployeeJobTitleList | string>} The job titles if the request was successful, and the error message if it was not.
+     */
+    public async getJobTitles(): Promise<EmployeeJobTitleList | string> {
         let errorMessage: string | null = null;
         let jobTitles: string[] = [];
         let queryDepartment = query(collection(this.#db, `jobTitles`));
@@ -751,6 +1070,65 @@ class APIManager extends Logger {
     }
 
     /**
+     * This method is used to get the current employee's schedule. If the request was not successful, it will return an error message.
+     * @method getCurrentEmployeeSchedule
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<Shift[] | string>} The schedule of the employee if the request was successful, and the error message if it was not.
+     */
+    public async getCurrentEmployeeSchedule(): Promise<Shift[] | string> {
+        let shifts: Shift[] | string = [];
+        if (this.#user?.uid) {
+            shifts = await this.getScheduleForOneEmployee(this.#user.uid);
+        }
+
+        return shifts;
+    }
+
+    /**
+     * This method is used to get the schedule of one employee. If the request was not successful, it will return an error message.
+     * @param idEmployee The ID of the employee.
+     * @method getScheduleForOneEmployee
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<Shift[] | string>} The schedule of the employee if the request was successful, and the error message if it was not.
+     */
+    public async getScheduleForOneEmployee(idEmployee?: string): Promise<Shift[] | string> {
+        let errorMessage: string | null = null;
+        let shifts: Shift[] = [];
+
+        if (this.isAuthenticated) {
+            let queryShifts = query(
+                collection(this.#db, `shifts`),
+                where("employeeId", "==", idEmployee)
+            );
+
+            let snaps = await getDocs(queryShifts).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
+
+            if (snaps) {
+                snaps.docs.forEach((doc) => {
+                    let data = doc.data();
+                    shifts.push(
+                        new Shift({
+                            employeeId: data.employeeId,
+                            department: data.department,
+                            projectName: data.projectName,
+                            start: this.getDayPilotDateString(data.start),
+                            end: this.getDayPilotDateString(data.end),
+                        })
+                    );
+                });
+            }
+        }
+
+        return errorMessage ?? shifts;
+    }
+
+    /**
      * Convert firebase timestamp to daypilot string
      * @param date the firebase timestamp to convert
      * @returns string daypilot Ex: (February 2, 2022 at 3:15 AM) = 2022-02-16T03:15:00
@@ -759,42 +1137,6 @@ class APIManager extends Logger {
         //Take UTC timestamp, remove timezone offset, convert to ISO format
         let myDate = new Date((date.seconds - new Date().getTimezoneOffset() * 60) * 1000).toISOString();
         return myDate.slice(0, -5);
-    }
-
-    public async getCurrentEmployeeSchedule(): Promise<Shift[] | string> {
-        return await this.getScheduleForOneEmployee(this.#user?.uid);
-    }
-
-    public async getScheduleForOneEmployee(idEmployee?: string): Promise<Shift[] | string> {
-        let errorMessage: string | null = null;
-        let shifts: Shift[] = [];
-        if (this.isAuthenticated) {
-
-                let queryShifts = query(
-                    collection(this.#db, `shifts`),
-                    where("employeeId", "==", idEmployee)
-                );
-                let snaps = await getDocs(queryShifts).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
-                });
-                if (snaps) {
-                    snaps.docs.forEach((doc) => {
-                        let data = doc.data();
-                        shifts.push(
-                            new Shift({
-                                employeeId: data.employeeId,
-                                department: data.department,
-                                projectName: data.projectName,
-                                start: this.getDayPilotDateString(data.start),
-                                end: this.getDayPilotDateString(data.end),
-                            })
-                        );
-                    });
-                }
-                return errorMessage ?? shifts;
-        } else {
-            return errorMessage ?? shifts;
-        }
     }
 
     /**
@@ -812,32 +1154,49 @@ class APIManager extends Logger {
      * @param department le nom du département que récupérer
      * @returns une liste de quarts de travail d'un département pour une journée
      */
+
+    /**
+     * This method is used to get the schedule of a department for a day. If the request was not successful, it will return an error message.
+     * @method getDailyScheduleForDepartment
+     * @async
+     * @public
+     * @memberof APIManager
+     * @param {DayPilot.Date} day The day to get the schedule for.
+     * @param {Department} department The department to get the schedule for.
+     * @returns {Promise<Shift[] | string>} The schedule of the department for the day if the request was successful, and the error message if it was not.
+     */
     public async getDailyScheduleForDepartment(day: DayPilot.Date, department: Department): Promise<Shift[] | string> {
         let errorMessage: string | null = null;
         let shifts: Shift[] = [];
+
         //Validate permissions
         if (!this.isAuthenticated) return errors.PERMISSION_DENIED;
         if (!this.hasPermission(4)) {
             //TODO: pass if user is director
             return errors.PERMISSION_DENIED;
         }
+
         //Convert Daypilot datetimes to Timestamps
         let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
         let convertedEndDay: Timestamp = this.getFirebaseTimestamp(day.addDays(1));
+
         //Query shifts
         let queryShifts = query(
             collection(this.#db, `shifts`),
             where("department", "==", department.name),
             where("end", ">", convertedStartDay),
             where("end", "<", convertedEndDay)
-            );
+        );
+
         let snaps = await getDocs(queryShifts).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
+
         //Parse recieved data
         if (snaps) {
             for (let doc of snaps.docs) {
                 let shift = doc.data();
+
                 //Push shift object
                 shifts.push(new Shift({
                     employeeId: shift.employeeId,
@@ -848,13 +1207,18 @@ class APIManager extends Logger {
                 }));
             }
         }
+
         return errorMessage ?? shifts;
     }
 
     /**
-     *
-     * @param shift est un shift avec toutes les données pour le créer
-     * @returns un booléen pour savoir si il est créé
+     * This method is used to create a shift. If the request was not successful, it will return an error message.
+     * @method createShift
+     * @async
+     * @public
+     * @memberof APIManager
+     * @param {Shift} shift The shift to create.
+     * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
      */
     public async createShift(shift: Shift): Promise<void | string> {
         //Check if user has permission
@@ -862,7 +1226,9 @@ class APIManager extends Logger {
             //Gestionnaire
             return errors.PERMISSION_DENIED;
         }
+
         let errorMessage : string | null = null;
+
         //Create Shift
         await addDoc(collection(this.#db, `shifts`),
             {
@@ -875,13 +1241,14 @@ class APIManager extends Logger {
         ).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
+
         if(errorMessage) return errorMessage;
     }
-
-
-
 }
 
+/**
+ * Instantiate the APIManager class and export it as a singleton.
+ */
 export const API = new APIManager();
 
 // @ts-ignore

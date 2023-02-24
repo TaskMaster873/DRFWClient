@@ -1,13 +1,14 @@
 import React, {useState} from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import {errors, FormErrorType, info, successes} from "../messages/FormMessages";
+import {errors, FormErrorType, successes} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
-import {NotificationManager} from "react-notifications";
+
 import {useNavigate} from "react-router-dom";
 import {RoutesPath} from "../RoutesPath";
 import {Container} from "react-bootstrap";
 import Logo from "../../deps/images/logo.png";
+import {NotificationManager} from "../api/NotificationManager";
 
 type Props = {
     actionCode: string,

@@ -8,9 +8,11 @@ import {Department} from "../types/Department";
 import {SelectDepartment} from "../components/SelectDepartment";
 import {Container} from "react-bootstrap";
 import {Employee} from "../types/Employee";
-import {NotificationManager} from 'react-notifications';
 import {errors} from "../messages/FormMessages";
-
+import {NotificationManager} from "../api/NotificationManager";
+import {RoutesPath} from "../RoutesPath";
+import {Navigate} from "react-router-dom";
+import {Roles} from "../types/Roles";
 
 enum FetchState {
     WAITING = 0,
@@ -24,6 +26,7 @@ interface CreateScheduleState {
     employees: Employee[];
     shifts: Shift[];
     fetchState: FetchState;
+    redirectTo: string | null;
 }
 
 export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
@@ -33,6 +36,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         employees: [],
         shifts: [],
         fetchState: FetchState.WAITING,
+        redirectTo: null
     };
 
     /**
@@ -47,13 +51,44 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
     public async componentDidMount(): Promise<void> {
         document.title = "Création d'horaire - TaskMaster";
 
-        let fetchedDepartments = await API.getDepartments();
-        if (typeof fetchedDepartments === "string") {
-            NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
-            this.setState({fetchState: FetchState.ERROR});
-        } else {
-            await this.#changeDepartment(fetchedDepartments[0], fetchedDepartments);
+        await this.verifyLogin();
+
+        if(API.isAuth()) {
+            let fetchedDepartments = await API.getDepartments();
+            if (typeof fetchedDepartments === "string") {
+                NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
+                this.setState({fetchState: FetchState.ERROR});
+            } else {
+                await this.#changeDepartment(fetchedDepartments[0], fetchedDepartments);
+            }
         }
+    }
+
+    private verifyPermissions(role: Roles): boolean {
+        return API.hasPermission(role);
+    }
+
+    /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<void> {
+        await API.awaitLogin;
+
+        if (!API.isAuth()) {
+            this.redirectTo(RoutesPath.INDEX);
+        }
+    }
+
+    /**
+     * Redirect to a path
+     * @param path
+     * @private
+     */
+    private redirectTo(path: string): void {
+        this.setState({
+            redirectTo: path
+        });
     }
 
     /**
@@ -137,6 +172,10 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
     }
 
     public render(): JSX.Element {
+        if(this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        }
+
         switch (this.state.fetchState) {
             case FetchState.WAITING:
                 return <ComponentLoading />;

@@ -3,7 +3,7 @@ import {Container} from "react-bootstrap";
 import {ComponentLogin} from "../components/ComponentLogin";
 import {API} from "../api/APIManager";
 import {errors, successes} from "../messages/FormMessages";
-import {NotificationManager} from 'react-notifications';
+import {NotificationManager} from "../api/NotificationManager";
 
 /***
  *
