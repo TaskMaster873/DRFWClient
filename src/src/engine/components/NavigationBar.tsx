@@ -9,6 +9,11 @@ import { errors, successes } from "../messages/FormMessages";
 import Logo from "../../deps/images/logo.png";
 
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar, faClock, faClipboard, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import {RoutesPath} from "../RoutesPath";
+import { ComponentNavItem as NavItem } from "./ComponentNavItem";
+
 interface NavigationBarState {
     showCreateSchedule: boolean;
 }
@@ -68,7 +73,7 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
     public render(): JSX.Element {
         return (
             <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{ fontSize: 15 }}>
-                <Container>
+                <Container fluid={true}>
                     <LinkContainer to="/">
                         <Navbar.Brand>
                             <img
@@ -78,28 +83,19 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
                                 width={50}
                                 height={60}
                             />
-                            Task Master</Navbar.Brand>
+
+                            TaskMaster
+                        </Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
-                        <Nav activeKey={window.location.pathname}>
+                        <Nav activeKey="">
                             {this.adminCommandLinks()}
 
-                            <LinkContainer to="/schedule">
-                                <Nav.Link>Mon horaire</Nav.Link>
-                            </LinkContainer>
-
-                            <LinkContainer to="/availabilities">
-                                <Nav.Link>Mes disponibilités</Nav.Link>
-                            </LinkContainer>
-
-                            <LinkContainer to="/departments">
-                                <Nav.Link>Départements</Nav.Link>
-                            </LinkContainer>
-
-                            <LinkContainer to="/about">
-                                <Nav.Link>À propos</Nav.Link>
-                            </LinkContainer>
+                            <NavItem icon={<FontAwesomeIcon icon={faCalendar} />} link={RoutesPath.SCHEDULE} label="Mon horaire" description="Gérez votre emploi du temps" />
+                            <NavItem icon={<FontAwesomeIcon icon={faClock} />} link={RoutesPath.AVAILABILITIES} label="Mes disponibilités" description="Gérez vos disponibilités" />
+                            <NavItem icon={<FontAwesomeIcon icon={faClipboard} />} link={RoutesPath.DEPARTMENTS} label="Départements" description="Voir tous les départements" />
+                            <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
                         </Nav>
 
                         <Nav className="ms-auto">
@@ -123,13 +119,13 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
     private loginButton(): JSX.Element {
         if (API.isAuth()) {
             return (
-                <LinkContainer to="/login">
+                <LinkContainer to={RoutesPath.INDEX}>
                     <Nav.Link id="logoutLink" onClick={this.#logout}>Se déconnecter</Nav.Link>
                 </LinkContainer>
             );
         } else {
             return (
-                <LinkContainer to="/login">
+                <LinkContainer to={RoutesPath.LOGIN}>
                     <Nav.Link id="loginLink">Connexion</Nav.Link>
                 </LinkContainer>
             );
@@ -149,7 +145,7 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
     private adminCommandLinks(): JSX.Element | undefined {
         if (this.state.showCreateSchedule) {
             return (
-                <LinkContainer to="/create-schedule">
+                <LinkContainer to={RoutesPath.CREATE_SCHEDULE}>
                     <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
                 </LinkContainer>
             );
@@ -172,7 +168,7 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGOUT_SUCCESS);
         } else {
-            NotificationManager.error(error, errors.ERROR_LOGOUT);
+            NotificationManager.error(errors.ERROR_LOGOUT, error);
         }
     }
 }
