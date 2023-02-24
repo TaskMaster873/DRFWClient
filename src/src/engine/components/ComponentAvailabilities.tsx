@@ -2,13 +2,13 @@
  * Ceci est du code qui a été cherché en partie sur https://code.daypilot.org/42221/react-weekly-calendar-tutorial,  la documentation de la librairie daypilot
  */
 import React, {Component} from 'react';
-import {colorRGB} from '../messages/ColorForAvailability';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
 import "../../deps/css/navigator_default.css";
 import {eventsForUnavailabilityList} from '../types/EmployeeAvailabilities';
 
 interface ComponentAvailabilitiesProps {
     employeeAvailabilities: eventsForUnavailabilityList,
+    onTimeRangeSelected: (start: Date, end: Date) => void;
 }
 
 interface ComponentAvailabilitiesState {
@@ -54,6 +54,11 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.calendar.update({
             startDate: args.day,
         });
+
+        let start = new Date(args.start);
+        let end = new Date(args.end);
+
+        this.props.onTimeRangeSelected(start, end);
     };
 
     public render(): JSX.Element {
@@ -64,8 +69,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         selectMode={"week"}
                         showMonths={3}
                         skipMonths={3}
-                        startDate={"2023-03-07"}
-                        selectionDay={"2023-03-07"}
+                        startDate={DayPilot.Date.today()}
+                        selectionDay={DayPilot.Date.today()}
                         onTimeRangeSelected={this.#onTimeRangeSelectedNavigator}
                         ref={this.datePickerRef}
                     />
@@ -99,7 +104,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         }*/
         this.calendar.update({ events: this.props.employeeAvailabilities });
         this.datePicker.update({events: this.props.employeeAvailabilities });
-
     }
 
     public componentDidMount(): void {

@@ -137,4 +137,4 @@ dist
 .idea
 .idea/*
 
-emulatorSave
+#emulatorSave
