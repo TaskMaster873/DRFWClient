@@ -18,6 +18,7 @@ export const errors = {
     INVALID_INITIAL_PASSWORD: "Le mot de passe initial doit contenir un minimum de 6 caractères, une minuscule, une majuscule et un caractère spécial",
     INVALID_NEW_PASSWORD: "Le nouveau mot de passe doit contenir un minimum de 6 caractères, une minuscule, une majuscule et un caractère spécial",
     INVALID_LOGIN: "Le numéro d'employé ou le mot de passe spécifié est invalide",
+    INVALID_DATE: "La date doit être un multiple d'une demi-heure.",
     DEPARTMENT_ALREADY_EXIST: "Le département existe déjà",
     MESSAGE_SCHEDULE_UNAVALIBLE: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
     SERVER_ERROR: "Une erreur s'est produite, veuillez réessayer plus tard",

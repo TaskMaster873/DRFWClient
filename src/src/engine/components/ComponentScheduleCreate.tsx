@@ -2,13 +2,13 @@ import React from "react";
 import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
 import {EventForCalendar, EventForShiftCreation, Shift} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
-import {CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, HeightSpecType, ViewType} from "../types/StatesForDaypilot";
+import {CalendarAttributesForEmployeeShiftCreationComponent, ColumnsType, EventDeleteHandlingType, EventManipulationType, HeightSpecType, ViewType} from "../types/StatesForDaypilot";
 import {Employee} from "../types/Employee";
 
 type ComponentScheduleCreateProps = {
 	events: EventForCalendar[];
 	employees: Employee[];
-	addShift: (shift: Shift) => {};
+	addShift: (shiftEvent: EventForShiftCreation) => {};
 };
 
 export class ComponentScheduleCreate extends React.Component<ComponentScheduleCreateProps, CalendarAttributesForEmployeeShiftCreationComponent> {
@@ -16,44 +16,12 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 		isShowingModal: false,
 		start: "2023-02-17T00:00:00",
 		end: "2023-02-18T00:00:00",
-		resourceName: ""
+		resourceName: "",
+		taskType: EventManipulationType.CREATE,
 	};
 
 	constructor(props: ComponentScheduleCreateProps) {
 		super(props);
-	}
-
-	/**
-	 * Called when the user clicks on the "Add Shift" button
-	 * @param args {EventForShiftCreation}
-	 * @returns {Promise<void>}
-	 * @private
-	 * @memberof ComponentScheduleCreate
-	 */
-	readonly #shiftAdd = async (event: EventForShiftCreation): Promise<void> => {
-		await this.props.addShift({
-			employeeId: event.employeeId,
-			start: event.start.toString("yyyy-MM-ddTHH:mm:ss"),
-			end: event.end.toString("yyyy-MM-ddTHH:mm:ss"),
-			department: "",
-			projectName: ""
-		});
-
-		this.setState({
-			isShowingModal: false,
-		});
-	};
-
-	private showScheduleCreationModal(): JSX.Element {
-		return (
-			<ComponentPopupSchedule
-				isShowing={this.state.isShowingModal}
-				eventAdd={this.#shiftAdd}
-				start={this.state.start}
-				end={this.state.end}
-				resource={this.state.resourceName}
-			/>
-		);
 	}
 
 	public render(): JSX.Element {
@@ -73,7 +41,15 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 					viewType={ViewType.Resources}
 					eventDeleteHandling={EventDeleteHandlingType.Update}
 				/>
-				{this.showScheduleCreationModal()}
+				<ComponentPopupSchedule
+					hideModal={this.#hideModal}
+					isShown={this.state.isShowingModal}
+					eventAdd={this.props.addShift}
+					start={this.state.start}
+					end={this.state.end}
+					resource={this.state.resourceName}
+					taskType={this.state.taskType}
+				/>
 			</div>
 		);
 	}
@@ -110,9 +86,16 @@ export class ComponentScheduleCreate extends React.Component<ComponentScheduleCr
 			isShowingModal: true,
 			start: args.start,
 			end: args.end,
-			resourceName: args.resource
+			resourceName: args.resource,
+			taskType: EventManipulationType.CREATE,
 		});
 
 		DayPilot.Calendar.clearSelection;
 	};
+
+	readonly #hideModal = () => {
+		this.setState({
+			isShowingModal: false
+		})
+	}
 }

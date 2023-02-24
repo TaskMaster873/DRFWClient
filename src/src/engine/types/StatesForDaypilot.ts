@@ -58,6 +58,13 @@ export interface CalendarAttributesForEmployeeShiftCreationComponent {
 	end: DayPilot.Date;
 	/** for the popup */
 	resourceName: string;
+    /** Popup taskType */
+    taskType: EventManipulationType;
+}
+
+export enum EventManipulationType {
+	CREATE = "Créer",
+	MODIFY = "Modifier"
 }
 
 export interface ColumnsType {

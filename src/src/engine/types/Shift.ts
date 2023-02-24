@@ -45,8 +45,6 @@ export interface EventForShiftCreation {
     employeeId: string;
     start: DayPilot.Date;
     end: DayPilot.Date;
-    department?: string;
-    projectName?: string;
 }
 
 /**
