@@ -8,7 +8,7 @@ import {Employee} from "../types/Employee";
 type ComponentScheduleCreateProps = {
 	events: EventForCalendar[];
 	employees: Employee[];
-	addShift: (shift: Shift) => {};
+	addShift: (shift: Shift) => Promise<void>;
 };
 
 export class ComponentScheduleCreate extends React.Component<ComponentScheduleCreateProps, CalendarAttributesForEmployeeShiftCreationComponent> {

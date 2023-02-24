@@ -3,12 +3,10 @@ import {Container} from "react-bootstrap";
 import {ComponentLogin} from "../components/ComponentLogin";
 import {API} from "../api/APIManager";
 import {errors, successes} from "../messages/FormMessages";
-import {NotificationManager} from 'react-notifications';
+import {NotificationManager} from "../api/NotificationManager";
 
-/***
- *
- * Page de connexion
- *
+/**
+ * Login page.
  */
 export class Login extends React.Component {
     public componentDidMount() {
@@ -19,9 +17,9 @@ export class Login extends React.Component {
         let errorMessage = await API.loginWithPassword(email, password);
 
         if (errorMessage === null) {
-            NotificationManager.success(successes.LOGIN_SUCCESS, successes.SUCCESS_GENERIC_MESSAGE);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGIN_SUCCESS);
         } else {
-            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errorMessage);
         }
 
         return errorMessage === null;

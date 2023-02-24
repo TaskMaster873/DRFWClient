@@ -4,12 +4,12 @@ import {Employee, EmployeeListProps, EmployeeListState, employeeTableHeads, admi
 import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 import {API} from "../api/APIManager";
-import {ScaleLoader} from "react-spinners";
 import {BiEdit} from "react-icons/bi"
 import {Roles} from "../types/Roles";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {SearchParams} from "../types/SearchParams";
 import {RoutesPath} from "../RoutesPath";
+import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 
 /**
  * Component that display the list of employees of a department
@@ -89,46 +89,39 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         if (list === null) {
             return [
                 <tr key={"firstCol"}>
-                    <td colSpan={9}>
-                        <div className='loadingBar'>
-                            <ScaleLoader
-                                color={"#A020F0"}
-                                loading={true}
-                                cssOverride={{
-                                    display: 'flex',
-                                    alignSelf: 'center',
-                                    margin: '0 auto',
-                                }}
-                                aria-label="Loading Spinner"
-                                data-testid="loader"
-                            />
-                        </div>
+                    <td colSpan={10}>
+                        <ComponentLoadingBarSpinner />
                     </td>
                 </tr>
             ]
         } else if (list.length !== 0) {
-            return list.map((employee, index) => (<tr key={"secondCol" + index}>
-                <td key={"id" + index}>{index + 1}</td>
-                <td key={"firstName" + index}>
-                    {employee.firstName}
-                </td>
-                <td key={"name " + index}>{employee.lastName}</td>
-                <td key={"email " + index}>{employee.email}</td>
-                <td key={"phoneNumber " + index}>
-                    {employee.phoneNumber}
-                </td>
-                <td key={"departmentId " + index}>{employee.department}</td>
-                <td key={"actif " + index}>{employee.isActive ? "Oui" : "Non"}</td>
-                <td key={"jobTitles " + index}>
-                    {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
-                </td>
-                <td key={"skills " + index}>{employee.skills}</td>
-                {this.renderAdminActions(index, employee)}
-            </tr>));
+            return list.map((employee, index) => (
+                <tr key={"secondCol" + index}>
+                    <td key={"id" + index}>{index + 1}</td>
+                    <td key={"firstName" + index}>
+                        {employee.firstName}
+                    </td>
+
+                    <td key={"name " + index}>{employee.lastName}</td>
+                    <td key={"email " + index}>{employee.email}</td>
+                    <td key={"phoneNumber " + index}>
+                        {employee.phoneNumber}
+                    </td>
+
+                    <td key={"departmentId " + index}>{employee.department}</td>
+                    <td key={"actif " + index}>{employee.isActive ? "Oui" : "Non"}</td>
+                    <td key={"jobTitles " + index}>
+                        {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
+                    </td>
+
+                    <td key={"skills " + index}>{employee.skills}</td>
+                    {this.renderAdminActions(index, employee)}
+                </tr>
+            ));
         } else {
             return [
                 <tr key={"firstCol"}>
-                    <td colSpan={9}>
+                    <td colSpan={10}>
                         <h6>Aucun employé est présent dans ce département</h6>
                     </td>
                 </tr>
@@ -144,21 +137,26 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
     private renderList(): JSX.Element | undefined {
         let list: Employee[] | null = this.state.filteredList !== null ? this.state.filteredList : this.props.employees;
 
-        return (<Table responsive bordered hover className="text-center">
-            <thead>
-            {this.renderTableHeads()}
-            </thead>
-            <tbody>
-            {this.getEmployeeList(list)}
-            </tbody>
-        </Table>);
+        return (
+            <Table responsive bordered hover className="text-center">
+                <thead>
+                    {this.renderTableHeads()}
+                </thead>
+
+                <tbody>
+                    {this.getEmployeeList(list)}
+                </tbody>
+            </Table>
+        );
     }
 
     private renderAddEmployeeButton(): JSX.Element | undefined {
         if (API.hasPermission(Roles.ADMIN)) {
-            return (<LinkContainer to="/add-employee">
-                <Button className="mt-3 mb-3">Ajouter</Button>
-            </LinkContainer>);
+            return (
+                <LinkContainer to="/add-employee">
+                    <Button className="mt-3 mb-3">Ajouter</Button>
+                </LinkContainer>
+            );
         } else {
             return <></>;
         }
@@ -170,12 +168,18 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
             if (!employee.isActive) {
                 component = <CgCheckO/>
             }
-            return <td key={`action ${index}`}><LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.employeeId}`}
-                                                              className="adminActions mx-1"><BiEdit/></LinkContainer>
-                <a className="adminActions ms-1 mx-1"
-                   onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a></td>
+            return (
+                <td key={`action ${index}`}>
+                    <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.employeeId}`} className="adminActions mx-1">
+                        <BiEdit/>
+                    </LinkContainer>
+                    <a className="adminActions ms-1 mx-1" onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>
+                </td>
+            );
         } else if (employee.employeeId && API.hasPermission(Roles.ADMIN)) {
-            return <td key={`action ${index}`}></td>;
+            return (
+                <td key={`action ${index}`}></td>
+            );
         }
     }
 

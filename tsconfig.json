@@ -36,6 +36,7 @@
 		"src/*.ts",
 		"src/*.cjs"
     ],
+
     "exclude": [
         "./build/**/*"
     ]

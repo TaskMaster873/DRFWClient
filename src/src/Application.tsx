@@ -33,9 +33,7 @@ export class Application {
             this.root = ReactDOM.createRoot(this.rootElem);
 
             this.root.render(
-                <React.StrictMode>
-                    <Engine />
-                </React.StrictMode>
+                <Engine />
             );
         } else {
             console.error("Root element is null or undefined!");

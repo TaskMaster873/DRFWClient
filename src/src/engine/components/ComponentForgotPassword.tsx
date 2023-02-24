@@ -3,8 +3,8 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {errors, FormErrorType, info} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
-import {NotificationManager} from "react-notifications";
 import Logo from "../../deps/images/logo.png";
+import {NotificationManager} from "../api/NotificationManager";
 /***
  * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un courriel
  */
