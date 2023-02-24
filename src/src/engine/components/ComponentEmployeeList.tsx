@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, Col, Row, Table} from "react-bootstrap";
-import {Employee, EmployeeListProps, EmployeeListState, employeeTableHeads, adminTableHeads} from "../types/Employee";
+import {Employee, EmployeeListProps, EmployeeListState, employeeTableHeads, employeeAdminTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {ComponentSearchBar} from "./ComponentSearchBar";
 import {API} from "../api/APIManager";
@@ -187,7 +187,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         if (API.hasPermission(Roles.ADMIN)) {
             return (
                 <tr key={"firstCol"}>
-                    {adminTableHeads.map((th) => (<th key={th}>{th}</th>))}
+                    {employeeAdminTableHeads.map((th) => (<th key={th}>{th}</th>))}
                 </tr>);
         } else {
             return (

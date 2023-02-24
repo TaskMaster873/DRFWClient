@@ -32,8 +32,8 @@ import {
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO, EmployeeEditDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
-import {Department, DepartmentCreateDTO} from "../types/Department";
-import {Shift, ShiftCreateDTO} from "../types/Shift";
+import {Department, DepartmentModifyDTO} from "../types/Department";
+import {Shift} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
 import {
     CreatedAccountData,
@@ -44,6 +44,7 @@ import {
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
+import {department} from "../../../Constants/testConstants";
 
 type SubscriberCallback =
     () =>
@@ -784,7 +785,7 @@ class APIManager extends Logger {
      * @returns {Promise<string | null>} Null if the department was created successfully, and the error message if it was not.
      */
     public async createDepartment(
-        department: DepartmentCreateDTO
+        department: DepartmentModifyDTO
     ): Promise<string | null> {
         if (!this.hasPermission) {
             return errors.PERMISSION_DENIED;
@@ -809,6 +810,7 @@ class APIManager extends Logger {
 
     /**
      * This method is used to edit a department.
+     * @param departmentId
      * @param department The department data.
      * @method editDepartment
      * @async
@@ -816,18 +818,28 @@ class APIManager extends Logger {
      * @memberof APIManager
      * @returns {Promise<string | null>} Null if the department was edited successfully, and the error message if it was not.
      */
-    public async editDepartment(department: Department): Promise<string | null> {
+    public async editDepartment(departmentId: string, department: DepartmentModifyDTO): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        let errorMessage: string | null = null;
-        if (department.departmentId) {
-            await updateDoc(doc(this.#db, `departments`, department.departmentId), {...department}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-            });
-        } else {
-            errorMessage = errors.INVALID_EMPLOYEE_ID;
+        let queryDepartment = query(
+            collection(this.#db, `departments`),
+            where("name", "==", department.name)
+        );
+        let errorMessage = await this.checkIfAlreadyExists(
+            queryDepartment,
+            errors.DEPARTMENT_ALREADY_EXIST
+        );
+        if(!errorMessage) {
+            if (departmentId) {
+                await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+                });
+            } else {
+                errorMessage = errors.INVALID_DEPARTMENT_ID;
+            }
         }
+
         return errorMessage;
     }
 
@@ -942,7 +954,11 @@ class APIManager extends Logger {
         if (snaps) {
             for (let doc of snaps.docs) {
                 departments.push(
-                    doc.data() as Department
+                    new Department({
+                        departmentId: doc.id,
+                        name: doc.data().name,
+                        director: doc.data().director
+                    })
                 );
             }
         }

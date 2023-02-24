@@ -1,7 +1,7 @@
 import React from "react";
 import {ComponentDepartmentList} from "../components/ComponentDepartmentList";
 import {API} from "../api/APIManager";
-import {Department, DepartmentListState} from "../types/Department";
+import {Department, DepartmentModifyDTO, DepartmentsState} from "../types/Department";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
@@ -12,8 +12,8 @@ import {Container} from "react-bootstrap";
 /**
  * Ceci est la page pour les departments
  */
-export class Departments extends React.Component<unknown, DepartmentListState> {
-    public state: DepartmentListState = {
+export class Departments extends React.Component<unknown, DepartmentsState> {
+    public state: DepartmentsState = {
         employees: [],
         employeeNb: [],
         departments: [],
@@ -104,14 +104,14 @@ export class Departments extends React.Component<unknown, DepartmentListState> {
         }
     }
 
-    public editDepartment = async (department: Department) : Promise<void> => {
-        let errorMessage = await API.editDepartment(department);
+    public editDepartment = async (departmentId: string, department: DepartmentModifyDTO) : Promise<void> => {
+        let errorMessage = await API.editDepartment(departmentId, department);
         if (!errorMessage) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
             let departments = this.state.departments;
-            let oldDepartment = departments.find(elem => elem.departmentId == department.departmentId);
+            let oldDepartment = departments.find(elem => elem.departmentId == departmentId);
             if(oldDepartment) {
-                let employeeIndex = departments.findIndex(elem => elem.departmentId == department.departmentId);
+                let employeeIndex = departments.findIndex(elem => elem.departmentId == departmentId);
                 if (department && employeeIndex != -1) {
                     departments[employeeIndex] = department;
                     this.setState({departments: departments});
