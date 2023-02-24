@@ -10,6 +10,6 @@ export class About extends React.Component {
   }
 
   public render(): JSX.Element {
-    return  <ComponentAbout></ComponentAbout>;
+    return  <ComponentAbout />;
   }
 }
