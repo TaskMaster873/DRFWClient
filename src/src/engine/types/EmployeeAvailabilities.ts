@@ -16,12 +16,12 @@ export enum DAYS {
 
 /**
  * The start time of the exception and end of the exception.
- * It is used when someone has a daybreak that is normal or juste some hours not available
+ * It is used when someone is not able to work
  */
-interface EmployeeRecursiveException {
+export interface EmployeeRecursiveException {
     //should 
-    startHour: number;
-    endHour: number;
+    startTime: number;
+    endTime: number;
 }
 
 /**
@@ -70,3 +70,11 @@ export interface EmployeeAvailabilities {
 }
 
 export type RecursiveAvailabilitiesList = RecursiveAvailabilities[];
+
+export interface eventsForUnavailability {
+    start: string;
+    end: string;
+    text: string;
+}
+
+export type eventsForUnavailabilityList = eventsForUnavailability[];

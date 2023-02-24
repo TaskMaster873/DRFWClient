@@ -5,10 +5,10 @@ import React, {Component} from 'react';
 import {colorRGB} from '../messages/ColorForAvailability';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
 import "../../deps/css/navigator_default.css";
-import {DAYS, EmployeeAvailabilities, EmployeeRecursiveExceptionList} from '../types/EmployeeAvailabilities';
+import {eventsForUnavailabilityList} from '../types/EmployeeAvailabilities';
 
 interface ComponentAvailabilitiesProps {
-    employeeAvailabilities: EmployeeAvailabilities,
+    employeeAvailabilities: eventsForUnavailabilityList,
 }
 
 interface ComponentAvailabilitiesState {
@@ -22,11 +22,11 @@ interface DayPilotArgumentTimeRange {
 }
 
 export class ComponentAvailabilities extends Component<ComponentAvailabilitiesProps, ComponentAvailabilitiesState> {
-    private calendarRef: React.RefObject<any> = React.createRef();
-    private datePickerRef: React.RefObject<any> = React.createRef();
+    private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
+    private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
     
     public state: ComponentAvailabilitiesState = {
-        businessBeginsHour: 0
+        businessBeginsHour: 0,
     };
 
     public props: ComponentAvailabilitiesProps;
@@ -50,7 +50,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
      * @param args Contains the date selected by the user
      * @returns void
      */
-    #onTimeRangeSelectedNavigator = (args: DayPilotArgumentTimeRange): void => {
+    readonly #onTimeRangeSelectedNavigator = (args: DayPilotArgumentTimeRange): void => {
         this.calendar.update({
             startDate: args.day,
         });
@@ -91,23 +91,19 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     }
 
 
+    public componentDidUpdate(prevProps: Readonly<ComponentAvailabilitiesProps>, prevState: Readonly<ComponentAvailabilitiesState>, snapshot?: any): void {
+        console.log("cela a update");
+        
+       /* for(events of this.props.employeeAvailabilities) {
+            eventToReturn.push({ start: events })
+        }*/
+        this.calendar.update({ events: this.props.employeeAvailabilities });
+        this.datePicker.update({events: this.props.employeeAvailabilities });
 
+    }
 
     public componentDidMount(): void {
-        console.log("mounted", this.props.employeeAvailabilities.recursiveExceptions[0].startDate);
-        
-        //let startDate = this.props.employeeAvailabilities.exception[0].startDate;
-       // let allDays = this.getCurrentAvailabilities();
-       /* let monday = this.props.employeeAvailabilities.recursiveExceptions[DAYS.MONDAY];
-        let tuesday = this.props.employeeAvailabilities.recursiveExceptions[DAYS.TUESDAY];
-        let wednesday = this.props.employeeAvailabilities.recursiveExceptions[DAYS.WEDNESDAY];
-        let thursday = this.props.employeeAvailabilities.recursiveExceptions[DAYS.THURSDAY];
-        let friday = this.props.employeeAvailabilities.recursiveExceptions[DAYS.FRIDAY];
-        let saturday = this.props.employeeAvailabilities.recursiveExceptions[DAYS.SATURDAY];
-        let sunday = this.props.employeeAvailabilities.recursiveExceptions[DAYS.SUNDAY];*/
-
-        //(date.getDay()+1)%8;
-
+        console.log("componentAvailabilities a mount",this.props.employeeAvailabilities);
         /*const events = [
             {
                 id: 1,
@@ -157,7 +153,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         return 0;
     }
 
-    #onTimeRangeSelectedCalendar = (args: DayPilotArgumentTimeRange): void => {
+    readonly #onTimeRangeSelectedCalendar = (args: DayPilotArgumentTimeRange): void => {
         let event = this.calendar.events.list;
         if (!event) {
             console.log("les events", event);
