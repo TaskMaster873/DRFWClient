@@ -8,7 +8,8 @@ class InternalFilterUtils {
         'isActive',
         'role',
         'skills',
-        'jobTitles'
+        'jobTitles',
+        'department',
     ];
 
     /**
@@ -22,7 +23,7 @@ class InternalFilterUtils {
      * @private
      * @memberof InternalFilterUtils
      */
-    public filterEmployee(list: Employee[], searchTerm: string) : Employee[] {
+    public filterEmployeeList(list: Employee[], searchTerm: string) : Employee[] {
         return list.filter((objectItem: Employee) => {
             let startWith = false;
             let keys: string[] = Object.keys(objectItem);
@@ -53,4 +54,7 @@ class InternalFilterUtils {
     }
 }
 
+/**
+ * Singleton instance of the FilterUtils class
+ */
 export const FilterUtils = new InternalFilterUtils();

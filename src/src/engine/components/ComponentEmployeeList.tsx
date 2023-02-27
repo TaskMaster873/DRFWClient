@@ -74,7 +74,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         let searchTerm: string = event.target.value;
 
         if(searchTerm) {
-            this.updateList(FilterUtils.filterEmployee(list, searchTerm));
+            this.updateList(FilterUtils.filterEmployeeList(list, searchTerm));
         } else {
             this.updateList(list);
         }
