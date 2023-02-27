@@ -1,4 +1,4 @@
-import React, {CSSProperties, MouseEventHandler} from "react";
+import React from "react";
 import { Nav, Table } from "react-bootstrap";
 import {
     Department, departmentAdminTableHeads,
@@ -15,7 +15,7 @@ import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
 import {BiEdit} from "react-icons/bi";
-import {employeeAdminTableHeads, employeeTableHeads} from "../types/Employee";
+import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
 
@@ -55,20 +55,8 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
              */
             return [
                 <tr key={"noDepartment"}>
-                    <td colSpan={4}>
-                        <div className='loadingBar'>
-                            <ScaleLoader
-                                color={"#A020F0"}
-                                loading={true}
-                                cssOverride={{
-                                    display: 'flex',
-                                    alignSelf: 'center',
-                                    margin: '0 auto'
-                                }}
-                                aria-label="Loading Spinner"
-                                data-testid="loader"
-                            />
-                        </div>
+                    <td colSpan={5}>
+                        <ComponentLoadingBarSpinner />
                     </td>
                 </tr>
             ];

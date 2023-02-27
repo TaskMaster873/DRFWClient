@@ -28,12 +28,12 @@ const config = {
             }
         ]
     },
-    maxConcurrency: 4,
+
+    maxConcurrency: 8,
     maxWorkers: '85%',
 
     setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
     testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    setupFiles: ['<rootDir>/setupJest.js'],
     moduleNameMapper: {
         '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|svg|webp)$': '<rootDir>/src/__mocks__/fileMock.js',
         "^.+\\.(css|less|sass|scss)$": "<rootDir>/src/__mocks__/styleMock.js",

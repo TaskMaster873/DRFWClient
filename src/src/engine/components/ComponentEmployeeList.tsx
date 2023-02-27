@@ -1,15 +1,25 @@
 import React from "react";
-import {Button, Col, Row, Table} from "react-bootstrap";
-import {Employee, EmployeeListProps, EmployeeListState, employeeTableHeads, employeeAdminTableHeads} from "../types/Employee";
+import {Button, Col, Form, Row, Table} from "react-bootstrap";
+import {Employee, employeeTableHeads, employeeAdminTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
-import {ComponentSearchBar} from "./ComponentSearchBar";
 import {API} from "../api/APIManager";
 import {BiEdit} from "react-icons/bi"
 import {Roles} from "../types/Roles";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
-import {SearchParams} from "../types/SearchParams";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
+import {FilterUtils} from "../utils/FilterUtils";
+
+export interface EmployeeListProps {
+    employees: Employee[] | null;
+    filteredList: Employee[] | null;
+    department?: string | null;
+    onEmployeeActivationChange: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
+}
+
+export interface EmployeeListState {
+    filteredList: Employee[] | null;
+}
 
 /**
  * Component that display the list of employees of a department
@@ -37,12 +47,9 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
     }
 
     public render(): JSX.Element {
-        let list: Employee[] = this.props.employees !== null ? this.props.employees : [];
-        // TODO: REDO THIS
-        let searchProps: SearchParams<Employee> = {list: list, filterList: this.updateList.bind(this)};
         return (
             <div className="mt-5">
-                {this.renderSearchBar(searchProps)}
+                {this.renderSearchBar()}
                 {this.renderList()}
                 {this.renderAddEmployeeButton()}
             </div>
@@ -62,6 +69,17 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         });
     }
 
+    private handleSearchChange(event): void {
+        let list: Employee[] = !!(this.props.employees) ? this.props.employees : [];
+        let searchTerm: string = event.target.value;
+
+        if(searchTerm) {
+            this.updateList(FilterUtils.filterEmployee(list, searchTerm));
+        } else {
+            this.updateList(list);
+        }
+    }
+
     /**
      * Render the list of employees
      * @param searchProps The search bar props to pass to the search bar
@@ -69,12 +87,20 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
      * @memberof ComponentEmployeeList
      * @todo Redo the search bar
      */
-    private renderSearchBar(searchProps: SearchParams<Employee>): JSX.Element {
+    private renderSearchBar(): JSX.Element {
         return (
             <Row>
                 <Col xs={7}><h3>Liste des employés du département {this.props.department}</h3></Col>
                 <Col xs={2}></Col>
-                <Col xs={3}><ComponentSearchBar {...searchProps} /></Col>
+                <Col xs={3}>
+                    <Form.Group>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search"
+                            onChange={this.handleSearchChange.bind(this)}
+                        />
+                    </Form.Group>
+                </Col>
             </Row>
         );
     }

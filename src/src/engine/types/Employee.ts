@@ -85,17 +85,6 @@ export interface EmployeeProps {
     params: Readonly<Params>;
 }
 
-export interface EmployeeListProps {
-    employees: Employee[] | null;
-    filteredList: Employee[] | null;
-    department?: string | null;
-    onEmployeeActivationChange: (employee: Employee) => PromiseLike<void> | Promise<void> | void;
-}
-
-export interface EmployeeListState {
-    filteredList: Employee[] | null;
-}
-
 export interface AddEmployeeProps {
     departments: Department[];
     roles: string[];
