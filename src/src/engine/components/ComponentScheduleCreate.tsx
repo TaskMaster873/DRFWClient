@@ -23,7 +23,7 @@ type State = {
 	/** end of the calendar */
 	end: DayPilot.Date;
 	/** for the popup */
-	resourceName: string;
+	resource: string;
     /** Popup taskType */
     taskType: EventManipulationType;
 }
@@ -32,9 +32,9 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 	public state: State = {
 		isShowingModal: false,
 		currentEventId: "",
-		start: "2023-02-17T00:00:00",
-		end: "2023-02-18T00:00:00",
-		resourceName: "",
+		start: "",
+		end: "",
+		resource: "",
 		taskType: EventManipulationType.CREATE,
 	};
 
@@ -70,7 +70,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 					id={this.state.currentEventId}
 					start={this.state.start}
 					end={this.state.end}
-					resource={this.state.resourceName}
+					resource={this.state.resource}
 					taskType={this.state.taskType}
 					employees={this.props.employees}
 				/>
@@ -110,7 +110,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 			isShowingModal: true,
 			start: args.start,
 			end: args.end,
-			resourceName: args.resource,
+			resource: args.resource,
 			taskType: EventManipulationType.CREATE,
 		});
 
@@ -127,7 +127,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 			currentEventId: args.e.data.id,
 			start: args.e.data.start,
 			end: args.e.data.end,
-			resourceName: args.e.data.resource,
+			resource: args.e.data.resource,
 			taskType: EventManipulationType.EDIT,
 		});
 	};

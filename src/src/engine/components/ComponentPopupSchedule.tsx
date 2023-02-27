@@ -27,8 +27,7 @@ export function ComponentPopupSchedule(props: Props) {
 	const [start, setStart] = useState<string | null>(null);
 	const [end, setEnd] = useState<string | null>(null);
 	const [disabled, setDisabled] = useState<boolean>(false);
-	const [employeeId, setEmployeeId] = useState<string>("");
-	const min = DayPilot.Date.today();
+	const [employeeId, setEmployeeId] = useState<string | null>(null);
 
 	/**
 	 * Verify if the form is valid and if it is, it sends the data to the parent
@@ -108,9 +107,18 @@ export function ComponentPopupSchedule(props: Props) {
 				<Modal.Body>
 					<Form.Group className="mb-6">
 						<Form.Label >Employé assigné</Form.Label>
-						<Form.Select aria-label="employee selector" onChange={(e) => setEmployeeId(e.target.value)} defaultValue={props.resource}>
+						<Form.Select
+							id="assignedEmployee"
+							onChange={(e) => setEmployeeId(e.target.value)} 
+							defaultValue={props.resource}
+						>
 							{props.employees.map((employee) => (
-								<option value={employee.employeeId} key={employee.employeeId}>{employee.firstName} {employee.lastName}</option>
+								<option 
+									value={employee.employeeId} 
+									key={employee.employeeId}
+								>
+									{employee.firstName} {employee.lastName}
+								</option>
 							))}
 						</Form.Select>
 					</Form.Group>
@@ -121,7 +129,6 @@ export function ComponentPopupSchedule(props: Props) {
 							type="datetime-local"
 							defaultValue={props.start}
 							step="1800"
-							min={min}
 							onChange={(e) => {setStart(e.target.value);}}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidStartDate">
@@ -135,7 +142,6 @@ export function ComponentPopupSchedule(props: Props) {
 							type="datetime-local"
 							defaultValue={props.end}
 							step="1800"
-							min={min}
 							onChange={(e) => setEnd(e.target.value)}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidEndDate">

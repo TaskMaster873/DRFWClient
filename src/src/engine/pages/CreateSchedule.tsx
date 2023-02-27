@@ -20,7 +20,7 @@ enum FetchState {
     OK = 2,
 }
 
-interface CreateScheduleState {
+interface State {
     currentDepartment: Department | null;
     departments: Department[];
     employees: Employee[];
@@ -29,8 +29,8 @@ interface CreateScheduleState {
     redirectTo: string | null;
 }
 
-export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
-    public state: CreateScheduleState = {
+export class CreateSchedule extends React.Component<unknown, State> {
+    public state: State = {
         currentDepartment: null,
         departments: [],
         employees: [],
