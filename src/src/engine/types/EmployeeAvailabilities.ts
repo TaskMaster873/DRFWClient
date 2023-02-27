@@ -4,13 +4,13 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
  * Enum for all days name 
 */
 export enum DAYS {
-    SUNDAY,
-    MONDAY,
-    TUESDAY,
-    WEDNESDAY,
-    THURSDAY,
-    FRIDAY,
-    SATURDAY,
+    SUNDAY = 1,
+    MONDAY = 2,
+    TUESDAY = 3,
+    WEDNESDAY = 4,
+    THURSDAY = 5,
+    FRIDAY = 6,
+    SATURDAY = 7,
 
 }
 

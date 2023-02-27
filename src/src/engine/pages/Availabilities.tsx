@@ -17,8 +17,8 @@ export interface AvailabilitiesState {
 }
 
 let curr = new Date;
-let firstday = new Date(curr.setDate(curr.getDate() - curr.getDay()));
-let lastday = new Date(curr.setDate(curr.getDate() - curr.getDay()+6));
+let firstday =new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0,0,0,0));
+let lastday = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0,0,0,0));
 
 export class Availabilities extends React.Component<unknown, AvailabilitiesState> {
     //It is a placeholder value, because the db doesn't exist for now.
@@ -26,19 +26,23 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     public state: AvailabilitiesState = {
         availabilities: {
             recursiveExceptions: [{
-                [DAYS.SUNDAY]: [],
+                [DAYS.SUNDAY]: [{
+                    startTime: 15,
+                    endTime: 360
+                },
+                ],
                 //time not available
                 [DAYS.MONDAY]: [
-                    {
-                        startTime: 15,
-                        endTime: 360
-                    },
+
                     {
                         startTime: 700,
                         endTime: 820
                     }
                 ],
-                [DAYS.TUESDAY]: [],
+                [DAYS.TUESDAY]: [{
+                    startTime: 500,
+                    endTime: 620
+                }],
                 [DAYS.WEDNESDAY]: [],
                 [DAYS.THURSDAY]: [],
                 [DAYS.FRIDAY]: [],
@@ -46,23 +50,24 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
             }, {
                 startDate: "2023-02-19T00:00:00",
-                endDate: "2023-02-26T00:00:00",
+                endDate: "2023-02-26T23:59:59",
                 [DAYS.SUNDAY]: [],
                 //time not available
-                [DAYS.FRIDAY]: [
-                    {
-                        startTime: 15,
-                        endTime: 360
-                    },
-                    {
-                        startTime: 700,
-                        endTime: 820
-                    }
-                ],
+                [DAYS.MONDAY]: [],
                 [DAYS.TUESDAY]: [],
                 [DAYS.WEDNESDAY]: [],
                 [DAYS.THURSDAY]: [],
-                [DAYS.MONDAY]: [],
+
+                [DAYS.FRIDAY]: [
+                    {
+                        startTime: 30,
+                        endTime: 400
+                    },
+                    {
+                        startTime: 500,
+                        endTime: 700
+                    }
+                ],
                 [DAYS.SATURDAY]: [],
 
             }],
@@ -76,6 +81,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     public componentDidMount() {
         document.title = "Disponibilitées - TaskMaster";
+        console.log(this.state);
         this.computeAllAvailabilities(this.state.currentWeekStart, this.state.currentWeekEnd);
     }
 
@@ -87,7 +93,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return date <= endDate;
     }
 
-    readonly #onTimeRangeSelected = (start: Date, end: Date) : void => {
+    readonly #onTimeRangeSelected = (start: Date, end: Date): void => {
         /*this.setState({
             currentWeekEnd: end,
             currentWeekStart: start,
@@ -96,7 +102,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         });*/
 
         this.computeAllAvailabilities(start, end);
-    }
+    };
 
     public render(): JSX.Element {
         return (
@@ -116,27 +122,28 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
         for (let recursive of this.state.availabilities.recursiveExceptions) {
             let canRenderData: boolean = true;
-            if(recursive.startDate) {
-                if(!this.isInTimeRangeFromStartDate(start, new Date(recursive.startDate))) {
+            if (recursive.startDate) {
+                if (!this.isInTimeRangeFromStartDate(start, new Date(recursive.startDate))) {
                     canRenderData = false;
                 }
             }
 
-            if(recursive.endDate && canRenderData) {
-                if(!this.isInTimeRangeFromEndDate(end, new Date(recursive.endDate))) {
+            if (recursive.endDate && canRenderData) {
+                if (!this.isInTimeRangeFromEndDate(end, new Date(recursive.endDate))) {
                     canRenderData = false;
                 }
             }
 
-            if(canRenderData) {
+            if (canRenderData) {
                 for (let day in recursive) {
-                    if(day === 'startDate' || day === 'endDate') {
+                    if (day === 'startDate' || day === 'endDate') {
                         continue;
                     }
 
                     if (recursive[day].length > 0) {
                         for (let i = 0; i < recursive[day].length; i++) {
                             const eventToPush = this.transformForDayPilot(start, recursive[day][i]);
+                            console.log(DAYS[day], start, recursive[day][i], i, eventToPush);
                             listOfUnavailbility.push(eventToPush);
                         }
                     }
@@ -149,47 +156,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             timesUnavailable: listOfUnavailbility,
         });
 
-        /*
-        const numberOfDaysAWeek = 7;
-        let startDate = new Date(this.state.availabilities.recursiveExceptions[0].startDate);
-        let endDate = new Date(this.state.availabilities.recursiveExceptions[0].endDate);
-        let dateToIncrement = startDate;
-
-        console.log(dateToIncrement);
-
-        console.log(startDate);
-
-        for (let recursive of this.state.availabilities.recursiveExceptions) {
-            let i = 0;
-            while (dateToIncrement < endDate) {
-                if (recursive[i].length > 0) {
-                    console.log("length:", recursive[i], i);
-                    //to pushThisIntoTheStateAtTheEnd
-                    for (let j = 0; j < recursive[i].length; j++) {
-                        console.log("le i j:", recursive[i][j]);
-                        const eventToPush = this.transformForDayPilot(dateToIncrement, recursive[i][j]);
-                        listOfUnavailbility.push(eventToPush);
-                        console.log("length de la liste to return:", listOfUnavailbility.length);
-                    }
-
-                }
-                dateToIncrement = ManagerDate.addDaysToADate(1, dateToIncrement);
-
-                i++;
-
-                if (i == numberOfDaysAWeek) {
-                    i = 0;
-                }
-
-            }
-            console.log("final list:", listOfUnavailbility);
-
-
-        }*/
-
-        /*this.setState({
-            timesUnavailable: listOfUnavailbility,
-        });*/
     }
 
     private transformForDayPilot(startTime: Date, hours: EmployeeRecursiveException): eventsForUnavailability {

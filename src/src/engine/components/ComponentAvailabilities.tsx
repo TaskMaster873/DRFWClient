@@ -69,6 +69,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         selectMode={"week"}
                         showMonths={3}
                         skipMonths={3}
+                        rowsPerMonth={"Auto"}
                         startDate={DayPilot.Date.today()}
                         selectionDay={DayPilot.Date.today()}
                         onTimeRangeSelected={this.#onTimeRangeSelectedNavigator}
@@ -97,7 +98,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
 
     public componentDidUpdate(prevProps: Readonly<ComponentAvailabilitiesProps>, prevState: Readonly<ComponentAvailabilitiesState>, snapshot?: any): void {
-        console.log("cela a update");
         
        /* for(events of this.props.employeeAvailabilities) {
             eventToReturn.push({ start: events })
@@ -108,6 +108,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
     public componentDidMount(): void {
         console.log("componentAvailabilities a mount",this.props.employeeAvailabilities);
+        this.calendar.update({ events: this.props.employeeAvailabilities });
+        this.datePicker.update({startDate: DayPilot.Date.today(), events: this.props.employeeAvailabilities });
         /*const events = [
             {
                 id: 1,

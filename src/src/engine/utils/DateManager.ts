@@ -38,7 +38,7 @@ export class DateManager {
         let numberOfMs = date.getTime();
         let msToAdd = 60 * 1000 * numberOfMinutes;
         //To get the good timezone and to get it good for a DayPilot.Date
-        let newDate = new Date(((numberOfMs + msToAdd) - (new Date().getTimezoneOffset()) * 60 * 1000));
+        let newDate = new Date(numberOfMs + msToAdd);
         return this.changeDateToDayPilotFormat(newDate);
     }
 
