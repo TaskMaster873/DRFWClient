@@ -1,4 +1,5 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react";
+import {Timestamp} from "firebase/firestore";
 
 /** 
  * Enum for all days name 
@@ -78,3 +79,11 @@ export interface eventsForUnavailability {
 }
 
 export type eventsForUnavailabilityList = eventsForUnavailability[];
+
+export interface EmployeeAvailabilitiesForCreate {
+    recursiveExceptions: RecursiveAvailabilities;
+    employeeId: string;
+    start: Timestamp;
+    end:Timestamp;
+}
+

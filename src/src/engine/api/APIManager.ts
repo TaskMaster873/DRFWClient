@@ -45,6 +45,7 @@ import {
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {department} from "../../../Constants/testConstants";
+import {EmployeeAvailabilities, EmployeeAvailabilitiesForCreate} from "../types/EmployeeAvailabilities";
 
 type SubscriberCallback =
     () =>
@@ -830,7 +831,7 @@ class APIManager extends Logger {
             queryDepartment,
             errors.DEPARTMENT_ALREADY_EXIST
         );
-        if(!errorMessage) {
+        if (!errorMessage) {
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
@@ -1285,6 +1286,30 @@ class APIManager extends Logger {
                 employeeId: shift.employeeId,
                 end: this.getFirebaseTimestamp(shift.end),
                 start: this.getFirebaseTimestamp(shift.start)
+            },
+        ).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        });
+
+        if (errorMessage) return errorMessage;
+    }
+
+
+    public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
+        if (!this.hasPermission(1)) {
+            //Gestionnaire
+            return errors.PERMISSION_DENIED;
+        }
+
+        let errorMessage: string | null = null;
+
+        //Create Shift
+        await addDoc(collection(this.#db, `unavailabilities`),
+            {
+                employeeId: list.employeeId,
+                unavailabilities: list.recursiveExceptions,
+                start: list.start,
+                end: list.end,
             },
         ).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);

@@ -132,6 +132,10 @@ service cloud.firestore {
                 return createdValidProject && hasFields
                        && getCurrentEmployeeRole(request.auth.uid) >= 3 && projectFieldTypes();
             }
+            match /unavailabilities/{unavailabilityId} {
+                allow read;
+                allow write;
+            }
         }
 
     }
