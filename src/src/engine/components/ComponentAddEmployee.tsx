@@ -152,24 +152,24 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 </Row>
                 <Row className="mb-3">
                     <Form.Group as={Col} md="4">
-                        <Form.Label className="w-100">Corps d'emploi<Button onClick={() => this.onShowEditJobTitles} className="float-end">+</Button></Form.Label>
+                        <Form.Label>Corps d'emploi</Form.Label><Button onClick={() => this.#onShowEditJobTitles()} className="float-end">+</Button>
                         {this.props.jobTitles.map((corps) => (<Form.Check
                             key={`${corps}`}
                             type="checkbox"
                             name={`${corps}`}
                             label={`${corps}`}
                         />))}
-                        <ComponentEditJobTitles cancelEdit={() => this.#onCancelEditJobTitles} showEdit={this.state.showEditJobTitles} jobTitles={this.state.jobTitles} onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle} ></ComponentEditJobTitles>
+                        <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditJobTitles} jobTitles={this.state.jobTitles} onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle} ></ComponentEditJobTitles>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
-                        <Form.Label className="w-100">Compétences<Button onClick={() => this.onShowEditSkills} className="float-end">+</Button></Form.Label>
+                        <Form.Label>Compétences</Form.Label><Button onClick={() => this.#onShowEditSkills()} className="float-end">+</Button>
                         {this.props.skills.map((skill) => (<Form.Check
                             key={`${skill}`}
                             type="checkbox"
                             name={`${skill}`}
                             label={`${skill}`}
                         />))}
-                        <ComponentEditSkills cancelEdit={() => this.#onCancelEditSkills} showEdit={this.state.showEditSkills} onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}></ComponentEditSkills>
+                        <ComponentEditSkills cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditSkills} onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}></ComponentEditSkills>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
@@ -201,22 +201,13 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         </Container>);
     }
 
-    private onShowEditJobTitles() {
-        this.setState({showEditJobTitles: true})
+    readonly #onShowEditJobTitles = (value: boolean = true): void => {
+        this.setState({showEditJobTitles: value})
         console.log(this.state.showEditJobTitles)
     }
 
-    private onShowEditSkills() {
-        this.setState({showEditSkills: true})
-        console.log(this.state.showEditJobTitles)
-    }
-
-    readonly #onCancelEditJobTitles = (): void => {
-        this.setState({showEditJobTitles: true});
-    }
-
-    readonly #onCancelEditSkills = (): void => {
-        this.setState({showEditSkills: true});
+    readonly #onShowEditSkills = (value: boolean = true): void => {
+        this.setState({showEditSkills: value})
     }
 
     /**

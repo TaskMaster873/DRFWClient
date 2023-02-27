@@ -45,7 +45,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     }
 
     public render(): JSX.Element {
-        return <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
+        return <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
             <Form
                 noValidate
                 validated={this.state.validated}
@@ -53,30 +53,39 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                 onChange={this.#handleChange}
                 data-error={this.state.error}
             >
-                <Row className="mb-3">
-                    <h5 className="mt-4 mb-3">Éditer les corps d'emploi</h5>
-                    {this.props.jobTitles.map((corps: string) => (<Form.Control
-                        key={corps}
-                        type="text"
-                        name={corps}
-                        className="jobTitles"
-                    />))}
-                    <Form.Group as={Col} md="6">
-                        <Form.Label className="mt-2">Nom</Form.Label>
-                        <Form.Control
-                            name="name"
-                            required
+                <Modal.Header closeButton>
+                    <Modal.Title>Édition de corps d'emploi</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row className="mb-3">
+                        {this.props.jobTitles.map((corps: string) => (<Form.Control
+                            key={corps}
                             type="text"
-                            placeholder="Nom"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.REQUIRED_JOB_TITLE_NAME}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                </Row>
-                <Button className="mt-3 mb-3" variant="primary" type="submit">
-                    Ajouter
-                </Button>
+                            name={corps}
+                            className="jobTitles"
+                        />))}
+                        <Form.Group as={Col} md="6">
+                            <Form.Label className="mt-2">Nom</Form.Label>
+                            <Form.Control
+                                name="name"
+                                required
+                                type="text"
+                                placeholder="Nom"
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.REQUIRED_JOB_TITLE_NAME}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => this.hideModal()}>
+                        Close
+                    </Button>
+                    <Button variant="primary" type="submit">
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
             </Form>
         </Modal>
     }
@@ -112,39 +121,39 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         }
     }
 
-/**
- * Function that is called when the form is changed. This update the state of the component.
- * @param event The event that triggered the function
- * @private
- */
-readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
-    const target = event.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
-    const name = target.name;
+    /**
+     * Function that is called when the form is changed. This update the state of the component.
+     * @param event The event that triggered the function
+     * @private
+     */
+    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
+        const target = event.target;
+        const value = target.type === "checkbox" ? target.checked : target.value;
+        const name = target.name;
 
-    if (!name) {
-        throw new Error("Id is undefined for element in form.");
+        if (!name) {
+            throw new Error("Id is undefined for element in form.");
+        }
+
+        this.setState({
+            ...{}, ...{
+                [name]: value,
+            }
+        });
     }
 
-    this.setState({
-        ...{}, ...{
-            [name]: value,
-        }
-    });
-}
+    /**
+     * Function that is called when the select is changed. This update the state of the component.
+     * @param event The event that triggered the function
+     * @private
+     */
+    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
+        const target = event.target;
 
-/**
- * Function that is called when the select is changed. This update the state of the component.
- * @param event The event that triggered the function
- * @private
- */
-readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const target = event.target;
-
-    this.setState({
-        ...this.state, ...{
-            [target.id]: target.value
-        }
-    });
-}
+        this.setState({
+            ...this.state, ...{
+                [target.id]: target.value
+            }
+        });
+    }
 }

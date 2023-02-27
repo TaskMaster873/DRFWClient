@@ -4,7 +4,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-import { errors, FormErrorType } from "../messages/FormMessages";
+import {errors, FormErrorType} from "../messages/FormMessages";
 import {Modal} from "react-bootstrap";
 
 interface EditSkillsState {
@@ -52,24 +52,33 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                 onChange={this.#handleChange}
                 data-error={this.state.error}
             >
-                <Row className="mb-3">
-                    <h5 className="mt-4 mb-3">Éditer les corps d'emploi</h5>
-                    <Form.Group as={Col} md="6">
-                        <Form.Label className="mt-2">Nom</Form.Label>
-                        <Form.Control
-                            name="name"
-                            required
-                            type="text"
-                            placeholder="Nom"
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.REQUIRED_JOB_TITLE_NAME}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                </Row>
-                <Button className="mt-3 mb-3" variant="primary" type="submit">
-                    Ajouter
-                </Button>
+                <Modal.Header closeButton>
+                    <Modal.Title>Édition de compétences</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row className="mb-3">
+                        <Form.Group as={Col} md="6">
+                            <Form.Label className="mt-2">Nom</Form.Label>
+                            <Form.Control
+                                name="name"
+                                required
+                                type="text"
+                                placeholder="Nom"
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.REQUIRED_JOB_TITLE_NAME}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => this.hideModal()}>
+                        Close
+                    </Button>
+                    <Button variant="primary" type="submit">
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
             </Form>
         </Modal>
     }
@@ -119,9 +128,11 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
             throw new Error("Id is undefined for element in form.");
         }
 
-        this.setState({...{}, ...{
+        this.setState({
+            ...{}, ...{
                 [name]: value,
-            }});
+            }
+        });
     }
 
     /**
@@ -129,11 +140,13 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
      * @param event The event that triggered the function
      * @private
      */
-    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
+    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
         const target = event.target;
 
-        this.setState({...this.state, ...{
+        this.setState({
+            ...this.state, ...{
                 [target.id]: target.value
-            }});
+            }
+        });
     }
 }
