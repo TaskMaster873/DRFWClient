@@ -47,55 +47,33 @@ describe("Test TaskMaster Client component", () => {
 
   test("test all are not rendered when isShowing is false", async () => {
     const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
-    render(<MemoryRouter><ComponentPopupSchedule isShowing={false} /></MemoryRouter>);
-    const { form, inputName, inputColor } = getFields();
+    render(<MemoryRouter><ComponentPopupSchedule isShown={false} /></MemoryRouter>);
+    const { form, inputStart, inputEnd } = getFields();
 
     expect(form).toBeNull();
 
-    expect(inputName).toBeNull();
-    expect(inputColor).toBeNull();
+    expect(inputStart).toBeNull();
+    expect(inputEnd).toBeNull();
  });
 
   test("test all are rendered when isShowing is true", async () => {
     const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
-    render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);
-    const { form, inputName, inputColor } = getFields();
+    render(<MemoryRouter><ComponentPopupSchedule isShown={true} /></MemoryRouter>);
+    const { form, inputStart, inputEnd } = getFields();
 
     expect(form).not.toBeNull();
 
-    expect(inputName).not.toBeNull();
-    expect(inputColor).not.toBeNull();
+    expect(inputStart).not.toBeNull();
+    expect(inputEnd).not.toBeNull();
   });
-
-  test("test user add a name in the input for the name, should change de value of the input", async () => {
-    const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
-     render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);
-    const { form, inputName, inputColor } = getFields();
-
-    await user.type(inputName, testConstants.validName);
-   
-    expect(inputName.value).toBe(testConstants.validName);
-  });
-
-  /* test("test user add a different color in the color input, should change de value of the input", async () => {
-    const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
-    user = userEvent.setup();
-    render(<ComponentPopupSchedule isShowing={true}/>);
-    const { form, inputName, inputColor } = getFields();
-    fireEvent.change(inputColor, { target: { value: '#ff6464' } });
-    /*console.log("input",inputColor.value);
-    userEvent.click(inputColor);
-    userEvent.type(inputColor, testPopupConstant.validRGBColor);
-    expect(inputColor).toHaveValue("#ff6464");
-  });*/
 });
 function getFields() {
   const form = document.querySelector("form");
-  const inputName = document.getElementById("nameOfEvent");
-  const inputColor = document.getElementById("colorOfEvent");
+  const inputStart = document.getElementById("start");
+  const inputEnd = document.getElementById("end");
   return {
     form,
-    inputName,
-    inputColor,
+    inputStart,
+    inputEnd,
   };
 }

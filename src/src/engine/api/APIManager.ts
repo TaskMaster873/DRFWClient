@@ -33,7 +33,7 @@ import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO, EmployeeEditDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
 import {Department, DepartmentModifyDTO} from "../types/Department";
-import {Shift} from "../types/Shift";
+import {Shift, ShiftCreateDTO} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
 import {
     CreatedAccountData,
@@ -925,12 +925,12 @@ class APIManager extends Logger {
 
         let snap = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
-        })
+        });
 
         if (snap && snap.exists()) {
             return snap.data() as EmployeeEditDTO;
         } else {
-            errorMessage = errors.EMPLOYEE_NOT_FOUND
+            errorMessage = errors.EMPLOYEE_NOT_FOUND;
         }
         return errorMessage;
     }
@@ -1130,9 +1130,9 @@ class APIManager extends Logger {
                     let data = doc.data();
                     shifts.push(
                         new Shift({
+                            id: doc.id,
                             employeeId: data.employeeId,
                             department: data.department,
-                            projectName: data.projectName,
                             start: this.getDayPilotDateString(data.start),
                             end: this.getDayPilotDateString(data.end),
                         })
@@ -1215,9 +1215,9 @@ class APIManager extends Logger {
 
                 //Push shift object
                 shifts.push(new Shift({
+                    id: doc.id,
                     employeeId: shift.employeeId,
                     department: shift.department,
-                    projectName: shift.projectName,
                     start: this.getDayPilotDateString(shift.start),
                     end: this.getDayPilotDateString(shift.end),
                 }));
@@ -1236,7 +1236,7 @@ class APIManager extends Logger {
      * @param {Shift} shift The shift to create.
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
      */
-    public async createShift(shift: Shift): Promise<void | string> {
+    public async createShift(shift: ShiftCreateDTO): Promise<void | string> {
         //Check if user has permission
         if (!this.hasPermission(2)) {
             //Gestionnaire
@@ -1251,7 +1251,39 @@ class APIManager extends Logger {
                 department: shift.department,
                 employeeId: shift.employeeId,
                 end: this.getFirebaseTimestamp(shift.end),
-                projectName: shift.projectName,
+                start: this.getFirebaseTimestamp(shift.start)
+            },
+        ).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        });
+
+        if (errorMessage) return errorMessage;
+    }
+
+    /**
+     * This method is used to edit a shift. If the request was not successful, it will return an error message.
+     * @method editShift
+     * @async
+     * @public
+     * @memberof APIManager
+     * @param {Shift} shift The shift to edit.
+     * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
+     */
+    public async editShift(shift: Shift): Promise<void | string> {
+        //Check if user has permission
+        if (!this.hasPermission(2)) {
+            //Gestionnaire
+            return errors.PERMISSION_DENIED;
+        }
+
+        let errorMessage: string | null = null;
+
+        //Edit Shift
+        await setDoc(doc(this.#db, `shifts`, shift.id),
+            {
+                department: shift.department,
+                employeeId: shift.employeeId,
+                end: this.getFirebaseTimestamp(shift.end),
                 start: this.getFirebaseTimestamp(shift.start)
             },
         ).catch((error) => {
