@@ -18,6 +18,7 @@ export const errors = {
     INVALID_INITIAL_PASSWORD: "Le mot de passe initial doit contenir un minimum de 6 caractères, une minuscule, une majuscule et un caractère spécial",
     INVALID_NEW_PASSWORD: "Le nouveau mot de passe doit contenir un minimum de 6 caractères, une minuscule, une majuscule et un caractère spécial",
     INVALID_LOGIN: "Le numéro d'employé ou le mot de passe spécifié est invalide",
+    INVALID_DATE: "La date doit être un multiple d'une demi-heure.",
     DEPARTMENT_ALREADY_EXIST: "Le département existe déjà",
     MESSAGE_SCHEDULE_UNAVALIBLE: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
     SERVER_ERROR: "Une erreur s'est produite, veuillez réessayer plus tard",
@@ -27,11 +28,12 @@ export const errors = {
     GET_DEPARTMENTS: "Une erreur s'est produite lors de la récupération des données des départements",
     GET_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données des employés",
     CREATE_SHIFT: "Une erreur s'est produite lors de la création du quart de travail.",
+    EDIT_SHIFT: "Une erreur s'est produite lors de la modification du quart de travail.",
     GET_EDIT_EMPLOYEES: "Une erreur s'est produite lors de la récupération des données de l'employé à éditer",
     INVALID_EMPLOYEE_ID_PARAMETER: "L'identifiant de l'employé en paramètre est invalide",
     EMPLOYEE_NOT_FOUND: "L'employée n'a pas été trouvé.",
     SORRY: "Oops!",
-    NO_PERMISSION: "Vous n'avez pas les permissions néssésaire pour visiter cette page."
+    NO_PERMISSION: "Vous n'avez pas les permissions nécessaires pour visiter cette page."
 }
 
 export const successes = {
@@ -46,6 +48,8 @@ export const successes = {
     EMPLOYEE_ACTIVATED: "L'employé a bien été activé !",
     EMPLOYEE_DEACTIVATED: "L'employé a bien été désactivé !",
     EMPLOYEE_EDITED: `L'employé a bien été modifié !`,
+    DEPARTMENT_EDITED: `Le département a bien été modifié`
+
 }
 
 export const info = {

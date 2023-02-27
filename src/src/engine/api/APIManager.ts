@@ -32,8 +32,8 @@ import {
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {Employee, EmployeeCreateDTO, EmployeeEditDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
-import {Department, DepartmentCreateDTO} from "../types/Department";
-import {Shift} from "../types/Shift";
+import {Department, DepartmentModifyDTO} from "../types/Department";
+import {Shift, ShiftCreateDTO} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
 import {
     CreatedAccountData,
@@ -44,12 +44,13 @@ import {
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
+import {department} from "../../../Constants/testConstants";
 
 type SubscriberCallback =
     () =>
-    | void
-    | (() => Promise<void>)
-    | PromiseLike<void>;
+        | void
+        | (() => Promise<void>)
+        | PromiseLike<void>;
 
 /**
  * The APIManager is responsible for all communication with the Firebase API.
@@ -126,7 +127,7 @@ class APIManager extends Logger {
      * @memberof APIManager
      * @returns {number} The current user role.
      */
-    public get userRole() : number {
+    public get userRole(): number {
         return this.#userRole;
     }
 
@@ -422,7 +423,7 @@ class APIManager extends Logger {
         this.log("Logging out user...");
         let errorMessage: string | null = null;
 
-        if(this.isAuth()) {
+        if (this.isAuth()) {
             await FirebaseAuth.signOut(this.#auth).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
@@ -656,7 +657,7 @@ class APIManager extends Logger {
                     errorMessage = this.getErrorMessageFromCode(error);
                 });
 
-                if(!errorMessage) {
+                if (!errorMessage) {
                     // Prompt the user to re-provide their sign-in credentials
                     let reAuth = await FirebaseAuth.reauthenticateWithCredential(
                         user,
@@ -784,7 +785,7 @@ class APIManager extends Logger {
      * @returns {Promise<string | null>} Null if the department was created successfully, and the error message if it was not.
      */
     public async createDepartment(
-        department: DepartmentCreateDTO
+        department: DepartmentModifyDTO
     ): Promise<string | null> {
         if (!this.hasPermission) {
             return errors.PERMISSION_DENIED;
@@ -809,6 +810,7 @@ class APIManager extends Logger {
 
     /**
      * This method is used to edit a department.
+     * @param departmentId
      * @param department The department data.
      * @method editDepartment
      * @async
@@ -816,18 +818,28 @@ class APIManager extends Logger {
      * @memberof APIManager
      * @returns {Promise<string | null>} Null if the department was edited successfully, and the error message if it was not.
      */
-    public async editDepartment(department: Department): Promise<string | null> {
+    public async editDepartment(departmentId: string, department: DepartmentModifyDTO): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        let errorMessage: string | null = null;
-        if (department.departmentId) {
-            await updateDoc(doc(this.#db, `departments`, department.departmentId), {...department}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
-            });
-        } else {
-            errorMessage = errors.INVALID_EMPLOYEE_ID;
+        let queryDepartment = query(
+            collection(this.#db, `departments`),
+            where("name", "==", department.name)
+        );
+        let errorMessage = await this.checkIfAlreadyExists(
+            queryDepartment,
+            errors.DEPARTMENT_ALREADY_EXIST
+        );
+        if(!errorMessage) {
+            if (departmentId) {
+                await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+                });
+            } else {
+                errorMessage = errors.INVALID_DEPARTMENT_ID;
+            }
         }
+
         return errorMessage;
     }
 
@@ -841,7 +853,7 @@ class APIManager extends Logger {
      * @memberof APIManager
      * @returns {Promise<string | null>} Null if the document does not exist, and the error message if it does.
      */
-    private async checkIfAlreadyExists(query, error: string) : Promise<string | null> {
+    private async checkIfAlreadyExists(query, error: string): Promise<string | null> {
         let errorMessage: string | null = null;
         let snaps = await getDocs(query).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
@@ -913,12 +925,12 @@ class APIManager extends Logger {
 
         let snap = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
-        })
+        });
 
         if (snap && snap.exists()) {
             return snap.data() as EmployeeEditDTO;
         } else {
-            errorMessage = errors.EMPLOYEE_NOT_FOUND
+            errorMessage = errors.EMPLOYEE_NOT_FOUND;
         }
         return errorMessage;
     }
@@ -940,9 +952,13 @@ class APIManager extends Logger {
         });
 
         if (snaps) {
-            for(let doc of snaps.docs){
+            for (let doc of snaps.docs) {
                 departments.push(
-                    doc.data() as Department
+                    new Department({
+                        departmentId: doc.id,
+                        name: doc.data().name,
+                        director: doc.data().director
+                    })
                 );
             }
         }
@@ -1114,9 +1130,9 @@ class APIManager extends Logger {
                     let data = doc.data();
                     shifts.push(
                         new Shift({
+                            id: doc.id,
                             employeeId: data.employeeId,
                             department: data.department,
-                            projectName: data.projectName,
                             start: this.getDayPilotDateString(data.start),
                             end: this.getDayPilotDateString(data.end),
                         })
@@ -1199,9 +1215,9 @@ class APIManager extends Logger {
 
                 //Push shift object
                 shifts.push(new Shift({
+                    id: doc.id,
                     employeeId: shift.employeeId,
                     department: shift.department,
-                    projectName: shift.projectName,
                     start: this.getDayPilotDateString(shift.start),
                     end: this.getDayPilotDateString(shift.end),
                 }));
@@ -1220,14 +1236,14 @@ class APIManager extends Logger {
      * @param {Shift} shift The shift to create.
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
      */
-    public async createShift(shift: Shift): Promise<void | string> {
+    public async createShift(shift: ShiftCreateDTO): Promise<void | string> {
         //Check if user has permission
         if (!this.hasPermission(2)) {
             //Gestionnaire
             return errors.PERMISSION_DENIED;
         }
 
-        let errorMessage : string | null = null;
+        let errorMessage: string | null = null;
 
         //Create Shift
         await addDoc(collection(this.#db, `shifts`),
@@ -1235,14 +1251,46 @@ class APIManager extends Logger {
                 department: shift.department,
                 employeeId: shift.employeeId,
                 end: this.getFirebaseTimestamp(shift.end),
-                projectName: shift.projectName,
                 start: this.getFirebaseTimestamp(shift.start)
             },
         ).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
 
-        if(errorMessage) return errorMessage;
+        if (errorMessage) return errorMessage;
+    }
+
+    /**
+     * This method is used to edit a shift. If the request was not successful, it will return an error message.
+     * @method editShift
+     * @async
+     * @public
+     * @memberof APIManager
+     * @param {Shift} shift The shift to edit.
+     * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
+     */
+    public async editShift(shift: Shift): Promise<void | string> {
+        //Check if user has permission
+        if (!this.hasPermission(2)) {
+            //Gestionnaire
+            return errors.PERMISSION_DENIED;
+        }
+
+        let errorMessage: string | null = null;
+
+        //Edit Shift
+        await setDoc(doc(this.#db, `shifts`, shift.id),
+            {
+                department: shift.department,
+                employeeId: shift.employeeId,
+                end: this.getFirebaseTimestamp(shift.end),
+                start: this.getFirebaseTimestamp(shift.start)
+            },
+        ).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        });
+
+        if (errorMessage) return errorMessage;
     }
 }
 

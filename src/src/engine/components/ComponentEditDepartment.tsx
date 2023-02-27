@@ -1,6 +1,6 @@
-import React, {ChangeEvent} from "react";
+import React from "react";
 import {Button, Modal} from "react-bootstrap";
-import {Department} from "../types/Department";
+import {Department, DepartmentModifyDTO} from "../types/Department";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType} from "../messages/FormMessages";
@@ -9,56 +9,52 @@ import {Employee} from "../types/Employee";
 
 export interface DepartmentEditProps {
     employees: Employee[],
-    onEditDepartment: (department) => PromiseLike<void> | Promise<void> | void;
+    onEditDepartment: (departmentId: string, department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
+    departmentToEdit?: Department;
+    cancelEdit: () => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface DepartmentEditState {
-    showModal: boolean;
-    name: string;
-    director: string;
     validated?: boolean;
     error: FormErrorType;
 }
 
 export class ComponentEditDepartment extends React.Component<DepartmentEditProps, DepartmentEditState> {
     public state: DepartmentEditState = {
-        showModal: false,
-        name: "",
-        director: "",
         validated: false,
         error: FormErrorType.NO_ERROR
     };
 
     public render(): JSX.Element {
-        return <Modal show={this.state.showModal} onHide={() => this.modalVisibility(false)}>
-            <Modal.Header closeButton>
-                <Modal.Title>Édition d'employé</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form
-                    noValidate
-                    validated={this.state.validated}
-                    onSubmit={this.#handleSubmit}
-                    onChange={this.#handleChange}
-                    data-error={this.state.error}
-                >
-                    <Row className="mb-3">
-                        <Form.Group as={Col} md="3">
+        return <Modal show={this.props.departmentToEdit != null} onHide={() => this.hideModal()}>
+            <Form
+                noValidate
+                validated={this.state.validated}
+                onSubmit={this.#handleSubmit}
+                data-error={this.state.error}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Édition de département</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+
+                    <Row className="mb-4">
+                        <Form.Group as={Col} md="6">
                             <Form.Label className="mt-2">Nom</Form.Label>
                             <Form.Control
-                                id="name"
                                 required
+                                name="name"
                                 type="text"
                                 placeholder="Nom"
+                                defaultValue={this.props.departmentToEdit?.name}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {errors.REQUIRED_DEPARTMENT_NAME}
                             </Form.Control.Feedback>
                         </Form.Group>
-                        <Form.Group as={Col} md="3">
+                        <Form.Group as={Col} md="6">
                             <Form.Label className="mt-2">Directeur</Form.Label>
-                            <Form.Select required id="director" value={this.state.director}
-                                         onChange={this.#handleSelect}>
+                            <Form.Select required name="director" defaultValue={this.props.departmentToEdit?.director}>
                                 {this.props.employees.map((employee, index) => (
                                     <option key={`${index}`}
                                             value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
@@ -68,21 +64,21 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
                             </Form.Control.Feedback>
                         </Form.Group>
                     </Row>
-                </Form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => this.modalVisibility(false)}>
-                    Close
-                </Button>
-                <Button variant="primary" type="submit">
-                    Save Changes
-                </Button>
-            </Modal.Footer>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => this.hideModal()}>
+                        Close
+                    </Button>
+                    <Button variant="primary" type="submit">
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Form>
         </Modal>
     }
 
-    private modalVisibility(visible: boolean): void {
-        this.setState({showModal: visible});
+    private hideModal(): void {
+        this.props.cancelEdit();
     }
 
     /**
@@ -97,6 +93,10 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
         event.preventDefault();
         event.stopPropagation();
 
+        let eventTarget: any = event.target;
+        let formData = new FormData(eventTarget);
+        let formDataObj: Department = Object.fromEntries(formData.entries()) as unknown as Department;
+
         let errorType = FormErrorType.NO_ERROR;
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
@@ -107,48 +107,8 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
             error: errorType,
         });
 
-        if (errorType === FormErrorType.NO_ERROR) {
-            let department = new Department({name: this.state.name, director: this.state.director});
-            await this.props.onEditDepartment(department);
-
+        if (errorType === FormErrorType.NO_ERROR && this.props.departmentToEdit?.departmentId) {
+            await this.props.onEditDepartment(this.props.departmentToEdit?.departmentId, formDataObj);
         }
     }
-
-    /**
-     * Function that is called when the form is changed. This update the state of the component.
-     * @param event The event that triggered the function
-     * @private
-     */
-    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
-        const target = event.target;
-        const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
-
-        if (!name) {
-            throw new Error("Id is undefined for element in form.");
-        }
-
-        this.setState({
-            ...this.state, ...{
-                [name]: value,
-            }
-        });
-    }
-
-    /**
-     * Function that is called when the select is changed. This update the state of the component.
-     * @param event The event that triggered the function
-     * @private
-     */
-    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
-        const target = event.target;
-
-        this.setState({
-            ...this.state, ...{
-                [target.id]: target.value
-            }
-        });
-    }
-
-
 }
