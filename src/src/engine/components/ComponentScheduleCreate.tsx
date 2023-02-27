@@ -1,6 +1,6 @@
 import React from "react";
 import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
-import {EventForCalendar, EventForShiftCreation, EventForShiftEdit, Shift} from "../types/Shift";
+import {EventForCalendar, EventForShiftCreation, EventForShiftEdit} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 import {Employee} from "../types/Employee";
 import {HeightSpecType, EventManipulationType, ViewType, EventDeleteHandlingType, ColumnsType} from "../types/StatesForDaypilot";
@@ -72,6 +72,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 					end={this.state.end}
 					resource={this.state.resourceName}
 					taskType={this.state.taskType}
+					employees={this.props.employees}
 				/>
 			</div>
 		);
