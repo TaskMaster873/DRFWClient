@@ -11,6 +11,17 @@ class InternalFilterUtils {
         'jobTitles'
     ];
 
+    /**
+     * This function filters a list of Employee objects based on a search term
+     * @description It will return a list of Employee objects that have at least one property that starts with the search term
+     * @description It will ignore the properties in the ignoredElementsEmployee array
+     * @description It will ignore the properties that are not a string or a number
+     * @param list {Employee[]} The list of Employee objects to filter
+     * @param searchTerm {string} The search term
+     * @returns {Employee[]} The filtered list of Employee objects
+     * @private
+     * @memberof InternalFilterUtils
+     */
     public filterEmployee(list: Employee[], searchTerm: string) : Employee[] {
         return list.filter((objectItem: Employee) => {
             let startWith = false;
