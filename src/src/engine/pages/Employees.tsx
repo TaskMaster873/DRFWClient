@@ -66,7 +66,7 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
             if (!error) {
                 let employees: Employee[] | null = this.state.employees;
                 if(employees) {
-                    let oldEmployee = employees.find(elem => elem.employeeId == employee.employeeId);
+                    let oldEmployee = employees.find(elem => elem.id == employee.id);
 
                     if(oldEmployee) {
                         oldEmployee.isActive = employee.isActive;
@@ -93,7 +93,7 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
     }
 
     private refreshList(employee: Employee, employees: Employee[]) {
-        let employeeIndex = employees.findIndex(elem => elem.employeeId == employee.employeeId);
+        let employeeIndex = employees.findIndex(elem => elem.id == employee.id);
         if (employee && employeeIndex != -1) {
             employees[employeeIndex] = employee;
             this.setState({employees: employees});

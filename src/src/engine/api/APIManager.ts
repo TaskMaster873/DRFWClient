@@ -31,7 +31,14 @@ import {
 
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
-import {Employee, EmployeeCreateDTO, EmployeeEditDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
+import {
+    Employee,
+    EmployeeCreateDTO,
+    EmployeeEditDTO,
+    EmployeeJobTitleList,
+    EmployeeRoleList,
+    EmployeeSkillList
+} from "../types/Employee";
 import {Department, DepartmentModifyDTO} from "../types/Department";
 import {Shift, ShiftCreateDTO} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
@@ -44,7 +51,7 @@ import {
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
-import {department} from "../../../Constants/testConstants";
+import {Utils} from "./APIUtils";
 
 type SubscriberCallback =
     () =>
@@ -75,6 +82,8 @@ type SubscriberCallback =
  * @property {Map<string, Task>} tasks - A map of tasks that are currently being executed.
  */
 class APIManager extends Logger {
+    
+    //region Attributes 
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
 
@@ -86,7 +95,6 @@ class APIManager extends Logger {
     #auth!: FirebaseAuth.Auth;
     #performance!: FirebasePerformance;
     #db!: Firestore;
-
     #user: FirebaseAuth.User | null = null;
     #userRole: number = 0;
 
@@ -118,8 +126,9 @@ class APIManager extends Logger {
             this.registerServiceWorker();
         }
     }
+    //endregion
 
-    //#region GETTERS
+    //region GETTERS
     /**
      * Return the current user role.
      * @readonly
@@ -319,44 +328,6 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method parse firebase error codes and return a human-readable error message.
-     * @param error The error to parse.
-     * @returns {string} The human-readable error message.
-     */
-    private getErrorMessageFromCode(error: Error | string): string {
-        let errorMessage: string;
-        let message: string;
-
-        if (typeof error === "string") {
-            message = error;
-        } else {
-            message = error.message;
-        }
-
-        switch (message) {
-            case "auth/invalid-email":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "auth/user-not-found":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "auth/wrong-password":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "permission-denied":
-                errorMessage = errors.PERMISSION_DENIED;
-                break;
-            default:
-                errorMessage = errors.DEFAULT;
-                break;
-        }
-        this.error(
-            `Erreur: ${errorMessage} Code: ${error} Message: ${message}`
-        );
-        return errorMessage;
-    }
-
-    /**
      * This method is used to authenticate the user with his email and password.
      * @param email The email to use.
      * @param password The password to use.
@@ -378,7 +349,7 @@ class APIManager extends Logger {
             email,
             password
         ).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         if (userCredentials !== null && userCredentials) {
@@ -406,7 +377,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch(
             (error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = Utils.getErrorMessageFromCode(error);
             }
         );
 
@@ -425,7 +396,7 @@ class APIManager extends Logger {
 
         if (this.isAuth()) {
             await FirebaseAuth.signOut(this.#auth).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = Utils.getErrorMessageFromCode(error);
             });
 
             this.#userRole = -1;
@@ -450,7 +421,7 @@ class APIManager extends Logger {
     ): Promise<string | null> {
         let errorMessage: string | null = null;
         await FirebaseAuth.sendEmailVerification(user).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
         return errorMessage;
     }
@@ -596,7 +567,7 @@ class APIManager extends Logger {
     ): Promise<string | false> {
         let errorMessage: string | null = null;
         let email = await verifyPasswordResetCode(this.#auth, actionCode).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         return (errorMessage || !email) ? false : email;
@@ -619,7 +590,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         await confirmPasswordReset(this.#auth, actionCode, newPassword).catch(
             (error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = Utils.getErrorMessageFromCode(error);
             }
         );
         return errorMessage;
@@ -654,7 +625,7 @@ class APIManager extends Logger {
                     user,
                     newPassword
                 ).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
+                    errorMessage = Utils.getErrorMessageFromCode(error);
                 });
 
                 if (!errorMessage) {
@@ -663,7 +634,7 @@ class APIManager extends Logger {
                         user,
                         credential
                     ).catch((error) => {
-                        errorMessage = this.getErrorMessageFromCode(error);
+                        errorMessage = Utils.getErrorMessageFromCode(error);
                     });
 
                     this.#user = reAuth?.user || null;
@@ -701,7 +672,7 @@ class APIManager extends Logger {
             createdUserMessageData.error !== null &&
             createdUserMessageData.error
         ) {
-            errorMessage = this.getErrorMessageFromCode(
+            errorMessage = Utils.getErrorMessageFromCode(
                 createdUserMessageData.error
             );
         } else {
@@ -712,7 +683,7 @@ class APIManager extends Logger {
                 await setDoc(doc(this.#db, `employees`, userId), {
                     ...employee,
                 }).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
+                    errorMessage = Utils.getErrorMessageFromCode(error);
                     // FIREBASE LIMITATION : We can't delete the user if it has been created. Because only connected users can delete them self.
                 });
                 // TODO: Send verification email on login until validated.
@@ -741,7 +712,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         if (employeeId) {
             await updateDoc(doc(this.#db, `employees`, employeeId), {...employee}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = Utils.getErrorMessageFromCode(error);
             });
         } else {
             errorMessage = errors.INVALID_EMPLOYEE_ID;
@@ -761,12 +732,12 @@ class APIManager extends Logger {
     public async changeEmployeeActivation(employee: Employee): Promise<string | null> {
         let errorMessage: string | null = null;
 
-        if (employee.employeeId) {
+        if (employee.id) {
             if (!this.hasPermission) {
                 return errors.PERMISSION_DENIED;
             }
-            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {isActive: employee.isActive}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+            await updateDoc(doc(this.#db, `employees`, employee.id), {isActive: employee.isActive}).catch((error) => {
+                errorMessage = Utils.getErrorMessageFromCode(error);
             });
         } else {
             errorMessage = errors.INVALID_EMPLOYEE_ID;
@@ -794,7 +765,7 @@ class APIManager extends Logger {
             collection(this.#db, `departments`),
             where("name", "==", department.name)
         );
-        let errorMessage = await this.checkIfAlreadyExists(
+        let errorMessage = await Utils.checkIfAlreadyExists(
             queryDepartment,
             errors.DEPARTMENT_ALREADY_EXISTS
         );
@@ -802,7 +773,7 @@ class APIManager extends Logger {
             await addDoc(collection(this.#db, `departments`), {
                 ...department,
             }).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = Utils.getErrorMessageFromCode(error);
             });
         }
         return errorMessage;
@@ -826,14 +797,14 @@ class APIManager extends Logger {
             collection(this.#db, `departments`),
             where("name", "==", department.name)
         );
-        let errorMessage = await this.checkIfAlreadyExists(
+        let errorMessage = await Utils.checkIfAlreadyExists(
             queryDepartment,
             errors.DEPARTMENT_ALREADY_EXISTS
         );
         if (!errorMessage) {
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
+                    errorMessage = Utils.getErrorMessageFromCode(error);
                 });
             } else {
                 errorMessage = errors.INVALID_DEPARTMENT_ID;
@@ -843,26 +814,7 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    /**
-     * Check if a document already exists.
-     * @param query The query to check.
-     * @param error The error message to return if the document already exists.
-     * @method checkIfAlreadyExists
-     * @async
-     * @private
-     * @memberof APIManager
-     * @returns {Promise<string | null>} Null if the document does not exist, and the error message if it does.
-     */
-    private async checkIfAlreadyExists(query, error: string): Promise<string | null> {
-        let errorMessage: string | null = null;
-        let snaps = await getDocs(query).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
-        });
-        if (snaps && snaps.docs.length > 0) {
-            errorMessage = error;
-        }
-        return errorMessage;
-    }
+    
 
     public async createJobTitle(
         title: string
@@ -874,7 +826,7 @@ class APIManager extends Logger {
             collection(this.#db, `jobTitles`),
             where("name", "==", title)
         );
-        let errorMessage = await this.checkIfAlreadyExists(
+        let errorMessage = await Utils.checkIfAlreadyExists(
             queryDepartment,
             errors.JOB_TITLE_ALREADY_EXISTS
         );
@@ -882,7 +834,7 @@ class APIManager extends Logger {
             await addDoc(collection(this.#db, `jobTitle`), {
                 name: title,
             }).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = Utils.getErrorMessageFromCode(error);
             });
         }
         return errorMessage;
@@ -910,7 +862,7 @@ class APIManager extends Logger {
         }
 
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         if (snaps) {
@@ -948,7 +900,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
 
         let snap = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         if (snap && snap.exists()) {
@@ -972,7 +924,7 @@ class APIManager extends Logger {
         let departments: Department[] = [];
         let queryDepartment = query(collection(this.#db, `departments`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         if (snaps) {
@@ -1026,7 +978,7 @@ class APIManager extends Logger {
                     }
                 }
             }).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = Utils.getErrorMessageFromCode(error);
             }).finally(() => {
                 resolve(errorMessage ?? employeeNb);
             });
@@ -1046,7 +998,7 @@ class APIManager extends Logger {
         let roles: string[] = [];
         let queryDepartment = query(collection(this.#db, `roles`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         if (snaps) {
@@ -1071,7 +1023,7 @@ class APIManager extends Logger {
         let employeeRole: number = 0;
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
             (error) => {
-                this.getErrorMessageFromCode(error);
+                Utils.getErrorMessageFromCode(error);
             }
         );
         if (employee && employee) {
@@ -1099,7 +1051,7 @@ class APIManager extends Logger {
         let jobTitles: string[] = [];
         let queryDepartment = query(collection(this.#db, `jobTitles`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
@@ -1107,6 +1059,21 @@ class APIManager extends Logger {
             });
         }
         return errorMessage ?? jobTitles;
+    }
+
+    public async getSkills(): Promise<EmployeeSkillList | string> {
+        let errorMessage: string | null = null;
+        let skills: string[] = [];
+        let queryDepartment = query(collection(this.#db, `skills`));
+        let snaps = await getDocs(queryDepartment).catch((error) => {
+            errorMessage = Utils.getErrorMessageFromCode(error);
+        });
+        if (snaps) {
+            snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
+                skills.push(doc.data().name);
+            });
+        }
+        return errorMessage ?? skills;
     }
 
     /**
@@ -1146,7 +1113,7 @@ class APIManager extends Logger {
             );
 
             let snaps = await getDocs(queryShifts).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = Utils.getErrorMessageFromCode(error);
             });
 
             if (snaps) {
@@ -1229,7 +1196,7 @@ class APIManager extends Logger {
         );
 
         let snaps = await getDocs(queryShifts).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         //Parse recieved data
@@ -1278,7 +1245,7 @@ class APIManager extends Logger {
                 start: this.getFirebaseTimestamp(shift.start)
             },
         ).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         if (errorMessage) return errorMessage;
@@ -1311,7 +1278,7 @@ class APIManager extends Logger {
                 start: this.getFirebaseTimestamp(shift.start)
             },
         ).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = Utils.getErrorMessageFromCode(error);
         });
 
         if (errorMessage) return errorMessage;

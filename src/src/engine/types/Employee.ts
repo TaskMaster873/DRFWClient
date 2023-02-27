@@ -12,7 +12,7 @@ export interface StateEmployeeList {
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
-    public employeeId?: string;
+    public id?: string;
     public lastName: string;
     public firstName: string;
     public email: string;
@@ -24,7 +24,7 @@ export class Employee {
     public role: number;
 
     constructor(employee: EmployeeDTO) {
-        this.employeeId = employee.employeeId;
+        this.id = employee.employeeId;
 		this.firstName = employee.firstName;
         this.lastName = employee.lastName;
         this.email = employee.email;
@@ -103,6 +103,9 @@ export interface AddEmployeeProps {
     skills: string[];
     onAddEmployee: (password : string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
     onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
+    onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
+    onEditJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
+    onEditSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface EditEmployeeProps {

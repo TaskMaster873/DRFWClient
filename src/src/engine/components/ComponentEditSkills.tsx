@@ -6,36 +6,35 @@ import Col from "react-bootstrap/Col";
 
 import { errors, FormErrorType } from "../messages/FormMessages";
 
-interface AddDepartmentState {
+interface EditSkillsState {
     name: string;
-    director: string;
     validated?: boolean;
     error: FormErrorType;
 }
 
-interface AddDepartmentProps {
-    onAddJobTitle: (department) => PromiseLike<void> | Promise<void> | void;
+interface EditSkillsProps {
+    onAddSkill: (skill) => PromiseLike<void> | Promise<void> | void;
+    onEditSkill: (skill) => PromiseLike<void> | Promise<void> | void;
 }
 
 /**
- * This is the form to add a department
+ * This is the form to add a skill
  * @param props The props of the component
  * @constructor
  * @category Components
- * @subcategory Department
+ * @subcategory skill
  * @hideconstructor
  */
-export class ComponentAddJobTitle extends React.Component<AddDepartmentProps, AddDepartmentState> {
-    public state: AddDepartmentState = {
+export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSkillsState> {
+    public state: EditSkillsState = {
         name: "",
-        director: "",
         validated: false,
         error: FormErrorType.NO_ERROR
     };
 
-    public props: AddDepartmentProps;
+    public props: EditSkillsProps;
 
-    constructor(props: AddDepartmentProps) {
+    constructor(props: EditSkillsProps) {
         super(props);
 
         this.props = props;
@@ -51,7 +50,7 @@ export class ComponentAddJobTitle extends React.Component<AddDepartmentProps, Ad
                 data-error={this.state.error}
             >
                 <Row className="mb-3">
-                    <h5 className="mt-4 mb-3">Ajouter un corps d'emploi</h5>
+                    <h5 className="mt-4 mb-3">Éditer les corps d'emploi</h5>
                     <Form.Group as={Col} md="6">
                         <Form.Label className="mt-2">Nom</Form.Label>
                         <Form.Control
@@ -95,7 +94,7 @@ export class ComponentAddJobTitle extends React.Component<AddDepartmentProps, Ad
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            await this.props.onAddJobTitle(this.state.name);
+            await this.props.onAddSkill(this.state.name);
         }
     }
 

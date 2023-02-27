@@ -116,6 +116,37 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
+    readonly #editJobTitle = async (title: string) : Promise<void> => {
+        let error = await API.editJobTitle(title);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+        } else {
+            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+
+    /**
+     * Add an jobTitle to the database
+     * @param title The jobTitle
+     */
+    readonly #addSkill = async (title: string) : Promise<void> => {
+        let error = await API.createSkill(title);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+        } else {
+            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+
+    readonly #editSkill = async (title: string) : Promise<void> => {
+        let error = await API.editSkill(title);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+        } else {
+            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+
     public render(): JSX.Element {
         if(this.state.redirectTo) {
             return (<Navigate to={this.state.redirectTo}></Navigate>);
@@ -129,6 +160,9 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 skills={this.state.skills}
                 onAddEmployee={this.#addEmployee}
                 onAddJobTitle={this.#addJobTitle}
+                onEditJobTitle={this.#editJobTitle}
+                onAddSkill={this.#addSkill}
+                onEditSkill={this.#editSkill}
             />
         );
     }

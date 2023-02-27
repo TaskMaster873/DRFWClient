@@ -4,7 +4,7 @@ import {
     AddEmployeeState,
     EmployeeEditDTO,
     EmployeeJobTitleList, EmployeeProps,
-    EmployeeRoleList
+    EmployeeRoleList, EmployeeSkillList
 } from "../types/Employee";
 
 import {errors, successes} from "../messages/FormMessages";
@@ -31,6 +31,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         departments: [],
         roles: [],
         titles: [],
+        skills: [],
         editedEmployee: undefined,
         redirectTo: null
     }
@@ -48,6 +49,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
             let departments = API.getDepartments();
             let roles = API.getRoles();
             let titles = API.getJobTitles();
+            let skills = API.getSkills();
 
             if(this.props.params.id) {
                 let editedEmployee = API.getEmployeeById(this.props.params.id);
@@ -56,11 +58,12 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                         Department[] | string,
                         EmployeeRoleList | string,
                         EmployeeJobTitleList | string,
-                        EmployeeEditDTO | string
-                ] = await Promise.all([departments, roles, titles, editedEmployee]);
+                        EmployeeSkillList | string,
+                        EmployeeEditDTO | string,
+                ] = await Promise.all([departments, roles, titles, skills, editedEmployee]);
 
-                if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && params[3] && typeof(params[3]) !== "string") {
-                    this.setState({departments: params[0], roles: params[1], titles: params[2], editedEmployee: params[3]});
+                if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray(params[3]) && typeof(params[4]) !== "string") {
+                    this.setState({departments: params[0], roles: params[1], titles: params[2], skills: params[3], editedEmployee: params[4]});
                 } else {
                     NotificationManager.error(errors.GET_EDIT_EMPLOYEES, errors.ERROR_GENERIC_MESSAGE);
                 }

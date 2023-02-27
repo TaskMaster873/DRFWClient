@@ -8,9 +8,12 @@ import { Container } from "react-bootstrap";
 import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
 import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
-import {ComponentAddJobTitle} from "./ComponentAddJobTitle";
+import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
+import {ComponentEditSkills} from "./ComponentEditSkills";
 
 interface ComponentAddEmployeeState extends Employee {
+    showEditJobTitles: boolean,
+    showEditSkills: boolean,
     validated?: boolean;
     error: FormErrorType;
     password: string;
@@ -26,18 +29,20 @@ interface ComponentAddEmployeeState extends Employee {
  */
 export class ComponentAddEmployee extends React.Component<AddEmployeeProps, ComponentAddEmployeeState> {
     public state: ComponentAddEmployeeState = {
-        employeeId: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        password: "",
-        role: 0,
         department: "",
+        email: "",
+        id: "",
+        error: FormErrorType.NO_ERROR,
+        firstName: "",
         jobTitles: [],
+        lastName: "",
+        password: "",
+        phoneNumber: "",
+        role: 0,
+        showEditJobTitles: false,
+        showEditSkills: false,
         skills: [],
         validated: false,
-        error: FormErrorType.NO_ERROR,
     };
 
     public props: AddEmployeeProps;
@@ -148,7 +153,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 </Row>
                 <Row className="mb-3">
                     <Form.Group as={Col} md="4">
-                        <Form.Label className="w-100">Corps d'emploi<Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
+                        <Form.Label className="w-100">Corps d'emploi<Button onClick={() => this.onShowEditJobTitles} className="float-end">+</Button></Form.Label>
                         {this.props.jobTitles.map((corps) => (<Form.Check
                             key={`${corps}`}
                             type="checkbox"
@@ -156,9 +161,10 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             className="jobTitles"
                             label={`${corps}`}
                         />))}
+                        <ComponentEditJobTitles onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}></ComponentEditJobTitles>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
-                        <Form.Label className="w-100">Compétence<Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
+                        <Form.Label className="w-100">Compétence<Button onClick={() => this.onShowEditSkills} className="float-end">+</Button></Form.Label>
                         {this.props.skills.map((skill) => (<Form.Check
                             key={`${skill}`}
                             type="checkbox"
@@ -166,6 +172,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             className="jobTitles"
                             label={`${skill}`}
                         />))}
+                        <ComponentEditSkills onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}></ComponentEditSkills>
                     </Form.Group>
                     <Form.Group as={Col} md="6">
                         <Form.Label>Rôle de l'employé</Form.Label>
@@ -195,6 +202,14 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 </div>
             </Form>
         </Container>);
+    }
+
+    private onShowEditJobTitles() {
+        this.setState({showEditJobTitles: true})
+    }
+
+    private onShowEditSkills() {
+        this.setState({showEditSkills: true})
     }
 
     /**

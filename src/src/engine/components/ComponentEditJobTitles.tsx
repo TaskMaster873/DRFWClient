@@ -6,19 +6,15 @@ import Col from "react-bootstrap/Col";
 
 import { errors, FormErrorType } from "../messages/FormMessages";
 
-import { Department } from "../types/Department";
-import { Employee } from "../types/Employee";
-
-interface AddDepartmentState {
+interface EditJobTitlesState {
     name: string;
-    director: string;
     validated?: boolean;
     error: FormErrorType;
 }
 
-interface AddDepartmentProps {
-    employees: Employee[];
-    onAddDepartment: (department) => PromiseLike<void> | Promise<void> | void;
+interface EditJobTitlesProps {
+    onAddJobTitle: (department) => PromiseLike<void> | Promise<void> | void;
+    onEditJobTitle: (department) => PromiseLike<void> | Promise<void> | void;
 }
 
 /**
@@ -29,29 +25,19 @@ interface AddDepartmentProps {
  * @subcategory Department
  * @hideconstructor
  */
-export class ComponentAddDepartment extends React.Component<AddDepartmentProps, AddDepartmentState> {
-    public state: AddDepartmentState = {
+export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, EditJobTitlesState> {
+    public state: EditJobTitlesState = {
         name: "",
-        director: "",
         validated: false,
         error: FormErrorType.NO_ERROR
     };
 
-    public props: AddDepartmentProps;
+    public props: EditJobTitlesProps;
 
-    constructor(props: AddDepartmentProps) {
+    constructor(props: EditJobTitlesProps) {
         super(props);
 
         this.props = props;
-    }
-
-    public componentDidUpdate(prevProps: AddDepartmentProps) : void {
-        if (prevProps.employees !== this.props.employees && this.props.employees.length > 0) {
-            let firstEmployee: Employee = this.props.employees[0];
-            this.setState({
-                director: `${firstEmployee.firstName} ${firstEmployee.lastName}`
-            });
-        }
     }
 
     public render(): JSX.Element {
@@ -64,8 +50,8 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
                 data-error={this.state.error}
             >
                 <Row className="mb-3">
-                    <h5 className="mt-4 mb-3">Ajouter un département</h5>
-                    <Form.Group as={Col} md="3">
+                    <h5 className="mt-4 mb-3">Éditer les corps d'emploi</h5>
+                    <Form.Group as={Col} md="6">
                         <Form.Label className="mt-2">Nom</Form.Label>
                         <Form.Control
                             id="name"
@@ -74,17 +60,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.REQUIRED_DEPARTMENT_NAME}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group as={Col} md="3">
-                        <Form.Label className="mt-2">Directeur</Form.Label>
-                        <Form.Select required id="director" value={this.state.director} onChange={this.#handleSelect}>
-                            {this.props.employees.map((employee, index) => (
-                                <option key={`${index}`} value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
-                        </Form.Select>
-                        <Form.Control.Feedback type="invalid">
-                            {errors.REQUIRED_DEPARTMENT_DIRECTOR}
+                            {errors.REQUIRED_JOB_TITLE_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
@@ -118,8 +94,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let department = new Department({name: this.state.name, director: this.state.director});
-            await this.props.onAddDepartment(department);
+            await this.props.onAddJobTitle(this.state.name);
         }
     }
 
@@ -138,8 +113,8 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
         }
 
         this.setState({...{}, ...{
-            [name]: value,
-        }});
+                [name]: value,
+            }});
     }
 
     /**
@@ -151,7 +126,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
         const target = event.target;
 
         this.setState({...this.state, ...{
-            [target.id]: target.value
-        }});
+                [target.id]: target.value
+            }});
     }
 }
