@@ -1,7 +1,10 @@
 import React from "react";
-import {DAYS, EmployeeAvailabilities, eventsForUnavailabilityList, eventsForUnavailability, EmployeeRecursiveException} from "../types/EmployeeAvailabilities";
+import {DAYS, EmployeeAvailabilities, EventsForUnavailabilityList, EventsForUnavailability, EmployeeRecursiveException} from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
 import {ManagerDate} from '../utils/DateManager';
+import { DayPilot } from "@daypilot/daypilot-lite-react";
+
+import '../../deps/css/daypilot_custom.css';
 
 /**
  * Ceci est la page pour ajouter un employé
@@ -9,15 +12,16 @@ import {ManagerDate} from '../utils/DateManager';
 
 export interface AvailabilitiesState {
     availabilities: EmployeeAvailabilities;
-    timesUnavailable: eventsForUnavailabilityList;
+    timesUnavailable: EventsForUnavailabilityList;
     popupActive: boolean;
 
     currentWeekStart: Date;
     currentWeekEnd: Date;
+    selectedDate: Date;
 }
 
 let curr = new Date;
-let firstday =new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0,0,0,0));
+let firstday = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0,0,0,0));
 let lastday = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0,0,0,0));
 
 export class Availabilities extends React.Component<unknown, AvailabilitiesState> {
@@ -26,23 +30,25 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     public state: AvailabilitiesState = {
         availabilities: {
             recursiveExceptions: [{
-                [DAYS.SUNDAY]: [{
-                    startTime: 15,
-                    endTime: 360
-                },
+                [DAYS.SUNDAY]: [
+                    {
+                        startTime: 0,
+                        endTime: 60
+                    },
                 ],
                 //time not available
                 [DAYS.MONDAY]: [
-
                     {
-                        startTime: 700,
-                        endTime: 820
+                        startTime: 120,
+                        endTime: 120+60
                     }
                 ],
-                [DAYS.TUESDAY]: [{
-                    startTime: 500,
-                    endTime: 620
-                }],
+                [DAYS.TUESDAY]: [
+                    {
+                        startTime: 120+60+60,
+                        endTime: 120+60+60+60
+                    }
+                ],
                 [DAYS.WEDNESDAY]: [],
                 [DAYS.THURSDAY]: [],
                 [DAYS.FRIDAY]: [],
@@ -58,16 +64,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                 [DAYS.WEDNESDAY]: [],
                 [DAYS.THURSDAY]: [],
 
-                [DAYS.FRIDAY]: [
-                    {
-                        startTime: 30,
-                        endTime: 400
-                    },
-                    {
-                        startTime: 500,
-                        endTime: 700
-                    }
-                ],
+                [DAYS.FRIDAY]: [],
                 [DAYS.SATURDAY]: [],
 
             }],
@@ -77,12 +74,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         currentWeekEnd: lastday,
         timesUnavailable: [],
         popupActive: false,
+        selectedDate: new Date,
     };
 
     public componentDidMount() {
         document.title = "Disponibilitées - TaskMaster";
-        console.log(this.state);
-        this.computeAllAvailabilities(this.state.currentWeekStart, this.state.currentWeekEnd);
+
+        this.computeAllAvailabilities(this.state.currentWeekStart, this.state.currentWeekEnd, this.state.selectedDate);
     }
 
     private isInTimeRangeFromStartDate(date: Date, startDate: Date): boolean {
@@ -93,7 +91,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return date <= endDate;
     }
 
-    readonly #onTimeRangeSelected = (start: Date, end: Date): void => {
+    readonly #onTimeRangeSelected = (start: Date, end: Date, selectedDate: Date): void => {
         /*this.setState({
             currentWeekEnd: end,
             currentWeekStart: start,
@@ -101,24 +99,43 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             this.computeAllAvailabilities();
         });*/
 
-        this.computeAllAvailabilities(start, end);
+        this.computeAllAvailabilities(start, end, selectedDate);
     };
 
     public render(): JSX.Element {
         return (
-            //The ... will need some changes here 
             <div>
                 <button type="button" className="btn btn-primary">Primary</button>
-                <ComponentAvailabilities onTimeRangeSelected={this.#onTimeRangeSelected} employeeAvailabilities={this.state.timesUnavailable} />
+                <ComponentAvailabilities onTimeRangeSelected={this.#onTimeRangeSelected} startDate={new DayPilot.Date(this.state.currentWeekStart)} selectionDay={new DayPilot.Date(this.state.selectedDate)} employeeAvailabilities={this.state.timesUnavailable} />
             </div>
         );
+    }
+
+    private convertRecursiveExceptionDate(startDate: Date, day: number, numberOfMinutes: number): Date {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + day);
+        date.setHours(Math.floor(numberOfMinutes / 60));
+        date.setMinutes(numberOfMinutes % 60);
+
+        return date;
+    }
+
+    private transformObjToEventForUnavailability(start: Date, day: number, hours: EmployeeRecursiveException): EventsForUnavailability {
+        let startTime = this.convertRecursiveExceptionDate(start, day, hours.startTime);
+        let endTime = this.convertRecursiveExceptionDate(start, day, hours.endTime);
+
+        return {
+            start: ManagerDate.changeDateToDayPilotFormat(startTime),
+            end: ManagerDate.changeDateToDayPilotFormat(endTime),
+            text: "Unavailable"
+        };
     }
 
     /**
      * Compute the availabilities in the state to convert it for daypilot 
      */
-    private computeAllAvailabilities(start: Date, end: Date): void {
-        let listOfUnavailbility: eventsForUnavailabilityList = [];
+    private computeAllAvailabilities(start: Date, end: Date, selectedDate: Date): void {
+        let listOfUnavailbility: EventsForUnavailabilityList = [];
 
         for (let recursive of this.state.availabilities.recursiveExceptions) {
             let canRenderData: boolean = true;
@@ -142,8 +159,11 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
                     if (recursive[day].length > 0) {
                         for (let i = 0; i < recursive[day].length; i++) {
-                            const eventToPush = this.transformForDayPilot(start, recursive[day][i]);
-                            console.log(DAYS[day], start, recursive[day][i], i, eventToPush);
+                            // This enum return a number but typescript thinks it's a string for some reasons.
+                            let dayNumber = DAYS[DAYS[day]] as unknown as number;
+
+                            const eventToPush = this.transformObjToEventForUnavailability(start, dayNumber, recursive[day][i]);
+                            console.log(DAYS[day], DAYS[DAYS[day]], start, recursive[day][i], i, eventToPush);
                             listOfUnavailbility.push(eventToPush);
                         }
                     }
@@ -151,29 +171,11 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             }
         }
 
-        console.log(listOfUnavailbility);
         this.setState({
+            currentWeekStart: start,
+            currentWeekEnd: end,
             timesUnavailable: listOfUnavailbility,
         });
-
     }
-
-    private transformForDayPilot(startTime: Date, hours: EmployeeRecursiveException): eventsForUnavailability {
-        // console.log("la date transformée", data, "et le jour de base:", startTime, hours.startTime);
-        let listToReturn: eventsForUnavailability;
-        //console.log(data);
-        listToReturn = {
-            start: ManagerDate.addHoursAndMinutes(hours.startTime, startTime),
-            end: ManagerDate.addHoursAndMinutes(hours.endTime, startTime),
-            text: "yo "
-        };
-
-        console.log("hours:", startTime, hours);
-
-
-        return listToReturn;
-    }
-
-
 }
 

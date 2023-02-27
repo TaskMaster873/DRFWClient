@@ -4,14 +4,13 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
  * Enum for all days name 
 */
 export enum DAYS {
-    SUNDAY = 1,
-    MONDAY = 2,
-    TUESDAY = 3,
-    WEDNESDAY = 4,
-    THURSDAY = 5,
-    FRIDAY = 6,
-    SATURDAY = 7,
-
+    SUNDAY = 0,
+    MONDAY = 1,
+    TUESDAY = 2,
+    WEDNESDAY = 3,
+    THURSDAY = 4,
+    FRIDAY = 5,
+    SATURDAY = 6
 }
 
 /**
@@ -19,9 +18,10 @@ export enum DAYS {
  * It is used when someone is not able to work
  */
 export interface EmployeeRecursiveException {
-    //should 
+    //should
     startTime: number;
     endTime: number;
+    details?: string;
 }
 
 /**
@@ -71,10 +71,10 @@ export interface EmployeeAvailabilities {
 
 export type RecursiveAvailabilitiesList = RecursiveAvailabilities[];
 
-export interface eventsForUnavailability {
+export interface EventsForUnavailability {
     start: string;
     end: string;
     text: string;
 }
 
-export type eventsForUnavailabilityList = eventsForUnavailability[];
+export type EventsForUnavailabilityList = EventsForUnavailability[];
