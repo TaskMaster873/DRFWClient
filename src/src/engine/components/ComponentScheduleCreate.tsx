@@ -10,6 +10,7 @@ type Props = {
 	employees: Employee[];
 	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
 	editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
+	deleteShift: (shiftId: string) => Promise<void>;
 };
 
 type State = {
@@ -53,6 +54,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 					onTimeRangeSelected={this.#onTimeRangeSelected}
 					onEventClick={this.#onEventClick}
 					onEventMoved={this.#onEventMoved}
+					onEventDelete={this.#onEventDelete}
 					startDate={DayPilot.Date.today()}
 					columns={this.getEmployeeColumns()}
 					events={this.props.events}
@@ -142,6 +144,14 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 		};
 		await this.props.editShift(eventToSend)
 	};
+
+	/**
+	 * When you delete an event, this function is called
+	 * @param args 
+	 */
+	readonly #onEventDelete = async (args: any): Promise<void> => {
+		await this.props.deleteShift(args.e.data.id);
+	}
 
 	/**
 	 * When you close the modal window, this function is called in order to hide it

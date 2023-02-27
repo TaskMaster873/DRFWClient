@@ -50,13 +50,10 @@ export function ComponentPopupSchedule(props: Props) {
 
 		if (errorType === FormErrorType.NO_ERROR) {
 			setDisabled(true);
-			switch (props.taskType) {
-				case EventManipulationType.EDIT:
-					await sendEditEvent();
-					break;
-				default:
-					await sendCreateEvent();
-					break;
+			if(props.taskType === EventManipulationType.EDIT) {
+				await sendEditEvent();
+			} else {
+				await sendCreateEvent();
 			}
 			closeModal();
 		}
