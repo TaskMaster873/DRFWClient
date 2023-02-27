@@ -100,6 +100,19 @@ service cloud.firestore {
                        && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
             }
 
+            match /skills/{skillId} {
+                allow read;
+                allow create: if isValidSkill(skillId);
+            }
+
+            function isValidSkill(skillId) {
+                let createdValidJobTitle = existsAfter(/databases/$(database)/documents/skills/$(skillId));
+                let hasFields = request.resource.data.keys().hasOnly(['name']);
+
+                return createdValidJobTitle && hasFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+            }
+
             match /shifts/{shiftId} {
                 allow read;
                 allow create: if isValidShift(shiftId);

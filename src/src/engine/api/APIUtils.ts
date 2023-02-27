@@ -70,4 +70,4 @@ export class APIUtils extends Logger {
 export const Utils = new APIUtils();
 
 // @ts-ignore
-window.API = API;
+window.Utils = Utils;

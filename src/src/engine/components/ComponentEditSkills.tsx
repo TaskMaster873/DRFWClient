@@ -5,6 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import { errors, FormErrorType } from "../messages/FormMessages";
+import {Modal} from "react-bootstrap";
 
 interface EditSkillsState {
     name: string;
@@ -13,8 +14,10 @@ interface EditSkillsState {
 }
 
 interface EditSkillsProps {
+    cancelEdit: () => void;
     onAddSkill: (skill) => PromiseLike<void> | Promise<void> | void;
-    onEditSkill: (skill) => PromiseLike<void> | Promise<void> | void;
+    onEditSkill: (skillId: string, skill: string) => PromiseLike<void> | Promise<void> | void;
+    showEdit: boolean;
 }
 
 /**
@@ -41,7 +44,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
     }
 
     public render(): JSX.Element {
-        return (
+        return <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
             <Form
                 noValidate
                 validated={this.state.validated}
@@ -54,7 +57,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                     <Form.Group as={Col} md="6">
                         <Form.Label className="mt-2">Nom</Form.Label>
                         <Form.Control
-                            id="name"
+                            name="name"
                             required
                             type="text"
                             placeholder="Nom"
@@ -68,7 +71,11 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                     Ajouter
                 </Button>
             </Form>
-        );
+        </Modal>
+    }
+
+    private hideModal() {
+        this.props.cancelEdit();
     }
 
     /**
@@ -106,7 +113,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
+        const name = target.name;
 
         if (!name) {
             throw new Error("Id is undefined for element in form.");

@@ -116,8 +116,8 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
-    readonly #editJobTitle = async (title: string) : Promise<void> => {
-        let error = await API.editJobTitle(title);
+    readonly #editJobTitle = async (titleId: string, title: string) : Promise<void> => {
+        let error = await API.editJobTitle(titleId, title);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
         } else {
@@ -138,8 +138,8 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
-    readonly #editSkill = async (title: string) : Promise<void> => {
-        let error = await API.editSkill(title);
+    readonly #editSkill = async (titleId: string, title: string) : Promise<void> => {
+        let error = await API.editSkill(titleId, title);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
         } else {

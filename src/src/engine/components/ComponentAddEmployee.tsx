@@ -75,7 +75,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control
-                            id="firstName"
+                            name="firstName"
                             required
                             type="text"
                             placeholder="Prénom"
@@ -87,7 +87,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Nom</Form.Label>
                         <Form.Control
-                            id="lastName"
+                            name="lastName"
                             required
                             type="text"
                             placeholder="Nom"
@@ -99,7 +99,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Adresse courriel</Form.Label>
                         <Form.Control
-                            id="email"
+                            name="email"
                             required
                             type="email"
                             
@@ -116,7 +116,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
-                            id="phoneNumber"
+                            name="phoneNumber"
                             required
                             type="tel"
                             pattern={RegexUtil.phoneNumberRegex}
@@ -129,7 +129,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Mot de passe initial</Form.Label>
                         <Form.Control
-                            id="password"
+                            name="password"
                             required
                             type="password"
                             pattern={RegexUtil.goodPasswordRegex}
@@ -141,7 +141,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Département</Form.Label>
-                        <Form.Select required id="department" value={this.state.department}
+                        <Form.Select required name="department" value={this.state.department}
                                      onChange={this.#handleSelect}>
                             {this.props.departments.map((department, index) => (
                                 <option key={`${index}`} value={`${department.name}`}>{`${department.name}`}</option>))}
@@ -157,26 +157,24 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                         {this.props.jobTitles.map((corps) => (<Form.Check
                             key={`${corps}`}
                             type="checkbox"
-                            id={`${corps}`}
-                            className="jobTitles"
+                            name={`${corps}`}
                             label={`${corps}`}
                         />))}
-                        <ComponentEditJobTitles onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}></ComponentEditJobTitles>
+                        <ComponentEditJobTitles cancelEdit={() => this.#onCancelEditJobTitles} showEdit={this.state.showEditJobTitles} jobTitles={this.state.jobTitles} onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle} ></ComponentEditJobTitles>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
-                        <Form.Label className="w-100">Compétence<Button onClick={() => this.onShowEditSkills} className="float-end">+</Button></Form.Label>
+                        <Form.Label className="w-100">Compétences<Button onClick={() => this.onShowEditSkills} className="float-end">+</Button></Form.Label>
                         {this.props.skills.map((skill) => (<Form.Check
                             key={`${skill}`}
                             type="checkbox"
-                            id={`${skill}`}
-                            className="jobTitles"
+                            name={`${skill}`}
                             label={`${skill}`}
                         />))}
-                        <ComponentEditSkills onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}></ComponentEditSkills>
+                        <ComponentEditSkills cancelEdit={() => this.#onCancelEditSkills} showEdit={this.state.showEditSkills} onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}></ComponentEditSkills>
                     </Form.Group>
-                    <Form.Group as={Col} md="6">
+                    <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required id="role" value={this.state.role} onChange={this.#handleSelect}>
+                        <Form.Select required name="role" value={this.state.role} onChange={this.#handleSelect}>
                             {this.props.roles.map((role, index) => {
                                 if(API.hasLowerPermission(index)) {
                                     return <option key={index} value={index}>{role}</option>
@@ -210,6 +208,14 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
 
     private onShowEditSkills() {
         this.setState({showEditSkills: true})
+    }
+
+    readonly #onCancelEditJobTitles = (): void => {
+        this.setState({showEditJobTitles: false});
+    }
+
+    readonly #onCancelEditSkills = (): void => {
+        this.setState({showEditSkills: false});
     }
 
     /**
@@ -283,7 +289,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
     readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
         const target = event.target;
         this.setState({...this.state, ...{
-            [target.id]: target.value
+            [target.name]: target.value
         }});
     }
 }

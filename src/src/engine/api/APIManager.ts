@@ -706,10 +706,11 @@ class APIManager extends Logger {
      * @returns {Promise<string | null>} Null if the employee was edited successfully, and the error message if it was not.
      */
     public async editEmployee(employeeId: string, employee: EmployeeEditDTO): Promise<string | null> {
+        let errorMessage: string | null = null;
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        let errorMessage: string | null = null;
+
         if (employeeId) {
             await updateDoc(doc(this.#db, `employees`, employeeId), {...employee}).catch((error) => {
                 errorMessage = Utils.getErrorMessageFromCode(error);
@@ -790,18 +791,11 @@ class APIManager extends Logger {
      * @returns {Promise<string | null>} Null if the department was edited successfully, and the error message if it was not.
      */
     public async editDepartment(departmentId: string, department: DepartmentModifyDTO): Promise<string | null> {
+        let errorMessage: string | null = null;
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        let queryDepartment = query(
-            collection(this.#db, `departments`),
-            where("name", "==", department.name)
-        );
-        let errorMessage = await Utils.checkIfAlreadyExists(
-            queryDepartment,
-            errors.DEPARTMENT_ALREADY_EXISTS
-        );
-        if (!errorMessage) {
+
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
                     errorMessage = Utils.getErrorMessageFromCode(error);
@@ -809,12 +803,8 @@ class APIManager extends Logger {
             } else {
                 errorMessage = errors.INVALID_DEPARTMENT_ID;
             }
-        }
-
         return errorMessage;
     }
-
-    
 
     public async createJobTitle(
         title: string
@@ -831,12 +821,75 @@ class APIManager extends Logger {
             errors.JOB_TITLE_ALREADY_EXISTS
         );
         if (!errorMessage) {
-            await addDoc(collection(this.#db, `jobTitle`), {
+            await addDoc(collection(this.#db, `jobTitles`), {
                 name: title,
             }).catch((error) => {
                 errorMessage = Utils.getErrorMessageFromCode(error);
             });
         }
+        return errorMessage;
+    }
+
+    public async editJobTitle(jobTitleId: string, jobTitle: string): Promise<string | null> {
+        let errorMessage: string | null = null;
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+            if (jobTitleId) {
+                await updateDoc(doc(this.#db, `jobTitles`, jobTitleId), {name: jobTitle}).catch((error) => {
+                    errorMessage = Utils.getErrorMessageFromCode(error);
+                });
+            } else {
+                errorMessage = errors.INVALID_JOB_TITLE_ID;
+            }
+
+        return errorMessage;
+    }
+
+    public async createSkill(skill: string): Promise<string | null> {
+        if (!this.hasPermission) {
+            return errors.PERMISSION_DENIED;
+        }
+        let queryDepartment = query(
+            collection(this.#db, `skills`),
+            where("name", "==", skill)
+        );
+        let errorMessage = await Utils.checkIfAlreadyExists(
+            queryDepartment,
+            errors.SKILL_ALREADY_EXISTS
+        );
+        if (!errorMessage) {
+            await addDoc(collection(this.#db, `skills`), {
+                name: skill,
+            }).catch((error) => {
+                errorMessage = Utils.getErrorMessageFromCode(error);
+            });
+        }
+        return errorMessage;
+    }
+
+    public async editSkill(skillId: string, skill: string): Promise<string | null> {
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        let queryDepartment = query(
+            collection(this.#db, `jobTitles`),
+            where("name", "==", skill)
+        );
+        let errorMessage = await Utils.checkIfAlreadyExists(
+            queryDepartment,
+            errors.DEPARTMENT_ALREADY_EXISTS
+        );
+        if (!errorMessage) {
+            if (skillId) {
+                await updateDoc(doc(this.#db, `jobTitles`, skillId), {name: skill}).catch((error) => {
+                    errorMessage = Utils.getErrorMessageFromCode(error);
+                });
+            } else {
+                errorMessage = errors.INVALID_SKILL_ID;
+            }
+        }
+
         return errorMessage;
     }
 
@@ -1049,8 +1102,8 @@ class APIManager extends Logger {
     public async getJobTitles(): Promise<EmployeeJobTitleList | string> {
         let errorMessage: string | null = null;
         let jobTitles: string[] = [];
-        let queryDepartment = query(collection(this.#db, `jobTitles`));
-        let snaps = await getDocs(queryDepartment).catch((error) => {
+        let queryJobTitles = query(collection(this.#db, `jobTitles`));
+        let snaps = await getDocs(queryJobTitles).catch((error) => {
             errorMessage = Utils.getErrorMessageFromCode(error);
         });
         if (snaps) {
@@ -1064,8 +1117,8 @@ class APIManager extends Logger {
     public async getSkills(): Promise<EmployeeSkillList | string> {
         let errorMessage: string | null = null;
         let skills: string[] = [];
-        let queryDepartment = query(collection(this.#db, `skills`));
-        let snaps = await getDocs(queryDepartment).catch((error) => {
+        let querySkills = query(collection(this.#db, `skills`));
+        let snaps = await getDocs(querySkills).catch((error) => {
             errorMessage = Utils.getErrorMessageFromCode(error);
         });
         if (snaps) {
@@ -1089,7 +1142,6 @@ class APIManager extends Logger {
         if (this.#user?.uid) {
             shifts = await this.getScheduleForOneEmployee(this.#user.uid);
         }
-
         return shifts;
     }
 

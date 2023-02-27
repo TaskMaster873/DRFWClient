@@ -4,7 +4,8 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-import { errors, FormErrorType } from "../messages/FormMessages";
+import {errors, FormErrorType} from "../messages/FormMessages";
+import {Modal} from "react-bootstrap";
 
 interface EditJobTitlesState {
     name: string;
@@ -13,8 +14,11 @@ interface EditJobTitlesState {
 }
 
 interface EditJobTitlesProps {
-    onAddJobTitle: (department) => PromiseLike<void> | Promise<void> | void;
-    onEditJobTitle: (department) => PromiseLike<void> | Promise<void> | void;
+    cancelEdit: () => void;
+    jobTitles: string[];
+    onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
+    onEditJobTitle: (titleId: string, title: string) => PromiseLike<void> | Promise<void> | void;
+    showEdit: boolean;
 }
 
 /**
@@ -41,7 +45,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     }
 
     public render(): JSX.Element {
-        return (
+        return <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
             <Form
                 noValidate
                 validated={this.state.validated}
@@ -51,6 +55,12 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             >
                 <Row className="mb-3">
                     <h5 className="mt-4 mb-3">Éditer les corps d'emploi</h5>
+                    {this.props.jobTitles.map((corps: string) => (<Form.Control
+                        key={corps}
+                        type="text"
+                        name={corps}
+                        className="jobTitles"
+                    />))}
                     <Form.Group as={Col} md="6">
                         <Form.Label className="mt-2">Nom</Form.Label>
                         <Form.Control
@@ -68,7 +78,11 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                     Ajouter
                 </Button>
             </Form>
-        );
+        </Modal>
+    }
+
+    private hideModal() {
+        this.props.cancelEdit();
     }
 
     /**
@@ -98,35 +112,39 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         }
     }
 
-    /**
-     * Function that is called when the form is changed. This update the state of the component.
-     * @param event The event that triggered the function
-     * @private
-     */
-    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
-        const target = event.target;
-        const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
+/**
+ * Function that is called when the form is changed. This update the state of the component.
+ * @param event The event that triggered the function
+ * @private
+ */
+readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
+    const target = event.target;
+    const value = target.type === "checkbox" ? target.checked : target.value;
+    const name = target.id;
 
-        if (!name) {
-            throw new Error("Id is undefined for element in form.");
+    if (!name) {
+        throw new Error("Id is undefined for element in form.");
+    }
+
+    this.setState({
+        ...{}, ...{
+            [name]: value,
         }
+    });
+}
 
-        this.setState({...{}, ...{
-                [name]: value,
-            }});
-    }
+/**
+ * Function that is called when the select is changed. This update the state of the component.
+ * @param event The event that triggered the function
+ * @private
+ */
+readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
+    const target = event.target;
 
-    /**
-     * Function that is called when the select is changed. This update the state of the component.
-     * @param event The event that triggered the function
-     * @private
-     */
-    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
-        const target = event.target;
-
-        this.setState({...this.state, ...{
-                [target.id]: target.value
-            }});
-    }
+    this.setState({
+        ...this.state, ...{
+            [target.id]: target.value
+        }
+    });
+}
 }
