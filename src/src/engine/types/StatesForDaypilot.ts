@@ -53,7 +53,7 @@ export enum ViewType {
 	Week  = "Week",
 	WorkWeek  = "WorkWeek",
 	Days = "Days",
-	Resources  = "Resources"
+	Resources = "Resources"
 }
 
 export enum EventDeleteHandlingType {
