@@ -104,6 +104,13 @@ service cloud.firestore {
                 allow read;
                 allow create: if isValidShift(shiftId);
                 allow update: if isValidShift(shiftId);
+                allow delete: if isValidShiftDeletion(shiftId);
+            }
+
+            function isValidShiftDeletion(shiftId) {
+                let validShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+
+                return !validShift && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
 
             function isValidShift(shiftId) {

@@ -20,7 +20,7 @@ enum FetchState {
     OK = 2,
 }
 
-interface CreateScheduleState {
+interface State {
     currentDepartment: Department | null;
     departments: Department[];
     employees: Employee[];
@@ -29,8 +29,8 @@ interface CreateScheduleState {
     redirectTo: string | null;
 }
 
-export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
-    public state: CreateScheduleState = {
+export class CreateSchedule extends React.Component<unknown, State> {
+    public state: State = {
         currentDepartment: null,
         departments: [],
         employees: [],
@@ -187,6 +187,22 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
     };
 
     /**
+     * Deletes a shift in the DB and refreshes the state (Halfway through the function chain)
+     * @param shiftEvent The id of the shift to delete
+     */
+    readonly #deleteShift= async (shiftId: string): Promise<void> => {
+        let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
+        //Delete shift
+        let error = await API.deleteShift(shiftId);
+        if (typeof error === "string") {
+            NotificationManager.error(errors.DELETE_SHIFT, error);
+            this.setState({fetchState: FetchState.ERROR});
+        }
+        //Refresh shifts
+        else await this.getShifts(currentDepartment, this.state.departments, this.state.employees);
+    }
+
+    /**
      * Converts the shift into events for the Daypilot calendar
      * @param shifts the Shift objects to convert
      * @returns the converted shifts
@@ -206,7 +222,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
 
     public render(): JSX.Element {
         if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}></Navigate>);
+            return (<Navigate to={this.state.redirectTo} />);
         }
 
         switch (this.state.fetchState) {
@@ -225,6 +241,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
                                 employees={this.state.employees}
                                 addShift={this.#addShift}
                                 editShift={this.#editShift}
+                                deleteShift={this.#deleteShift}
                             />
                         </Container>
                     );
@@ -234,6 +251,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
                         employees={this.state.employees}
                         addShift={this.#addShift}
                         editShift={this.#editShift}
+                        deleteShift={this.#deleteShift}
                     />;
                 }
             default:
@@ -242,6 +260,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
                     employees={[]}
                     addShift={this.#addShift}
                     editShift={this.#editShift}
+                    deleteShift={this.#deleteShift}
                 />;
         }
     }
