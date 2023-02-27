@@ -124,6 +124,19 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         }
     }
 
+    /**
+     * Add an jobTitle to the database
+     * @param title The jobTitle
+     */
+    readonly #addJobTitle = async (title: string) : Promise<void> => {
+        let error = await API.createJobTitle(title);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+        } else {
+            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+
     public render(): JSX.Element {
         if(this.state.redirectTo) {
             return (<Navigate to={this.state.redirectTo}></Navigate>);
@@ -137,6 +150,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 editedEmployee={this.state.editedEmployee}
                 employeeId={this.props.params.id}
                 onEditEmployee={this.#editEmployee}
+                onAddJobTitle={this.#addJobTitle}
             />
         );
     }

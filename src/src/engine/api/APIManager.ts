@@ -796,7 +796,7 @@ class APIManager extends Logger {
         );
         let errorMessage = await this.checkIfAlreadyExists(
             queryDepartment,
-            errors.DEPARTMENT_ALREADY_EXIST
+            errors.DEPARTMENT_ALREADY_EXISTS
         );
         if (!errorMessage) {
             await addDoc(collection(this.#db, `departments`), {
@@ -828,9 +828,9 @@ class APIManager extends Logger {
         );
         let errorMessage = await this.checkIfAlreadyExists(
             queryDepartment,
-            errors.DEPARTMENT_ALREADY_EXIST
+            errors.DEPARTMENT_ALREADY_EXISTS
         );
-        if(!errorMessage) {
+        if (!errorMessage) {
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
@@ -860,6 +860,30 @@ class APIManager extends Logger {
         });
         if (snaps && snaps.docs.length > 0) {
             errorMessage = error;
+        }
+        return errorMessage;
+    }
+
+    public async createJobTitle(
+        title: string
+    ): Promise<string | null> {
+        if (!this.hasPermission) {
+            return errors.PERMISSION_DENIED;
+        }
+        let queryDepartment = query(
+            collection(this.#db, `jobTitles`),
+            where("name", "==", title)
+        );
+        let errorMessage = await this.checkIfAlreadyExists(
+            queryDepartment,
+            errors.JOB_TITLE_ALREADY_EXISTS
+        );
+        if (!errorMessage) {
+            await addDoc(collection(this.#db, `jobTitle`), {
+                name: title,
+            }).catch((error) => {
+                errorMessage = this.getErrorMessageFromCode(error);
+            });
         }
         return errorMessage;
     }

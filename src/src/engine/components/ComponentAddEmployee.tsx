@@ -8,6 +8,7 @@ import { Container } from "react-bootstrap";
 import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
 import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
+import {ComponentAddJobTitle} from "./ComponentAddJobTitle";
 
 interface ComponentAddEmployeeState extends Employee {
     validated?: boolean;
@@ -146,14 +147,24 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     </Form.Group>
                 </Row>
                 <Row className="mb-3">
-                    <Form.Group as={Col} md="6">
-                        <Form.Label>Corps d'emploi</Form.Label>
+                    <Form.Group as={Col} md="4">
+                        <Form.Label className="w-100">Corps d'emploi<Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
                         {this.props.jobTitles.map((corps) => (<Form.Check
                             key={`${corps}`}
                             type="checkbox"
                             id={`${corps}`}
                             className="jobTitles"
                             label={`${corps}`}
+                        />))}
+                    </Form.Group>
+                    <Form.Group as={Col} md="4">
+                        <Form.Label className="w-100">Compétence<Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
+                        {this.props.skills.map((skill) => (<Form.Check
+                            key={`${skill}`}
+                            type="checkbox"
+                            id={`${skill}`}
+                            className="jobTitles"
+                            label={`${skill}`}
                         />))}
                     </Form.Group>
                     <Form.Group as={Col} md="6">

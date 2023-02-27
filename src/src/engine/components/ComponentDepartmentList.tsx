@@ -1,4 +1,4 @@
-import React, {CSSProperties, MouseEventHandler} from "react";
+import React from "react";
 import { Nav, Table } from "react-bootstrap";
 import {
     Department, departmentAdminTableHeads,
@@ -15,7 +15,6 @@ import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
 import {BiEdit} from "react-icons/bi";
-import {employeeAdminTableHeads, employeeTableHeads} from "../types/Employee";
 
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
 
@@ -136,7 +135,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
      * @returns {Promise<void>}
      * @throws {Error} If the parent function is not defined
      */
-    readonly #onDataChange = async (department: Department): Promise<void> => {
+    readonly #onAddDepartment = async (department: Department): Promise<void> => {
         if (this.props.onAddDepartment !== null && this.props.onAddDepartment) {
             await this.props.onAddDepartment(department);
         }
@@ -161,7 +160,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
     private renderAddDepartmentComponent(): JSX.Element {
         if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
             return (
-                <ComponentAddDepartment employees={this.props.employees} onAddDepartment={this.#onDataChange}/>
+                <ComponentAddDepartment employees={this.props.employees} onAddDepartment={this.#onAddDepartment}/>
             );
         } else {
             return <></>;

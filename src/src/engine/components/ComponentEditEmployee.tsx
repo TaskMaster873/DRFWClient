@@ -103,7 +103,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
-                        <Form.Label>Corps d'emploi</Form.Label>
+                        <Form.Label className="w-100">Corps d'emploi <Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
                         {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) =>
                             <Form.Check
                             name={corps}
@@ -111,7 +111,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             type="checkbox"
                             id={corps}
                             className="jobTitles"
-                            label={`${corps}`}
+                            label={corps}
                             value={this.props.editedEmployee?.jobTitles}
                         />) : <p className="mt-1 noneJobTitle">Aucun corps d'emplois</p>}
                     </Form.Group>
