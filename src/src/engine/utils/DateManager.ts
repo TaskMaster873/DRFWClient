@@ -43,7 +43,7 @@ export class DateManager {
     }
 
     public changeDateToDayPilotFormat(date: Date) {
-        return date.toISOString() //.slice(0, -5);
+        return date.toISOString().slice(0, -5);
     }
 }
 

@@ -2,27 +2,22 @@
  * Ceci est du code qui a été cherché en partie sur https://code.daypilot.org/42221/react-weekly-calendar-tutorial,  la documentation de la librairie daypilot
  */
 import React, {Component} from 'react';
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
+import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
-import {EventsForUnavailabilityList} from '../types/EmployeeAvailabilities';
 
 interface ComponentAvailabilitiesProps {
-    employeeAvailabilities: EventsForUnavailabilityList;
-    onTimeRangeSelected: (start: Date, end: Date, selectedDate: Date) => void;
+    employeeAvailabilities: DayPilot.EventData[];
+    onTimeRangeSelected: (start: Date, end: Date, selectedDate: Date) => DayPilot.EventData[];
+    getStartData: () => DayPilot.EventData[];
     startDate: DayPilot.Date;
     selectionDay: DayPilot.Date;
+    isCellInStartToEndTimeRange: (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date) => boolean;
 }
 
 interface ComponentAvailabilitiesState {
     daypilotSettings: {
         businessBeginsHour: number
     };
-}
-
-interface DayPilotArgumentTimeRange {
-    start: DayPilot.Date,
-    end: DayPilot.Date,
-    day: string;
 }
 
 export class ComponentAvailabilities extends Component<ComponentAvailabilitiesProps, ComponentAvailabilitiesState> {
@@ -44,11 +39,23 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     }
 
     get calendar() {
-        return this.calendarRef.current.control;
+        return this.calendarRef?.current?.control;
     }
 
     get datePicker() {
-        return this.datePickerRef.current.control;
+        return this.datePickerRef?.current?.control;
+    }
+
+    public componentDidMount(): void {
+        let events = this.props.getStartData();
+
+        this.calendar?.update({
+            events: events
+        });
+
+        this.datePicker?.update({
+            events: events
+        });
     }
 
     /**
@@ -56,41 +63,91 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
      * @param args Contains the date selected by the user
      * @returns void
      */
-    readonly #onTimeRangeSelectedNavigator = (args: DayPilotArgumentTimeRange): void => {
-        /*this.calendar.update({
-            startDate: args.day,
-        });*/
+    readonly #onTimeRangeSelectedNavigator = (args: DayPilot.NavigatorTimeRangeSelectedArgs): void => {
+        let start = args.start.toDateLocal();
+        let end = args.end.toDateLocal();
+        let selectedDate = args.day.toDateLocal();
 
-        /*this.datePicker.update({
-            selectionDay: args.day,
-        });*/
+        let events: DayPilot.EventData[] = this.props.onTimeRangeSelected(start, end, selectedDate);
 
         // @ts-ignore
         args.preventDefault();
 
-        // @ts-ignore
-        window.ag = args;
-        let start = new Date(args.start);
-        let end = new Date(args.end);
-        let selectedDate = new Date(args.day);
+        this.calendar?.update({
+            startDate: args.start,
+            events: events
+        });
 
-        console.log(args);
-        this.props.onTimeRangeSelected(start, end, selectedDate);
+        this.datePicker?.update({
+            events: events,
+            startDate: args.start
+        });
     };
 
-    public render(): JSX.Element {
-        console.log(this.props.startDate, this.props.selectionDay);
+    /**
+     * This function is called when the user selects a date in the calendar
+     * @param args Contains the date selected by the user
+     * @private
+     * @returns void
+     * @see https://code.daypilot.org/42221/react-weekly-calendar-tutorial
+     */
+    readonly #onTimeRangeSelectedCalendar = (args: DayPilot.CalendarTimeRangeSelectedArgs): void => {
+        let event = this.calendar?.events?.list;
+        if (!event) {
+            console.log("les events", event);
+            event = [];
+        }
 
+        const eventToAdd: DayPilot.EventData = {
+            start: args.start,
+            end: args.end,
+            id: '',
+            text: ''
+        };
+
+        event.push(eventToAdd);
+
+        this.datePicker?.update({events: event});
+        this.calendar?.update({events: event});
+    };
+
+    readonly #onBeforeCellRender = (args: any): void => {
+        let cell = args.cell;
+        let start: DayPilot.Date = cell.start;
+        let end: DayPilot.Date = cell.end;
+        let startDateOfWeek: DayPilot.Date = start.firstDayOfWeek('en-us');
+
+        if(startDateOfWeek) {
+            let isDisabled: boolean = this.props.isCellInStartToEndTimeRange(startDateOfWeek, start, end);
+            console.log(isDisabled);
+
+            if(isDisabled) {
+                args.cell.properties.disabled = true;
+                args.cell.properties.backColor = "#eeeeee";
+            }
+        }
+
+        /*const previousWeekStart = DayPilot.Date.today().firstDayOfWeek().addDays(-7);
+        const previousWeekEnd = previousWeekStart.addDays(7);
+
+        if (DayPilot.Util.overlaps(args.cell.start, args.cell.end, previousWeekStart, previousWeekEnd)) {
+            args.cell.properties.disabled = true;
+            args.cell.properties.backColor = "#eeeeee";
+        }*/
+    }
+
+    public render(): JSX.Element {
         return (
             <div className='wrap'>
                 <div className='left'>
                     <DayPilotNavigator
-                        selectMode={"week"}
-                        showMonths={3}
-                        skipMonths={3}
+                        selectMode={"Week"}
+                        showMonths={1}
+                        skipMonths={1}
+                        weekStarts={0}
                         rowsPerMonth={"Auto"}
-                        startDate={this.props.startDate}
-                        selectionDay={this.props.selectionDay}
+                        startDate={DayPilot.Date.today()}
+                        selectionDay={DayPilot.Date.today()}
                         onTimeRangeSelected={this.#onTimeRangeSelectedNavigator}
                         ref={this.datePickerRef}
                     />
@@ -98,59 +155,22 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                 <div className='main'>
                     <DayPilotCalendar
                         {...this.state.daypilotSettings}
-                        cellsMarkBusiness={false}
-                        businessWeekends={true}
                         headerDateFormat={"dddd"}
                         viewType={"Week"}
                         businessBeginsHour={0}
                         businessEndsHour={24}
+                        weekStarts={0}
                         onTimeRangeSelected={this.#onTimeRangeSelectedCalendar}
                         eventDeleteHandling={"Update"}
                         allowEventOverlap={false}
                         durationBarVisible={true}
+                        onBeforeCellRender={this.#onBeforeCellRender}
                         ref={this.calendarRef}
                     />
                 </div>
             </div>
         );
     }
-
-
-    public componentDidUpdate(prevProps: Readonly<ComponentAvailabilitiesProps>, prevState: Readonly<ComponentAvailabilitiesState>, snapshot?: any): void {
-        /*for(events of this.props.employeeAvailabilities) {
-            eventToReturn.push({ start: events })
-        }*/
-
-        console.log('update!', prevProps, prevState);
-        //this.calendar.update({ events: this.props.employeeAvailabilities, startDate: this.props.startDate });
-        //this.datePicker.update({ events: this.props.employeeAvailabilities, startDate: this.props.startDate });
-    }
-
-    public componentDidMount(): void {
-        console.log("componentAvailabilities a mount",this.props.employeeAvailabilities);
-
-        //this.calendar.update({ selectionDay: this.props.selectionDay, startDate: this.props.startDate, events: this.props.employeeAvailabilities });
-        //this.datePicker.update({ selectionDay: this.props.selectionDay, startDate: this.props.startDate, events: this.props.employeeAvailabilities });
-    }
-
-    readonly #onTimeRangeSelectedCalendar = (args: DayPilotArgumentTimeRange): void => {
-        let event = this.calendar.events.list;
-        if (!event) {
-            console.log("les events", event);
-            event = [];
-        }
-
-        const eventToAdd = {
-            start: args.start,
-            end: args.end
-        };
-
-        event.push(eventToAdd);
-        console.log("event après", event);
-
-        this.datePicker.update({events: event});
-        this.calendar.update({events: event});
-    };
 }
 
 
