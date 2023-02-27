@@ -92,6 +92,13 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
         }
     }
 
+    /**
+     * Used to refresh the list of employees
+     * @param employee {Employee} The employee to refresh
+     * @param employees {Employee[]} The list of employees
+     * @private
+     * @return {void}
+     */
     private refreshList(employee: Employee, employees: Employee[]) {
         let employeeIndex = employees.findIndex(elem => elem.id == employee.id);
         if (employee && employeeIndex != -1) {

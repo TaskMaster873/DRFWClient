@@ -10,12 +10,16 @@ import {
 import { ComponentAddDepartment } from "./ComponentAddDepartment";
 import { API } from "../api/APIManager";
 import { LinkContainer } from "react-router-bootstrap";
-import { ScaleLoader } from "react-spinners";
 import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
 import {BiEdit} from "react-icons/bi";
+import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 
+
+/**
+ * Component that display the list of departments
+ */
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
 
     public state: DepartmentListState = {
@@ -54,20 +58,8 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
              */
             return [
                 <tr key={"noDepartment"}>
-                    <td colSpan={4}>
-                        <div className='loadingBar'>
-                            <ScaleLoader
-                                color={"#A020F0"}
-                                loading={true}
-                                cssOverride={{
-                                    display: 'flex',
-                                    alignSelf: 'center',
-                                    margin: '0 auto'
-                                }}
-                                aria-label="Loading Spinner"
-                                data-testid="loader"
-                            />
-                        </div>
+                    <td colSpan={5}>
+                        <ComponentLoadingBarSpinner />
                     </td>
                 </tr>
             ];
@@ -95,6 +87,12 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
         }
     }
 
+    /**
+     * Render the component to add a department
+     * @private
+     * @memberof ComponentDepartmentList
+     * @returns {JSX.Element} The component to add a department
+     */
     private renderTableHeads(): JSX.Element {
         if (API.hasPermission(Roles.ADMIN)) {
             return (
