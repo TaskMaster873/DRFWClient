@@ -16,7 +16,6 @@ import {ComponentEditDepartment} from "./ComponentEditDepartment";
 import {BiEdit} from "react-icons/bi";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 
-
 /**
  * Component that display the list of departments
  */

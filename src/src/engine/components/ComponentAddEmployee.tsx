@@ -8,8 +8,8 @@ import { Container } from "react-bootstrap";
 import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
 import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
-import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
 import {ComponentEditSkills} from "./ComponentEditSkills";
+import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
 
 interface ComponentAddEmployeeState extends Employee {
     showEditJobTitles: boolean,
@@ -102,7 +102,6 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             name="email"
                             required
                             type="email"
-                            
                             pattern={RegexUtil.emailGoodRegex}
                             placeholder="exemple@exemple.ca"
                         />
@@ -204,18 +203,20 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
 
     private onShowEditJobTitles() {
         this.setState({showEditJobTitles: true})
+        console.log(this.state.showEditJobTitles)
     }
 
     private onShowEditSkills() {
         this.setState({showEditSkills: true})
+        console.log(this.state.showEditJobTitles)
     }
 
     readonly #onCancelEditJobTitles = (): void => {
-        this.setState({showEditJobTitles: false});
+        this.setState({showEditJobTitles: true});
     }
 
     readonly #onCancelEditSkills = (): void => {
-        this.setState({showEditSkills: false});
+        this.setState({showEditSkills: true});
     }
 
     /**
@@ -268,7 +269,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
      */
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
-        let name: string = target.id;
+        let name: string = target.name;
 
         let value;
         if (target.type === "checkbox") {
@@ -278,7 +279,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         }
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({...this.state, ...{

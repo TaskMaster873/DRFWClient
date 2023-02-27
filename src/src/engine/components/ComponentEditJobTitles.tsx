@@ -64,7 +64,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                     <Form.Group as={Col} md="6">
                         <Form.Label className="mt-2">Nom</Form.Label>
                         <Form.Control
-                            id="name"
+                            name="name"
                             required
                             type="text"
                             placeholder="Nom"
@@ -120,7 +120,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
 readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
     const target = event.target;
     const value = target.type === "checkbox" ? target.checked : target.value;
-    const name = target.id;
+    const name = target.name;
 
     if (!name) {
         throw new Error("Id is undefined for element in form.");

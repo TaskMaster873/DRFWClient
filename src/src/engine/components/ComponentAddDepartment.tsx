@@ -68,7 +68,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
                     <Form.Group as={Col} md="3">
                         <Form.Label className="mt-2">Nom</Form.Label>
                         <Form.Control
-                            id="name"
+                            name="name"
                             required
                             type="text"
                             placeholder="Nom"
@@ -79,7 +79,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
                     </Form.Group>
                     <Form.Group as={Col} md="3">
                         <Form.Label className="mt-2">Directeur</Form.Label>
-                        <Form.Select required id="director" value={this.state.director} onChange={this.#handleSelect}>
+                        <Form.Select required name="director" value={this.state.director} onChange={this.#handleSelect}>
                             {this.props.employees.map((employee, index) => (
                                 <option key={`${index}`} value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
                         </Form.Select>
@@ -131,10 +131,10 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
+        const name = target.name;
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({...{}, ...{

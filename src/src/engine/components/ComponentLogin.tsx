@@ -64,13 +64,12 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                         data-error={this.state.error}
                     >
                         <Form.Group>
-                            <Form.Label htmlFor="no" className="mt-2">
+                            <Form.Label htmlFor="emailLogin" className="mt-2">
                                 Adresse courriel
                             </Form.Label>
                             <Form.Control
                                 required
                                 name="emailLogin"
-                                id="emailLogin"
                                 className="row mt-1"
                                 type="email"
                                 pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
@@ -87,7 +86,6 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                             <Form.Control
                                 required
                                 name="passwordLogin"
-                                id="passwordLogin"
                                 className="row mt-1"
                                 type="password"
                                 placeholder="Entrez votre mot de passe"
@@ -156,10 +154,10 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
+        const name = target.name;
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({...this.state, ...{
