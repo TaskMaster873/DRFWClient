@@ -1,6 +1,3 @@
-/**
- * Ceci est du code qui a été cherché en partie sur https://code.daypilot.org/42221/react-weekly-calendar-tutorial,  la documentation de la librairie daypilot
- */
 import React, {Component} from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
