@@ -5,10 +5,6 @@ import { DayPilot } from "daypilot-pro-react";
 
 import '../../deps/css/daypilot_custom.css';
 
-/**
- * Ceci est la page pour ajouter un employé
- */
-
 export interface AvailabilitiesState {
     availabilities: EmployeeAvailabilities;
     timesUnavailable: DayPilot.EventData[];
@@ -258,4 +254,3 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return listOfUnavailbility;
     }
 }
-
