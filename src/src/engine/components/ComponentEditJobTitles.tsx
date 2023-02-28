@@ -57,7 +57,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     }
 
     public render(): JSX.Element {
-        return <div><ComponentConfirmDeleteJobTitle  cancelDelete={() => this.#onShowConfirmDeleteJobTitles(undefined)} jobTitle={this.state.jobTitleToDelete} onDeleteJobTitle={this.props.onDeleteJobTitle}/>
+        return <div><ComponentConfirmDeleteJobTitle closePrompt={() => this.#onShowConfirmDeleteJobTitles(undefined)} jobTitle={this.state.jobTitleToDelete} onDeleteJobTitle={this.props.onDeleteJobTitle}/>
         <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
             <Modal.Header closeButton>
                 <Modal.Title>Édition de corps d'emploi</Modal.Title>
