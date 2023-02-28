@@ -81,7 +81,7 @@ export type EventsForUnavailabilityList = EventsForUnavailability[];
 
 export interface EmployeeAvailabilitiesForCreate {
     recursiveExceptions: RecursiveAvailabilities;
-    employeeId: string;
+    employeeId?: string;
     start?: Timestamp;
     end?:Timestamp;
 }

@@ -1333,7 +1333,7 @@ class APIManager extends Logger {
         //Create Shift
         await addDoc(collection(this.#db, `unavailabilities`),
             {
-                employeeId: list.employeeId,
+                employeeId: this.#user?.uid,
                 unavailabilities: list.recursiveExceptions,
                 start: list.start,
                 end: list.end,
@@ -1341,7 +1341,7 @@ class APIManager extends Logger {
         ).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
-
+        console.log("created");
         if (errorMessage) return errorMessage;
     }
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import {DAYS, EmployeeAvailabilities, EventsForUnavailability, EmployeeRecursiveException, RecursiveAvailabilities, RecursiveAvailabilitiesList} from "../types/EmployeeAvailabilities";
+import {DAYS, EmployeeAvailabilities, EventsForUnavailability, EmployeeRecursiveException, RecursiveAvailabilities, RecursiveAvailabilitiesList, EmployeeAvailabilitiesForCreate} from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
 import {ManagerDate} from '../utils/DateManager';
 import {DayPilot} from "daypilot-pro-react";
@@ -10,9 +10,6 @@ import {Timestamp} from "firebase/firestore";
 import {API} from "../api/APIManager";
 import {Container} from "react-bootstrap";
 
-/**
- * Ceci est la page pour ajouter un employé
- */
 
 export interface AvailabilitiesState {
     availabilities: EmployeeAvailabilities;
@@ -134,9 +131,10 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
     readonly #createNewAvailabilityRequest = async (start?: Timestamp, end?: Timestamp): Promise<void> => {
-        let recursiveExceptions: RecursiveAvailabilities;
         let starts;
         let ends;
+        let unavailabilitiesInCalendar = this.componentAvailability?.getListFromTheCalendar();
+        console.log(unavailabilitiesInCalendar);
         if (start) {
            starts = ManagerDate.getDayPilotDateString(start);
         }
@@ -144,7 +142,9 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             ends =  ManagerDate.getDayPilotDateString(end);
         }
        let date = this.toUTC(this.state.currentWeekStart);
-        recursiveExceptions = {
+       
+       let listCreate: EmployeeAvailabilitiesForCreate = {
+        recursiveExceptions: {
             startDate: starts ?? undefined,
             endDate: ends ?? undefined,
             [DAYS.SUNDAY]: [],
@@ -155,12 +155,18 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             //It is to have acces more easily to the datepicker and calendar getters and their public methods
             [DAYS.FRIDAY]: [],
             [DAYS.SATURDAY]: []
-        };
+        },
+        start: start,
+        end: end
+       }
 
-        console.log(recursiveExceptions);
+
+        await API.pushAvailabilitiesToManager(listCreate);
 
         console.log(this.componentAvailability?.getListFromTheCalendar());
     };
+
+    private 
 
     readonly #openPopup = (): void => {
         this.setState({popupActive: true});
@@ -273,15 +279,12 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                             let dayNumber = DAYS[DAYS[day]] as unknown as number;
 
                             const eventToPush = this.transformObjToEventForUnavailability(start, dayNumber, recursive[day][i]);
-                            //console.log(DAYS[day], DAYS[DAYS[day]], start, recursive[day][i], i, eventToPush);
                             listOfUnavailbility.push(eventToPush);
                         }
                     }
                 }
             }
         }
-
-        //this.state.timesUnavailable = listOfUnavailbility;
 
         return listOfUnavailbility;
     }
