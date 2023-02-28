@@ -162,7 +162,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             label={title.name}
                         />))}
                         <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
-                                                onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle} ></ComponentEditJobTitles>
+                                                onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}  onDeleteJobTitle={this.props.onEditSkill}></ComponentEditJobTitles>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Compétences</Form.Label><Button onClick={() => this.#onShowEditSkills()} className="float-end">+</Button>

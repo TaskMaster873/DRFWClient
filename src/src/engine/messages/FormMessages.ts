@@ -51,10 +51,11 @@ export const successes = {
     EMPLOYEE_ACTIVATED: "L'employé a bien été activé !",
     EMPLOYEE_DEACTIVATED: "L'employé a bien été désactivé !",
     EMPLOYEE_EDITED: "L'employé a bien été modifié !",
-    DEPARTMENT_EDITED: "Le département a bien été modifié",
-    JOB_TITLE_EDITED: "Le corps d'emploi a bien été modifié",
-    SKILL_EDITED: "La compétence a bien été modifié"
-
+    DEPARTMENT_EDITED: "Le département a bien été modifié !",
+    JOB_TITLE_EDITED: "Le corps d'emploi a bien été modifié !",
+    SKILL_EDITED: "La compétence a bien été modifié !",
+    JOB_TITLE_DELETED: "Le corps d'emploi a bien été supprimé !",
+    SKILL_DELETED: "La compétence a bien été supprimé !"
 }
 
 export const info = {

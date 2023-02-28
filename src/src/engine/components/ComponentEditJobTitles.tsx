@@ -10,8 +10,10 @@ import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
 import {JobTitle} from "../types/JobTitle";
 import {CgUnavailable} from "react-icons/cg";
 import {FormUtils} from "../utils/FormUtils";
+import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
 
 interface EditJobTitlesState {
+    jobTitleToDelete?: JobTitle;
     editedJobTitle?: JobTitle;
     name: string;
     addValidated?: boolean;
@@ -24,7 +26,8 @@ interface EditJobTitlesProps {
     cancelEdit: () => void;
     jobTitles: JobTitle[];
     onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
-    onEditJobTitle: (titleId: string, title: string) => PromiseLike<void> | Promise<void> | void;
+    onEditJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
+    onDeleteJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
     showEdit: boolean;
 }
 
@@ -38,7 +41,6 @@ interface EditJobTitlesProps {
  */
 export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, EditJobTitlesState> {
     public state: EditJobTitlesState = {
-        editedJobTitle: undefined,
         addError: FormErrorType.NO_ERROR,
         editError: FormErrorType.NO_ERROR,
         name: "",
@@ -55,8 +57,8 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     }
 
     public render(): JSX.Element {
-        return <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
-
+        return <div><ComponentConfirmDeleteJobTitle  cancelDelete={() => this.#onShowConfirmDeleteJobTitles(undefined)} jobTitle={this.state.jobTitleToDelete} onDeleteJobTitle={this.props.onDeleteJobTitle}/>
+        <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
             <Modal.Header closeButton>
                 <Modal.Title>Édition de corps d'emploi</Modal.Title>
             </Modal.Header>
@@ -76,7 +78,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                                     type="text"
                                     name={title.name}
                                     defaultValue={title.name}
-                                    disabled={!this.state.editedJobTitle}
+                                    disabled={this.state.editedJobTitle != title}
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.REQUIRED_JOB_TITLE_NAME}
@@ -121,23 +123,36 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                 </Button>
             </Modal.Footer>
         </Modal>
+        </div>
     }
 
     private hideModal() {
         this.props.cancelEdit();
     }
 
+    readonly #onShowConfirmDeleteJobTitles = (value: JobTitle | undefined): void => {
+        this.setState({jobTitleToDelete: value})
+    }
+
+
     private renderActions(title: JobTitle): JSX.Element {
-        if (this.state.editedJobTitle) {
-            return <div><BiCheck/> <CgUnavailable/></div>
+        if (this.state.editedJobTitle == title) {
+            return <div><BiCheck type="submit" className="adminActions me-2"/> <CgUnavailable onClick={() => this.editJobTitle(undefined)} className="adminActions me-2"/></div>
         } else {
-            return <div><BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/><BiTrash
-                className="adminActions ms-2"/></div>
+            return <div>
+                <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
+                <BiTrash onClick={() => this.deleteJobTitle(title)} className="adminActions ms-2"/>
+            </div>
         }
     }
 
-    private editJobTitle(title: JobTitle) {
+    private editJobTitle(title: JobTitle | undefined) {
         this.setState({editedJobTitle: title})
+        console.log(this.state.editedJobTitle);
+    }
+
+    private deleteJobTitle(title: JobTitle) {
+
     }
 
     /**
@@ -154,7 +169,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
 
         if (errorType === FormErrorType.NO_ERROR) {
             if(formDataObj.id) {
-                await this.props.onEditJobTitle(formDataObj.id, formDataObj.name);
+                await this.props.onEditJobTitle(formDataObj);
             }
         }
     }

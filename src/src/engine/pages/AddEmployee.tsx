@@ -14,6 +14,8 @@ import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
+import {JobTitle} from "../types/JobTitle";
+import {Skill} from "../types/skill";
 
 export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {
@@ -117,10 +119,19 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
-    readonly #editJobTitle = async (titleId: string, title: string): Promise<void> => {
-        let error = await API.editJobTitle(titleId, title);
+    readonly #editJobTitle = async (title: JobTitle): Promise<void> => {
+        let error = await API.editJobTitle(title);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_EDITED);
+        } else {
+            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+
+    readonly #deleteJobTitle = async (title: JobTitle): Promise<void> => {
+        let error = await API.deleteJobTitle(title);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_DELETED);
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
@@ -140,9 +151,17 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
+    readonly #editSkill = async (skill: Skill): Promise<void> => {
+        let error = await API.editSkill(skill);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
+        } else {
+            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
 
-    readonly #editSkill = async (titleId: string, title: string): Promise<void> => {
-        let error = await API.editSkill(titleId, title);
+    readonly #deleteSkill = async (skill: Skill): Promise<void> => {
+        let error = await API.deleteSkill(skill);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
         } else {
@@ -167,6 +186,8 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 onEditJobTitle={this.#editJobTitle}
                 onAddSkill={this.#addSkill}
                 onEditSkill={this.#editSkill}
+                onDeleteJobTitle={this.#deleteJobTitle}
+                onDeleteSkill={this.#deleteSkill}
             />
         );
     }

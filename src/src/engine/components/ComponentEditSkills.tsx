@@ -18,7 +18,7 @@ interface EditSkillsProps {
     skills: Skill[];
     cancelEdit: () => void;
     onAddSkill: (skill) => PromiseLike<void> | Promise<void> | void;
-    onEditSkill: (skillId: string, skill: string) => PromiseLike<void> | Promise<void> | void;
+    onEditSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
     showEdit: boolean;
 }
 

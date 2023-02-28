@@ -13,6 +13,7 @@ import {
     addDoc,
     collection,
     connectFirestoreEmulator,
+    deleteDoc,
     doc,
     DocumentData,
     enableIndexedDbPersistence,
@@ -84,7 +85,7 @@ type SubscriberCallback =
  * @property {Map<string, Task>} tasks - A map of tasks that are currently being executed.
  */
 class APIManager extends Logger {
-    
+
     //region Attributes 
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
@@ -128,6 +129,7 @@ class APIManager extends Logger {
             this.registerServiceWorker();
         }
     }
+
     //endregion
 
     //region GETTERS
@@ -798,13 +800,13 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
 
-            if (departmentId) {
-                await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
-                    errorMessage = Utils.getErrorMessageFromCode(error);
-                });
-            } else {
-                errorMessage = errors.INVALID_DEPARTMENT_ID;
-            }
+        if (departmentId) {
+            await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
+                errorMessage = Utils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_DEPARTMENT_ID;
+        }
         return errorMessage;
     }
 
@@ -814,12 +816,12 @@ class APIManager extends Logger {
         if (!this.hasPermission) {
             return errors.PERMISSION_DENIED;
         }
-        let queryDepartment = query(
+        let queryJobTitles = query(
             collection(this.#db, `jobTitles`),
             where("name", "==", title)
         );
         let errorMessage = await Utils.checkIfAlreadyExists(
-            queryDepartment,
+            queryJobTitles,
             errors.JOB_TITLE_ALREADY_EXISTS
         );
         if (!errorMessage) {
@@ -832,18 +834,40 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async editJobTitle(jobTitleId: string, jobTitle: string): Promise<string | null> {
+    public async editJobTitle(jobTitle: JobTitle): Promise<string | null> {
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        let queryJobTitles = query(
+            collection(this.#db, `jobTitles`),
+            where("name", "==", jobTitle.name)
+        );
+        let errorMessage = await Utils.checkIfAlreadyExists(
+            queryJobTitles,
+            errors.JOB_TITLE_ALREADY_EXISTS
+        );
+        if (jobTitle.id) {
+            await updateDoc(doc(this.#db, `jobTitles`, jobTitle.id), {name: jobTitle.name}).catch((error) => {
+                errorMessage = Utils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_JOB_TITLE_ID;
+        }
+
+        return errorMessage;
+    }
+    public async deleteJobTitle(title: JobTitle): Promise<string | null> {
         let errorMessage: string | null = null;
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-            if (jobTitleId) {
-                await updateDoc(doc(this.#db, `jobTitles`, jobTitleId), {name: jobTitle}).catch((error) => {
-                    errorMessage = Utils.getErrorMessageFromCode(error);
-                });
-            } else {
-                errorMessage = errors.INVALID_JOB_TITLE_ID;
-            }
+        if (title.id) {
+            await deleteDoc(doc(this.#db, `jobTitles`, title.id)).catch((error) => {
+                errorMessage = Utils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_SKILL_ID;
+        }
 
         return errorMessage;
     }
@@ -852,14 +876,11 @@ class APIManager extends Logger {
         if (!this.hasPermission) {
             return errors.PERMISSION_DENIED;
         }
-        let queryDepartment = query(
+        let querySkills = query(
             collection(this.#db, `skills`),
             where("name", "==", skill)
         );
-        let errorMessage = await Utils.checkIfAlreadyExists(
-            queryDepartment,
-            errors.SKILL_ALREADY_EXISTS
-        );
+        let errorMessage = await Utils.checkIfAlreadyExists(querySkills, errors.SKILL_ALREADY_EXISTS);
         if (!errorMessage) {
             await addDoc(collection(this.#db, `skills`), {
                 name: skill,
@@ -870,26 +891,39 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async editSkill(skillId: string, skill: string): Promise<string | null> {
+    public async editSkill(skill: Skill): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        let queryDepartment = query(
-            collection(this.#db, `jobTitles`),
+        let querySkills = query(
+            collection(this.#db, `skills`),
             where("name", "==", skill)
         );
-        let errorMessage = await Utils.checkIfAlreadyExists(
-            queryDepartment,
-            errors.DEPARTMENT_ALREADY_EXISTS
-        );
+        let errorMessage = await Utils.checkIfAlreadyExists(querySkills, errors.DEPARTMENT_ALREADY_EXISTS);
         if (!errorMessage) {
-            if (skillId) {
-                await updateDoc(doc(this.#db, `jobTitles`, skillId), {name: skill}).catch((error) => {
+            if (skill.id) {
+                await updateDoc(doc(this.#db, `skills`, skill.id), {name: skill.name}).catch((error) => {
                     errorMessage = Utils.getErrorMessageFromCode(error);
                 });
             } else {
                 errorMessage = errors.INVALID_SKILL_ID;
             }
+        }
+
+        return errorMessage;
+    }
+
+    public async deleteSkill(skill: Skill): Promise<string | null> {
+        let errorMessage: string | null = null;
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        if (skill.id) {
+            await deleteDoc(doc(this.#db, `skills`, skill.id)).catch((error) => {
+                errorMessage = Utils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_SKILL_ID;
         }
 
         return errorMessage;

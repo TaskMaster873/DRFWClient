@@ -95,8 +95,10 @@ export interface AddEmployeeProps {
     onAddEmployee: (password : string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
     onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
     onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
-    onEditJobTitle: (titleId: string, title: string) => PromiseLike<void> | Promise<void> | void;
-    onEditSkill: (skillId: string, skill: string) => PromiseLike<void> | Promise<void> | void;
+    onEditJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
+    onEditSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
+    onDeleteJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
+    onDeleteSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface EditEmployeeProps {
