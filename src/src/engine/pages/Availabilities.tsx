@@ -14,11 +14,12 @@ import {Timestamp} from "firebase/firestore";
 
 export interface AvailabilitiesState {
     availabilities: EmployeeAvailabilities;
-    timesUnavailable: eventsForUnavailabilityList;
+    timesUnavailable: DayPilot.EventData[];
     popupActive: boolean;
 
     currentWeekStart: Date;
     currentWeekEnd: Date;
+    selectedDate: Date;
 }
 
 let curr = new Date;
@@ -31,23 +32,25 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     public state: AvailabilitiesState = {
         availabilities: {
             recursiveExceptions: [{
-                [DAYS.SUNDAY]: [{
-                    startTime: 15,
-                    endTime: 360
-                },
+                [DAYS.SUNDAY]: [
+                    {
+                        startTime: 0,
+                        endTime: 60
+                    },
                 ],
                 //time not available
                 [DAYS.MONDAY]: [
-
                     {
-                        startTime: 700,
-                        endTime: 820
+                        startTime: 60,
+                        endTime: 60+60
                     }
                 ],
-                [DAYS.TUESDAY]: [{
-                    startTime: 500,
-                    endTime: 620
-                }],
+                [DAYS.TUESDAY]: [
+                    {
+                        startTime: 120,
+                        endTime: 120+60
+                    }
+                ],
                 [DAYS.WEDNESDAY]: [],
                 [DAYS.THURSDAY]: [],
                 [DAYS.FRIDAY]: [],
@@ -63,16 +66,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                 [DAYS.WEDNESDAY]: [],
                 [DAYS.THURSDAY]: [],
 
-                [DAYS.FRIDAY]: [
-                    {
-                        startTime: 30,
-                        endTime: 400
-                    },
-                    {
-                        startTime: 500,
-                        endTime: 700
-                    }
-                ],
+                [DAYS.FRIDAY]: [],
                 [DAYS.SATURDAY]: [],
 
             }],
@@ -82,6 +76,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         currentWeekEnd: lastday,
         timesUnavailable: [],
         popupActive: false,
+        selectedDate: new Date,
     };
 
     public componentDidMount() {
@@ -99,24 +94,28 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return date <= endDate;
     }
 
-    readonly #onTimeRangeSelected = (start: Date, end: Date): void => {
-        /*this.setState({
-            currentWeekEnd: end,
-            currentWeekStart: start,
-        }, () => {
-            this.computeAllAvailabilities();
-        });*/
+    readonly #getStartData = (): DayPilot.EventData[] => {
+        return this.computeAllAvailabilities(this.state.currentWeekStart, this.state.currentWeekEnd, this.state.selectedDate);
+    }
 
-        this.computeAllAvailabilities(start, end);
+    readonly #onTimeRangeSelected = (start: Date, end: Date, selectedDate: Date): DayPilot.EventData[] => {
+        return this.computeAllAvailabilities(start, end, selectedDate);
     };
 
     public render(): JSX.Element {
         return (
-            //The ... will need some changes here 
             <div>
-                <button type="button" className="btn btn-primary" onClick={() =>this.showModal()}>Soumettre disponibilitées</button>
-                <ComponentAvailabilities onTimeRangeSelected={this.#onTimeRangeSelected} employeeAvailabilities={this.state.timesUnavailable} />
+
                < ComponentAvailabilitiesPopup availabilityAdd={this.#addAvailability} isShown={this.state.popupActive} hideModal={this.#hideModal} start={DayPilot.Date.today()} end={DayPilot.Date.today()}></ComponentAvailabilitiesPopup>
+
+                <button type="button" className="btn btn-primary">Primary</button>
+                <ComponentAvailabilities getStartData={this.#getStartData}
+                                         onTimeRangeSelected={this.#onTimeRangeSelected}
+                                         isCellInStartToEndTimeRange={this.#isCellInStartToEndTimeRange}
+                                         startDate={new DayPilot.Date(this.state.currentWeekStart)}
+                                         selectionDay={new DayPilot.Date(this.state.selectedDate)}
+                                         employeeAvailabilities={this.state.timesUnavailable} />
+
             </div>
         );
     }
@@ -150,16 +149,16 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             employeeId: "yo",
             start: Timestamp.now(),
             end: Timestamp.now(),
-           
+
         }
         await API.pushAvailabilitiesToManager(tryToAddToApi);
     }
 
-  
+
 
     private showModal = (): void => {
         this.setState({popupActive: true});
-        
+
     };
 
     /**
@@ -172,10 +171,10 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 	}
 
     /**
-     * Compute the availabilities in the state to convert it for daypilot 
+     * Compute the availabilities in the state to convert it for daypilot
      */
-    private computeAllAvailabilities(start: Date, end: Date): void {
-        let listOfUnavailbility: eventsForUnavailabilityList = [];
+    private computeAllAvailabilities(start: Date, end: Date, selectedDate: Date): DayPilot.EventData[] {
+        let listOfUnavailbility: DayPilot.EventData[] = [];
 
         for (let recursive of this.state.availabilities.recursiveExceptions) {
             let canRenderData: boolean = true;
@@ -199,8 +198,11 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
                     if (recursive[day].length > 0) {
                         for (let i = 0; i < recursive[day].length; i++) {
-                            const eventToPush = this.transformForDayPilot(start, recursive[day][i]);
-                            console.log(DAYS[day], start, recursive[day][i], i, eventToPush);
+                            // This enum return a number but typescript thinks it's a string for some reasons.
+                            let dayNumber = DAYS[DAYS[day]] as unknown as number;
+
+                            const eventToPush = this.transformObjToEventForUnavailability(start, dayNumber, recursive[day][i]);
+                            //console.log(DAYS[day], DAYS[DAYS[day]], start, recursive[day][i], i, eventToPush);
                             listOfUnavailbility.push(eventToPush);
                         }
                     }
@@ -208,11 +210,9 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             }
         }
 
-        console.log(listOfUnavailbility);
-        this.setState({
-            timesUnavailable: listOfUnavailbility,
-        });
+        //this.state.timesUnavailable = listOfUnavailbility;
 
+        return listOfUnavailbility;
     }
 
     private transformForDayPilot(startTime: Date, hours: EmployeeRecursiveException): eventsForUnavailability {
@@ -232,4 +232,3 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
 }
-
