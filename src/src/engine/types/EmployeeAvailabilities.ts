@@ -35,7 +35,7 @@ interface EmployeeAvailabilityException {
 /**
  * Contains a list of {@link EmployeeRecursiveExceptionList} for everyDays that will be recursive every weeks
  */
-interface RecursiveAvailabilities {
+export interface RecursiveAvailabilities {
     startDate?: string;
     endDate?: string;
     [DAYS.SUNDAY]: EmployeeRecursiveExceptionList;
@@ -82,6 +82,7 @@ export type EventsForUnavailabilityList = EventsForUnavailability[];
 export interface EmployeeAvailabilitiesForCreate {
     recursiveExceptions: RecursiveAvailabilities;
     employeeId: string;
-    start: Timestamp;
-    end:Timestamp;
+    start?: Timestamp;
+    end?:Timestamp;
 }
+

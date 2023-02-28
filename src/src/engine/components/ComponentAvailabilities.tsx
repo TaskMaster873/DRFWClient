@@ -109,7 +109,13 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
         this.datePicker?.update({events: event});
         this.calendar?.update({events: event});
+        this.#getListOfTheCalendarEvents();
     };
+
+    readonly #getListOfTheCalendarEvents = (): void => {
+        console.log("all in the calendar",this.calendar?.events?.list);
+        console.log("start week", this.calendar?.startDate?.toString());
+    }
 
     readonly #onBeforeCellRender = (args: any): void => {
         let cell = args.cell;
@@ -134,6 +140,10 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
             args.cell.properties.disabled = true;
             args.cell.properties.backColor = "#eeeeee";
         }*/
+    }
+
+    public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
+        return this.calendar?.events.list;
     }
 
     public render(): JSX.Element {

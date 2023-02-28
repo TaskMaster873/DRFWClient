@@ -3,19 +3,18 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import {DayPilot} from "@daypilot/daypilot-lite-react";
-import {EventForShiftCreation} from "../types/Shift";
+import {RecursiveAvailabilities} from "../types/EmployeeAvailabilities";
 import {errors, FormErrorType} from '../messages/FormMessages';
+import {Timestamp} from "firebase/firestore";
+import {ManagerDate} from '../utils/DateManager';
 
 type Props = {
-	availabilityAdd: (newAvailabilities: EventForShiftCreation) => Promise<void>;
+	availabilityAdd: (start?: Timestamp, end?: Timestamp) => Promise<void>;
 	//eventEdit: (shiftEvent: EventForShiftEdit) => Promise<void>;
 	hideModal: () => void;
 	isShown: boolean;
-	//id: string,
 	start: DayPilot.Date;
 	end: DayPilot.Date;
-	//resource: string;
-	//taskType: EventManipulationType;
 };
 
 export function ComponentAvailabilitiesPopup(props: Props) {
@@ -24,8 +23,8 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 	const [start, setStart] = useState<string | null>(null);
 	const [end, setEnd] = useState<string | null>(null);
 	const [disabled, setDisabled] = useState<boolean>(false);
-	const min = DayPilot.Date.today();
-	const max = min.addDays(6);
+	const min = DayPilot.Date.today().addDays(-2);
+	const max = min.addDays(10);
 
 	/**
 	 * Verify if the form is valid and if it is, it sends the data to the parent
@@ -40,7 +39,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 		if (!isValid) {
 			errorType = FormErrorType.INVALID_FORM;
 		}
-
+		console.log(event);
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -49,7 +48,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 
 		if (errorType === FormErrorType.NO_ERROR) {
 			setDisabled(true);
-			//availabilityAdd();
+			props.availabilityAdd(ManagerDate.getFirebaseTimestamp(props.start), ManagerDate.getFirebaseTimestamp(props.end));
 			closeModal();
 		}
 	};
@@ -84,7 +83,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 	return (
 		<Modal show={props.isShown} >
 			<Modal.Header closeButton onClick={() => closeModal()}>
-				<Modal.Title>{/*props.taskType*/}Les dates de commencement et de fin</Modal.Title>
+				<Modal.Title>Les dates de commencement et de fin</Modal.Title>
 			</Modal.Header>
 			<Form onSubmit={(e) => handleSubmit(e)} validated={validated} data-error={error}>
 				<Modal.Body>
