@@ -19,11 +19,11 @@ export class ComponentConfirmDeleteJobTitle extends React.Component<DeleteJobTit
                     <p>Voulez-vous vraiment supprimer le corps d'emploi {this.props.jobTitle?.name} ?</p>
                 </Modal.Body>
                 <Modal.Footer>
+                    <Button variant="primary" onClick={() => this.hideModal(true)}>
+                        Oui
+                    </Button>
                     <Button variant="secondary" onClick={() => this.hideModal()}>
                         Non
-                    </Button>
-                    <Button variant="primary" onClick={() => this.hideModal()}>
-                        Oui
                     </Button>
                 </Modal.Footer>
         </Modal>);

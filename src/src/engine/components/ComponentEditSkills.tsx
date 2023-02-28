@@ -7,6 +7,7 @@ import Col from "react-bootstrap/Col";
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Modal} from "react-bootstrap";
 import {Skill} from "../types/skill";
+import {SkillActions} from "../types/Employee";
 
 interface EditSkillsState {
     name: string;
@@ -14,11 +15,9 @@ interface EditSkillsState {
     error: FormErrorType;
 }
 
-interface EditSkillsProps {
+interface EditSkillsProps extends SkillActions {
     skills: Skill[];
     cancelEdit: () => void;
-    onAddSkill: (skill) => PromiseLike<void> | Promise<void> | void;
-    onEditSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
     showEdit: boolean;
 }
 

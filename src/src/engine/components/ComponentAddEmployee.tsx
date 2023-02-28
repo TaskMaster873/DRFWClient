@@ -162,7 +162,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             label={title.name}
                         />))}
                         <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
-                                                onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}  onDeleteJobTitle={this.props.onEditSkill}></ComponentEditJobTitles>
+                                                onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}  onDeleteJobTitle={this.props.onDeleteJobTitle}></ComponentEditJobTitles>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Compétences</Form.Label><Button onClick={() => this.#onShowEditSkills()} className="float-end">+</Button>
@@ -173,7 +173,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             label={skill.name}
                         />))}
                         <ComponentEditSkills cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditSkills} skills={this.props.jobTitles}
-                                             onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}></ComponentEditSkills>
+                                             onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill} onDeleteSkill={this.props.onDeleteSkill}></ComponentEditSkills>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>

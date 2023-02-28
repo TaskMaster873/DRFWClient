@@ -87,18 +87,24 @@ export interface EmployeeProps {
     params: Readonly<Params>;
 }
 
-export interface AddEmployeeProps {
+export interface AddEmployeeProps extends SkillActions, JobTitleActions {
     departments: Department[];
     roles: string[];
     jobTitles: JobTitle[];
     skills: Skill[];
     onAddEmployee: (password : string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
-    onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
+}
+
+export interface SkillActions {
     onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
-    onEditJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
     onEditSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
-    onDeleteJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
     onDeleteSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
+}
+
+export interface JobTitleActions {
+    onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
+    onEditJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
+    onDeleteJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface EditEmployeeProps {

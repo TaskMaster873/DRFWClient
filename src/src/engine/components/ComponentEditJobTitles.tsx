@@ -57,7 +57,8 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     }
 
     public render(): JSX.Element {
-        return <div><ComponentConfirmDeleteJobTitle closePrompt={() => this.#onShowConfirmDeleteJobTitles(undefined)} jobTitle={this.state.jobTitleToDelete} onDeleteJobTitle={this.props.onDeleteJobTitle}/>
+        return <div><ComponentConfirmDeleteJobTitle closePrompt={() => this.#onShowConfirmDeleteJobTitles(undefined)}
+                                                    jobTitle={this.state.jobTitleToDelete} onDeleteJobTitle={this.props.onDeleteJobTitle}/>
         <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
             <Modal.Header closeButton>
                 <Modal.Title>Édition de corps d'emploi</Modal.Title>
@@ -141,7 +142,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         } else {
             return <div>
                 <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
-                <BiTrash onClick={() => this.deleteJobTitle(title)} className="adminActions ms-2"/>
+                <BiTrash onClick={() => this.showDeletePrompt(title)} className="adminActions ms-2"/>
             </div>
         }
     }
@@ -151,8 +152,8 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         console.log(this.state.editedJobTitle);
     }
 
-    private deleteJobTitle(title: JobTitle) {
-
+    private showDeletePrompt(title: JobTitle) {
+        this.setState({jobTitleToDelete: title});
     }
 
     /**
