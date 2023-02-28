@@ -10,7 +10,7 @@ import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
 import {ComponentEditSkills} from "./ComponentEditSkills";
 import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
-import {Skill} from "../types/skill";
+import {Skill} from "../types/Skill";
 import {FormUtils} from "../utils/FormUtils";
 
 interface ComponentAddEmployeeState extends Employee {

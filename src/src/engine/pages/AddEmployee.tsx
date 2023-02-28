@@ -15,7 +15,7 @@ import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import {JobTitle} from "../types/JobTitle";
-import {Skill} from "../types/skill";
+import {Skill} from "../types/Skill";
 
 export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {

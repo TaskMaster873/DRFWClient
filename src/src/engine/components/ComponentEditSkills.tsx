@@ -6,7 +6,7 @@ import Col from "react-bootstrap/Col";
 
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Modal} from "react-bootstrap";
-import {Skill} from "../types/skill";
+import {Skill} from "../types/Skill";
 import {SkillActions} from "../types/Employee";
 
 interface EditSkillsState {

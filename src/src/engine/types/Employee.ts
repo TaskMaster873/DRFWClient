@@ -1,6 +1,6 @@
 import {Department} from "./Department";
 import {Params} from "react-router-dom";
-import {Skill} from "./skill";
+import {Skill} from "./Skill";
 import {JobTitle} from "./JobTitle";
 
 /**

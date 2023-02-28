@@ -2,7 +2,7 @@ import {Logger} from "../Logger";
 import {getDocs} from "firebase/firestore";
 import {errors} from "../messages/APIMessages";
 
-export class APIUtils extends Logger {
+export class InternalAPIUtils extends Logger {
 
     /**
      * This method parse firebase error codes and return a human-readable error message.
@@ -67,7 +67,7 @@ export class APIUtils extends Logger {
 /**
  * Instantiate the APIManager class and export it as a singleton.
  */
-export const Utils = new APIUtils();
+export const APIUtils = new InternalAPIUtils();
 
 // @ts-ignore
-window.Utils = Utils;
+window.APIUtils = APIUtils;

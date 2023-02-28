@@ -77,7 +77,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                                 <Form.Control
                                     key={title.name}
                                     type="text"
-                                    name={title.name}
+                                    name="name"
                                     defaultValue={title.name}
                                     disabled={this.state.editedJobTitle != title}
                                 />
@@ -138,7 +138,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
 
     private renderActions(title: JobTitle): JSX.Element {
         if (this.state.editedJobTitle == title) {
-            return <div><BiCheck type="submit" className="adminActions me-2"/> <CgUnavailable onClick={() => this.editJobTitle(undefined)} className="adminActions me-2"/></div>
+            return <div><button className="transparentButton me-2" type="submit"><BiCheck className="adminActions"/></button> <CgUnavailable onClick={() => this.editJobTitle(undefined)} className="adminActions ms-1"/></div>
         } else {
             return <div>
                 <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
@@ -149,7 +149,6 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
 
     private editJobTitle(title: JobTitle | undefined) {
         this.setState({editedJobTitle: title})
-        console.log(this.state.editedJobTitle);
     }
 
     private showDeletePrompt(title: JobTitle) {
@@ -169,9 +168,11 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         let formDataObj: JobTitle = Object.fromEntries(formData.entries()) as unknown as JobTitle;
 
         if (errorType === FormErrorType.NO_ERROR) {
+            formDataObj.id = this.state.editedJobTitle?.id;
             if(formDataObj.id) {
                 await this.props.onEditJobTitle(formDataObj);
             }
+            this.setState({editedJobTitle: undefined});
         }
     }
 

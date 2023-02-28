@@ -64,6 +64,16 @@ code {
 .adminActions {
     text-decoration: none;
     cursor: pointer;
+    color: black;
+    padding: 0 !important;
+}
+
+.transparentButton {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    cursor: pointer;
 }
 
 .navbar-dark.bg-dark {
