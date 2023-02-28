@@ -1,18 +1,17 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {Timestamp} from "firebase/firestore";
 
-/** 
- * Enum for all days name 
+/**
+ * Enum for all days name
 */
 export enum DAYS {
-    SUNDAY = 1,
-    MONDAY = 2,
-    TUESDAY = 3,
-    WEDNESDAY = 4,
-    THURSDAY = 5,
-    FRIDAY = 6,
-    SATURDAY = 7,
-
+    SUNDAY = 0,
+    MONDAY = 1,
+    TUESDAY = 2,
+    WEDNESDAY = 3,
+    THURSDAY = 4,
+    FRIDAY = 5,
+    SATURDAY = 6
 }
 
 /**
@@ -20,9 +19,10 @@ export enum DAYS {
  * It is used when someone is not able to work
  */
 export interface EmployeeRecursiveException {
-    //should 
+    //should
     startTime: number;
     endTime: number;
+    details?: string;
 }
 
 /**
@@ -60,7 +60,7 @@ export type EmployeeAvailabilityExceptionList = EmployeeAvailabilityException[];
 
 /**
  * Should contains a {@link RecursiveAvailabilities }, {@link EmployeeAvailabilityExceptionList} and a employeeId : string.
- * It is used to show the user his availabilities or to push his availabilities to his manager. 
+ * It is used to show the user his availabilities or to push his availabilities to his manager.
  */
 export interface EmployeeAvailabilities {
     /** When he can work */
@@ -72,7 +72,7 @@ export interface EmployeeAvailabilities {
 
 export type RecursiveAvailabilitiesList = RecursiveAvailabilities[];
 
-export interface eventsForUnavailability {
+export interface EventsForUnavailability {
     start: string;
     end: string;
     text: string;
@@ -86,4 +86,3 @@ export interface EmployeeAvailabilitiesForCreate {
     start: Timestamp;
     end:Timestamp;
 }
-
