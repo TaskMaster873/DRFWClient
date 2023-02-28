@@ -21,6 +21,10 @@ export interface AvailabilitiesState {
     selectedDate: Date;
 }
 
+/**
+ * Get the first and last day of the current week
+ * NON TERMINER
+ */
 let curr = new Date;
 let firstday = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0, 0, 0, 0));
 let lastday = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0, 0, 0, 0));
@@ -74,8 +78,8 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             }],
             employeeId: "",
         },
-        currentWeekStart: firstday,
-        currentWeekEnd: lastday,
+        currentWeekStart: firstDay,
+        currentWeekEnd: lastDay,
         timesUnavailable: [],
         popupActive: false,
         selectedDate: new Date,
@@ -142,7 +146,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             ends =  ManagerDate.getDayPilotDateString(end);
         }
        let date = this.toUTC(this.state.currentWeekStart);
-       
+
        let listCreate: EmployeeAvailabilitiesForCreate = {
         recursiveExceptions: {
             startDate: starts ?? undefined,
@@ -166,7 +170,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         console.log(this.componentAvailability?.getListFromTheCalendar());
     };
 
-    private 
+    private
 
     readonly #openPopup = (): void => {
         this.setState({popupActive: true});
@@ -188,6 +192,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return new DayPilot.Date(date, true);
     }
 
+    /**
+     * This function will compute all the availabilities for the current week and the selected day.
+     * @param start The start of the week
+     * @param day The selected day
+     * @param hours The hours of the selected day
+     * @private
+     */
     private transformObjToEventForUnavailability(start: Date, day: number, hours: EmployeeRecursiveException): DayPilot.EventData {
         let startTime = this.convertRecursiveExceptionDate(start, day, hours.startTime);
         let endTime = this.convertRecursiveExceptionDate(start, day, hours.endTime);
@@ -200,22 +211,32 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         };
     }
 
+    /**
+     * This function will compute all the availabilities for the current week and the selected day.
+     * @description This function will compute all the availabilities for the current week and the selected day.
+     * @param weekStart The start of the week
+     * @param startDate The start of the selected day
+     * @param endDate The end of the selected day
+     * @private
+     * @returns {DayPilot.EventData[]} The list of all the availabilities for the current week and the selected day.
+     * @memberof Availabilities
+     */
     readonly #isCellInStartToEndTimeRange = (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date): boolean => {
         for (let recursive of this.state.availabilities.recursiveExceptions) {
-            let canRenderData: boolean = true;
+            let canRenderWeeklyData: boolean = true;
             if (recursive.startDate) {
                 if (!this.isInTimeRangeFromStartDate(startDate.toDateLocal(), new Date(recursive.startDate))) {
-                    canRenderData = false;
+                    canRenderWeeklyData = false;
                 }
             }
 
-            if (recursive.endDate && canRenderData) {
+            if (recursive.endDate && canRenderWeeklyData) {
                 if (!this.isInTimeRangeFromEndDate(endDate.toDateLocal(), new Date(recursive.endDate))) {
-                    canRenderData = false;
+                    canRenderWeeklyData = false;
                 }
             }
 
-            if (canRenderData) {
+            if (canRenderWeeklyData) {
                 for (let day in recursive) {
                     if (day === 'startDate' || day === 'endDate') {
                         continue;
@@ -233,7 +254,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
                             let startDateTime = new Date(startDate.toDateLocal());
                             let endDateTime = new Date(endDate.toDateLocal());
-                            //console.log(eventStart, eventEnd, startDateTime, endDateTime, eventStart.getTime() >= startDateTime.getTime(), eventEnd.getTime() <= endDateTime.getTime());
 
                             if (eventStart.getTime() <= startDateTime.getTime() && endDateTime.getTime() <= eventEnd.getTime()) {
                                 return true;
@@ -248,7 +268,14 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     };
 
     /**
-     * Compute the availabilities in the state to convert it for daypilot 
+     * This function will compute all the availabilities for the current week and the selected day.
+     * @description This function will compute all the availabilities for the current week and the selected day.
+     * @param start The start of the selected day
+     * @param end The end of the selected day
+     * @param selectedDate The selected date
+     * @private
+     * @returns {DayPilot.EventData[]} The list of all the availabilities for the current week and the selected day.
+     * @memberof Availabilities
      */
     private computeAllAvailabilities(start: Date, end: Date, selectedDate: Date): DayPilot.EventData[] {
         let listOfUnavailbility: DayPilot.EventData[] = [];
@@ -289,4 +316,3 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return listOfUnavailbility;
     }
 }
-

@@ -113,6 +113,13 @@ code {
     color:rgba(255,255,255,0.5);
 }
 
+.dropdown-menu {
+    right: 0; left: auto!important;
+}
+.dropDownMenuText {
+    color: black!important;
+}
+
 @media only screen and (max-width: 990px) {
     .navbar-nav .nav-link {
         width: 100%;

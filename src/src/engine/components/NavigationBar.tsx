@@ -4,9 +4,10 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { LinkContainer } from "react-router-bootstrap";
 import { API } from "../api/APIManager";
-import { errors, successes } from "../messages/FormMessages";
+
 import Logo from "../../deps/images/logo.png";
-import {NotificationManager} from "../api/NotificationManager";
+
+import {ComponentUserActionDropdown} from "./ComponentUserActionDropdown";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faClock, faClipboard, faBuilding } from '@fortawesome/free-solid-svg-icons';
@@ -118,9 +119,7 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
     private loginButton(): JSX.Element {
         if (API.isAuth()) {
             return (
-                <LinkContainer to={RoutesPath.INDEX}>
-                    <Nav.Link id="logoutLink" onClick={this.#logout}>Se déconnecter</Nav.Link>
-                </LinkContainer>
+                <ComponentUserActionDropdown />
             );
         } else {
             return (
@@ -148,26 +147,6 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
                     <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
                 </LinkContainer>
             );
-        }
-    }
-
-    /**
-     * This function logs out the user
-     * @returns {Promise<void>} A promise that resolves when the logout is complete
-     * @category Components
-     * @subcategory Navigation
-     * @hideconstructor
-     * @see adminCommandLinks
-     * @see NavigationBarState
-     * @see API
-     * @private
-     */
-    readonly #logout = async (): Promise<void> => {
-        let error = await API.logout();
-        if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGOUT_SUCCESS);
-        } else {
-            NotificationManager.error(errors.ERROR_LOGOUT, error);
         }
     }
 }

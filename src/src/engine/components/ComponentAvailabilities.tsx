@@ -1,6 +1,3 @@
-/**
- * Ceci est du code qui a été cherché en partie sur https://code.daypilot.org/42221/react-weekly-calendar-tutorial,  la documentation de la librairie daypilot
- */
 import React, {Component} from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
@@ -125,21 +122,12 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
         if(startDateOfWeek) {
             let isDisabled: boolean = this.props.isCellInStartToEndTimeRange(startDateOfWeek, start, end);
-            console.log(isDisabled);
 
             if(isDisabled) {
                 args.cell.properties.disabled = true;
                 args.cell.properties.backColor = "#eeeeee";
             }
         }
-
-        /*const previousWeekStart = DayPilot.Date.today().firstDayOfWeek().addDays(-7);
-        const previousWeekEnd = previousWeekStart.addDays(7);
-
-        if (DayPilot.Util.overlaps(args.cell.start, args.cell.end, previousWeekStart, previousWeekEnd)) {
-            args.cell.properties.disabled = true;
-            args.cell.properties.backColor = "#eeeeee";
-        }*/
     }
 
     public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
