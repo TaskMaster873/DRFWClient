@@ -19,9 +19,13 @@ export interface AvailabilitiesState {
     selectedDate: Date;
 }
 
+/**
+ * Get the first and last day of the current week
+ * NON TERMINER
+ */
 let curr = new Date;
-let firstday = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0,0,0,0));
-let lastday = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0,0,0,0));
+let firstDay = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0,0,0,0));
+let lastDay = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0,0,0,0));
 
 export class Availabilities extends React.Component<unknown, AvailabilitiesState> {
     //It is a placeholder value, because the db doesn't exist for now.
@@ -68,8 +72,8 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             }],
             employeeId: "",
         },
-        currentWeekStart: firstday,
-        currentWeekEnd: lastday,
+        currentWeekStart: firstDay,
+        currentWeekEnd: lastDay,
         timesUnavailable: [],
         popupActive: false,
         selectedDate: new Date,
