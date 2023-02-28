@@ -65,3 +65,63 @@ code {
     text-decoration: none;
     cursor: pointer;
 }
+
+.navbar-dark.bg-dark {
+    background-color:#141414 !important;
+}
+
+.navbar-nav {
+    display:flex;
+    gap:10px;
+    align-items: center;
+}
+
+.nav-link {
+    display:flex;
+    align-items: center;
+    gap:15px;
+    border:1px solid rgba(255,255,255,0);
+    border-radius:15px;
+    padding:5px 15px !important;
+    padding-right: 25px !important;
+}
+
+.nav-link.active {
+    border:1px solid rgba(255,255,255,0.1);
+}
+
+.nav-link > .navIcon {
+    font-size:20px;
+}
+
+.nav-link > .navItem > .navLabel {
+    font-size:14px;
+    color:rgba(255,255,255,0.7);
+}
+
+.nav-link > .navItem > .navDescription {
+    font-size:11px;
+    color:rgba(255,255,255,0.5);
+}
+
+.nav-link.active > .navItem > .navLabel {
+    color:rgba(255,255,255,1);
+}
+
+.nav-link.active > .navItem > .navDescription {
+    font-size:11px;
+    color:rgba(255,255,255,0.5);
+}
+
+.dropdown-menu {
+    right: 0; left: auto!important;
+}
+.dropDownMenuText {
+    color: black!important;
+}
+
+@media only screen and (max-width: 990px) {
+    .navbar-nav .nav-link {
+        width: 100%;
+    }
+}
