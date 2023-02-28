@@ -2,6 +2,7 @@ import React from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
 import {Shift, ShiftForCalendar} from '../types/Shift';
 import {DayPilotCalendarSettings} from '../types/StatesForDaypilot';
+
 import {ManagerDate} from '../utils/DateManager';
 
 interface ComponentEmployeeScheduleViewProps {
