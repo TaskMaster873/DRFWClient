@@ -12,6 +12,7 @@ import {ComponentEditSkills} from "./ComponentEditSkills";
 import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
 import {Skill} from "../types/Skill";
 import {FormUtils} from "../utils/FormUtils";
+import {JobTitle} from "../types/JobTitle";
 
 interface ComponentAddEmployeeState extends Employee {
     showEditJobTitles: boolean,
@@ -155,7 +156,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 <Row className="mb-3">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label><Button onClick={() => this.#onShowEditJobTitles()} className="float-end">+</Button>
-                        {this.props.jobTitles.map((title) => (<Form.Check
+                        {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
                             key={title.name}
                             type="checkbox"
                             name={title.name}
