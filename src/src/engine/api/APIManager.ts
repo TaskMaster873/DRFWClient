@@ -1020,7 +1020,7 @@ class APIManager extends Logger {
             for (let doc of snaps.docs) {
                 departments.push(
                     new Department({
-                        departmentId: doc.id,
+                        id: doc.id,
                         name: doc.data().name,
                         director: doc.data().director
                     })

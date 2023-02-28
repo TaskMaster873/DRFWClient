@@ -16,6 +16,7 @@ import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import {JobTitle} from "../types/JobTitle";
 import {Skill} from "../types/Skill";
+import {Utils} from "../utils/Utils";
 
 export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {
@@ -29,6 +30,10 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public async componentDidMount(): Promise<void> {
         document.title = "Ajouter un Employé - TaskMaster";
 
+        await this.fetchData();
+    }
+
+    private async fetchData() {
         let isLoggedIn: boolean = await this.verifyLogin();
         if (isLoggedIn) {
             let departments = API.getDepartments();
@@ -114,26 +119,40 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         let error = await API.createJobTitle(title);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_CREATED);
+            let titles = this.state.titles;
+            titles.push(new JobTitle({name: title}));
+            this.setState({titles: titles});
+            await this.fetchData();
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
 
     readonly #editJobTitle = async (title: JobTitle): Promise<void> => {
-        let error = await API.editJobTitle(title);
-        if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_EDITED);
-        } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        if(title.id) {
+            let error = await API.editJobTitle(title);
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_EDITED);
+                let titles = Utils.editElement(this.state.titles, title.id, title) as JobTitle[];
+                this.setState({titles: titles});
+                //await this.fetchData();
+            } else {
+                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            }
         }
     }
 
     readonly #deleteJobTitle = async (title: JobTitle): Promise<void> => {
-        let error = await API.deleteJobTitle(title);
-        if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_DELETED);
-        } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        if(title.id) {
+            let error = await API.deleteJobTitle(title);
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_DELETED);
+                let titles = Utils.deleteElement(this.state.titles, title.id, title) as JobTitle[];
+                this.setState({titles: titles});
+                await this.fetchData();
+            } else {
+                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            }
         }
     }
     //#endregion
@@ -141,31 +160,45 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     //#region Skills
     /**
      * Add a skill to the database
-     * @param title The jobTitle
+     * @param skill the skill
      */
-    readonly #addSkill = async (title: string): Promise<void> => {
-        let error = await API.createSkill(title);
+    readonly #addSkill = async (skill: string): Promise<void> => {
+        let error = await API.createSkill(skill);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_CREATED);
+            let skills = this.state.skills;
+            skills.push(new Skill({name: skill}));
+            this.setState({skills: skills});
+            await this.fetchData();
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
     readonly #editSkill = async (skill: Skill): Promise<void> => {
-        let error = await API.editSkill(skill);
-        if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
-        } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        if(skill.id) {
+            let error = await API.editSkill(skill);
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
+                let skills = Utils.editElement(this.state.skills, skill.id, skill) as Skill[];
+                this.setState({skills: skills});
+                await this.fetchData();
+            } else if(error) {
+                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            }
         }
     }
 
     readonly #deleteSkill = async (skill: Skill): Promise<void> => {
-        let error = await API.deleteSkill(skill);
-        if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
-        } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        if(skill.id) {
+            let error = await API.deleteSkill(skill);
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
+                let skills = Utils.deleteElement(this.state.skills, skill.id, skill) as Skill[];
+                this.setState({skills: skills});
+                await this.fetchData();
+            } else {
+                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            }
         }
     }
     //#endregion

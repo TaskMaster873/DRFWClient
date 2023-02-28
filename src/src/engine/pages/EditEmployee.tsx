@@ -8,12 +8,15 @@ import {
 } from "../types/Employee";
 
 import {errors, successes} from "../messages/FormMessages";
-import {Department} from "../types/Department";
+import {Department, DepartmentModifyDTO} from "../types/Department";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
 import {Navigate, Params, useParams} from "react-router-dom";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
+import {IdElement} from "../types/Global";
+import {Utils} from "../utils/Utils";
+import {JobTitle} from "../types/JobTitle";
 
 export function EditEmployeeWrapper(): JSX.Element {
     let parameters: Readonly<Params<string>> = useParams();
@@ -133,6 +136,9 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
      */
     readonly #addJobTitle = async (title: string) : Promise<void> => {
         let error = await API.createJobTitle(title);
+        let titles = this.state.titles;
+        titles.push(new JobTitle({name: title}));
+        this.setState({titles: titles});
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
         } else {
