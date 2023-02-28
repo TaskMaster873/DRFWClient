@@ -9,12 +9,15 @@ import {Modal} from "react-bootstrap";
 import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
 import {JobTitle} from "../types/JobTitle";
 import {CgUnavailable} from "react-icons/cg";
+import {FormUtils} from "../utils/FormUtils";
 
 interface EditJobTitlesState {
     editedJobTitle?: JobTitle;
     name: string;
-    validated?: boolean;
-    error: FormErrorType;
+    addValidated?: boolean;
+    editValidated?: boolean;
+    addError: FormErrorType;
+    editError: FormErrorType;
 }
 
 interface EditJobTitlesProps {
@@ -36,9 +39,11 @@ interface EditJobTitlesProps {
 export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, EditJobTitlesState> {
     public state: EditJobTitlesState = {
         editedJobTitle: undefined,
-        error: FormErrorType.NO_ERROR,
+        addError: FormErrorType.NO_ERROR,
+        editError: FormErrorType.NO_ERROR,
         name: "",
-        validated: false
+        addValidated: false,
+        editValidated: false
     };
 
     public props: EditJobTitlesProps;
@@ -58,10 +63,10 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             <Modal.Body>
                 <Form
                     noValidate
-                    validated={this.state.validated}
+                    validated={this.state.editValidated}
                     onSubmit={this.#handleEditSubmit}
                     onChange={this.#handleChange}
-                    data-error={this.state.error}>
+                    data-error={this.state.editError}>
                     <Form.Label className="mt-2">Corps d'emplois</Form.Label>
                     {this.props.jobTitles.map((title: JobTitle) => (
                         <Row key={`row ${title.name}`} className="mb-3">
@@ -85,10 +90,10 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                 </Form>
                 <Form
                     noValidate
-                    validated={this.state.validated}
+                    validated={this.state.addValidated}
                     onSubmit={this.#handleAddSubmit}
                     onChange={this.#handleChange}
-                    data-error={this.state.error}
+                    data-error={this.state.addError}
                 >
                     <Row className="mb-3">
                         <Form.Label className="mt-2">Nouveau corps d'emploi</Form.Label>
@@ -113,9 +118,6 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => this.hideModal()}>
                     Fermer
-                </Button>
-                <Button variant="primary" type="submit">
-                    Sauvegarder
                 </Button>
             </Modal.Footer>
         </Modal>
@@ -144,7 +146,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * @private
      */
     readonly #handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        let errorType = this.validateForm(event);
+        let errorType = FormUtils.validateForm(event);
 
         let eventTarget: any = event.target;
         let formData = new FormData(eventTarget);
@@ -163,30 +165,15 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * @private
      */
     readonly #handleAddSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        let errorType = this.validateForm(event);
+        let errorType = FormUtils.validateForm(event);
 
+        this.setState({
+            addValidated: true,
+            addError: errorType,
+        });
         if (errorType === FormErrorType.NO_ERROR) {
             await this.props.onAddJobTitle(this.state.name);
         }
-    }
-
-    private validateForm(event: React.FormEvent<HTMLFormElement>) {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        let errorType = FormErrorType.NO_ERROR;
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
-
-        this.setState({
-            validated: true,
-            error: errorType,
-        });
-        return errorType;
     }
 
     /**

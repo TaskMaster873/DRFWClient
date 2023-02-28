@@ -10,6 +10,7 @@ import {Department} from "../types/Department";
 import {API} from "../api/APIManager";
 import {RegexUtil} from "../utils/RegexValidator";
 import {JobTitle} from "../types/JobTitle";
+import {FormUtils} from "../utils/FormUtils";
 
 interface ComponentEditEmployeeState {
     validated?: boolean;
@@ -160,20 +161,12 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
      * @memberof CreateEmployee
      */
     readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-
-        event.preventDefault();
-        event.stopPropagation();
+        let errorType = FormUtils.validateForm(event);
 
         let eventTarget: any = event.target;
         let formData = new FormData(eventTarget);
         let formDataObj: EmployeeEditDTO = Object.fromEntries(formData.entries()) as unknown as EmployeeEditDTO;
 
-        let errorType = FormErrorType.NO_ERROR;
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
         this.setState({
             validated: true,
             error: errorType
