@@ -2,7 +2,7 @@ import React from "react";
 import {ComponentLoading} from "../components/ComponentLoading";
 import {ComponentScheduleCreate} from "../components/ComponentScheduleCreate";
 import {API} from "../api/APIManager";
-import {EventForCalendar, EventForShiftCreation, Shift} from "../types/Shift";
+import {EventForCalendar, EventForShiftCreation, EventForShiftEdit, Shift} from "../types/Shift";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {Department} from "../types/Department";
 import {SelectDepartment} from "../components/SelectDepartment";
@@ -20,7 +20,7 @@ enum FetchState {
     OK = 2,
 }
 
-interface CreateScheduleState {
+interface State {
     currentDepartment: Department | null;
     departments: Department[];
     employees: Employee[];
@@ -29,8 +29,8 @@ interface CreateScheduleState {
     redirectTo: string | null;
 }
 
-export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
-    public state: CreateScheduleState = {
+export class CreateSchedule extends React.Component<unknown, State> {
+    public state: State = {
         currentDepartment: null,
         departments: [],
         employees: [],
@@ -52,7 +52,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         document.title = "Création d'horaire - TaskMaster";
 
         let isLoggedIn: boolean = await this.verifyLogin();
-        if(isLoggedIn) {
+        if (isLoggedIn) {
             let fetchedDepartments = await API.getDepartments();
             if (typeof fetchedDepartments === "string") {
                 NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
@@ -150,20 +150,57 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
     readonly #addShift = async (shiftEvent: EventForShiftCreation): Promise<void> => {
         let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
         //Create Shift
-        let success = await API.createShift({
+        let error = await API.createShift({
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
             end: shiftEvent.end,
             department: this.state.currentDepartment ? this.state.currentDepartment.name : "",
-            projectName: ""
         });
-        if (typeof success === "string") {
-            NotificationManager.error(errors.CREATE_SHIFT, success);
+        if (typeof error === "string") {
+            NotificationManager.error(errors.CREATE_SHIFT, error);
             this.setState({fetchState: FetchState.ERROR});
         }
         //Refresh shifts
         else await this.getShifts(currentDepartment, this.state.departments, this.state.employees);
     };
+
+    /**
+     * Edits a shift in the DB and refreshes the state (Halfway through the function chain)
+     * @param shiftEvent The shift to add
+     */
+    readonly #editShift = async (shiftEvent: EventForShiftEdit): Promise<void> => {
+        let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
+        //Create Shift
+        let error = await API.editShift({
+            id: shiftEvent.id,
+            employeeId: shiftEvent.employeeId,
+            start: shiftEvent.start,
+            end: shiftEvent.end,
+            department: this.state.currentDepartment ? this.state.currentDepartment.name : "",
+        });
+        if (typeof error === "string") {
+            NotificationManager.error(errors.EDIT_SHIFT, error);
+            this.setState({fetchState: FetchState.ERROR});
+        }
+        //Refresh shifts
+        else await this.getShifts(currentDepartment, this.state.departments, this.state.employees);
+    };
+
+    /**
+     * Deletes a shift in the DB and refreshes the state (Halfway through the function chain)
+     * @param shiftEvent The id of the shift to delete
+     */
+    readonly #deleteShift= async (shiftId: string): Promise<void> => {
+        let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
+        //Delete shift
+        let error = await API.deleteShift(shiftId);
+        if (typeof error === "string") {
+            NotificationManager.error(errors.DELETE_SHIFT, error);
+            this.setState({fetchState: FetchState.ERROR});
+        }
+        //Refresh shifts
+        else await this.getShifts(currentDepartment, this.state.departments, this.state.employees);
+    }
 
     /**
      * Converts the shift into events for the Daypilot calendar
@@ -174,7 +211,7 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
         let events: EventForCalendar[] = [];
         for (let shift of shifts) {
             events.push({
-                id: "",
+                id: shift.id,
                 start: shift.start,
                 end: shift.end,
                 resource: shift.employeeId
@@ -184,8 +221,8 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
     }
 
     public render(): JSX.Element {
-        if(this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo} />);
         }
 
         switch (this.state.fetchState) {
@@ -195,15 +232,36 @@ export class CreateSchedule extends React.Component<unknown, CreateScheduleState
                 if (this.state.departments.length > 1) {
                     return (
                         <Container>
-                            <SelectDepartment departments={this.state.departments} changeDepartment={this.#changeDepartment} />
-                            <ComponentScheduleCreate events={this.getEventsForCalendarFromShifts(this.state.shifts)} employees={this.state.employees} addShift={this.#addShift} />
+                            <SelectDepartment
+                                departments={this.state.departments}
+                                changeDepartment={this.#changeDepartment}
+                            />
+                            <ComponentScheduleCreate
+                                events={this.getEventsForCalendarFromShifts(this.state.shifts)}
+                                employees={this.state.employees}
+                                addShift={this.#addShift}
+                                editShift={this.#editShift}
+                                deleteShift={this.#deleteShift}
+                            />
                         </Container>
                     );
                 } else {
-                    return <ComponentScheduleCreate events={this.getEventsForCalendarFromShifts(this.state.shifts)} employees={this.state.employees} addShift={this.#addShift} />;
+                    return <ComponentScheduleCreate
+                        events={this.getEventsForCalendarFromShifts(this.state.shifts)}
+                        employees={this.state.employees}
+                        addShift={this.#addShift}
+                        editShift={this.#editShift}
+                        deleteShift={this.#deleteShift}
+                    />;
                 }
             default:
-                return <ComponentScheduleCreate events={[]} employees={[]} addShift={this.#addShift} />;
+                return <ComponentScheduleCreate
+                    events={[]}
+                    employees={[]}
+                    addShift={this.#addShift}
+                    editShift={this.#editShift}
+                    deleteShift={this.#deleteShift}
+                />;
         }
     }
 }

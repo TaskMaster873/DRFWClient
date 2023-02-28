@@ -10,14 +10,18 @@ export const testConstants = {
     invalidEmail: "a@a",
     invalidPhoneNumber: "41-92-006",
     invalidPassword: "44ab",
-    validNewPassword: "HWDIj23ie1w!"
+    validNewPassword: "HWDIj23ie1w!",
+    validStartDate: "2022-09-10T10:30:00",
+    validEndDate: "2022-09-10T12:30:00",
+    invalidDate: "2022-09-10T10:29:23",
+    validId: "1"
 };
 
 export const testPopupConstant = {
     validRGBColor: "#6aa84f",
 };
 
-let employee = new Employee({
+const employee = new Employee({
     firstName: "George",
     lastName: "Belleau",
     email: "georgeBelleau@gmail.com",
@@ -27,9 +31,9 @@ let employee = new Employee({
     jobTitles: [],
     skills: [],
     role: 1,
-})
+});
 
-let employee2 = new Employee({
+const employee2 = new Employee({
     firstName: "Mathieu",
     lastName: "Bédard",
     email: "mathieubedard@gmail.com",
@@ -39,23 +43,52 @@ let employee2 = new Employee({
     jobTitles: [],
     skills: [],
     role: 2,
-})
-let employees = [employee]
-let employees2 = [employee, employee2]
+});
 
-let department = new Department({
+const employeeWithId = new Employee({
+    employeeId: "123",
+    firstName: "David",
+    lastName: "Gol",
+    email: "test@test.test",
+    isActive: true,
+    phoneNumber: "977-333-2954",
+    department: "Marketing",
+    jobTitles: [],
+    skills: [],
+    role: 1
+});
+
+const employeeWithId2 = new Employee({
+    employeeId: "1234",
+    firstName: "John",
+    lastName: "Trenta",
+    email: "jtrenta@hotmail.com",
+    isActive: true,
+    phoneNumber: "976-433-1062",
+    department: "Marketing",
+    jobTitles: [],
+    skills: [],
+    role: 1
+});
+
+const employees = [employee];
+const employees2 = [employee, employee2];
+const employeesWithIds = [employeeWithId];
+const employeesWithIds2 = [employeeWithId, employeeWithId2];
+
+const department = new Department({
     name: "Informatique", director: "Jasmin"
-})
+});
 
-let department2 = new Department({
+const department2 = new Department({
     name: "Informatique", director: "Jasmin"
-})
+});
 
-let departments: Department[] = [department];
-let departments2: Department[] = [department, department2];
+const departments: Department[] = [department];
+const departments2: Department[] = [department, department2];
 
-let employeeNb: number[] = [1, 2];
+const employeeNb: number[] = [1, 2];
 
-export {employee, employee2, employees, employees2, department, department2, departments, departments2, employeeNb};
+export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2, employeesWithIds, employeesWithIds2, department, department2, departments, departments2, employeeNb};
 
 
