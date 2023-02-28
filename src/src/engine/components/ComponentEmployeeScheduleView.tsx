@@ -3,7 +3,7 @@ import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-
 import {Shift, ShiftForCalendar} from '../types/Shift';
 import {DayPilotCalendarSettings} from '../types/StatesForDaypilot';
 
-import {ManagerDate} from '../utils/DateManager';
+import {DateManager} from '../utils/DateManager';
 
 interface ComponentEmployeeScheduleViewProps {
 	shifts: Shift[];
@@ -61,8 +61,8 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 		let startDate = DayPilot.Date.today();
 
 		for (let shift of this.props.shifts) {
-			let convertedStartTime = ManagerDate.convertTimestampToDayPilotDate(shift.start);
-			let convertedEndTime = ManagerDate.convertTimestampToDayPilotDate(shift.end);
+			let convertedStartTime = DateManager.convertTimestampToDayPilotDate(shift.start);
+			let convertedEndTime = DateManager.convertTimestampToDayPilotDate(shift.end);
 
 			events.push({
 				text: `${convertedStartTime} à ${convertedEndTime}`,

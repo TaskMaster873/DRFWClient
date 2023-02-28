@@ -1,7 +1,6 @@
 import React from "react";
-import {DAYS, EmployeeAvailabilities, EventsForUnavailability, EmployeeRecursiveException} from "../types/EmployeeAvailabilities";
+import {DAYS, EmployeeAvailabilities, EmployeeRecursiveException} from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
-import {ManagerDate} from '../utils/DateManager';
 import { DayPilot } from "daypilot-pro-react";
 
 import '../../deps/css/daypilot_custom.css';
@@ -26,7 +25,6 @@ let lastday = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay() + 
 
 export class Availabilities extends React.Component<unknown, AvailabilitiesState> {
     //It is a placeholder value, because the db doesn't exist for now.
-
     public state: AvailabilitiesState = {
         availabilities: {
             recursiveExceptions: [{
@@ -111,6 +109,14 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         );
     }
 
+    /**
+     * This function will compute all the availabilities for the current week and the selected day.
+     * @description This function will compute all the availabilities for the current week and the selected day.
+     * @param startDate
+     * @param day
+     * @param numberOfMinutes
+     * @private
+     */
     private convertRecursiveExceptionDate(startDate: Date, day: number, numberOfMinutes: number): Date {
         const date = new Date(startDate);
         date.setDate(date.getDate() + day);
@@ -124,6 +130,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return new DayPilot.Date(date, true);
     }
 
+    /**
+     * This function will compute all the availabilities for the current week and the selected day.
+     * @param start The start of the week
+     * @param day The selected day
+     * @param hours The hours of the selected day
+     * @private
+     */
     private transformObjToEventForUnavailability(start: Date, day: number, hours: EmployeeRecursiveException): DayPilot.EventData {
         let startTime = this.convertRecursiveExceptionDate(start, day, hours.startTime);
         let endTime = this.convertRecursiveExceptionDate(start, day, hours.endTime);
@@ -136,6 +149,16 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         };
     }
 
+    /**
+     * This function will compute all the availabilities for the current week and the selected day.
+     * @description This function will compute all the availabilities for the current week and the selected day.
+     * @param weekStart The start of the week
+     * @param startDate The start of the selected day
+     * @param endDate The end of the selected day
+     * @private
+     * @returns {DayPilot.EventData[]} The list of all the availabilities for the current week and the selected day.
+     * @memberof Availabilities
+     */
     readonly #isCellInStartToEndTimeRange = (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date): boolean => {
         for (let recursive of this.state.availabilities.recursiveExceptions) {
             let canRenderData: boolean = true;
@@ -184,7 +207,14 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
     /**
-     * Compute the availabilities in the state to convert it for daypilot 
+     * This function will compute all the availabilities for the current week and the selected day.
+     * @description This function will compute all the availabilities for the current week and the selected day.
+     * @param start The start of the selected day
+     * @param end The end of the selected day
+     * @param selectedDate The selected date
+     * @private
+     * @returns {DayPilot.EventData[]} The list of all the availabilities for the current week and the selected day.
+     * @memberof Availabilities
      */
     private computeAllAvailabilities(start: Date, end: Date, selectedDate: Date): DayPilot.EventData[] {
         let listOfUnavailbility: DayPilot.EventData[] = [];
@@ -222,8 +252,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                 }
             }
         }
-
-        //this.state.timesUnavailable = listOfUnavailbility;
 
         return listOfUnavailbility;
     }

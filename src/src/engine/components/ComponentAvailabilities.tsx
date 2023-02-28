@@ -119,21 +119,12 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
         if(startDateOfWeek) {
             let isDisabled: boolean = this.props.isCellInStartToEndTimeRange(startDateOfWeek, start, end);
-            console.log(isDisabled);
 
             if(isDisabled) {
                 args.cell.properties.disabled = true;
                 args.cell.properties.backColor = "#eeeeee";
             }
         }
-
-        /*const previousWeekStart = DayPilot.Date.today().firstDayOfWeek().addDays(-7);
-        const previousWeekEnd = previousWeekStart.addDays(7);
-
-        if (DayPilot.Util.overlaps(args.cell.start, args.cell.end, previousWeekStart, previousWeekEnd)) {
-            args.cell.properties.disabled = true;
-            args.cell.properties.backColor = "#eeeeee";
-        }*/
     }
 
     public render(): JSX.Element {

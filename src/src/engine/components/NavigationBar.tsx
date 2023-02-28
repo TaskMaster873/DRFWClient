@@ -52,7 +52,6 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
      * This function returns the links to the admin commands if the user is an admin
      * @returns {JSX.Element[]} The links to the admin commands
      * @private
-     *
      * @category Components
      * @subcategory Navigation
      * @hideconstructor

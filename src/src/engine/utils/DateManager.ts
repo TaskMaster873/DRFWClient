@@ -1,11 +1,9 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react"; import {Timestamp} from "firebase/firestore";
 ;
 
-export class DateManager {
-
+export class InternalDateManager {
     public convertTimestampToDayPilotDate(time: string): string {
         return DayPilot.Date.parse(time, "yyyy-MM-ddTHH:mm:ss").toString("H:mm");
-
     }
 
     /**
@@ -47,4 +45,4 @@ export class DateManager {
     }
 }
 
-export const ManagerDate = new DateManager();
+export const DateManager = new InternalDateManager();
