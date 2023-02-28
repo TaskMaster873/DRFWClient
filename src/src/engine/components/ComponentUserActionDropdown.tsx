@@ -69,9 +69,11 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
      * @private
      */
     readonly #changePassword = async (): Promise<void> => {
-        this.setState({
-            redirectTo: RoutesPath.CHANGE_PASSWORD
-        });
+        if(API.isAuth()) {
+            this.setState({
+                redirectTo: RoutesPath.CHANGE_PASSWORD
+            });
+        }
     }
 
     public render(): JSX.Element {
