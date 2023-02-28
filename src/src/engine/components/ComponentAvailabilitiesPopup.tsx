@@ -7,7 +7,7 @@ import {EventForShiftCreation} from "../types/Shift";
 import {errors, FormErrorType} from '../messages/FormMessages';
 
 type Props = {
-	availabilityAdd: (shiftEvent: EventForShiftCreation) => Promise<void>;
+	//availabilityAdd: (: EventForShiftCreation) => Promise<void>;
 	//eventEdit: (shiftEvent: EventForShiftEdit) => Promise<void>;
 	hideModal: () => void;
 	isShown: boolean;

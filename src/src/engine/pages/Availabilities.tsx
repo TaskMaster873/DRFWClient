@@ -78,6 +78,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         popupActive: false,
         selectedDate: new Date,
     };
+   
 
     public componentDidMount() {
         document.title = "Disponibilitées - TaskMaster";
@@ -102,20 +103,24 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     public render(): JSX.Element {
         return (
             <div>
-                <button type="button" className="btn btn-primary">Primary</button>
+                <button type="button" className="btn btn-primary" onClick={() => this.#openPopup()}>Sauvegarder</button>
                 <ComponentAvailabilities getStartData={this.#getStartData}
                                          onTimeRangeSelected={this.#onTimeRangeSelected}
                                          isCellInStartToEndTimeRange={this.#isCellInStartToEndTimeRange}
                                          startDate={new DayPilot.Date(this.state.currentWeekStart)}
                                          selectionDay={new DayPilot.Date(this.state.selectedDate)}
                                          employeeAvailabilities={this.state.timesUnavailable} />
-                <ComponentAvailabilitiesPopup availabilityAdd={function (shiftEvent: EventForShiftCreation): Promise<void> {
-                    throw new Error("Function not implemented.");
-                } } hideModal={function (): void {
-                    throw new Error("Function not implemented.");
-                } } isShown={false} start={undefined} end={undefined}></ComponentAvailabilitiesPopup>
+                <ComponentAvailabilitiesPopup
+                  hideModal={this.#onCloseClicked} isShown={this.state.popupActive} start={this.state.currentWeekStart} end={this.state.currentWeekEnd}></ComponentAvailabilitiesPopup>
             </div>
         );
+    }
+
+    readonly #openPopup = (): void => {
+        this.setState({popupActive: true});
+    }
+    readonly #onCloseClicked = (): void => {
+        this.setState({popupActive: false});
     }
 
     private convertRecursiveExceptionDate(startDate: Date, day: number, numberOfMinutes: number): Date {

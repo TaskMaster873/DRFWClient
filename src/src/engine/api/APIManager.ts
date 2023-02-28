@@ -46,6 +46,7 @@ import {
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {department} from "../../../Constants/testConstants";
+import {EmployeeAvailabilitiesForCreate} from "../types/EmployeeAvailabilities";
 
 type SubscriberCallback =
     () =>
