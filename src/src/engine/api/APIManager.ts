@@ -1320,6 +1320,29 @@ class APIManager extends Logger {
 
         if (errorMessage) return errorMessage;
     }
+    
+    public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
+        if (!this.hasPermission(1)) {
+            //Gestionnaire
+            return errors.PERMISSION_DENIED;
+        }
+
+        let errorMessage: string | null = null;
+
+        //Create Shift
+        await addDoc(collection(this.#db, `unavailabilities`),
+            {
+                employeeId: list.employeeId,
+                unavailabilities: list.recursiveExceptions,
+                start: list.start,
+                end: list.end,
+            },
+        ).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
+        });
+
+        if (errorMessage) return errorMessage;
+    }
 }
 
 /**
