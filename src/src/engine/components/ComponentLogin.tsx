@@ -55,7 +55,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                             width={50}
                             height={60}
                         />
-                        <h4 className="text-center mt-4 mb-4">Se connecter à Task Master</h4>
+                        <h4 className="text-center mt-4 mb-4">Se connecter à TaskMaster</h4>
                     </div>
                     <Form
                         noValidate

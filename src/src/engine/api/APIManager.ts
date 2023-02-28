@@ -1266,7 +1266,7 @@ class APIManager extends Logger {
 
         //Validate permissions
         if (!this.isAuthenticated) return errors.PERMISSION_DENIED;
-        if (!this.hasPermission(4)) {
+        if (!this.hasPermission(Roles.ADMIN)) {
             //TODO: pass if user is director
             return errors.PERMISSION_DENIED;
         }
@@ -1317,8 +1317,8 @@ class APIManager extends Logger {
      */
     public async createShift(shift: ShiftCreateDTO): Promise<void | string> {
         //Check if user has permission
-        if (!this.hasPermission(2)) {
-            //Gestionnaire
+        if (!this.hasPermission(Roles.ADMIN)) {
+            //Manager or less
             return errors.PERMISSION_DENIED;
         }
 
@@ -1350,8 +1350,8 @@ class APIManager extends Logger {
      */
     public async editShift(shift: Shift): Promise<void | string> {
         //Check if user has permission
-        if (!this.hasPermission(2)) {
-            //Gestionnaire
+        if (!this.hasPermission(Roles.ADMIN)) {
+            //Manager or less
             return errors.PERMISSION_DENIED;
         }
 
@@ -1367,6 +1367,33 @@ class APIManager extends Logger {
             },
         ).catch((error) => {
             errorMessage = Utils.getErrorMessageFromCode(error);
+        });
+
+        if (errorMessage) return errorMessage;
+    }
+
+    /**
+     * This method is used to delete a shift. If the request was not successful, it will return an error message.
+     * @method deleteShift
+     * @async
+     * @public
+     * @memberof APIManager
+     * @param {string} shiftId The id of the shift to delete.
+     * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
+     */
+    public async deleteShift(shiftId: string): Promise<void | string> {
+        //Check if user has permission
+        if (!this.hasPermission(Roles.ADMIN)) {
+            //Manager or less
+            return errors.PERMISSION_DENIED;
+        }
+
+        let errorMessage: string | null = null;
+
+        //Delete Shift
+        await deleteDoc(doc(this.#db, `shifts`, shiftId),
+        ).catch((error) => {
+            errorMessage = this.getErrorMessageFromCode(error);
         });
 
         if (errorMessage) return errorMessage;

@@ -1,6 +1,6 @@
 import React from "react";
 import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
-import {EventForCalendar, EventForShiftCreation, EventForShiftEdit, Shift} from "../types/Shift";
+import {EventForCalendar, EventForShiftCreation, EventForShiftEdit} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 import {Employee} from "../types/Employee";
 import {HeightSpecType, EventManipulationType, ViewType, EventDeleteHandlingType, ColumnsType} from "../types/StatesForDaypilot";
@@ -10,6 +10,7 @@ type Props = {
 	employees: Employee[];
 	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
 	editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
+	deleteShift: (shiftId: string) => Promise<void>;
 };
 
 type State = {
@@ -22,7 +23,7 @@ type State = {
 	/** end of the calendar */
 	end: DayPilot.Date;
 	/** for the popup */
-	resourceName: string;
+	resource: string;
     /** Popup taskType */
     taskType: EventManipulationType;
 }
@@ -31,9 +32,9 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 	public state: State = {
 		isShowingModal: false,
 		currentEventId: "",
-		start: "2023-02-17T00:00:00",
-		end: "2023-02-18T00:00:00",
-		resourceName: "",
+		start: "",
+		end: "",
+		resource: "",
 		taskType: EventManipulationType.CREATE,
 	};
 
@@ -53,6 +54,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 					onTimeRangeSelected={this.#onTimeRangeSelected}
 					onEventClick={this.#onEventClick}
 					onEventMoved={this.#onEventMoved}
+					onEventDelete={this.#onEventDelete}
 					startDate={DayPilot.Date.today()}
 					columns={this.getEmployeeColumns()}
 					events={this.props.events}
@@ -68,8 +70,9 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 					id={this.state.currentEventId}
 					start={this.state.start}
 					end={this.state.end}
-					resource={this.state.resourceName}
+					resource={this.state.resource}
 					taskType={this.state.taskType}
+					employees={this.props.employees}
 				/>
 			</div>
 		);
@@ -107,7 +110,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 			isShowingModal: true,
 			start: args.start,
 			end: args.end,
-			resourceName: args.resource,
+			resource: args.resource,
 			taskType: EventManipulationType.CREATE,
 		});
 
@@ -124,7 +127,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 			currentEventId: args.e.data.id,
 			start: args.e.data.start,
 			end: args.e.data.end,
-			resourceName: args.e.data.resource,
+			resource: args.e.data.resource,
 			taskType: EventManipulationType.EDIT,
 		});
 	};
@@ -142,6 +145,14 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 		};
 		await this.props.editShift(eventToSend)
 	};
+
+	/**
+	 * When you delete an event, this function is called
+	 * @param args 
+	 */
+	readonly #onEventDelete = async (args: any): Promise<void> => {
+		await this.props.deleteShift(args.e.data.id);
+	}
 
 	/**
 	 * When you close the modal window, this function is called in order to hide it

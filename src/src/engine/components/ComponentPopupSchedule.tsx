@@ -6,6 +6,7 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {EventForShiftCreation, EventForShiftEdit} from "../types/Shift";
 import {errors, FormErrorType} from '../messages/FormMessages';
 import {EventManipulationType} from '../types/StatesForDaypilot';
+import {Employee} from '../types/Employee';
 
 type Props = {
 	eventAdd: (shiftEvent: EventForShiftCreation) => Promise<void>;
@@ -17,6 +18,7 @@ type Props = {
 	end: DayPilot.Date;
 	resource: string;
 	taskType: EventManipulationType;
+	employees: Employee[];
 };
 
 export function ComponentPopupSchedule(props: Props) {
@@ -25,8 +27,7 @@ export function ComponentPopupSchedule(props: Props) {
 	const [start, setStart] = useState<string | null>(null);
 	const [end, setEnd] = useState<string | null>(null);
 	const [disabled, setDisabled] = useState<boolean>(false);
-	const min = DayPilot.Date.today();
-	const max = min.addHours(23);
+	const [employeeId, setEmployeeId] = useState<string | null>(null);
 
 	/**
 	 * Verify if the form is valid and if it is, it sends the data to the parent
@@ -50,13 +51,10 @@ export function ComponentPopupSchedule(props: Props) {
 
 		if (errorType === FormErrorType.NO_ERROR) {
 			setDisabled(true);
-			switch (props.taskType) {
-				case EventManipulationType.EDIT:
-					await sendEditEvent();
-					break;
-				default:
-					await sendCreateEvent();
-					break;
+			if (props.taskType === EventManipulationType.EDIT) {
+				await sendEditEvent();
+			} else {
+				await sendCreateEvent();
 			}
 			closeModal();
 		}
@@ -67,7 +65,7 @@ export function ComponentPopupSchedule(props: Props) {
 	 */
 	const sendCreateEvent = async () => {
 		let eventToReturn: EventForShiftCreation = {
-			employeeId: props.resource,
+			employeeId: employeeId ?? props.resource,
 			start: start ?? props.start,
 			end: end ?? props.end,
 		};
@@ -80,7 +78,7 @@ export function ComponentPopupSchedule(props: Props) {
 	const sendEditEvent = async () => {
 		let eventToReturn: EventForShiftEdit = {
 			id: props.id,
-			employeeId: props.resource,
+			employeeId: employeeId ?? props.resource,
 			start: start ?? props.start,
 			end: end ?? props.end,
 		};
@@ -97,6 +95,7 @@ export function ComponentPopupSchedule(props: Props) {
 		setError(FormErrorType.NO_ERROR);
 		setStart(null);
 		setEnd(null);
+		setEmployeeId("");
 	};
 
 	return (
@@ -106,15 +105,30 @@ export function ComponentPopupSchedule(props: Props) {
 			</Modal.Header>
 			<Form onSubmit={(e) => handleSubmit(e)} validated={validated} data-error={error}>
 				<Modal.Body>
+					<Form.Group className="mb-6">
+						<Form.Label >Employé assigné</Form.Label>
+						<Form.Select
+							id="assignedEmployee"
+							onChange={(e) => setEmployeeId(e.target.value)} 
+							defaultValue={props.resource}
+						>
+							{props.employees.map((employee) => (
+								<option 
+									value={employee.employeeId} 
+									key={employee.employeeId}
+								>
+									{employee.firstName} {employee.lastName}
+								</option>
+							))}
+						</Form.Select>
+					</Form.Group>
 					<Form.Group className="mb-3">
-						<Form.Label>Start moment</Form.Label>
+						<Form.Label>Début du quart de travail</Form.Label>
 						<Form.Control
 							id="start"
 							type="datetime-local"
 							defaultValue={props.start}
 							step="1800"
-							min={min}
-							max={max}
 							onChange={(e) => {setStart(e.target.value);}}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidStartDate">
@@ -122,14 +136,12 @@ export function ComponentPopupSchedule(props: Props) {
 						</Form.Control.Feedback>
 					</Form.Group>
 					<Form.Group className="mb-3">
-						<Form.Label >End moment</Form.Label>
+						<Form.Label >Fin du quart de travail</Form.Label>
 						<Form.Control
 							id="end"
 							type="datetime-local"
 							defaultValue={props.end}
 							step="1800"
-							min={min}
-							max={max}
 							onChange={(e) => setEnd(e.target.value)}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidEndDate">
