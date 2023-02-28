@@ -130,7 +130,7 @@ service cloud.firestore {
                 let shiftDepartment = get(/databases/$(database)/documents/shifts/$(shiftId)).data.department;
                 let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
 
-                return !validShift && getCurrentEmployeeRole(request.auth.uid) >= 2 && isAllowed;
+                return !validShift && isAllowed;
             }
 
             function isManagerAllowed(documentDepartment) {
