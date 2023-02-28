@@ -1,4 +1,4 @@
-import React, {ChangeEvent} from "react";
+import React from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -6,8 +6,12 @@ import Col from "react-bootstrap/Col";
 
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Modal} from "react-bootstrap";
+import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
+import {JobTitle} from "../types/JobTitle";
+import {CgUnavailable} from "react-icons/cg";
 
 interface EditJobTitlesState {
+    editedJobTitle?: JobTitle;
     name: string;
     validated?: boolean;
     error: FormErrorType;
@@ -15,7 +19,7 @@ interface EditJobTitlesState {
 
 interface EditJobTitlesProps {
     cancelEdit: () => void;
-    jobTitles: string[];
+    jobTitles: JobTitle[];
     onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
     onEditJobTitle: (titleId: string, title: string) => PromiseLike<void> | Promise<void> | void;
     showEdit: boolean;
@@ -31,9 +35,10 @@ interface EditJobTitlesProps {
  */
 export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, EditJobTitlesState> {
     public state: EditJobTitlesState = {
+        editedJobTitle: undefined,
+        error: FormErrorType.NO_ERROR,
         name: "",
-        validated: false,
-        error: FormErrorType.NO_ERROR
+        validated: false
     };
 
     public props: EditJobTitlesProps;
@@ -46,26 +51,48 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
 
     public render(): JSX.Element {
         return <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
-            <Form
-                noValidate
-                validated={this.state.validated}
-                onSubmit={this.#handleSubmit}
-                onChange={this.#handleChange}
-                data-error={this.state.error}
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>Édition de corps d'emploi</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+
+            <Modal.Header closeButton>
+                <Modal.Title>Édition de corps d'emploi</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form
+                    noValidate
+                    validated={this.state.validated}
+                    onSubmit={this.#handleEditSubmit}
+                    onChange={this.#handleChange}
+                    data-error={this.state.error}>
+                    <Form.Label className="mt-2">Corps d'emplois</Form.Label>
+                    {this.props.jobTitles.map((title: JobTitle) => (
+                        <Row key={`row ${title.name}`} className="mb-3">
+                            <Form.Group key={`group ${title.name}`} as={Col} md="10">
+                                <Form.Control
+                                    key={title.name}
+                                    type="text"
+                                    name={title.name}
+                                    defaultValue={title.name}
+                                    disabled={!this.state.editedJobTitle}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.REQUIRED_JOB_TITLE_NAME}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+                            <Form.Group className="mt-1" as={Col} md="2">
+                                {this.renderActions(title)}
+                            </Form.Group>
+                        </Row>
+                    ))}
+                </Form>
+                <Form
+                    noValidate
+                    validated={this.state.validated}
+                    onSubmit={this.#handleAddSubmit}
+                    onChange={this.#handleChange}
+                    data-error={this.state.error}
+                >
                     <Row className="mb-3">
-                        {this.props.jobTitles.map((corps: string) => (<Form.Control
-                            key={corps}
-                            type="text"
-                            name={corps}
-                            className="jobTitles"
-                        />))}
-                        <Form.Group as={Col} md="6">
-                            <Form.Label className="mt-2">Nom</Form.Label>
+                        <Form.Label className="mt-2">Nouveau corps d'emploi</Form.Label>
+                        <Form.Group as={Col} md="10">
                             <Form.Control
                                 name="name"
                                 required
@@ -76,17 +103,21 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                                 {errors.REQUIRED_JOB_TITLE_NAME}
                             </Form.Control.Feedback>
                         </Form.Group>
+                        <Form.Group as={Col} md="2">
+                            <Button type="submit"><BiPlus className="adminActions mb-1"/></Button>
+                        </Form.Group>
                     </Row>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => this.hideModal()}>
-                        Close
-                    </Button>
-                    <Button variant="primary" type="submit">
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Form>
+                </Form>
+
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => this.hideModal()}>
+                    Fermer
+                </Button>
+                <Button variant="primary" type="submit">
+                    Sauvegarder
+                </Button>
+            </Modal.Footer>
         </Modal>
     }
 
@@ -94,12 +125,52 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         this.props.cancelEdit();
     }
 
+    private renderActions(title: JobTitle): JSX.Element {
+        if (this.state.editedJobTitle) {
+            return <div><BiCheck/> <CgUnavailable/></div>
+        } else {
+            return <div><BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/><BiTrash
+                className="adminActions ms-2"/></div>
+        }
+    }
+
+    private editJobTitle(title: JobTitle) {
+        this.setState({editedJobTitle: title})
+    }
+
     /**
-     * Function that is called when the form is submitted.
+     * Function that is called when the add form is submitted.
      * @param event The event that triggered the function
      * @private
      */
-    readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    readonly #handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+        let errorType = this.validateForm(event);
+
+        let eventTarget: any = event.target;
+        let formData = new FormData(eventTarget);
+        let formDataObj: JobTitle = Object.fromEntries(formData.entries()) as unknown as JobTitle;
+
+        if (errorType === FormErrorType.NO_ERROR) {
+            if(formDataObj.id) {
+                await this.props.onEditJobTitle(formDataObj.id, formDataObj.name);
+            }
+        }
+    }
+
+    /**
+     * Function that is called when the add form is submitted.
+     * @param event The event that triggered the function
+     * @private
+     */
+    readonly #handleAddSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+        let errorType = this.validateForm(event);
+
+        if (errorType === FormErrorType.NO_ERROR) {
+            await this.props.onAddJobTitle(this.state.name);
+        }
+    }
+
+    private validateForm(event: React.FormEvent<HTMLFormElement>) {
         const form = event.currentTarget;
         let isValid = form.checkValidity();
 
@@ -115,10 +186,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             validated: true,
             error: errorType,
         });
-
-        if (errorType === FormErrorType.NO_ERROR) {
-            await this.props.onAddJobTitle(this.state.name);
-        }
+        return errorType;
     }
 
     /**
@@ -138,21 +206,6 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         this.setState({
             ...{}, ...{
                 [name]: value,
-            }
-        });
-    }
-
-    /**
-     * Function that is called when the select is changed. This update the state of the component.
-     * @param event The event that triggered the function
-     * @private
-     */
-    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
-        const target = event.target;
-
-        this.setState({
-            ...this.state, ...{
-                [target.id]: target.value
             }
         });
     }

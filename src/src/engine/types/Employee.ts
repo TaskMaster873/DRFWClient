@@ -1,5 +1,7 @@
 import {Department} from "./Department";
-import {Params, useParams} from "react-router-dom";
+import {Params} from "react-router-dom";
+import {Skill} from "./skill";
+import {JobTitle} from "./JobTitle";
 
 /**
  * Liste d'employé
@@ -88,8 +90,8 @@ export interface EmployeeProps {
 export interface AddEmployeeProps {
     departments: Department[];
     roles: string[];
-    jobTitles: string[];
-    skills: string[];
+    jobTitles: JobTitle[];
+    skills: Skill[];
     onAddEmployee: (password : string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
     onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
     onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
@@ -100,7 +102,8 @@ export interface AddEmployeeProps {
 export interface EditEmployeeProps {
     departments: Department[];
     roles: string[];
-    jobTitles: string[];
+    jobTitles: JobTitle[];
+    skills: Skill[];
     employeeId?: string | null;
     editedEmployee: EmployeeEditDTO | undefined;
     onEditEmployee: (employeeId: string, employee: EmployeeEditDTO) => PromiseLike<void> | Promise<void> | void;
@@ -109,8 +112,8 @@ export interface EditEmployeeProps {
 }
 
 export type EmployeeRoleList = string[];
-export type EmployeeJobTitleList = string[];
-export type EmployeeSkillList = string[];
+export type EmployeeJobTitleList = JobTitle[];
+export type EmployeeSkillList = Skill[];
 
 export interface AddEmployeeState {
     departments: Department[];

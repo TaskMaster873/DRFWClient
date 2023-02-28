@@ -10,6 +10,7 @@ import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
 import {ComponentEditSkills} from "./ComponentEditSkills";
 import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
+import {Skill} from "../types/skill";
 
 interface ComponentAddEmployeeState extends Employee {
     showEditJobTitles: boolean,
@@ -153,23 +154,25 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 <Row className="mb-3">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label><Button onClick={() => this.#onShowEditJobTitles()} className="float-end">+</Button>
-                        {this.props.jobTitles.map((corps) => (<Form.Check
-                            key={`${corps}`}
+                        {this.props.jobTitles.map((title) => (<Form.Check
+                            key={title.name}
                             type="checkbox"
-                            name={`${corps}`}
-                            label={`${corps}`}
+                            name={title.name}
+                            label={title.name}
                         />))}
-                        <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditJobTitles} jobTitles={this.state.jobTitles} onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle} ></ComponentEditJobTitles>
+                        <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
+                                                onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle} ></ComponentEditJobTitles>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Compétences</Form.Label><Button onClick={() => this.#onShowEditSkills()} className="float-end">+</Button>
-                        {this.props.skills.map((skill) => (<Form.Check
-                            key={`${skill}`}
+                        {this.props.skills.map((skill: Skill) => (<Form.Check
+                            key={skill.name}
                             type="checkbox"
-                            name={`${skill}`}
-                            label={`${skill}`}
+                            name={skill.name}
+                            label={skill.name}
                         />))}
-                        <ComponentEditSkills cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditSkills} onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}></ComponentEditSkills>
+                        <ComponentEditSkills cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditSkills} skills={this.props.jobTitles}
+                                             onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}></ComponentEditSkills>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
@@ -203,7 +206,6 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
 
     readonly #onShowEditJobTitles = (value: boolean = true): void => {
         this.setState({showEditJobTitles: value})
-        console.log(this.state.showEditJobTitles)
     }
 
     readonly #onShowEditSkills = (value: boolean = true): void => {

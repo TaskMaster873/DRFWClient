@@ -9,6 +9,7 @@ import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {API} from "../api/APIManager";
 import {RegexUtil} from "../utils/RegexValidator";
+import {JobTitle} from "../types/JobTitle";
 
 interface ComponentEditEmployeeState {
     validated?: boolean;
@@ -104,16 +105,15 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label className="w-100">Corps d'emploi <Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
-                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) =>
+                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((title: JobTitle) =>
                             <Form.Check
-                            name={corps}
-                            key={corps}
+                            name={title.name}
+                            key={title.name}
                             type="checkbox"
-                            id={corps}
                             className="jobTitles"
-                            label={corps}
+                            label={title.name}
                             value={this.props.editedEmployee?.jobTitles}
-                        />) : <p className="mt-1 noneJobTitle">Aucun corps d'emplois</p>}
+                        />) : <p className="mt-1 noneJobTitle">Aucun title d'emplois</p>}
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>

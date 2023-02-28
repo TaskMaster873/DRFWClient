@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Modal} from "react-bootstrap";
+import {Skill} from "../types/skill";
 
 interface EditSkillsState {
     name: string;
@@ -14,6 +15,7 @@ interface EditSkillsState {
 }
 
 interface EditSkillsProps {
+    skills: Skill[];
     cancelEdit: () => void;
     onAddSkill: (skill) => PromiseLike<void> | Promise<void> | void;
     onEditSkill: (skillId: string, skill: string) => PromiseLike<void> | Promise<void> | void;

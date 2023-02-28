@@ -42,14 +42,18 @@ export const successes = {
     EMAIL_SENT: "Un courriel a bien été envoyé !",
     EMPLOYEE_CREATED: "Un nouvel employé a été ajouté avec succès !",
     DEPARTMENT_CREATED: "Un nouveau département a été ajouté avec succès !",
+    JOB_TITLE_CREATED: "Un nouveau corps d'emploi a été ajouté avec succès !",
+    SKILL_CREATED: "Un nouvelle compétence a été ajouté avec succès !",
     LOGIN_SUCCESS: "Vous êtes maintenant connecté !",
     LOGOUT_SUCCESS: "Vous êtes maintenant déconnecté !",
     CHANGE_PASSWORD: "Le changement de mot de passe a bien été effectué !",
     RESET_PASSWORD: "Le mot de passe a bien été mis à jour !",
     EMPLOYEE_ACTIVATED: "L'employé a bien été activé !",
     EMPLOYEE_DEACTIVATED: "L'employé a bien été désactivé !",
-    EMPLOYEE_EDITED: `L'employé a bien été modifié !`,
-    DEPARTMENT_EDITED: `Le département a bien été modifié`
+    EMPLOYEE_EDITED: "L'employé a bien été modifié !",
+    DEPARTMENT_EDITED: "Le département a bien été modifié",
+    JOB_TITLE_EDITED: "Le corps d'emploi a bien été modifié",
+    SKILL_EDITED: "La compétence a bien été modifié"
 
 }
 

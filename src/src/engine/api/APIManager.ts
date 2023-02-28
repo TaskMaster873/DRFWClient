@@ -52,6 +52,8 @@ import {
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {Utils} from "./APIUtils";
+import {JobTitle} from "../types/JobTitle";
+import {Skill} from "../types/skill";
 
 type SubscriberCallback =
     () =>
@@ -1101,14 +1103,14 @@ class APIManager extends Logger {
      */
     public async getJobTitles(): Promise<EmployeeJobTitleList | string> {
         let errorMessage: string | null = null;
-        let jobTitles: string[] = [];
+        let jobTitles: JobTitle[] = [];
         let queryJobTitles = query(collection(this.#db, `jobTitles`));
         let snaps = await getDocs(queryJobTitles).catch((error) => {
             errorMessage = Utils.getErrorMessageFromCode(error);
         });
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
-                jobTitles.push(doc.data().name);
+                jobTitles.push(new JobTitle({id: doc.id, name: doc.data().name}));
             });
         }
         return errorMessage ?? jobTitles;
@@ -1116,14 +1118,14 @@ class APIManager extends Logger {
 
     public async getSkills(): Promise<EmployeeSkillList | string> {
         let errorMessage: string | null = null;
-        let skills: string[] = [];
+        let skills: Skill[] = [];
         let querySkills = query(collection(this.#db, `skills`));
         let snaps = await getDocs(querySkills).catch((error) => {
             errorMessage = Utils.getErrorMessageFromCode(error);
         });
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
-                skills.push(doc.data().name);
+                skills.push(new Skill({id: doc.id, name: doc.data().name}));
             });
         }
         return errorMessage ?? skills;

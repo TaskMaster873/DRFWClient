@@ -150,6 +150,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
+                skills={this.state.skills}
                 editedEmployee={this.state.editedEmployee}
                 employeeId={this.props.params.id}
                 onEditEmployee={this.#editEmployee}

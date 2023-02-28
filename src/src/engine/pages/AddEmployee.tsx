@@ -24,11 +24,11 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         redirectTo: null
     }
 
-    public async componentDidMount() : Promise<void> {
+    public async componentDidMount(): Promise<void> {
         document.title = "Ajouter un Employé - TaskMaster";
 
         let isLoggedIn: boolean = await this.verifyLogin();
-        if(isLoggedIn) {
+        if (isLoggedIn) {
             let departments = API.getDepartments();
             let roles = API.getRoles();
             let titles = API.getJobTitles();
@@ -41,7 +41,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                     EmployeeSkillList | string
             ] = await Promise.all([departments, roles, titles, skills]);
 
-            if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray((params[3]))) {
+            if (Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray((params[3]))) {
                 this.setState({departments: params[0], roles: params[1], titles: params[2], skills: params[3]});
             } else {
                 NotificationManager.error(errors.GET_DEPARTMENTS, errors.SERVER_ERROR);
@@ -94,7 +94,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @param password {string} The password of the employee
      * @param employee {EmployeeCreateDTO} The employee to add
      */
-    readonly #addEmployee = async (password : string, employee: EmployeeCreateDTO) : Promise<void> => {
+    readonly #addEmployee = async (password: string, employee: EmployeeCreateDTO): Promise<void> => {
         let error = await API.createEmployee(password, employee);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
@@ -103,52 +103,56 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
+    //#region JobTitles
     /**
      * Add an jobTitle to the database
      * @param title The jobTitle
      */
-    readonly #addJobTitle = async (title: string) : Promise<void> => {
+    readonly #addJobTitle = async (title: string): Promise<void> => {
         let error = await API.createJobTitle(title);
         if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_CREATED);
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
 
-    readonly #editJobTitle = async (titleId: string, title: string) : Promise<void> => {
+    readonly #editJobTitle = async (titleId: string, title: string): Promise<void> => {
         let error = await API.editJobTitle(titleId, title);
         if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_EDITED);
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
+    //#endregion
 
+    //#region Skills
     /**
-     * Add an jobTitle to the database
+     * Add a skill to the database
      * @param title The jobTitle
      */
-    readonly #addSkill = async (title: string) : Promise<void> => {
+    readonly #addSkill = async (title: string): Promise<void> => {
         let error = await API.createSkill(title);
         if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_CREATED);
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
 
-    readonly #editSkill = async (titleId: string, title: string) : Promise<void> => {
+    readonly #editSkill = async (titleId: string, title: string): Promise<void> => {
         let error = await API.editSkill(titleId, title);
         if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
         } else {
             NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
         }
     }
+    //#endregion
 
     public render(): JSX.Element {
-        if(this.state.redirectTo) {
+        if (this.state.redirectTo) {
             return (<Navigate to={this.state.redirectTo}></Navigate>);
         }
 
