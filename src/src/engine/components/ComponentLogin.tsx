@@ -8,6 +8,7 @@ import { Routes } from "../api/routes/Routes";
 import { ComponentPropsLogin } from "../types/ComponentPropsType";
 import Logo from "../../deps/images/logo.png";
 import {RoutesPath} from "../RoutesPath";
+import {FormUtils} from "../utils/FormUtils";
 
 interface ComponentStateLogin {
     emailLogin: string;
@@ -126,16 +127,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
     }
 
     readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-        let errorType = FormErrorType.NO_ERROR;
-
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
+        let errorType = FormUtils.validateForm(event);
 
         this.setState({
             validated: true,

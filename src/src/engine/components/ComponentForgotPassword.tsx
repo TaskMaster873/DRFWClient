@@ -5,6 +5,7 @@ import {errors, FormErrorType, info} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
 import Logo from "../../deps/images/logo.png";
 import {NotificationManager} from "../api/NotificationManager";
+import {FormUtils} from "../utils/FormUtils";
 /***
  * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un courriel
  */
@@ -14,16 +15,7 @@ export function ComponentForgotPassword() {
     const [error, setError] = useState(FormErrorType.NO_ERROR);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-        let errorType = FormErrorType.NO_ERROR;
-
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
+        let errorType = FormUtils.validateForm(event);
 
         setValidated(true);
         setError(errorType);

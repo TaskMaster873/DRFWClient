@@ -11,6 +11,7 @@ import {API} from "../api/APIManager";
 import {ComponentEditSkills} from "./ComponentEditSkills";
 import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
 import {Skill} from "../types/skill";
+import {FormUtils} from "../utils/FormUtils";
 
 interface ComponentAddEmployeeState extends Employee {
     showEditJobTitles: boolean,
@@ -225,19 +226,12 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
      * @memberof CreateEmployee
      */
     readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        let errorType = FormErrorType.NO_ERROR;
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
+        let errorType = FormUtils.validateForm(event);
         this.setState({
-            validated: true, error: errorType,
+            validated: true,
+            error: errorType
         });
+
         if (errorType === FormErrorType.NO_ERROR) {
             let employee: EmployeeCreateDTO = {
                 firstName: this.state.firstName,

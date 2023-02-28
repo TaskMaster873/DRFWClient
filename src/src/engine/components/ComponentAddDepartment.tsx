@@ -8,6 +8,7 @@ import { errors, FormErrorType } from "../messages/FormMessages";
 
 import { Department } from "../types/Department";
 import { Employee } from "../types/Employee";
+import {FormUtils} from "../utils/FormUtils";
 
 interface AddDepartmentState {
     name: string;
@@ -101,16 +102,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
      * @private
      */
     readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        let errorType = FormErrorType.NO_ERROR;
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
+        let errorType = FormUtils.validateForm(event);
 
         this.setState({
             validated: true,
