@@ -6,7 +6,7 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {RecursiveAvailabilities} from "../types/EmployeeAvailabilities";
 import {errors, FormErrorType} from '../messages/FormMessages';
 import {Timestamp} from "firebase/firestore";
-import {ManagerDate} from '../utils/DateManager';
+import {DateManager} from '../utils/DateManager';
 
 type Props = {
 	availabilityAdd: (start?: Timestamp, end?: Timestamp) => Promise<void>;
@@ -48,7 +48,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 
 		if (errorType === FormErrorType.NO_ERROR) {
 			setDisabled(true);
-			props.availabilityAdd(ManagerDate.getFirebaseTimestamp(props.start), ManagerDate.getFirebaseTimestamp(props.end));
+			props.availabilityAdd(DateManager.getFirebaseTimestamp(props.start), DateManager.getFirebaseTimestamp(props.end));
 			closeModal();
 		}
 	};
