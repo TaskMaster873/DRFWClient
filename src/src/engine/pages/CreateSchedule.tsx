@@ -13,7 +13,7 @@ import {NotificationManager} from "../api/NotificationManager";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import {Roles} from "../types/Roles";
-import {Converter} from "../utils/DateConverter";
+import {DateManager} from "../utils/DateManager";
 
 enum FetchState {
     WAITING = 0,
@@ -228,8 +228,8 @@ export class CreateSchedule extends React.Component<unknown, State> {
     private getEventsForCalendarFromShifts(shifts: Shift[]): EventForCalendar[] {
         let events: EventForCalendar[] = [];
         for (let shift of shifts) {
-            let startText = Converter.convertTimestampToDayPilotDate(shift.start);
-            let endText = Converter.convertTimestampToDayPilotDate(shift.end);
+            let startText = DateManager.convertTimestampToDayPilotDate(shift.start);
+            let endText = DateManager.convertTimestampToDayPilotDate(shift.end);
             events.push({
                 id: shift.id,
                 text: `${startText} à ${endText}`,
