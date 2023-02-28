@@ -5,6 +5,8 @@ import {ManagerDate} from '../utils/DateManager';
 import { DayPilot } from "daypilot-pro-react";
 
 import '../../deps/css/daypilot_custom.css';
+import {ComponentAvailabilitiesPopup} from "../components/ComponentAvailabilitiesPopup";
+import {EventForShiftCreation} from "../types/Shift";
 
 /**
  * Ceci est la page pour ajouter un employé
@@ -107,6 +109,11 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                                          startDate={new DayPilot.Date(this.state.currentWeekStart)}
                                          selectionDay={new DayPilot.Date(this.state.selectedDate)}
                                          employeeAvailabilities={this.state.timesUnavailable} />
+                <ComponentAvailabilitiesPopup availabilityAdd={function (shiftEvent: EventForShiftCreation): Promise<void> {
+                    throw new Error("Function not implemented.");
+                } } hideModal={function (): void {
+                    throw new Error("Function not implemented.");
+                } } isShown={false} start={undefined} end={undefined}></ComponentAvailabilitiesPopup>
             </div>
         );
     }
