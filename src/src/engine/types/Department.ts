@@ -1,11 +1,15 @@
 import {Employee} from "./Employee";
 import {FormErrorType} from "../messages/FormMessages";
 
-export interface DepartmentListState {
+export interface DepartmentsState {
     employees: Employee[];
     employeeNb: number[];
     departments: Department[];
     redirectTo: string | null;
+}
+
+export interface DepartmentListState {
+    editedDepartment?: Department;
 }
 
 /**
@@ -26,10 +30,13 @@ export class Department {
 export let departmentTableHeads : string[] =
     ["#", "Nom", "Directeur/Gérant", "Nombre d'employés"];
 
+export let departmentAdminTableHeads : string[] =
+    ["#", "Nom", "Directeur/Gérant", "Nombre d'employés", "Actions"];
+
 /**
  * Contient tous les renseignements pour créer un nouveau département dans la bd
  */
-export interface DepartmentCreateDTO {
+export interface DepartmentModifyDTO {
 	readonly name: string;
     readonly director: string;
 }
@@ -45,7 +52,7 @@ export interface DepartmentListProps {
     employeeNb: number[],
     departments: Department[],
     onAddDepartment: (department) => PromiseLike<void> | Promise<void> | void;
-    onEditDepartment: (department) => PromiseLike<void> | Promise<void> | void;
+    onEditDepartment: (departmentId: string, department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
 }
 
 

@@ -59,14 +59,14 @@ service cloud.firestore {
             match /departments/{departmentId} {
                 allow read;
                 allow create: if isValidDepartment(departmentId);
-
+                allow update: if isValidDepartment(departmentId);
             }
 
             function isValidDepartment(departmentId) {
                 let createdValidDepartment = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
                 let hasFields = request.resource.data.keys().hasOnly(['name', 'director']);
 
-                return createdValidDepartment && hasFields && request.auth != null
+                return createdValidDepartment && hasFields
                        && getCurrentEmployeeRole(request.auth.uid) >= 3 && departmentFieldTypes();
             }
 
@@ -104,6 +104,13 @@ service cloud.firestore {
                 allow read;
                 allow create: if isValidShift(shiftId);
                 allow update: if isValidShift(shiftId);
+                allow delete: if isValidShiftDeletion(shiftId);
+            }
+
+            function isValidShiftDeletion(shiftId) {
+                let validShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+
+                return !validShift && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
 
             function isValidShift(shiftId) {
