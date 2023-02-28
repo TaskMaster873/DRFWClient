@@ -1,7 +1,7 @@
 import React from "react";
 import {DAYS, EmployeeAvailabilities, EventsForUnavailability, EmployeeRecursiveException, RecursiveAvailabilities, RecursiveAvailabilitiesList, EmployeeAvailabilitiesForCreate} from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
-import {ManagerDate} from '../utils/DateManager';
+import {DateManager} from '../utils/DateManager';
 import {DayPilot} from "daypilot-pro-react";
 
 import '../../deps/css/daypilot_custom.css';
@@ -26,8 +26,8 @@ export interface AvailabilitiesState {
  * NON TERMINER
  */
 let curr = new Date;
-let firstday = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0, 0, 0, 0));
-let lastday = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0, 0, 0, 0));
+let firstDay = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0, 0, 0, 0));
+let lastDay = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0, 0, 0, 0));
 
 export class Availabilities extends React.Component<unknown, AvailabilitiesState> {
 
@@ -140,10 +140,10 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         let unavailabilitiesInCalendar = this.componentAvailability?.getListFromTheCalendar();
         console.log(unavailabilitiesInCalendar);
         if (start) {
-           starts = ManagerDate.getDayPilotDateString(start);
+           starts = DateManager.getDayPilotDateString(start);
         }
         if (end) {
-            ends =  ManagerDate.getDayPilotDateString(end);
+            ends =  DateManager.getDayPilotDateString(end);
         }
        let date = this.toUTC(this.state.currentWeekStart);
 
