@@ -45,16 +45,18 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
      * @private
      */
     readonly #logout = async (): Promise<void> => {
-        let error = await API.logout();
-        if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGOUT_SUCCESS);
-        } else {
-            NotificationManager.error(errors.ERROR_LOGOUT, error);
-        }
+        if(API.isAuth()) {
+            let error = await API.logout();
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGOUT_SUCCESS);
+            } else {
+                NotificationManager.error(errors.ERROR_LOGOUT, error);
+            }
 
-        this.setState({
-            redirectTo: RoutesPath.INDEX
-        });
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
+        }
     }
 
     /**

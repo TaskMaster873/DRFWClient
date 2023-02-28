@@ -161,20 +161,20 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
      */
     readonly #isCellInStartToEndTimeRange = (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date): boolean => {
         for (let recursive of this.state.availabilities.recursiveExceptions) {
-            let canRenderData: boolean = true;
+            let canRenderWeeklyData: boolean = true;
             if (recursive.startDate) {
                 if (!this.isInTimeRangeFromStartDate(startDate.toDateLocal(), new Date(recursive.startDate))) {
-                    canRenderData = false;
+                    canRenderWeeklyData = false;
                 }
             }
 
-            if (recursive.endDate && canRenderData) {
+            if (recursive.endDate && canRenderWeeklyData) {
                 if (!this.isInTimeRangeFromEndDate(endDate.toDateLocal(), new Date(recursive.endDate))) {
-                    canRenderData = false;
+                    canRenderWeeklyData = false;
                 }
             }
 
-            if (canRenderData) {
+            if (canRenderWeeklyData) {
                 for (let day in recursive) {
                     if (day === 'startDate' || day === 'endDate') {
                         continue;
@@ -192,7 +192,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
                             let startDateTime = new Date(startDate.toDateLocal());
                             let endDateTime = new Date(endDate.toDateLocal());
-                            //console.log(eventStart, eventEnd, startDateTime, endDateTime, eventStart.getTime() >= startDateTime.getTime(), eventEnd.getTime() <= endDateTime.getTime());
 
                             if(eventStart.getTime() <= startDateTime.getTime() && endDateTime.getTime() <= eventEnd.getTime()) {
                                 return true;
@@ -245,7 +244,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                             let dayNumber = DAYS[DAYS[day]] as unknown as number;
 
                             const eventToPush = this.transformObjToEventForUnavailability(start, dayNumber, recursive[day][i]);
-                            //console.log(DAYS[day], DAYS[DAYS[day]], start, recursive[day][i], i, eventToPush);
                             listOfUnavailbility.push(eventToPush);
                         }
                     }
