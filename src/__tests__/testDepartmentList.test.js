@@ -12,7 +12,8 @@ import {departments, departments2, employeeNb, employees, employees2} from "../C
 jest.mock("../src/engine/api/APIManager");
 test("should render department informations", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
-                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb} onEditDepartment={jest.fn()}/></MemoryRouter>);
+                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb}
+                                                  onEditDepartment={jest.fn()}/></MemoryRouter>);
     const {
         table,
         ths,
@@ -29,7 +30,8 @@ test("should render department informations", async () => {
 
 test("should have correct length based on department list", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments2} employees={employees}
-                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb} onEditDepartment={jest.fn()}/></MemoryRouter>);
+                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb}
+                                                  onEditDepartment={jest.fn()}/></MemoryRouter>);
     const {
         ths,
         trs,
@@ -41,7 +43,8 @@ test("should have correct length based on department list", async () => {
 
 test("Table heads should have proper values", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
-                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb} onEditDepartment={jest.fn()}/></MemoryRouter>);
+          onAddDepartment={jest.fn()} employeeNb={employeeNb}
+          onEditDepartment={jest.fn()}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
@@ -51,7 +54,8 @@ test("Table heads should have proper values", async () => {
 
 test("Table heads should have proper values 2", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments2} employees={employees2}
-                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb} onEditDepartment={jest.fn()}/></MemoryRouter>);
+           onAddDepartment={jest.fn()} employeeNb={employeeNb}
+           onEditDepartment={jest.fn()}/></MemoryRouter>);
     const {
         ths,
     } = getFields();
@@ -61,7 +65,8 @@ test("Table heads should have proper values 2", async () => {
 
 test("Department number should be incremental", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
-                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb} onEditDepartment={jest.fn()}/></MemoryRouter>);
+            onAddDepartment={jest.fn()} employeeNb={employeeNb}
+            onEditDepartment={jest.fn()}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -74,7 +79,8 @@ test("Department number should be incremental", async () => {
 
 test("Department number should be incremental 2", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
-                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb} onEditDepartment={jest.fn()}/></MemoryRouter>);
+           onAddDepartment={jest.fn()} employeeNb={employeeNb}
+           onEditDepartment={jest.fn()}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -87,7 +93,8 @@ test("Department number should be incremental 2", async () => {
 
 test("Department fields should match employee infos", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments} employees={employees}
-                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb} onEditDepartment={jest.fn()}/></MemoryRouter>);
+            onAddDepartment={jest.fn()} employeeNb={employeeNb}
+            onEditDepartment={jest.fn()}/></MemoryRouter>);
     const {
         trs,
         ths,
@@ -100,7 +107,8 @@ test("Department fields should match employee infos", async () => {
 
 test("Department fields should match employee infos 2", async () => {
     render(<MemoryRouter><ComponentDepartmentList departments={departments2} employees={employees2}
-                                                  onAddDepartment={jest.fn()} employeeNb={employeeNb} onEditDepartment={jest.fn()}/></MemoryRouter>);
+           onAddDepartment={jest.fn()} employeeNb={employeeNb}
+           onEditDepartment={jest.fn()}/></MemoryRouter>);
     const {
         trs,
         ths,

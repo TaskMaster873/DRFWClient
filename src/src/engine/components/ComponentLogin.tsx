@@ -8,7 +8,7 @@ import { Routes } from "../api/routes/Routes";
 import { ComponentPropsLogin } from "../types/ComponentPropsType";
 import Logo from "../../deps/images/logo.png";
 import {RoutesPath} from "../RoutesPath";
-import {FormUtils} from "../utils/FormUtils";
+import FormUtils from "../utils/FormUtils";
 
 interface ComponentStateLogin {
     emailLogin: string;

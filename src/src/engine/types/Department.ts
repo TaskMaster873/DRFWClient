@@ -22,7 +22,7 @@ export class Department implements IdElement {
 
     constructor(department: DepartmentDTO) {
         this.id = department.id;
-		this.name = department.name;
+        this.name = department.name;
         this.director = department.director;
 	}
 }

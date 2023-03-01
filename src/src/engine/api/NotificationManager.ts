@@ -17,6 +17,12 @@ class InternalNotificationManager {
         return hasProcess;
     }
 
+    /**
+     * This method shows a notification displayed in the user interface
+     * @param title the notification title
+     * @param message the notification message below title
+     * @param type the notification type
+     */
     private showNotification(title: string, message: string, type: NOTIFICATION_TYPE | undefined) : void {
         if(Store && Store.addNotification && !this.hasProcess()) {
             Store.addNotification({

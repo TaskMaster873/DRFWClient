@@ -10,7 +10,7 @@ import {Department} from "../types/Department";
 import {API} from "../api/APIManager";
 import {RegexUtil} from "../utils/RegexValidator";
 import {JobTitle} from "../types/JobTitle";
-import {FormUtils} from "../utils/FormUtils";
+import FormUtils from "../utils/FormUtils";
 
 interface ComponentEditEmployeeState {
     validated?: boolean;
@@ -221,6 +221,5 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 [target.id]: target.value
             }
         });
-        console.log(this.state);
     }
 }

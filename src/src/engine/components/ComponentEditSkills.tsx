@@ -9,7 +9,7 @@ import {Modal} from "react-bootstrap";
 import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
 import {Skill} from "../types/Skill";
 import {CgUnavailable} from "react-icons/cg";
-import {FormUtils} from "../utils/FormUtils";
+import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteSkill} from "./ComponentConfirmDeleteSkill";
 
 interface EditSkillsState {
@@ -57,9 +57,9 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
     }
 
     public render(): JSX.Element {
-        return <div><ComponentConfirmDeleteSkill closePrompt={() => this.#onShowConfirmDeleteSkills(undefined)}
+        return <div><ComponentConfirmDeleteSkill closePrompt={this.#onShowConfirmDeleteSkills}
                                                     skill={this.state.skillToDelete} onDeleteSkill={this.props.onDeleteSkill}/>
-            <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
+            <Modal show={this.props.showEdit} onHide={this.hideModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Édition de compétence</Modal.Title>
                 </Modal.Header>
@@ -116,23 +116,17 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                             </Form.Group>
                         </Row>
                     </Form>
-
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => this.hideModal()}>
-                        Fermer
-                    </Button>
-                </Modal.Footer>
             </Modal>
         </div>
     }
 
-    private hideModal() {
+    readonly hideModal = (): void => {
         this.props.cancelEdit();
     }
 
-    readonly #onShowConfirmDeleteSkills = (value: Skill | undefined): void => {
-        this.setState({skillToDelete: value})
+    readonly #onShowConfirmDeleteSkills = (value?: Skill): void => {
+        this.setState({skillToDelete: value});
     }
 
 
@@ -148,7 +142,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
     }
 
     private editSkill(skill: Skill | undefined) {
-        this.setState({editedSkill: skill})
+        this.setState({editedSkill: skill});
     }
 
     private showDeletePrompt(skill: Skill) {
@@ -208,7 +202,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         }
 
         this.setState({
-            ...{}, ...{
+            ...this.state, ...{
                 [name]: value,
             }
         });

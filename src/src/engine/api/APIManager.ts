@@ -15,7 +15,6 @@ import {
     connectFirestoreEmulator,
     deleteDoc,
     doc,
-    DocumentData,
     enableIndexedDbPersistence,
     Firestore,
     getDoc,
@@ -56,6 +55,7 @@ import {JobTitle} from "../types/JobTitle";
 import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
 import {EmployeeInfos} from "./types/APITypes";
+import {NotificationManager} from "./NotificationManager";
 
 type SubscriberCallback =
     () =>
@@ -135,7 +135,7 @@ class APIManager extends Logger {
 
     //region GETTERS
     /**
-     * Return the current user role.
+     * Returns the current user role.
      * @readonly
      * @type {number}
      * @memberof APIManager
@@ -146,7 +146,7 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method return the current employee name.
+     * This method returns the current employee name.
      * @readonly
      * @type {string}
      * @memberof APIManager
@@ -161,7 +161,7 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method return if the user is authenticated or not.
+     * This method returns if the user is authenticated or not.
      * @returns {boolean} True if the user is authenticated, false otherwise.
      * @memberof APIManager
      * @method isAuth
@@ -171,7 +171,7 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method return if the current user has the given permissions.
+     * This method returns true if the current user has the given permissions.
      * @param permissionLevel The permission level to check.
      * @returns {boolean} True if the user has the given permissions, false otherwise.
      */
@@ -180,7 +180,7 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method return if the current user has a lower permission than the given one.
+     * This method returns true if the current user has a lower permission than the given one.
      * @param permissionLevel The permission level to check.
      * @returns {boolean} True if the user has a lower permission than the given one, false otherwise.
      */
@@ -403,12 +403,12 @@ class APIManager extends Logger {
         this.log("Logging out user...");
         let errorMessage: string | null = null;
 
-        if (this.isAuth()) {
+        if (this.isAuthenticated) {
             await FirebaseAuth.signOut(this.#auth).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
 
-            this.#employeeInfos.role = -1;
+            this.#employeeInfos.role = 0;
 
             await this.onEvent();
         }
@@ -457,9 +457,14 @@ class APIManager extends Logger {
                     } else {
                         this.isAuthenticated = true;
                         this.#user = user;
-                        this.#employeeInfos = await this.getEmployeeInfos(
-                            user.uid
-                        );
+                        let result = await this.getEmployeeInfos(user.uid);
+                        if(typeof result === "string") {
+                            NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
+                            this.#employeeInfos.role = 0;
+                            this.#employeeInfos.department = undefined;
+                        } else {
+                            this.#employeeInfos = result;
+                        }
 
                         console.log("user", user);
                         console.log("employeeInfos", this.#employeeInfos);
@@ -1113,25 +1118,24 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method is used to get the current employee's role. If the request was not successful, it will return an error message.
+     * This method is used to get employee information. If the request was not successful, it will return an error message.
      * @param uid The ID of the employee.
-     * @method getCurrentEmployeeRole
+     * @method getEmployeeInfos
      * @async
      * @public
      * @memberof APIManager
      * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
      */
-    public async getEmployeeInfos(uid: string): Promise<EmployeeInfos> {
+    public async getEmployeeInfos(uid: string): Promise<EmployeeInfos | string> {
+        let errorMessage: string | null = null;
         let employeeInfos: EmployeeInfos = {role: 0, department: undefined};
-        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
-            (error) => {
-                APIUtils.getErrorMessageFromCode(error);
-            }
-        );
+        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
         if (employee) {
             employeeInfos = employee.data() as EmployeeInfos;
         }
-        return employeeInfos;
+        return errorMessage ?? employeeInfos;
     }
 
     /**
@@ -1265,9 +1269,8 @@ class APIManager extends Logger {
         let shifts: Shift[] = [];
 
         //Validate permissions
-        if (!this.isAuthenticated) return errors.PERMISSION_DENIED;
-        if (!this.hasPermission(Roles.ADMIN)) {
-            //TODO: pass if user is director
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && department.name === this.#employeeInfos.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
 

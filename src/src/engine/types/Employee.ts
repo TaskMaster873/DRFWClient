@@ -27,11 +27,11 @@ export class Employee {
 
     constructor(employee: EmployeeDTO) {
         this.id = employee.employeeId;
-		this.firstName = employee.firstName;
+        this.firstName = employee.firstName;
         this.lastName = employee.lastName;
         this.email = employee.email;
         this.isActive = employee.isActive;
-		this.phoneNumber = employee.phoneNumber;
+        this.phoneNumber = employee.phoneNumber;
         this.department = employee.department;
         this.jobTitles = employee.jobTitles;
         this.skills = employee.skills;

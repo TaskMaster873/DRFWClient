@@ -9,7 +9,7 @@ import {Modal} from "react-bootstrap";
 import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
 import {JobTitle} from "../types/JobTitle";
 import {CgUnavailable} from "react-icons/cg";
-import {FormUtils} from "../utils/FormUtils";
+import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
 
 interface EditJobTitlesState {
@@ -57,101 +57,99 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     }
 
     public render(): JSX.Element {
-        return <div><ComponentConfirmDeleteJobTitle closePrompt={() => this.#onShowConfirmDeleteJobTitles(undefined)}
-                                                    jobTitle={this.state.jobTitleToDelete} onDeleteJobTitle={this.props.onDeleteJobTitle}/>
-        <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
-            <Modal.Header closeButton>
-                <Modal.Title>Édition de corps d'emploi</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form
-                    noValidate
-                    validated={this.state.editValidated}
-                    onSubmit={this.#handleEditSubmit}
-                    onChange={this.#handleChange}
-                    data-error={this.state.editError}>
-                    <Form.Label className="mt-2">Corps d'emplois</Form.Label>
-                    {this.props.jobTitles.map((title: JobTitle) => (
-                        <Row key={`row ${title.name}`} className="mb-3">
-                            <Form.Group key={`group ${title.name}`} as={Col} md="10">
+        return <div><ComponentConfirmDeleteJobTitle closePrompt={this.#onShowConfirmDeleteJobTitles}
+                                                    jobTitle={this.state.jobTitleToDelete}
+                                                    onDeleteJobTitle={this.props.onDeleteJobTitle}/>
+            <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Édition de corps d'emploi</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form
+                        noValidate
+                        validated={this.state.editValidated}
+                        onSubmit={this.#handleEditSubmit}
+                        onChange={this.#handleChange}
+                        data-error={this.state.editError}>
+                        <Form.Label className="mt-2">Corps d'emplois</Form.Label>
+                        {this.props.jobTitles.map((title: JobTitle) => (
+                            <Row key={`row ${title.name}`} className="mb-3">
+                                <Form.Group key={`group ${title.name}`} as={Col} md="10">
+                                    <Form.Control
+                                        key={title.name}
+                                        type="text"
+                                        name="name"
+                                        defaultValue={title.name}
+                                        disabled={this.state.editedJobTitle != title}
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {errors.REQUIRED_JOB_TITLE_NAME}
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group className="mt-1" as={Col} md="2">
+                                    {this.renderActions(title)}
+                                </Form.Group>
+                            </Row>
+                        ))}
+                    </Form>
+                    <Form
+                        noValidate
+                        validated={this.state.addValidated}
+                        onSubmit={this.#handleAddSubmit}
+                        onChange={this.#handleChange}
+                        data-error={this.state.addError}
+                    >
+                        <Row className="mb-3">
+                            <Form.Label className="mt-2">Nouveau corps d'emploi</Form.Label>
+                            <Form.Group as={Col} md="10">
                                 <Form.Control
-                                    key={title.name}
-                                    type="text"
                                     name="name"
-                                    defaultValue={title.name}
-                                    disabled={this.state.editedJobTitle != title}
+                                    required
+                                    type="text"
+                                    placeholder="Nom"
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     {errors.REQUIRED_JOB_TITLE_NAME}
                                 </Form.Control.Feedback>
                             </Form.Group>
-                            <Form.Group className="mt-1" as={Col} md="2">
-                                {this.renderActions(title)}
+                            <Form.Group as={Col} md="2">
+                                <Button type="submit"><BiPlus className="adminActions mb-1"/></Button>
                             </Form.Group>
                         </Row>
-                    ))}
-                </Form>
-                <Form
-                    noValidate
-                    validated={this.state.addValidated}
-                    onSubmit={this.#handleAddSubmit}
-                    onChange={this.#handleChange}
-                    data-error={this.state.addError}
-                >
-                    <Row className="mb-3">
-                        <Form.Label className="mt-2">Nouveau corps d'emploi</Form.Label>
-                        <Form.Group as={Col} md="10">
-                            <Form.Control
-                                name="name"
-                                required
-                                type="text"
-                                placeholder="Nom"
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {errors.REQUIRED_JOB_TITLE_NAME}
-                            </Form.Control.Feedback>
-                        </Form.Group>
-                        <Form.Group as={Col} md="2">
-                            <Button type="submit"><BiPlus className="adminActions mb-1"/></Button>
-                        </Form.Group>
-                    </Row>
-                </Form>
-
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={() => this.hideModal()}>
-                    Fermer
-                </Button>
-            </Modal.Footer>
-        </Modal>
+                    </Form>
+                </Modal.Body>
+            </Modal>
         </div>
     }
 
-    private hideModal() {
+    readonly hideModal = (): void => {
         this.props.cancelEdit();
     }
 
-    readonly #onShowConfirmDeleteJobTitles = (value: JobTitle | undefined): void => {
-        this.setState({jobTitleToDelete: value})
+    readonly #onShowConfirmDeleteJobTitles = (value?: JobTitle): void => {
+        this.setState({jobTitleToDelete: value});
     }
-
 
     private renderActions(title: JobTitle): JSX.Element {
         if (this.state.editedJobTitle == title) {
-            return <div><button className="transparentButton me-2" type="submit"><BiCheck className="adminActions"/></button> <CgUnavailable onClick={() => this.editJobTitle(undefined)} className="adminActions ms-1"/></div>
+            return <div>
+                <button className="transparentButton me-2" type="submit">
+                    <BiCheck className="adminActions"/>
+                </button>
+                <CgUnavailable onClick={() => this.#editJobTitle} className="adminActions ms-1"/></div>
         } else {
             return <div>
-                <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
-                <BiTrash onClick={() => this.showDeletePrompt(title)} className="adminActions ms-2"/>
+                <BiPencil onClick={() => this.#editJobTitle(title)} className="adminActions me-2"/>
+                <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
             </div>
         }
     }
 
-    private editJobTitle(title: JobTitle | undefined) {
-        this.setState({editedJobTitle: title})
+    readonly #editJobTitle = (title?: JobTitle): void => {
+        this.setState({editedJobTitle: title});
     }
 
-    private showDeletePrompt(title: JobTitle) {
+    readonly #showDeletePrompt = (title: JobTitle): void => {
         this.setState({jobTitleToDelete: title});
     }
 
@@ -169,7 +167,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
 
         if (errorType === FormErrorType.NO_ERROR) {
             formDataObj.id = this.state.editedJobTitle?.id;
-            if(formDataObj.id) {
+            if (formDataObj.id) {
                 await this.props.onEditJobTitle(formDataObj);
             }
             this.setState({editedJobTitle: undefined});
@@ -208,7 +206,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         }
 
         this.setState({
-            ...{}, ...{
+            ...this.state, ...{
                 [name]: value,
             }
         });
