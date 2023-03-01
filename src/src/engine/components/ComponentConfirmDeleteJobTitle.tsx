@@ -11,7 +11,7 @@ interface DeleteJobTitleProps {
 
 export class ComponentConfirmDeleteJobTitle extends React.Component<DeleteJobTitleProps, unknown> {
     public render(): JSX.Element {
-        return (<Modal show={this.props.jobTitle != undefined} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
+        return (<Modal show={this.props.jobTitle != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmation de suppression</Modal.Title>
                 </Modal.Header>
@@ -19,17 +19,17 @@ export class ComponentConfirmDeleteJobTitle extends React.Component<DeleteJobTit
                     <p>Voulez-vous vraiment supprimer le corps d'emploi {this.props.jobTitle?.name} ?</p>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="primary" onClick={() => this.hideModal(true)}>
+                    <Button variant="primary" onClick={() => this.#hideModal(true)}>
                         Oui
                     </Button>
-                    <Button variant="secondary" onClick={() => this.hideModal()}>
+                    <Button variant="secondary" onClick={() => this.#hideModal()}>
                         Non
                     </Button>
                 </Modal.Footer>
         </Modal>);
     }
 
-    private hideModal(confirm: boolean = false) {
+    readonly #hideModal = (confirm: boolean = false) => {
         if(confirm && this.props.jobTitle) {
             this.props.onDeleteJobTitle(this.props.jobTitle);
         }

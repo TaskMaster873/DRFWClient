@@ -8,7 +8,7 @@ import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import {Container} from "react-bootstrap";
-import {Utils} from "../utils/Utils";
+import Utils from "../utils/Utils";
 
 /**
  * Ceci est la page pour les departments

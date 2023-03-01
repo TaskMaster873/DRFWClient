@@ -9,7 +9,7 @@ import {RoutesPath} from "../RoutesPath";
 import {Container} from "react-bootstrap";
 import Logo from "../../deps/images/logo.png";
 import {NotificationManager} from "../api/NotificationManager";
-import {FormUtils} from "../utils/FormUtils";
+import FormUtils from "../utils/FormUtils";
 
 type Props = {
     actionCode: string,

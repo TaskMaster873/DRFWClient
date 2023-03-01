@@ -5,7 +5,7 @@ import {errors, FormErrorType, info} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
 import Logo from "../../deps/images/logo.png";
 import {NotificationManager} from "../api/NotificationManager";
-import {FormUtils} from "../utils/FormUtils";
+import FormUtils from "../utils/FormUtils";
 /***
  * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un courriel
  */

@@ -16,7 +16,7 @@ import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import {JobTitle} from "../types/JobTitle";
 import {Skill} from "../types/Skill";
-import {Utils} from "../utils/Utils";
+import Utils from "../utils/Utils";
 
 export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {
@@ -100,6 +100,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * Add an employee to the database
      * @param password {string} The password of the employee
      * @param employee {EmployeeCreateDTO} The employee to add
+     * @private
      */
     readonly #addEmployee = async (password: string, employee: EmployeeCreateDTO): Promise<void> => {
         let error = await API.createEmployee(password, employee);
@@ -114,6 +115,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     /**
      * Add an jobTitle to the database
      * @param title The jobTitle
+     * @private
      */
     readonly #addJobTitle = async (title: string): Promise<void> => {
         let error = await API.createJobTitle(title);
@@ -128,6 +130,11 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
+    /**
+     * Edit a jobTitle from the database
+     * @param title The jobTitle
+     * @private
+     */
     readonly #editJobTitle = async (title: JobTitle): Promise<void> => {
         if(title.id) {
             let error = await API.editJobTitle(title);
@@ -142,12 +149,17 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
+    /**
+     * Delete a jobTitle from the database
+     * @param title The jobTitle
+     * @private
+     */
     readonly #deleteJobTitle = async (title: JobTitle): Promise<void> => {
         if(title.id) {
             let error = await API.deleteJobTitle(title);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_DELETED);
-                let titles = Utils.deleteElement(this.state.titles, title.id, title) as JobTitle[];
+                let titles = Utils.deleteElement(this.state.titles, title.id) as JobTitle[];
                 this.setState({titles: titles});
                 await this.fetchData();
             } else {
@@ -161,6 +173,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     /**
      * Add a skill to the database
      * @param skill the skill
+     * @private
      */
     readonly #addSkill = async (skill: string): Promise<void> => {
         let error = await API.createSkill(skill);
@@ -174,6 +187,12 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
+
+    /**
+     * Edit a skill from the database
+     * @param skill the skill
+     * @private
+     */
     readonly #editSkill = async (skill: Skill): Promise<void> => {
         if(skill.id) {
             let error = await API.editSkill(skill);
@@ -188,12 +207,17 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         }
     }
 
+    /**
+     * Delete a skill from the database
+     * @param skill the skill
+     * @private
+     */
     readonly #deleteSkill = async (skill: Skill): Promise<void> => {
         if(skill.id) {
             let error = await API.deleteSkill(skill);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
-                let skills = Utils.deleteElement(this.state.skills, skill.id, skill) as Skill[];
+                let skills = Utils.deleteElement(this.state.skills, skill.id) as Skill[];
                 this.setState({skills: skills});
                 await this.fetchData();
             } else {

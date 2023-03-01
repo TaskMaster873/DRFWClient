@@ -8,14 +8,12 @@ import {
 } from "../types/Employee";
 
 import {errors, successes} from "../messages/FormMessages";
-import {Department, DepartmentModifyDTO} from "../types/Department";
+import {Department} from "../types/Department";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
 import {Navigate, Params, useParams} from "react-router-dom";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
-import {IdElement} from "../types/Global";
-import {Utils} from "../utils/Utils";
 import {JobTitle} from "../types/JobTitle";
 
 export function EditEmployeeWrapper(): JSX.Element {

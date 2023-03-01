@@ -9,18 +9,24 @@ import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
+import {JobTitle} from "../src/engine/types/JobTitle.js";
+import {Skill} from "../src/engine/types/Skill.js";
 jest.mock("../src/engine/api/APIManager");
 let user;
 
 let departments = [{name: "Informatique", director: "Maxime"}];
 let roles = ["Employé"];
-let jobTitles = ["Anglophone"];
-let skills = ["Conducteur de véhicule lourds"]
+let jobTitles = [new JobTitle({id: "1", name: "Anglophone"})];
+let skills = [new Skill({id: "1", name: "Conducteur de véhicule lourds"} )]
 
 beforeEach(async () => {
     user = userEvent.setup();
-    render(<MemoryRouter><ComponentAddEmployee departments={departments} roles={roles} jobTitles={jobTitles} skills={skills} onAddEmployee={jest.fn()} onAddJobTitle={jest.fn()}
-                                               onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()} /></MemoryRouter>);
+    render(<MemoryRouter>
+        <ComponentAddEmployee departments={departments} roles={roles}
+            jobTitles={jobTitles} skills={skills} onAddEmployee={jest.fn()} onAddJobTitle={jest.fn()}
+            onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
+            onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}/>
+    </MemoryRouter>);
 });
 
 test("should render form inputs", async () => {

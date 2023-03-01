@@ -2,10 +2,17 @@ import {Logger} from "../Logger";
 import {getDocs} from "firebase/firestore";
 import {errors} from "../messages/APIMessages";
 
+/**
+ * The InternalAPIUtils is responsible for storing useful methods often used in the API.
+ * It is a singleton class, this allows us to have a single instance of the APIUtils and use it throughout the application.
+ * @class InternalAPIUtils
+ * @extends Logger
+ */
 export class InternalAPIUtils extends Logger {
 
     /**
      * This method parse firebase error codes and return a human-readable error message.
+     * @memberof InternalAPIUtils
      * @param error The error to parse.
      * @returns {string} The human-readable error message.
      */
@@ -65,7 +72,7 @@ export class InternalAPIUtils extends Logger {
 }
 
 /**
- * Instantiate the APIManager class and export it as a singleton.
+ * Instantiate the APIUtils class and export it as a singleton.
  */
 export const APIUtils = new InternalAPIUtils();
 

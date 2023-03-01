@@ -3,12 +3,10 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-
-import { errors, FormErrorType } from "../messages/FormMessages";
-
-import { Department } from "../types/Department";
-import { Employee } from "../types/Employee";
-import {FormUtils} from "../utils/FormUtils";
+import {errors, FormErrorType} from "../messages/FormMessages";
+import {Department} from "../types/Department";
+import {Employee} from "../types/Employee";
+import FormUtils from "../utils/FormUtils";
 
 interface AddDepartmentState {
     name: string;
@@ -46,7 +44,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
         this.props = props;
     }
 
-    public componentDidUpdate(prevProps: AddDepartmentProps) : void {
+    public componentDidUpdate(prevProps: AddDepartmentProps): void {
         if (prevProps.employees !== this.props.employees && this.props.employees.length > 0) {
             let firstEmployee: Employee = this.props.employees[0];
             this.setState({
@@ -81,8 +79,9 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
                     <Form.Group as={Col} md="3">
                         <Form.Label className="mt-2">Directeur</Form.Label>
                         <Form.Select required name="director" value={this.state.director} onChange={this.#handleSelect}>
-                            {this.props.employees.map((employee, index) => (
-                                <option key={`${index}`} value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
+                            {this.props.employees.map((employee: Employee, index: number) => (
+                                <option key={`${index}`}
+                                        value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
                             {errors.REQUIRED_DEPARTMENT_DIRECTOR}
@@ -129,9 +128,11 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
             throw new Error("Name is undefined for element in form.");
         }
 
-        this.setState({...{}, ...{
-            [name]: value,
-        }});
+        this.setState({
+            ...this.state, ...{
+                [name]: value,
+            }
+        });
     }
 
     /**
@@ -139,11 +140,13 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
      * @param event The event that triggered the function
      * @private
      */
-    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
+    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
         const target = event.target;
 
-        this.setState({...this.state, ...{
-            [target.id]: target.value
-        }});
+        this.setState({
+            ...this.state, ...{
+                [target.name]: target.value
+            }
+        });
     }
 }
