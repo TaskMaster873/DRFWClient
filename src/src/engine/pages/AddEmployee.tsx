@@ -106,7 +106,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
         } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
 
@@ -124,7 +124,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
             this.setState({titles: titles});
             await this.fetchData();
         } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
 
@@ -137,7 +137,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 this.setState({titles: titles});
                 await this.fetchData();
             } else {
-                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
     }
@@ -151,7 +151,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 this.setState({titles: titles});
                 await this.fetchData();
             } else {
-                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
     }
@@ -171,7 +171,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
             this.setState({skills: skills});
             await this.fetchData();
         } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
     readonly #editSkill = async (skill: Skill): Promise<void> => {
@@ -183,7 +183,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 this.setState({skills: skills});
                 await this.fetchData();
             } else if(error) {
-                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
     }
@@ -197,7 +197,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 this.setState({skills: skills});
                 await this.fetchData();
             } else {
-                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
     }

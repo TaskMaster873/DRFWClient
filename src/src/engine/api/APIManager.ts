@@ -55,6 +55,7 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {JobTitle} from "../types/JobTitle";
 import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
+import {EmployeeInfos} from "./types/APITypes";
 
 type SubscriberCallback =
     () =>
@@ -99,7 +100,7 @@ class APIManager extends Logger {
     #performance!: FirebasePerformance;
     #db!: Firestore;
     #user: FirebaseAuth.User | null = null;
-    #userRole: number = 0;
+    #employeeInfos: EmployeeInfos = {role: 0, department: undefined};
 
     /**
      * Global variables of APIManager.
@@ -141,7 +142,7 @@ class APIManager extends Logger {
      * @returns {number} The current user role.
      */
     public get userRole(): number {
-        return this.#userRole;
+        return this.#employeeInfos.role;
     }
 
     /**
@@ -153,6 +154,10 @@ class APIManager extends Logger {
      */
     public getEmployeeName(): string {
         return this.#user?.displayName || this.#user?.email || "Anonyme";
+    }
+
+    public getCurrentEmployeeInfos(): EmployeeInfos {
+        return this.#employeeInfos;
     }
 
     /**
@@ -171,7 +176,7 @@ class APIManager extends Logger {
      * @returns {boolean} True if the user has the given permissions, false otherwise.
      */
     public hasPermission(permissionLevel: Roles): boolean {
-        return this.#userRole >= permissionLevel;
+        return this.#employeeInfos.role >= permissionLevel;
     }
 
     /**
@@ -180,7 +185,7 @@ class APIManager extends Logger {
      * @returns {boolean} True if the user has a lower permission than the given one, false otherwise.
      */
     public hasLowerPermission(permissionLevel: Roles): boolean {
-        return this.#userRole > permissionLevel;
+        return this.#employeeInfos.role > permissionLevel;
     }
 
     //#endregion
@@ -403,7 +408,7 @@ class APIManager extends Logger {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
 
-            this.#userRole = -1;
+            this.#employeeInfos.role = -1;
 
             await this.onEvent();
         }
@@ -452,12 +457,12 @@ class APIManager extends Logger {
                     } else {
                         this.isAuthenticated = true;
                         this.#user = user;
-                        this.#userRole = await this.getCurrentEmployeeRole(
+                        this.#employeeInfos = await this.getEmployeeInfos(
                             user.uid
                         );
 
                         console.log("user", user);
-                        console.log("userRole", this.#userRole);
+                        console.log("employeeInfos", this.#employeeInfos);
                     }
 
                     if (!resolved) {
@@ -1055,7 +1060,7 @@ class APIManager extends Logger {
             let errorMessage: string | null = null;
             let employeeNb: number[] = [];
 
-            let promises: Promise<void | QuerySnapshot<DocumentData>>[] = [];
+            let promises: Promise<void | QuerySnapshot>[] = [];
 
             for (const department of departments) {
                 let queryEmployees = query(
@@ -1116,23 +1121,17 @@ class APIManager extends Logger {
      * @memberof APIManager
      * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
      */
-    public async getCurrentEmployeeRole(uid: string): Promise<number> {
-        let employeeRole: number = 0;
+    public async getEmployeeInfos(uid: string): Promise<EmployeeInfos> {
+        let employeeInfos: EmployeeInfos = {role: 0, department: undefined};
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
             (error) => {
                 APIUtils.getErrorMessageFromCode(error);
             }
         );
-        if (employee && employee) {
-            let employeeData = employee.data();
-            if (employeeData) {
-                employeeRole = employeeData.role;
-                if (!employeeData.role) {
-                    return 0;
-                }
-            }
+        if (employee) {
+            employeeInfos = employee.data() as EmployeeInfos;
         }
-        return employeeRole;
+        return employeeInfos;
     }
 
     /**
@@ -1213,7 +1212,7 @@ class APIManager extends Logger {
             });
 
             if (snaps) {
-                snaps.docs.forEach((doc) => {
+                snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                     let data = doc.data();
                     shifts.push(
                         new Shift({
@@ -1250,13 +1249,6 @@ class APIManager extends Logger {
     private getFirebaseTimestamp(daypilotString: string): Timestamp {
         return new Timestamp(Date.parse(daypilotString) / 1000, 0);
     }
-
-    /**
-     * Récupère l'horaire de la journée d'un département pour une journée
-     * @param day
-     * @param department le nom du département que récupérer
-     * @returns une liste de quarts de travail d'un département pour une journée
-     */
 
     /**
      * This method is used to get the schedule of a department for a day. If the request was not successful, it will return an error message.
@@ -1325,7 +1317,8 @@ class APIManager extends Logger {
      */
     public async createShift(shift: ShiftCreateDTO): Promise<void | string> {
         //Check if user has permission
-        if (!this.hasPermission(Roles.ADMIN)) {
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#employeeInfos?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             //Manager or less
             return errors.PERMISSION_DENIED;
         }
@@ -1358,7 +1351,8 @@ class APIManager extends Logger {
      */
     public async editShift(shift: Shift): Promise<void | string> {
         //Check if user has permission
-        if (!this.hasPermission(Roles.ADMIN)) {
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#employeeInfos?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             //Manager or less
             return errors.PERMISSION_DENIED;
         }
@@ -1386,10 +1380,14 @@ class APIManager extends Logger {
      * @async
      * @public
      * @memberof APIManager
-     * @param {string} shiftId The id of the shift to delete.
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
+     * @param shift
      */
-    public async deleteShift(shiftId: string): Promise<void | string> {
+    public async deleteShift(shift: Shift): Promise<void | string> {
+        let isManagerPermitted = !this.hasPermission(Roles.MANAGER) || shift.department !== this.#employeeInfos?.department;
+        if (!this.hasPermission(Roles.ADMIN) && isManagerPermitted) {
+            return errors.PERMISSION_DENIED;
+        }
         //Check if user has permission
         if (!this.hasPermission(Roles.ADMIN)) {
             //Manager or less
@@ -1399,7 +1397,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
 
         //Delete Shift
-        await deleteDoc(doc(this.#db, `shifts`, shiftId),
+        await deleteDoc(doc(this.#db, `shifts`, shift.id)
         ).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });

@@ -173,7 +173,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             name={skill.name}
                             label={skill.name}
                         />))}
-                        <ComponentEditSkills cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditSkills} skills={this.props.jobTitles}
+                        <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)} showEdit={this.state.showEditSkills} skills={this.props.skills}
                                              onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill} onDeleteSkill={this.props.onDeleteSkill}></ComponentEditSkills>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
