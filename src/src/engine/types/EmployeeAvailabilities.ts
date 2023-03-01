@@ -86,3 +86,10 @@ export interface EmployeeAvailabilitiesForCreate {
     end?:Timestamp;
 }
 
+export interface DateOfUnavailability {
+    start: Date ,
+    end: Date
+}
+
+export type DateOfUnavailabilityList = DateOfUnavailability[];
+

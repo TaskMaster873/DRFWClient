@@ -1,5 +1,5 @@
 import React from "react";
-import {DAYS, EmployeeAvailabilities, EventsForUnavailability, EmployeeRecursiveException, RecursiveAvailabilities, RecursiveAvailabilitiesList, EmployeeAvailabilitiesForCreate} from "../types/EmployeeAvailabilities";
+import {DAYS, EmployeeAvailabilities, EventsForUnavailability, EmployeeRecursiveException, RecursiveAvailabilities, RecursiveAvailabilitiesList, EmployeeAvailabilitiesForCreate, EmployeeRecursiveExceptionList, DateOfUnavailabilityList} from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
 import {DateManager} from '../utils/DateManager';
 import {DayPilot} from "daypilot-pro-react";
@@ -30,6 +30,7 @@ let firstDay = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay())))
 let lastDay = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0, 0, 0, 0));
 
 export class Availabilities extends React.Component<unknown, AvailabilitiesState> {
+
 
     //It is to have acces more easily to the datepicker and calendar getters and their public methods
     private componentAvailabilitiesRef: React.RefObject<ComponentAvailabilities> = React.createRef();
@@ -138,39 +139,67 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         let starts;
         let ends;
         let unavailabilitiesInCalendar = this.componentAvailability?.getListFromTheCalendar();
-        console.log(unavailabilitiesInCalendar);
+        let sorted = unavailabilitiesInCalendar;
+        if (unavailabilitiesInCalendar) {
+            //let unavailabilitiesFiltered = this.sortFromStart(unavailabilitiesInCalendar);
+            console.log("calendar", unavailabilitiesInCalendar);
+            this.transformListIntoDateList(unavailabilitiesInCalendar);
+        }
+
+
         if (start) {
-           starts = DateManager.getDayPilotDateString(start);
+            starts = DateManager.getDayPilotDateString(start);
         }
         if (end) {
-            ends =  DateManager.getDayPilotDateString(end);
+            ends = DateManager.getDayPilotDateString(end);
         }
-       let date = this.toUTC(this.state.currentWeekStart);
-
-       let listCreate: EmployeeAvailabilitiesForCreate = {
-        recursiveExceptions: {
-            startDate: starts ?? undefined,
-            endDate: ends ?? undefined,
-            [DAYS.SUNDAY]: [],
-            [DAYS.MONDAY]: [],
-            [DAYS.TUESDAY]: [],
-            [DAYS.WEDNESDAY]: [],
-            [DAYS.THURSDAY]: [],
-            //It is to have acces more easily to the datepicker and calendar getters and their public methods
-            [DAYS.FRIDAY]: [],
-            [DAYS.SATURDAY]: []
-        },
-        start: start,
-        end: end
-       }
-
+        // let date = this.toUTC(this.state.currentWeekStart).addHours(2);
+        //let ok = date.getHours()*60 + date.getMinutes();
+        //console.log("ok", ok);
+        let listCreate: EmployeeAvailabilitiesForCreate = {
+            recursiveExceptions: {
+                startDate: starts ?? undefined,
+                endDate: ends ?? undefined,
+                [DAYS.SUNDAY]: [],
+                [DAYS.MONDAY]: [],
+                [DAYS.TUESDAY]: [],
+                [DAYS.WEDNESDAY]: [],
+                [DAYS.THURSDAY]: [],
+                //It is to have acces more easily to the datepicker and calendar getters and their public methods
+                [DAYS.FRIDAY]: [],
+                [DAYS.SATURDAY]: []
+            },
+            start: start,
+            end: end
+        };
 
         await API.pushAvailabilitiesToManager(listCreate);
 
         console.log(this.componentAvailability?.getListFromTheCalendar());
     };
 
-    private
+    private transformListIntoDateList(unavailabilitiesInCalendar: DayPilot.EventData[]) {
+        let listSortedByStart: DateOfUnavailabilityList = [];
+
+        if (unavailabilitiesInCalendar.length != 0) {
+            for (let eventData of unavailabilitiesInCalendar) {
+                listSortedByStart.push({start: new Date(eventData.start as string), end: new Date(eventData.end as string)});
+            }
+
+        }
+
+
+
+
+    }
+
+    /*  private tranformShiftsToMinutes(list: DayPilot.Date[]): EmployeeRecursiveExceptionList  {
+          let listToReturn: EmployeeRecursiveExceptionList = [];
+          for(let date of list) {
+              date.toDate();
+          }
+          return null;
+      }*/
 
     readonly #openPopup = (): void => {
         this.setState({popupActive: true});
