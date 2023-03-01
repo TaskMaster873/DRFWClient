@@ -52,7 +52,9 @@ import {
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
-import {department} from "../../../Constants/testConstants";
+import {JobTitle} from "../types/JobTitle";
+import {APIUtils} from "./APIUtils";
+import {Skill} from "../types/Skill";
 
 type SubscriberCallback =
     () =>
@@ -793,7 +795,6 @@ class APIManager extends Logger {
      * @returns {Promise<string | null>} Null if the department was edited successfully, and the error message if it was not.
      */
     public async editDepartment(departmentId: string, department: DepartmentModifyDTO): Promise<string | null> {
-        let errorMessage: string | null = null;
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
@@ -801,14 +802,14 @@ class APIManager extends Logger {
             collection(this.#db, `departments`),
             where("name", "==", department.name)
         );
-        let errorMessage = await this.checkIfAlreadyExists(
+        let errorMessage = await APIUtils.checkIfAlreadyExists(
             queryDepartment,
-            errors.DEPARTMENT_ALREADY_EXIST
+            errors.DEPARTMENT_ALREADY_EXISTS
         );
         if(!errorMessage) {
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
+                    errorMessage = APIUtils.getErrorMessageFromCode(error);
                 });
             } else {
                 errorMessage = errors.INVALID_DEPARTMENT_ID;
@@ -1119,7 +1120,7 @@ class APIManager extends Logger {
         let employeeRole: number = 0;
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
             (error) => {
-                this.getErrorMessageFromCode(error);
+                APIUtils.getErrorMessageFromCode(error);
             }
         );
         if (employee && employee) {
