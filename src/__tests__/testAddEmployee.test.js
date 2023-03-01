@@ -9,8 +9,8 @@ import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
-import {JobTitle} from "../src/engine/types/JobTitle.js";
-import {Skill} from "../src/engine/types/Skill.js";
+import {JobTitle} from "../src/engine/types/JobTitle";
+import {Skill} from "../src/engine/types/Skill";
 jest.mock("../src/engine/api/APIManager");
 let user;
 
