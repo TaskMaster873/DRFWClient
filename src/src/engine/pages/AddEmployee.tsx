@@ -135,7 +135,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_EDITED);
                 let titles = Utils.editElement(this.state.titles, title.id, title) as JobTitle[];
                 this.setState({titles: titles});
-                //await this.fetchData();
+                await this.fetchData();
             } else {
                 NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
             }

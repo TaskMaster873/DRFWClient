@@ -67,7 +67,7 @@ test("Valid old and new password should submit form", async () => {
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputOldPassword = document.getElementById("oldPassword");
-    const inputNewPassword = document.getElementById("newPassword");
+    const inputOldPassword = document.getElementsByName("oldPassword")[0];
+    const inputNewPassword = document.getElementsByName("newPassword")[0];
     return {inputNewPassword, form, inputOldPassword};
 }

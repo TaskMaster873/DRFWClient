@@ -61,7 +61,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                                                     skill={this.state.skillToDelete} onDeleteSkill={this.props.onDeleteSkill}/>
             <Modal show={this.props.showEdit} onHide={() => this.hideModal()} onExit={() => this.hideModal()}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Édition de corps d'emploi</Modal.Title>
+                    <Modal.Title>Édition de compétence</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form
@@ -70,7 +70,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                         onSubmit={this.#handleEditSubmit}
                         onChange={this.#handleChange}
                         data-error={this.state.editError}>
-                        <Form.Label className="mt-2">Corps d'emplois</Form.Label>
+                        <Form.Label className="mt-2">Compétences</Form.Label>
                         {this.props.skills.map((skill: Skill) => (
                             <Row key={`row ${skill.name}`} className="mb-3">
                                 <Form.Group key={`group ${skill.name}`} as={Col} md="10">
@@ -99,7 +99,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                         data-error={this.state.addError}
                     >
                         <Row className="mb-3">
-                            <Form.Label className="mt-2">Nouveau corps d'emploi</Form.Label>
+                            <Form.Label className="mt-2">Nouvelle compétence</Form.Label>
                             <Form.Group as={Col} md="10">
                                 <Form.Control
                                     name="name"
