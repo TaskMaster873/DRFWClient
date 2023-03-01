@@ -185,7 +185,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
                         <Form.Select required name="role" value={this.state.role} onChange={this.#handleSelect}>
-                            {this.props.roles.map((role, index) => {
+                            {this.props.roles.map((role: string, index: number) => {
                                 if(API.hasLowerPermission(index)) {
                                     return <option key={index} value={index}>{role}</option>
                                 }

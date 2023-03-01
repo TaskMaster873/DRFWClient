@@ -105,7 +105,8 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
-                        <Form.Label className="w-100">Corps d'emploi <Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
+                        <Form.Label className="w-100">Corps d'emploi
+                            <Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
                         {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((title: JobTitle) =>
                             <Form.Check
                             name={title.name}
