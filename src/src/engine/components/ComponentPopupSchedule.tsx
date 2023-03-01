@@ -95,7 +95,7 @@ export function ComponentPopupSchedule(props: Props) {
 		setError(FormErrorType.NO_ERROR);
 		setStart(null);
 		setEnd(null);
-		setEmployeeId("");
+		setEmployeeId(null);
 	};
 
 	return (
