@@ -1170,8 +1170,8 @@ class APIManager extends Logger {
      */
     public async getDailyScheduleForDepartment(day: DayPilot.Date, department: Department): Promise<Shift[] | string> {
         //Manager is allowed, if its his department
-        let isManagerPermitted = !this.hasPermission(Roles.MANAGER) || department.name !== this.#currentEmployee?.department;
-        if (!this.hasPermission(Roles.ADMIN) && isManagerPermitted) {
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && department.name === this.#currentEmployee?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
 
@@ -1224,8 +1224,8 @@ class APIManager extends Logger {
      */
     public async createShift(shift: ShiftCreateDTO): Promise<void | string> {
         //Manager is allowed, if its his department
-        let isManagerPermitted = !this.hasPermission(Roles.MANAGER) || shift.department !== this.#currentEmployee?.department;
-        if (!this.hasPermission(Roles.ADMIN) && isManagerPermitted) {
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
 
@@ -1257,8 +1257,8 @@ class APIManager extends Logger {
      */
     public async editShift(shift: Shift): Promise<void | string> {
         //Manager is allowed, if its his department
-        let isManagerPermitted = !this.hasPermission(Roles.MANAGER) || shift.department !== this.#currentEmployee?.department;
-        if (!this.hasPermission(Roles.ADMIN) && isManagerPermitted) {
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
 
@@ -1290,8 +1290,8 @@ class APIManager extends Logger {
      */
     public async deleteShift(shift: Shift): Promise<void | string> {
         //Manager is allowed, if its his department
-        let isManagerPermitted = !this.hasPermission(Roles.MANAGER) || shift.department !== this.#currentEmployee?.department;
-        if (!this.hasPermission(Roles.ADMIN) && isManagerPermitted) {
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
 
