@@ -79,7 +79,7 @@ test("Valid email and password should submit form", async () => {
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputEmail = document.getElementById("emailLogin");
-    const inputPassword = document.getElementById("passwordLogin");
+    const inputEmail = document.getElementsByName("emailLogin")[0];
+    const inputPassword = document.getElementsByName("passwordLogin")[0];
     return {inputPassword, form, inputEmail};
 }

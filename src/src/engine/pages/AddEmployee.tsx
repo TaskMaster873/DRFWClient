@@ -1,39 +1,55 @@
 import React from "react";
 import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {API} from "../api/APIManager";
-import {AddEmployeeState, EmployeeCreateDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
+import {
+    AddEmployeeState,
+    EmployeeCreateDTO,
+    EmployeeJobTitleList,
+    EmployeeRoleList,
+    EmployeeSkillList
+} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {Department} from "../types/Department";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
+import {JobTitle} from "../types/JobTitle";
+import {Skill} from "../types/Skill";
+import {Utils} from "../utils/Utils";
 
 export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     public state: AddEmployeeState = {
         departments: [],
         roles: [],
         titles: [],
+        skills: [],
         redirectTo: null
     }
 
-    public async componentDidMount() : Promise<void> {
+    public async componentDidMount(): Promise<void> {
         document.title = "Ajouter un Employé - TaskMaster";
 
+        await this.fetchData();
+    }
+
+    private async fetchData() {
         let isLoggedIn: boolean = await this.verifyLogin();
-        if(isLoggedIn) {
+        if (isLoggedIn) {
             let departments = API.getDepartments();
             let roles = API.getRoles();
             let titles = API.getJobTitles();
+            let skills = API.getSkills();
 
             let params: [
                     Department[] | string,
                     EmployeeRoleList | string,
-                    EmployeeJobTitleList | string
-            ] = await Promise.all([departments, roles, titles]);
+                    EmployeeJobTitleList | string,
+                    EmployeeSkillList | string
+            ] = await Promise.all([departments, roles, titles, skills]);
 
-            if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2])) {
-                this.setState({departments: params[0], roles: params[1], titles: params[2]});
+            if (Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray((params[3]))) {
+                this.setState({departments: params[0], roles: params[1], titles: params[2], skills: params[3]});
             } else {
                 NotificationManager.error(errors.GET_DEPARTMENTS, errors.SERVER_ERROR);
             }
@@ -85,17 +101,110 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @param password {string} The password of the employee
      * @param employee {EmployeeCreateDTO} The employee to add
      */
-    readonly #addEmployee = async (password : string, employee: EmployeeCreateDTO) : Promise<void> => {
+    readonly #addEmployee = async (password: string, employee: EmployeeCreateDTO): Promise<void> => {
         let error = await API.createEmployee(password, employee);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
         } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
 
+    //#region JobTitles
+    /**
+     * Add an jobTitle to the database
+     * @param title The jobTitle
+     */
+    readonly #addJobTitle = async (title: string): Promise<void> => {
+        let error = await API.createJobTitle(title);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_CREATED);
+            let titles = this.state.titles;
+            titles.push(new JobTitle({name: title}));
+            this.setState({titles: titles});
+            await this.fetchData();
+        } else {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+        }
+    }
+
+    readonly #editJobTitle = async (title: JobTitle): Promise<void> => {
+        if(title.id) {
+            let error = await API.editJobTitle(title);
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_EDITED);
+                let titles = Utils.editElement(this.state.titles, title.id, title) as JobTitle[];
+                this.setState({titles: titles});
+                await this.fetchData();
+            } else {
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+            }
+        }
+    }
+
+    readonly #deleteJobTitle = async (title: JobTitle): Promise<void> => {
+        if(title.id) {
+            let error = await API.deleteJobTitle(title);
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_DELETED);
+                let titles = Utils.deleteElement(this.state.titles, title.id, title) as JobTitle[];
+                this.setState({titles: titles});
+                await this.fetchData();
+            } else {
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+            }
+        }
+    }
+    //#endregion
+
+    //#region Skills
+    /**
+     * Add a skill to the database
+     * @param skill the skill
+     */
+    readonly #addSkill = async (skill: string): Promise<void> => {
+        let error = await API.createSkill(skill);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_CREATED);
+            let skills = this.state.skills;
+            skills.push(new Skill({name: skill}));
+            this.setState({skills: skills});
+            await this.fetchData();
+        } else {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+        }
+    }
+    readonly #editSkill = async (skill: Skill): Promise<void> => {
+        if(skill.id) {
+            let error = await API.editSkill(skill);
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
+                let skills = Utils.editElement(this.state.skills, skill.id, skill) as Skill[];
+                this.setState({skills: skills});
+                await this.fetchData();
+            } else if(error) {
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+            }
+        }
+    }
+
+    readonly #deleteSkill = async (skill: Skill): Promise<void> => {
+        if(skill.id) {
+            let error = await API.deleteSkill(skill);
+            if (!error) {
+                NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
+                let skills = Utils.deleteElement(this.state.skills, skill.id, skill) as Skill[];
+                this.setState({skills: skills});
+                await this.fetchData();
+            } else {
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+            }
+        }
+    }
+    //#endregion
+
     public render(): JSX.Element {
-        if(this.state.redirectTo) {
+        if (this.state.redirectTo) {
             return (<Navigate to={this.state.redirectTo}></Navigate>);
         }
 
@@ -104,7 +213,14 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
+                skills={this.state.skills}
                 onAddEmployee={this.#addEmployee}
+                onAddJobTitle={this.#addJobTitle}
+                onEditJobTitle={this.#editJobTitle}
+                onAddSkill={this.#addSkill}
+                onEditSkill={this.#editSkill}
+                onDeleteJobTitle={this.#deleteJobTitle}
+                onDeleteSkill={this.#deleteSkill}
             />
         );
     }

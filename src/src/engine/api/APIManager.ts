@@ -32,7 +32,14 @@ import {
 
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
-import {Employee, EmployeeCreateDTO, EmployeeEditDTO, EmployeeJobTitleList, EmployeeRoleList} from "../types/Employee";
+import {
+    Employee,
+    EmployeeCreateDTO,
+    EmployeeEditDTO,
+    EmployeeJobTitleList,
+    EmployeeRoleList,
+    EmployeeSkillList
+} from "../types/Employee";
 import {Department, DepartmentModifyDTO} from "../types/Department";
 import {Shift, ShiftCreateDTO} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
@@ -45,6 +52,10 @@ import {
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
+import {JobTitle} from "../types/JobTitle";
+import {APIUtils} from "./APIUtils";
+import {Skill} from "../types/Skill";
+import {EmployeeInfos} from "./types/APITypes";
 
 type SubscriberCallback =
     () =>
@@ -75,6 +86,8 @@ type SubscriberCallback =
  * @property {Map<string, Task>} tasks - A map of tasks that are currently being executed.
  */
 class APIManager extends Logger {
+
+    //region Attributes
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
 
@@ -86,10 +99,8 @@ class APIManager extends Logger {
     #auth!: FirebaseAuth.Auth;
     #performance!: FirebasePerformance;
     #db!: Firestore;
-
     #user: FirebaseAuth.User | null = null;
-    #currentEmployee: EmployeeEditDTO | null = null;
-    #userRole: number = 0;
+    #employeeInfos: EmployeeInfos = {role: 0, department: undefined};
 
     /**
      * Global variables of APIManager.
@@ -120,20 +131,22 @@ class APIManager extends Logger {
         }
     }
 
-    //#region GETTERS
+    //endregion
+
+    //region GETTERS
     /**
-     * Returns the current user role.
+     * Return the current user role.
      * @readonly
      * @type {number}
      * @memberof APIManager
      * @returns {number} The current user role.
      */
     public get userRole(): number {
-        return this.#userRole;
+        return this.#employeeInfos.role;
     }
 
     /**
-     * This method returns the current employee name.
+     * This method return the current employee name.
      * @readonly
      * @type {string}
      * @memberof APIManager
@@ -143,8 +156,12 @@ class APIManager extends Logger {
         return this.#user?.displayName || this.#user?.email || "Anonyme";
     }
 
+    public getCurrentEmployeeInfos(): EmployeeInfos {
+        return this.#employeeInfos;
+    }
+
     /**
-     * This method returns if the user is authenticated or not.
+     * This method return if the user is authenticated or not.
      * @returns {boolean} True if the user is authenticated, false otherwise.
      * @memberof APIManager
      * @method isAuth
@@ -154,31 +171,21 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method returns the current employee if he's connected
-     * @returns {EmployeeEditDTO | null} EmployeeEditDTO if the user is authenticated, null otherwise.
-     * @memberof APIManager
-     * @method getCurrentEmployee
-     */
-    public getCurrentEmployee(): EmployeeEditDTO | null {
-        return this.#currentEmployee;
-    }
-
-    /**
-     * This method returns if the current user has the given permissions.
+     * This method return if the current user has the given permissions.
      * @param permissionLevel The permission level to check.
      * @returns {boolean} True if the user has the given permissions, false otherwise.
      */
     public hasPermission(permissionLevel: Roles): boolean {
-        return this.#userRole >= permissionLevel;
+        return this.#employeeInfos.role >= permissionLevel;
     }
 
     /**
-     * This method returns if the current user has a lower permission than the given one.
+     * This method return if the current user has a lower permission than the given one.
      * @param permissionLevel The permission level to check.
      * @returns {boolean} True if the user has a lower permission than the given one, false otherwise.
      */
     public hasLowerPermission(permissionLevel: Roles): boolean {
-        return this.#userRole > permissionLevel;
+        return this.#employeeInfos.role > permissionLevel;
     }
 
     //#endregion
@@ -330,44 +337,6 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method parse firebase error codes and return a human-readable error message.
-     * @param error The error to parse.
-     * @returns {string} The human-readable error message.
-     */
-    private getErrorMessageFromCode(error: Error | string): string {
-        let errorMessage: string;
-        let message: string;
-
-        if (typeof error === "string") {
-            message = error;
-        } else {
-            message = error.message;
-        }
-
-        switch (message) {
-            case "auth/invalid-email":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "auth/user-not-found":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "auth/wrong-password":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "permission-denied":
-                errorMessage = errors.PERMISSION_DENIED;
-                break;
-            default:
-                errorMessage = errors.DEFAULT;
-                break;
-        }
-        this.error(
-            `Erreur: ${errorMessage} Code: ${error} Message: ${message}`
-        );
-        return errorMessage;
-    }
-
-    /**
      * This method is used to authenticate the user with his email and password.
      * @param email The email to use.
      * @param password The password to use.
@@ -389,7 +358,7 @@ class APIManager extends Logger {
             email,
             password
         ).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (userCredentials !== null && userCredentials) {
@@ -417,7 +386,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         await FirebaseAuth.sendPasswordResetEmail(this.#auth, email).catch(
             (error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
             }
         );
 
@@ -434,13 +403,12 @@ class APIManager extends Logger {
         this.log("Logging out user...");
         let errorMessage: string | null = null;
 
-        if (this.isAuthenticated) {
+        if (this.isAuth()) {
             await FirebaseAuth.signOut(this.#auth).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
 
-            this.#currentEmployee = null;
-            this.#userRole = Roles.GUEST;
+            this.#employeeInfos.role = -1;
 
             await this.onEvent();
         }
@@ -462,7 +430,7 @@ class APIManager extends Logger {
     ): Promise<string | null> {
         let errorMessage: string | null = null;
         await FirebaseAuth.sendEmailVerification(user).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
         return errorMessage;
     }
@@ -476,7 +444,7 @@ class APIManager extends Logger {
      * @returns {Promise<void>} Nothing.
      */
     private async listenEvents(): Promise<void> {
-        let isResolved = false;
+        let resolved = false;
 
         this.awaitLogin = new Promise(async (resolve) => {
             FirebaseAuth.onAuthStateChanged(
@@ -489,26 +457,16 @@ class APIManager extends Logger {
                     } else {
                         this.isAuthenticated = true;
                         this.#user = user;
-                        //Get employee document from firestore
-                        let fetchedEmployee = await this.getEmployeeById(
+                        this.#employeeInfos = await this.getEmployeeInfos(
                             user.uid
                         );
-                        //Check for errors
-                        if (typeof fetchedEmployee === "string") {
-                            this.#currentEmployee = null;
-                            this.#userRole = 0;
-                        } else {
-                            this.#currentEmployee = fetchedEmployee;
-                            this.#userRole = fetchedEmployee.role;
-                        }
 
-                        console.log("user", this.#user);
-                        console.log("currentEmployee", this.#currentEmployee);
-                        console.log("userRole", this.#userRole);
+                        console.log("user", user);
+                        console.log("employeeInfos", this.#employeeInfos);
                     }
 
-                    if (!isResolved) {
-                        isResolved = true;
+                    if (!resolved) {
+                        resolved = true;
                         resolve();
                     }
                 }
@@ -618,7 +576,7 @@ class APIManager extends Logger {
     ): Promise<string | false> {
         let errorMessage: string | null = null;
         let email = await verifyPasswordResetCode(this.#auth, actionCode).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         return (errorMessage || !email) ? false : email;
@@ -641,7 +599,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         await confirmPasswordReset(this.#auth, actionCode, newPassword).catch(
             (error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
             }
         );
         return errorMessage;
@@ -676,7 +634,7 @@ class APIManager extends Logger {
                     user,
                     newPassword
                 ).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
+                    errorMessage = APIUtils.getErrorMessageFromCode(error);
                 });
 
                 if (!errorMessage) {
@@ -685,7 +643,7 @@ class APIManager extends Logger {
                         user,
                         credential
                     ).catch((error) => {
-                        errorMessage = this.getErrorMessageFromCode(error);
+                        errorMessage = APIUtils.getErrorMessageFromCode(error);
                     });
 
                     this.#user = reAuth?.user || null;
@@ -723,7 +681,7 @@ class APIManager extends Logger {
             createdUserMessageData.error !== null &&
             createdUserMessageData.error
         ) {
-            errorMessage = this.getErrorMessageFromCode(
+            errorMessage = APIUtils.getErrorMessageFromCode(
                 createdUserMessageData.error
             );
         } else {
@@ -734,7 +692,7 @@ class APIManager extends Logger {
                 await setDoc(doc(this.#db, `employees`, userId), {
                     ...employee,
                 }).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
+                    errorMessage = APIUtils.getErrorMessageFromCode(error);
                     // FIREBASE LIMITATION : We can't delete the user if it has been created. Because only connected users can delete them self.
                 });
                 // TODO: Send verification email on login until validated.
@@ -757,13 +715,14 @@ class APIManager extends Logger {
      * @returns {Promise<string | null>} Null if the employee was edited successfully, and the error message if it was not.
      */
     public async editEmployee(employeeId: string, employee: EmployeeEditDTO): Promise<string | null> {
+        let errorMessage: string | null = null;
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        let errorMessage: string | null = null;
+
         if (employeeId) {
             await updateDoc(doc(this.#db, `employees`, employeeId), {...employee}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
         } else {
             errorMessage = errors.INVALID_EMPLOYEE_ID;
@@ -783,12 +742,12 @@ class APIManager extends Logger {
     public async changeEmployeeActivation(employee: Employee): Promise<string | null> {
         let errorMessage: string | null = null;
 
-        if (employee.employeeId) {
+        if (employee.id) {
             if (!this.hasPermission) {
                 return errors.PERMISSION_DENIED;
             }
-            await updateDoc(doc(this.#db, `employees`, employee.employeeId), {isActive: employee.isActive}).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+            await updateDoc(doc(this.#db, `employees`, employee.id), {isActive: employee.isActive}).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
         } else {
             errorMessage = errors.INVALID_EMPLOYEE_ID;
@@ -816,15 +775,15 @@ class APIManager extends Logger {
             collection(this.#db, `departments`),
             where("name", "==", department.name)
         );
-        let errorMessage = await this.checkIfAlreadyExists(
+        let errorMessage = await APIUtils.checkIfAlreadyExists(
             queryDepartment,
-            errors.DEPARTMENT_ALREADY_EXIST
+            errors.DEPARTMENT_ALREADY_EXISTS
         );
         if (!errorMessage) {
             await addDoc(collection(this.#db, `departments`), {
                 ...department,
             }).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
         }
         return errorMessage;
@@ -848,41 +807,138 @@ class APIManager extends Logger {
             collection(this.#db, `departments`),
             where("name", "==", department.name)
         );
-        let errorMessage = await this.checkIfAlreadyExists(
+        let errorMessage = await APIUtils.checkIfAlreadyExists(
             queryDepartment,
-            errors.DEPARTMENT_ALREADY_EXIST
+            errors.DEPARTMENT_ALREADY_EXISTS
         );
-        if (!errorMessage) {
+        if(!errorMessage) {
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
-                    errorMessage = this.getErrorMessageFromCode(error);
+                    errorMessage = APIUtils.getErrorMessageFromCode(error);
                 });
             } else {
                 errorMessage = errors.INVALID_DEPARTMENT_ID;
+            }
+        }
+        return errorMessage;
+    }
+
+    public async createJobTitle(
+        title: string
+    ): Promise<string | null> {
+        if (!this.hasPermission) {
+            return errors.PERMISSION_DENIED;
+        }
+        let queryJobTitles = query(
+            collection(this.#db, `jobTitles`),
+            where("name", "==", title)
+        );
+        let errorMessage = await APIUtils.checkIfAlreadyExists(
+            queryJobTitles,
+            errors.JOB_TITLE_ALREADY_EXISTS
+        );
+        if (!errorMessage) {
+            await addDoc(collection(this.#db, `jobTitles`), {
+                name: title,
+            }).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        }
+        return errorMessage;
+    }
+
+    public async editJobTitle(jobTitle: JobTitle): Promise<string | null> {
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        let queryJobTitles = query(
+            collection(this.#db, `jobTitles`),
+            where("name", "==", jobTitle.name)
+        );
+        let errorMessage = await APIUtils.checkIfAlreadyExists(
+            queryJobTitles,
+            errors.JOB_TITLE_ALREADY_EXISTS
+        );
+        if (jobTitle.id) {
+            await updateDoc(doc(this.#db, `jobTitles`, jobTitle.id), {name: jobTitle.name}).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_JOB_TITLE_ID;
+        }
+
+        return errorMessage;
+    }
+    public async deleteJobTitle(title: JobTitle): Promise<string | null> {
+        let errorMessage: string | null = null;
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        if (title.id) {
+            await deleteDoc(doc(this.#db, `jobTitles`, title.id)).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_SKILL_ID;
+        }
+
+        return errorMessage;
+    }
+
+    public async createSkill(skill: string): Promise<string | null> {
+        if (!this.hasPermission) {
+            return errors.PERMISSION_DENIED;
+        }
+        let querySkills = query(
+            collection(this.#db, `skills`),
+            where("name", "==", skill)
+        );
+        let errorMessage = await APIUtils.checkIfAlreadyExists(querySkills, errors.SKILL_ALREADY_EXISTS);
+        if (!errorMessage) {
+            await addDoc(collection(this.#db, `skills`), {
+                name: skill,
+            }).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        }
+        return errorMessage;
+    }
+
+    public async editSkill(skill: Skill): Promise<string | null> {
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        let querySkills = query(
+            collection(this.#db, `skills`),
+            where("name", "==", skill)
+        );
+        let errorMessage = await APIUtils.checkIfAlreadyExists(querySkills, errors.DEPARTMENT_ALREADY_EXISTS);
+        if (!errorMessage) {
+            if (skill.id) {
+                await updateDoc(doc(this.#db, `skills`, skill.id), {name: skill.name}).catch((error) => {
+                    errorMessage = APIUtils.getErrorMessageFromCode(error);
+                });
+            } else {
+                errorMessage = errors.INVALID_SKILL_ID;
             }
         }
 
         return errorMessage;
     }
 
-    /**
-     * Check if a document already exists.
-     * @param query The query to check.
-     * @param error The error message to return if the document already exists.
-     * @method checkIfAlreadyExists
-     * @async
-     * @private
-     * @memberof APIManager
-     * @returns {Promise<string | null>} Null if the document does not exist, and the error message if it does.
-     */
-    private async checkIfAlreadyExists(query, error: string): Promise<string | null> {
+    public async deleteSkill(skill: Skill): Promise<string | null> {
         let errorMessage: string | null = null;
-        let snaps = await getDocs(query).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
-        });
-        if (snaps && snaps.docs.length > 0) {
-            errorMessage = error;
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
         }
+        if (skill.id) {
+            await deleteDoc(doc(this.#db, `skills`, skill.id)).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_SKILL_ID;
+        }
+
         return errorMessage;
     }
 
@@ -908,7 +964,7 @@ class APIManager extends Logger {
         }
 
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (snaps) {
@@ -946,7 +1002,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
 
         let snap = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (snap && snap.exists()) {
@@ -970,14 +1026,14 @@ class APIManager extends Logger {
         let departments: Department[] = [];
         let queryDepartment = query(collection(this.#db, `departments`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (snaps) {
             for (let doc of snaps.docs) {
                 departments.push(
                     new Department({
-                        departmentId: doc.id,
+                        id: doc.id,
                         name: doc.data().name,
                         director: doc.data().director
                     })
@@ -1004,7 +1060,7 @@ class APIManager extends Logger {
             let errorMessage: string | null = null;
             let employeeNb: number[] = [];
 
-            let promises: Promise<void | QuerySnapshot<DocumentData>>[] = [];
+            let promises: Promise<void | QuerySnapshot>[] = [];
 
             for (const department of departments) {
                 let queryEmployees = query(
@@ -1024,7 +1080,7 @@ class APIManager extends Logger {
                     }
                 }
             }).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
             }).finally(() => {
                 resolve(errorMessage ?? employeeNb);
             });
@@ -1044,7 +1100,7 @@ class APIManager extends Logger {
         let roles: string[] = [];
         let queryDepartment = query(collection(this.#db, `roles`));
         let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (snaps) {
@@ -1057,6 +1113,28 @@ class APIManager extends Logger {
     }
 
     /**
+     * This method is used to get the current employee's role. If the request was not successful, it will return an error message.
+     * @param uid The ID of the employee.
+     * @method getCurrentEmployeeRole
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
+     */
+    public async getEmployeeInfos(uid: string): Promise<EmployeeInfos> {
+        let employeeInfos: EmployeeInfos = {role: 0, department: undefined};
+        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
+            (error) => {
+                APIUtils.getErrorMessageFromCode(error);
+            }
+        );
+        if (employee) {
+            employeeInfos = employee.data() as EmployeeInfos;
+        }
+        return employeeInfos;
+    }
+
+    /**
      * This method is used to get the job titles list. If the request was not successful, it will return an error message.
      * @method getJobTitles
      * @async
@@ -1066,17 +1144,32 @@ class APIManager extends Logger {
      */
     public async getJobTitles(): Promise<EmployeeJobTitleList | string> {
         let errorMessage: string | null = null;
-        let jobTitles: string[] = [];
-        let queryDepartment = query(collection(this.#db, `jobTitles`));
-        let snaps = await getDocs(queryDepartment).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+        let jobTitles: JobTitle[] = [];
+        let queryJobTitles = query(collection(this.#db, `jobTitles`));
+        let snaps = await getDocs(queryJobTitles).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
         if (snaps) {
             snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
-                jobTitles.push(doc.data().name);
+                jobTitles.push(new JobTitle({id: doc.id, name: doc.data().name}));
             });
         }
         return errorMessage ?? jobTitles;
+    }
+
+    public async getSkills(): Promise<EmployeeSkillList | string> {
+        let errorMessage: string | null = null;
+        let skills: Skill[] = [];
+        let querySkills = query(collection(this.#db, `skills`));
+        let snaps = await getDocs(querySkills).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+        if (snaps) {
+            snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
+                skills.push(new Skill({id: doc.id, name: doc.data().name}));
+            });
+        }
+        return errorMessage ?? skills;
     }
 
     /**
@@ -1092,7 +1185,6 @@ class APIManager extends Logger {
         if (this.#user?.uid) {
             shifts = await this.getScheduleForOneEmployee(this.#user.uid);
         }
-
         return shifts;
     }
 
@@ -1116,11 +1208,11 @@ class APIManager extends Logger {
             );
 
             let snaps = await getDocs(queryShifts).catch((error) => {
-                errorMessage = this.getErrorMessageFromCode(error);
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
 
             if (snaps) {
-                snaps.docs.forEach((doc) => {
+                snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                     let data = doc.data();
                     shifts.push(
                         new Shift({
@@ -1169,14 +1261,15 @@ class APIManager extends Logger {
      * @returns {Promise<Shift[] | string>} The schedule of the department for the day if the request was successful, and the error message if it was not.
      */
     public async getDailyScheduleForDepartment(day: DayPilot.Date, department: Department): Promise<Shift[] | string> {
-        //Manager is allowed, if its his department
-        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && department.name === this.#currentEmployee?.department;
-        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
-            return errors.PERMISSION_DENIED;
-        }
-
         let errorMessage: string | null = null;
         let shifts: Shift[] = [];
+
+        //Validate permissions
+        if (!this.isAuthenticated) return errors.PERMISSION_DENIED;
+        if (!this.hasPermission(Roles.ADMIN)) {
+            //TODO: pass if user is director
+            return errors.PERMISSION_DENIED;
+        }
 
         //Convert Daypilot datetimes to Timestamps
         let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
@@ -1191,7 +1284,7 @@ class APIManager extends Logger {
         );
 
         let snaps = await getDocs(queryShifts).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         //Parse recieved data
@@ -1223,9 +1316,10 @@ class APIManager extends Logger {
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
      */
     public async createShift(shift: ShiftCreateDTO): Promise<void | string> {
-        //Manager is allowed, if its his department
-        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
+        //Check if user has permission
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#employeeInfos?.department;
         if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
+            //Manager or less
             return errors.PERMISSION_DENIED;
         }
 
@@ -1240,7 +1334,7 @@ class APIManager extends Logger {
                 start: this.getFirebaseTimestamp(shift.start)
             },
         ).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (errorMessage) return errorMessage;
@@ -1256,9 +1350,10 @@ class APIManager extends Logger {
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
      */
     public async editShift(shift: Shift): Promise<void | string> {
-        //Manager is allowed, if its his department
-        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
+        //Check if user has permission
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#employeeInfos?.department;
         if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
+            //Manager or less
             return errors.PERMISSION_DENIED;
         }
 
@@ -1273,7 +1368,7 @@ class APIManager extends Logger {
                 start: this.getFirebaseTimestamp(shift.start)
             },
         ).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (errorMessage) return errorMessage;
@@ -1285,22 +1380,26 @@ class APIManager extends Logger {
      * @async
      * @public
      * @memberof APIManager
-     * @param {shift} shift The shift to delete.
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
+     * @param shift
      */
     public async deleteShift(shift: Shift): Promise<void | string> {
-        //Manager is allowed, if its his department
-        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
-        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
+        let isManagerPermitted = !this.hasPermission(Roles.MANAGER) || shift.department !== this.#employeeInfos?.department;
+        if (!this.hasPermission(Roles.ADMIN) && isManagerPermitted) {
+            return errors.PERMISSION_DENIED;
+        }
+        //Check if user has permission
+        if (!this.hasPermission(Roles.ADMIN)) {
+            //Manager or less
             return errors.PERMISSION_DENIED;
         }
 
         let errorMessage: string | null = null;
 
         //Delete Shift
-        await deleteDoc(doc(this.#db, `shifts`, shift.id),
+        await deleteDoc(doc(this.#db, `shifts`, shift.id)
         ).catch((error) => {
-            errorMessage = this.getErrorMessageFromCode(error);
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (errorMessage) return errorMessage;

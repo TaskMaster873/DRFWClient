@@ -9,6 +9,7 @@ import {RoutesPath} from "../RoutesPath";
 import {Container} from "react-bootstrap";
 import Logo from "../../deps/images/logo.png";
 import {NotificationManager} from "../api/NotificationManager";
+import {FormUtils} from "../utils/FormUtils";
 
 type Props = {
     actionCode: string,
@@ -25,16 +26,7 @@ export function ComponentResetPassword(props: Props) {
     const [error, setError] = useState(FormErrorType.NO_ERROR);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-        let errorType = FormErrorType.NO_ERROR;
-
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
+        let errorType = FormUtils.validateForm(event);
 
         setValidated(true);
         setError(errorType);

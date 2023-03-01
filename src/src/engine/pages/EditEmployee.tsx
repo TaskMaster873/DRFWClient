@@ -4,16 +4,19 @@ import {
     AddEmployeeState,
     EmployeeEditDTO,
     EmployeeJobTitleList, EmployeeProps,
-    EmployeeRoleList
+    EmployeeRoleList, EmployeeSkillList
 } from "../types/Employee";
 
 import {errors, successes} from "../messages/FormMessages";
-import {Department} from "../types/Department";
+import {Department, DepartmentModifyDTO} from "../types/Department";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
 import {Navigate, Params, useParams} from "react-router-dom";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
+import {IdElement} from "../types/Global";
+import {Utils} from "../utils/Utils";
+import {JobTitle} from "../types/JobTitle";
 
 export function EditEmployeeWrapper(): JSX.Element {
     let parameters: Readonly<Params<string>> = useParams();
@@ -31,6 +34,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         departments: [],
         roles: [],
         titles: [],
+        skills: [],
         editedEmployee: undefined,
         redirectTo: null
     }
@@ -48,6 +52,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
             let departments = API.getDepartments();
             let roles = API.getRoles();
             let titles = API.getJobTitles();
+            let skills = API.getSkills();
 
             if(this.props.params.id) {
                 let editedEmployee = API.getEmployeeById(this.props.params.id);
@@ -56,11 +61,12 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                         Department[] | string,
                         EmployeeRoleList | string,
                         EmployeeJobTitleList | string,
-                        EmployeeEditDTO | string
-                ] = await Promise.all([departments, roles, titles, editedEmployee]);
+                        EmployeeSkillList | string,
+                        EmployeeEditDTO | string,
+                ] = await Promise.all([departments, roles, titles, skills, editedEmployee]);
 
-                if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && params[3] && typeof(params[3]) !== "string") {
-                    this.setState({departments: params[0], roles: params[1], titles: params[2], editedEmployee: params[3]});
+                if(Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray(params[3]) && typeof(params[4]) !== "string") {
+                    this.setState({departments: params[0], roles: params[1], titles: params[2], skills: params[3], editedEmployee: params[4]});
                 } else {
                     NotificationManager.error(errors.GET_EDIT_EMPLOYEES, errors.ERROR_GENERIC_MESSAGE);
                 }
@@ -124,6 +130,22 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         }
     }
 
+    /**
+     * Add an jobTitle to the database
+     * @param title The jobTitle
+     */
+    readonly #addJobTitle = async (title: string) : Promise<void> => {
+        let error = await API.createJobTitle(title);
+        let titles = this.state.titles;
+        titles.push(new JobTitle({name: title}));
+        this.setState({titles: titles});
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
+        } else {
+            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+
     public render(): JSX.Element {
         if(this.state.redirectTo) {
             return (<Navigate to={this.state.redirectTo}></Navigate>);
@@ -134,9 +156,11 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 departments={this.state.departments}
                 roles={this.state.roles}
                 jobTitles={this.state.titles}
+                skills={this.state.skills}
                 editedEmployee={this.state.editedEmployee}
                 employeeId={this.props.params.id}
                 onEditEmployee={this.#editEmployee}
+                onAddJobTitle={this.#addJobTitle}
             />
         );
     }

@@ -8,8 +8,15 @@ import { Container } from "react-bootstrap";
 import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
 import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
+import {ComponentEditSkills} from "./ComponentEditSkills";
+import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
+import {Skill} from "../types/Skill";
+import {FormUtils} from "../utils/FormUtils";
+import {JobTitle} from "../types/JobTitle";
 
 interface ComponentAddEmployeeState extends Employee {
+    showEditJobTitles: boolean,
+    showEditSkills: boolean,
     validated?: boolean;
     error: FormErrorType;
     password: string;
@@ -25,18 +32,20 @@ interface ComponentAddEmployeeState extends Employee {
  */
 export class ComponentAddEmployee extends React.Component<AddEmployeeProps, ComponentAddEmployeeState> {
     public state: ComponentAddEmployeeState = {
-        employeeId: "",
-        firstName: "",
-        lastName: "",
-        email: "",
-        phoneNumber: "",
-        password: "",
-        role: 0,
         department: "",
+        email: "",
+        id: "",
+        error: FormErrorType.NO_ERROR,
+        firstName: "",
         jobTitles: [],
+        lastName: "",
+        password: "",
+        phoneNumber: "",
+        role: 0,
+        showEditJobTitles: false,
+        showEditSkills: false,
         skills: [],
         validated: false,
-        error: FormErrorType.NO_ERROR,
     };
 
     public props: AddEmployeeProps;
@@ -69,7 +78,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control
-                            id="firstName"
+                            name="firstName"
                             required
                             type="text"
                             placeholder="Prénom"
@@ -81,7 +90,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Nom</Form.Label>
                         <Form.Control
-                            id="lastName"
+                            name="lastName"
                             required
                             type="text"
                             placeholder="Nom"
@@ -93,10 +102,9 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Adresse courriel</Form.Label>
                         <Form.Control
-                            id="email"
+                            name="email"
                             required
                             type="email"
-                            
                             pattern={RegexUtil.emailGoodRegex}
                             placeholder="exemple@exemple.ca"
                         />
@@ -110,7 +118,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
-                            id="phoneNumber"
+                            name="phoneNumber"
                             required
                             type="tel"
                             pattern={RegexUtil.phoneNumberRegex}
@@ -123,7 +131,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Mot de passe initial</Form.Label>
                         <Form.Control
-                            id="password"
+                            name="password"
                             required
                             type="password"
                             pattern={RegexUtil.goodPasswordRegex}
@@ -135,7 +143,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Département</Form.Label>
-                        <Form.Select required id="department" value={this.state.department}
+                        <Form.Select required name="department" value={this.state.department}
                                      onChange={this.#handleSelect}>
                             {this.props.departments.map((department, index) => (
                                 <option key={`${index}`} value={`${department.name}`}>{`${department.name}`}</option>))}
@@ -146,19 +154,31 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     </Form.Group>
                 </Row>
                 <Row className="mb-3">
-                    <Form.Group as={Col} md="6">
-                        <Form.Label>Corps d'emploi</Form.Label>
-                        {this.props.jobTitles.map((corps) => (<Form.Check
-                            key={`${corps}`}
+                    <Form.Group as={Col} md="4">
+                        <Form.Label>Corps d'emploi</Form.Label><Button onClick={() => this.#onShowEditJobTitles()} className="float-end">+</Button>
+                        {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
+                            key={title.name}
                             type="checkbox"
-                            id={`${corps}`}
-                            className="jobTitles"
-                            label={`${corps}`}
+                            name={title.name}
+                            label={title.name}
                         />))}
+                        <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)} showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
+                                                onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}  onDeleteJobTitle={this.props.onDeleteJobTitle}></ComponentEditJobTitles>
                     </Form.Group>
-                    <Form.Group as={Col} md="6">
+                    <Form.Group as={Col} md="4">
+                        <Form.Label>Compétences</Form.Label><Button onClick={() => this.#onShowEditSkills()} className="float-end">+</Button>
+                        {this.props.skills.map((skill: Skill) => (<Form.Check
+                            key={skill.name}
+                            type="checkbox"
+                            name={skill.name}
+                            label={skill.name}
+                        />))}
+                        <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)} showEdit={this.state.showEditSkills} skills={this.props.skills}
+                                             onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill} onDeleteSkill={this.props.onDeleteSkill}></ComponentEditSkills>
+                    </Form.Group>
+                    <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required id="role" value={this.state.role} onChange={this.#handleSelect}>
+                        <Form.Select required name="role" value={this.state.role} onChange={this.#handleSelect}>
                             {this.props.roles.map((role, index) => {
                                 if(API.hasLowerPermission(index)) {
                                     return <option key={index} value={index}>{role}</option>
@@ -186,6 +206,14 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         </Container>);
     }
 
+    readonly #onShowEditJobTitles = (value: boolean = true): void => {
+        this.setState({showEditJobTitles: value})
+    }
+
+    readonly #onShowEditSkills = (value: boolean = true): void => {
+        this.setState({showEditSkills: value})
+    }
+
     /**
      * TODO
      * Generate automatically a password for new employee and ask them to change it on the first login.
@@ -199,19 +227,12 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
      * @memberof CreateEmployee
      */
     readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        let errorType = FormErrorType.NO_ERROR;
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
+        let errorType = FormUtils.validateForm(event);
         this.setState({
-            validated: true, error: errorType,
+            validated: true,
+            error: errorType
         });
+
         if (errorType === FormErrorType.NO_ERROR) {
             let employee: EmployeeCreateDTO = {
                 firstName: this.state.firstName,
@@ -236,7 +257,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
      */
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
-        let name: string = target.id;
+        let name: string = target.name;
 
         let value;
         if (target.type === "checkbox") {
@@ -246,7 +267,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         }
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({...this.state, ...{
@@ -257,7 +278,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
     readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
         const target = event.target;
         this.setState({...this.state, ...{
-            [target.id]: target.value
+            [target.name]: target.value
         }});
     }
 }

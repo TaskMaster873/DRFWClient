@@ -9,6 +9,8 @@ import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {API} from "../api/APIManager";
 import {RegexUtil} from "../utils/RegexValidator";
+import {JobTitle} from "../types/JobTitle";
+import {FormUtils} from "../utils/FormUtils";
 
 interface ComponentEditEmployeeState {
     validated?: boolean;
@@ -103,17 +105,16 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
-                        <Form.Label>Corps d'emploi</Form.Label>
-                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((corps) =>
+                        <Form.Label className="w-100">Corps d'emploi <Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
+                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((title: JobTitle) =>
                             <Form.Check
-                            name={corps}
-                            key={corps}
+                            name={title.name}
+                            key={title.name}
                             type="checkbox"
-                            id={corps}
                             className="jobTitles"
-                            label={`${corps}`}
+                            label={title.name}
                             value={this.props.editedEmployee?.jobTitles}
-                        />) : <p className="mt-1 noneJobTitle">Aucun corps d'emplois</p>}
+                        />) : <p className="mt-1 noneJobTitle">Aucun title d'emplois</p>}
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
@@ -160,20 +161,12 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
      * @memberof CreateEmployee
      */
     readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-
-        event.preventDefault();
-        event.stopPropagation();
+        let errorType = FormUtils.validateForm(event);
 
         let eventTarget: any = event.target;
         let formData = new FormData(eventTarget);
         let formDataObj: EmployeeEditDTO = Object.fromEntries(formData.entries()) as unknown as EmployeeEditDTO;
 
-        let errorType = FormErrorType.NO_ERROR;
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
         this.setState({
             validated: true,
             error: errorType

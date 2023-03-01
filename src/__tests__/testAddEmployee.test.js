@@ -12,13 +12,15 @@ import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmploye
 jest.mock("../src/engine/api/APIManager");
 let user;
 
-let departments = [{name: "Informatique"}];
+let departments = [{name: "Informatique", director: "Maxime"}];
 let roles = ["Employé"];
 let jobTitles = ["Anglophone"];
+let skills = ["Conducteur de véhicule lourds"]
 
 beforeEach(async () => {
     user = userEvent.setup();
-    render(<MemoryRouter><ComponentAddEmployee departments={departments} roles={roles} jobTitles={jobTitles} /></MemoryRouter>);
+    render(<MemoryRouter><ComponentAddEmployee departments={departments} roles={roles} jobTitles={jobTitles} skills={skills} onAddEmployee={jest.fn()} onAddJobTitle={jest.fn()}
+                                               onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()} /></MemoryRouter>);
 });
 
 test("should render form inputs", async () => {
@@ -285,13 +287,11 @@ test("Valid employee number and password should submit form", async () => {
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputFirstName = document.getElementById("firstName");
-    const inputName = document.getElementById("lastName");
-    const inputEmail = document.getElementById("email");
-    const inputPhoneNumber = document.getElementById("phoneNumber");
-    const inputInitialPassword = document.getElementById(
-        "password"
-    );
+    const inputFirstName = document.getElementsByName("firstName")[0];
+    const inputName = document.getElementsByName("lastName")[0];
+    const inputEmail = document.getElementsByName("email")[0];
+    const inputPhoneNumber = document.getElementsByName("phoneNumber")[0];
+    const inputInitialPassword = document.getElementsByName("password")[0];
     return {
         form,
         inputEmail,
