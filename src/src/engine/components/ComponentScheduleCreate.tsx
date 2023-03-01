@@ -10,23 +10,23 @@ type Props = {
 	employees: Employee[];
 	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
 	editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
-	deleteShift: (shiftId: string) => Promise<void>;
+	deleteShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
 };
 
 type State = {
 	/** is the popup child active or not */
 	isShowingModal: boolean;
-    /** Shift id and serves as a unique DayPilot marker */
-    currentEventId: string;
+	/** Shift id and serves as a unique DayPilot marker */
+	currentEventId: string;
 	/** start of the calendar */
 	start: DayPilot.Date;
 	/** end of the calendar */
 	end: DayPilot.Date;
 	/** for the popup */
 	resource: string;
-    /** Popup taskType */
-    taskType: EventManipulationType;
-}
+	/** Popup taskType */
+	taskType: EventManipulationType;
+};
 
 export class ComponentScheduleCreate extends React.Component<Props, State> {
 	public state: State = {
@@ -54,6 +54,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 					onTimeRangeSelected={this.#onTimeRangeSelected}
 					onEventClick={this.#onEventClick}
 					onEventMoved={this.#onEventMoved}
+					onEventResized={this.#onEventResized}
 					onEventDelete={this.#onEventDelete}
 					startDate={DayPilot.Date.today()}
 					columns={this.getEmployeeColumns()}
@@ -90,7 +91,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 			for (let employee of this.props.employees) {
 				listToReturn.push({
 					id: employee.id ?? "1",
-					name: employee.firstName
+					name: `${employee.firstName} ${employee.lastName}`
 				});
 			}
 		}
@@ -143,7 +144,21 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 			start: args.newStart,
 			end: args.newEnd,
 		};
-		await this.props.editShift(eventToSend)
+		await this.props.editShift(eventToSend);
+	};
+
+	/**
+	 * When you resize an event in order to modify its length, this function is called
+	 * @param args info on the dragged event
+	 */
+	readonly #onEventResized = async (args: any): Promise<void> => {
+		let eventToSend: EventForShiftEdit = {
+			id: args.e.data.id,
+			employeeId: args.e.data.resource,
+			start: args.newStart,
+			end: args.newEnd,
+		};
+		await this.props.editShift(eventToSend);
 	};
 
 	/**
@@ -151,8 +166,14 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 	 * @param args 
 	 */
 	readonly #onEventDelete = async (args: any): Promise<void> => {
-		await this.props.deleteShift(args.e.data.id);
-	}
+		let eventToSend: EventForShiftEdit = {
+			id: args.e.data.id,
+			employeeId: args.e.data.resource,
+			start: args.e.data.start,
+			end: args.e.data.end,
+		};
+		await this.props.deleteShift(eventToSend);
+	};
 
 	/**
 	 * When you close the modal window, this function is called in order to hide it
@@ -160,6 +181,6 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 	readonly #hideModal = () => {
 		this.setState({
 			isShowingModal: false
-		})
-	}
+		});
+	};
 }

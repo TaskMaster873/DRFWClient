@@ -52,9 +52,7 @@ import {
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
-import {APIUtils} from "./APIUtils";
-import {JobTitle} from "../types/JobTitle";
-import {Skill} from "../types/Skill";
+import {department} from "../../../Constants/testConstants";
 
 type SubscriberCallback =
     () =>
@@ -86,7 +84,7 @@ type SubscriberCallback =
  */
 class APIManager extends Logger {
 
-    //region Attributes 
+    //region Attributes
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
 
@@ -799,13 +797,22 @@ class APIManager extends Logger {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-
-        if (departmentId) {
-            await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
-                errorMessage = APIUtils.getErrorMessageFromCode(error);
-            });
-        } else {
-            errorMessage = errors.INVALID_DEPARTMENT_ID;
+        let queryDepartment = query(
+            collection(this.#db, `departments`),
+            where("name", "==", department.name)
+        );
+        let errorMessage = await this.checkIfAlreadyExists(
+            queryDepartment,
+            errors.DEPARTMENT_ALREADY_EXIST
+        );
+        if(!errorMessage) {
+            if (departmentId) {
+                await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
+                    errorMessage = this.getErrorMessageFromCode(error);
+                });
+            } else {
+                errorMessage = errors.INVALID_DEPARTMENT_ID;
+            }
         }
         return errorMessage;
     }
@@ -1112,7 +1119,7 @@ class APIManager extends Logger {
         let employeeRole: number = 0;
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
             (error) => {
-                APIUtils.getErrorMessageFromCode(error);
+                this.getErrorMessageFromCode(error);
             }
         );
         if (employee && employee) {
