@@ -13,6 +13,7 @@ import {NotificationManager} from "../api/NotificationManager";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import {Roles} from "../types/Roles";
+import {DateManager} from "../utils/DateManager";
 
 enum FetchState {
     WAITING = 0,
@@ -58,6 +59,12 @@ export class CreateSchedule extends React.Component<unknown, State> {
                 NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
                 this.setState({fetchState: FetchState.ERROR});
             } else {
+                //If current user is a manager, limit access to other departments
+                if (!this.verifyPermissions(Roles.ADMIN)) {
+                    fetchedDepartments = fetchedDepartments.filter(d =>
+                        d.name === API.getCurrentEmployee()?.department
+                    );
+                }
                 await this.#changeDepartment(fetchedDepartments[0], fetchedDepartments);
             }
         } else {
@@ -111,6 +118,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
     readonly #changeDepartment = async (currentDepartment: Department, departments?: Department[]): Promise<void> => {
         //Get all employees of this department
         let fetchedEmployees = await API.getEmployees(currentDepartment.name);
+        //Manage errors
         if (typeof fetchedEmployees === "string") {
             NotificationManager.error(errors.GET_EMPLOYEES, fetchedEmployees);
             this.setState({fetchState: FetchState.ERROR});
@@ -128,6 +136,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
     private getShifts = async (currentDepartment: Department, departments?: Department[], employees?: Employee[]): Promise<void> => {
         //Get all daily shifts of this department
         let fetchedShifts = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), currentDepartment);
+        //Manage errors
         if (typeof fetchedShifts === "string") {
             NotificationManager.error(errors.GET_SHIFTS, fetchedShifts);
             this.setState({fetchState: FetchState.ERROR});
@@ -154,8 +163,9 @@ export class CreateSchedule extends React.Component<unknown, State> {
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
             end: shiftEvent.end,
-            department: this.state.currentDepartment ? this.state.currentDepartment.name : "",
+            department: currentDepartment.name,
         });
+        //Manage errors
         if (typeof error === "string") {
             NotificationManager.error(errors.CREATE_SHIFT, error);
             this.setState({fetchState: FetchState.ERROR});
@@ -176,8 +186,9 @@ export class CreateSchedule extends React.Component<unknown, State> {
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
             end: shiftEvent.end,
-            department: this.state.currentDepartment ? this.state.currentDepartment.name : "",
+            department: currentDepartment.name,
         });
+        //Manage errors
         if (typeof error === "string") {
             NotificationManager.error(errors.EDIT_SHIFT, error);
             this.setState({fetchState: FetchState.ERROR});
@@ -190,17 +201,24 @@ export class CreateSchedule extends React.Component<unknown, State> {
      * Deletes a shift in the DB and refreshes the state (Halfway through the function chain)
      * @param shiftEvent The id of the shift to delete
      */
-    readonly #deleteShift= async (shiftId: string): Promise<void> => {
+    readonly #deleteShift = async (shiftEvent: EventForShiftEdit): Promise<void> => {
         let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
         //Delete shift
-        let error = await API.deleteShift(shiftId);
+        let error = await API.deleteShift({
+            id: shiftEvent.id,
+            employeeId: shiftEvent.employeeId,
+            start: shiftEvent.start,
+            end: shiftEvent.end,
+            department: currentDepartment.name,
+        });
+        //Manage errors
         if (typeof error === "string") {
             NotificationManager.error(errors.DELETE_SHIFT, error);
             this.setState({fetchState: FetchState.ERROR});
         }
         //Refresh shifts
         else await this.getShifts(currentDepartment, this.state.departments, this.state.employees);
-    }
+    };
 
     /**
      * Converts the shift into events for the Daypilot calendar
@@ -210,8 +228,11 @@ export class CreateSchedule extends React.Component<unknown, State> {
     private getEventsForCalendarFromShifts(shifts: Shift[]): EventForCalendar[] {
         let events: EventForCalendar[] = [];
         for (let shift of shifts) {
+            let startText = DateManager.convertTimestampToDayPilotDate(shift.start);
+            let endText = DateManager.convertTimestampToDayPilotDate(shift.end);
             events.push({
                 id: shift.id,
+                text: `${startText} à ${endText}`,
                 start: shift.start,
                 end: shift.end,
                 resource: shift.employeeId

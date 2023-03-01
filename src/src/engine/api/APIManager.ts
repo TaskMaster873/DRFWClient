@@ -90,6 +90,7 @@ class APIManager extends Logger {
     #db!: Firestore;
 
     #user: FirebaseAuth.User | null = null;
+    #currentEmployee: EmployeeEditDTO | null = null;
     #userRole: number = 0;
 
     /**
@@ -123,7 +124,7 @@ class APIManager extends Logger {
 
     //#region GETTERS
     /**
-     * Return the current user role.
+     * Returns the current user role.
      * @readonly
      * @type {number}
      * @memberof APIManager
@@ -134,7 +135,7 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method return the current employee name.
+     * This method returns the current employee name.
      * @readonly
      * @type {string}
      * @memberof APIManager
@@ -145,7 +146,7 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method return if the user is authenticated or not.
+     * This method returns if the user is authenticated or not.
      * @returns {boolean} True if the user is authenticated, false otherwise.
      * @memberof APIManager
      * @method isAuth
@@ -155,7 +156,17 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method return if the current user has the given permissions.
+     * This method returns the current employee if he's connected
+     * @returns {EmployeeEditDTO | null} EmployeeEditDTO if the user is authenticated, null otherwise.
+     * @memberof APIManager
+     * @method getCurrentEmployee
+     */
+    public getCurrentEmployee(): EmployeeEditDTO | null {
+        return this.#currentEmployee;
+    }
+
+    /**
+     * This method returns if the current user has the given permissions.
      * @param permissionLevel The permission level to check.
      * @returns {boolean} True if the user has the given permissions, false otherwise.
      */
@@ -164,7 +175,7 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method return if the current user has a lower permission than the given one.
+     * This method returns if the current user has a lower permission than the given one.
      * @param permissionLevel The permission level to check.
      * @returns {boolean} True if the user has a lower permission than the given one, false otherwise.
      */
@@ -425,12 +436,13 @@ class APIManager extends Logger {
         this.log("Logging out user...");
         let errorMessage: string | null = null;
 
-        if (this.isAuth()) {
+        if (this.isAuthenticated) {
             await FirebaseAuth.signOut(this.#auth).catch((error) => {
                 errorMessage = this.getErrorMessageFromCode(error);
             });
 
-            this.#userRole = -1;
+            this.#currentEmployee = null;
+            this.#userRole = Roles.GUEST;
 
             await this.onEvent();
         }
@@ -466,7 +478,7 @@ class APIManager extends Logger {
      * @returns {Promise<void>} Nothing.
      */
     private async listenEvents(): Promise<void> {
-        let resolved = false;
+        let isResolved = false;
 
         this.awaitLogin = new Promise(async (resolve) => {
             FirebaseAuth.onAuthStateChanged(
@@ -479,16 +491,26 @@ class APIManager extends Logger {
                     } else {
                         this.isAuthenticated = true;
                         this.#user = user;
-                        this.#userRole = await this.getCurrentEmployeeRole(
+                        //Get employee document from firestore
+                        let fetchedEmployee = await this.getEmployeeById(
                             user.uid
                         );
+                        //Check for errors
+                        if (typeof fetchedEmployee === "string") {
+                            this.#currentEmployee = null;
+                            this.#userRole = 0;
+                        } else {
+                            this.#currentEmployee = fetchedEmployee;
+                            this.#userRole = fetchedEmployee.role;
+                        }
 
-                        console.log("user", user);
+                        console.log("user", this.#user);
+                        console.log("currentEmployee", this.#currentEmployee);
                         console.log("userRole", this.#userRole);
                     }
 
-                    if (!resolved) {
-                        resolved = true;
+                    if (!isResolved) {
+                        isResolved = true;
                         resolve();
                     }
                 }
@@ -832,7 +854,7 @@ class APIManager extends Logger {
             queryDepartment,
             errors.DEPARTMENT_ALREADY_EXIST
         );
-        if(!errorMessage) {
+        if (!errorMessage) {
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
                     errorMessage = this.getErrorMessageFromCode(error);
@@ -1037,34 +1059,6 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method is used to get the current employee's role. If the request was not successful, it will return an error message.
-     * @param uid The ID of the employee.
-     * @method getCurrentEmployeeRole
-     * @async
-     * @public
-     * @memberof APIManager
-     * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
-     */
-    public async getCurrentEmployeeRole(uid: string): Promise<number> {
-        let employeeRole: number = 0;
-        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch(
-            (error) => {
-                this.getErrorMessageFromCode(error);
-            }
-        );
-        if (employee && employee) {
-            let employeeData = employee.data();
-            if (employeeData) {
-                employeeRole = employeeData.role;
-                if (!employeeData.role) {
-                    return 0;
-                }
-            }
-        }
-        return employeeRole;
-    }
-
-    /**
      * This method is used to get the job titles list. If the request was not successful, it will return an error message.
      * @method getJobTitles
      * @async
@@ -1167,13 +1161,6 @@ class APIManager extends Logger {
     }
 
     /**
-     * Récupère l'horaire de la journée d'un département pour une journée
-     * @param day
-     * @param department le nom du département que récupérer
-     * @returns une liste de quarts de travail d'un département pour une journée
-     */
-
-    /**
      * This method is used to get the schedule of a department for a day. If the request was not successful, it will return an error message.
      * @method getDailyScheduleForDepartment
      * @async
@@ -1184,15 +1171,14 @@ class APIManager extends Logger {
      * @returns {Promise<Shift[] | string>} The schedule of the department for the day if the request was successful, and the error message if it was not.
      */
     public async getDailyScheduleForDepartment(day: DayPilot.Date, department: Department): Promise<Shift[] | string> {
-        let errorMessage: string | null = null;
-        let shifts: Shift[] = [];
-
-        //Validate permissions
-        if (!this.isAuthenticated) return errors.PERMISSION_DENIED;
-        if (!this.hasPermission(Roles.ADMIN)) {
-            //TODO: pass if user is director
+        //Manager is allowed, if its his department
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && department.name === this.#currentEmployee?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
+
+        let errorMessage: string | null = null;
+        let shifts: Shift[] = [];
 
         //Convert Daypilot datetimes to Timestamps
         let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
@@ -1239,9 +1225,9 @@ class APIManager extends Logger {
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
      */
     public async createShift(shift: ShiftCreateDTO): Promise<void | string> {
-        //Check if user has permission
-        if (!this.hasPermission(Roles.ADMIN)) {
-            //Manager or less
+        //Manager is allowed, if its his department
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
 
@@ -1272,9 +1258,9 @@ class APIManager extends Logger {
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
      */
     public async editShift(shift: Shift): Promise<void | string> {
-        //Check if user has permission
-        if (!this.hasPermission(Roles.ADMIN)) {
-            //Manager or less
+        //Manager is allowed, if its his department
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
 
@@ -1301,27 +1287,27 @@ class APIManager extends Logger {
      * @async
      * @public
      * @memberof APIManager
-     * @param {string} shiftId The id of the shift to delete.
+     * @param {shift} shift The shift to delete.
      * @returns {Promise<void | string>} Nothing if the request was successful, and the error message if it was not.
      */
-    public async deleteShift(shiftId: string): Promise<void | string> {
-        //Check if user has permission
-        if (!this.hasPermission(Roles.ADMIN)) {
-            //Manager or less
+    public async deleteShift(shift: Shift): Promise<void | string> {
+        //Manager is allowed, if its his department
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#currentEmployee?.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
             return errors.PERMISSION_DENIED;
         }
 
         let errorMessage: string | null = null;
 
         //Delete Shift
-        await deleteDoc(doc(this.#db, `shifts`, shiftId),
+        await deleteDoc(doc(this.#db, `shifts`, shift.id),
         ).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);
         });
 
         if (errorMessage) return errorMessage;
     }
-    
+
     public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
         if (!this.hasPermission(1)) {
             //Gestionnaire

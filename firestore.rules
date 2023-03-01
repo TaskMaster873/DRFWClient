@@ -102,42 +102,49 @@ service cloud.firestore {
 
             match /shifts/{shiftId} {
                 allow read;
-                allow create: if isValidShift(shiftId);
-                allow update: if isValidShift(shiftId);
-                allow delete: if isValidShiftDeletion(shiftId);
+                allow create: if isValidShiftCreate(shiftId);
+                allow update: if isValidShiftUpdate(shiftId);
+                allow delete: if isValidShiftDelete(shiftId);
             }
 
-            function isValidShiftDeletion(shiftId) {
-                let validShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
-
-                return !validShift && getCurrentEmployeeRole(request.auth.uid) >= 3;
-            }
-
-            function isValidShift(shiftId) {
+            function isValidShiftCreate(shiftId) {
                 let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
-                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'projectName', 'start']);
+                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'start']);
+                let shiftDepartment = request.resource.data.department;
+                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
 
-                return createdValidShift && hasFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3;
+                return createdValidShift && hasFields && isAllowed && shiftFieldTypes();
             }
 
-            match /projects/{projectId} {
-                allow read;
-                allow create: if isValidProject(projectId);
-                allow update: if isValidProject(projectId);
+            function isValidShiftUpdate(shiftId) {
+                let updatedValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'start']);
+                let shiftDepartment = get(/databases/$(database)/documents/shifts/$(shiftId)).data.department;
+                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
+
+                return updatedValidShift && hasFields && isAllowed && shiftFieldTypes();
             }
 
-            function projectFieldTypes() {
-                return request.resource.data.name is string &&
-                       request.resource.data.start is timestamp
+            function isValidShiftDelete(shiftId) {
+                let validShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+                let shiftDepartment = get(/databases/$(database)/documents/shifts/$(shiftId)).data.department;
+                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
+
+                return !validShift && isAllowed;
             }
 
-            function isValidProject(projectId) {
-                let createdValidProject = existsAfter(/databases/$(database)/documents/projects/$(projectId));
-                let hasFields = request.resource.data.keys().hasOnly(['name', 'start']);
+            function isManagerAllowed(documentDepartment) {
+                let isManager = getCurrentEmployeeRole(request.auth.uid) >= 2;
+                let employeeDepartment = get(/databases/$(database)/documents/employees/$(request.auth.uid)).data.department;
+                
+                return employeeDepartment == documentDepartment && isManager;
+            }
 
-                return createdValidProject && hasFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && projectFieldTypes();
+            function shiftFieldTypes() {
+                return request.resource.data.department is string &&
+                       request.resource.data.employeeId is string &&
+                       request.resource.data.start is timestamp &&
+                       request.resource.data.end is timestamp
             }
 
             match /unavailabilities/{unavailabilityId} {
@@ -145,6 +152,5 @@ service cloud.firestore {
                 allow write;
             }
         }
-
     }
 }
