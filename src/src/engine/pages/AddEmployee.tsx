@@ -33,28 +33,23 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         await this.fetchData();
     }
 
-    private async fetchData() {
+    private async fetchData(): Promise<void> {
         let isLoggedIn: boolean = await this.verifyLogin();
-        if (isLoggedIn) {
-            let departments = API.getDepartments();
-            let roles = API.getRoles();
-            let titles = API.getJobTitles();
-            let skills = API.getSkills();
-
-            let params: [
-                    Department[] | string,
-                    EmployeeRoleList | string,
-                    EmployeeJobTitleList | string,
-                    EmployeeSkillList | string
-            ] = await Promise.all([departments, roles, titles, skills]);
-
-            if (Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray((params[3]))) {
-                this.setState({departments: params[0], roles: params[1], titles: params[2], skills: params[3]});
-            } else {
-                NotificationManager.error(errors.GET_DEPARTMENTS, errors.SERVER_ERROR);
-            }
-        } else {
+        if (!isLoggedIn) {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
+            return;
+        }
+        const [departments, roles, titles, skills] = await Promise.all([
+            API.getDepartments(),
+            API.getRoles(),
+            API.getJobTitles(),
+            API.getSkills(),
+        ]);
+
+        if (Array.isArray(departments) && Array.isArray(roles) && Array.isArray(titles) && Array.isArray(skills)) {
+            this.setState({ departments: departments, roles, titles, skills });
+        } else {
+            NotificationManager.error(errors.GET_DEPARTMENTS, errors.SERVER_ERROR);
         }
     }
 
@@ -72,17 +67,15 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @private
      */
     private async verifyLogin(): Promise<boolean> {
-        let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
         let hasPerms = this.verifyPermissions(Roles.ADMIN);
         if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
         } else {
-            isLoggedIn = true;
+            return false;
         }
-
-        return isLoggedIn;
+        return true;
     }
 
     /**
@@ -103,7 +96,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @private
      */
     readonly #addEmployee = async (password: string, employee: EmployeeCreateDTO): Promise<void> => {
-        let error = await API.createEmployee(password, employee);
+        const error = await API.createEmployee(password, employee);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_CREATED);
         } else {
@@ -114,15 +107,14 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     //#region JobTitles
     /**
      * Add an jobTitle to the database
-     * @param title The jobTitle
+     * @param titleName The jobTitle
      * @private
      */
-    readonly #addJobTitle = async (title: string): Promise<void> => {
-        let error = await API.createJobTitle(title);
+    readonly #addJobTitle = async (titleName: string): Promise<void> => {
+        const error = await API.createJobTitle(titleName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_CREATED);
-            let titles = this.state.titles;
-            titles.push(new JobTitle({name: title}));
+            const titles = [...this.state.titles, new JobTitle({ name: titleName })];
             this.setState({titles: titles});
             await this.fetchData();
         } else {
@@ -136,8 +128,8 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @private
      */
     readonly #editJobTitle = async (title: JobTitle): Promise<void> => {
-        if(title.id) {
-            let error = await API.editJobTitle(title);
+        if (title.id) {
+            const error = await API.editJobTitle(title);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_EDITED);
                 let titles = Utils.editElement(this.state.titles, title.id, title) as JobTitle[];
@@ -155,8 +147,8 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @private
      */
     readonly #deleteJobTitle = async (titleId: string): Promise<void> => {
-        if(titleId) {
-            let error = await API.deleteJobTitle(titleId);
+        if (titleId) {
+            const error = await API.deleteJobTitle(titleId);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_DELETED);
                 let titles = Utils.deleteElement(this.state.titles, titleId) as JobTitle[];
@@ -176,11 +168,10 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @private
      */
     readonly #addSkill = async (skillName: string): Promise<void> => {
-        let error = await API.createSkill(skillName);
+        const error = await API.createSkill(skillName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_CREATED);
-            let skills = this.state.skills;
-            skills.push(new Skill({name: skillName}));
+            const skills = [...this.state.skills, new Skill({ name: skillName })];
             this.setState({skills: skills});
             await this.fetchData();
         } else {
@@ -194,14 +185,14 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @private
      */
     readonly #editSkill = async (skill: Skill): Promise<void> => {
-        if(skill.id) {
-            let error = await API.editSkill(skill);
+        if (skill.id) {
+            const error = await API.editSkill(skill);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
                 let skills = Utils.editElement(this.state.skills, skill.id, skill) as Skill[];
                 this.setState({skills: skills});
                 await this.fetchData();
-            } else if(error) {
+            } else if (error) {
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
@@ -213,8 +204,8 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
      * @private
      */
     readonly #deleteSkill = async (skillId: string): Promise<void> => {
-        if(skillId) {
-            let error = await API.deleteSkill(skillId);
+        if (skillId) {
+            const error = await API.deleteSkill(skillId);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
                 let skills = Utils.deleteElement(this.state.skills, skillId) as Skill[];

@@ -75,7 +75,6 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 data-error={this.state.error}
             >
                 <Row className="mb-3 mt-3">
-
                     <Form.Group as={Col} md="4">
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control

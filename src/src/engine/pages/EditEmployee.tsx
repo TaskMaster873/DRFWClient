@@ -3,12 +3,10 @@ import {API} from "../api/APIManager";
 import {
     AddEmployeeState,
     EmployeeEditDTO,
-    EmployeeJobTitleList, EmployeeProps,
-    EmployeeRoleList, EmployeeSkillList
+    EmployeeProps,
 } from "../types/Employee";
 
 import {errors, successes} from "../messages/FormMessages";
-import {Department} from "../types/Department";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
 import {Navigate, Params, useParams} from "react-router-dom";
 import {NotificationManager} from "../api/NotificationManager";
@@ -52,39 +50,32 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
 
     private async fetchData() {
         let isLoggedIn: boolean = await this.verifyLogin();
-        if (isLoggedIn) {
-            let departments = API.getDepartments();
-            let roles = API.getRoles();
-            let titles = API.getJobTitles();
-            let skills = API.getSkills();
+        if (!isLoggedIn) {
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
+            return;
+        }
+        if (this.props.params.id) {
+            const [departments, roles, titles, skills, editedEmployee] = await Promise.all([
+                API.getDepartments(),
+                API.getRoles(),
+                API.getJobTitles(),
+                API.getSkills(),
+                API.getEmployeeById(this.props.params.id)
+            ]);
 
-            if (this.props.params.id) {
-                let editedEmployee = API.getEmployeeById(this.props.params.id);
-
-                let params: [
-                        Department[] | string,
-                        EmployeeRoleList | string,
-                        EmployeeJobTitleList | string,
-                        EmployeeSkillList | string,
-                        EmployeeEditDTO | string,
-                ] = await Promise.all([departments, roles, titles, skills, editedEmployee]);
-
-                if (Array.isArray(params[0]) && Array.isArray(params[1]) && Array.isArray(params[2]) && Array.isArray(params[3]) && typeof (params[4]) !== "string") {
-                    this.setState({
-                        departments: params[0],
-                        roles: params[1],
-                        titles: params[2],
-                        skills: params[3],
-                        editedEmployee: params[4]
-                    });
-                } else {
-                    NotificationManager.error(errors.GET_EDIT_EMPLOYEES, errors.ERROR_GENERIC_MESSAGE);
-                }
+            if (Array.isArray(departments) && Array.isArray(roles) && Array.isArray(titles) && Array.isArray(skills) && typeof (editedEmployee) !== "string") {
+                this.setState({
+                    departments: departments,
+                    roles: roles,
+                    titles: titles,
+                    skills: skills,
+                    editedEmployee: editedEmployee
+                });
             } else {
-                NotificationManager.error(errors.INVALID_EMPLOYEE_ID_PARAMETER, errors.ERROR_GENERIC_MESSAGE);
+                NotificationManager.error(errors.GET_EDIT_EMPLOYEES, errors.ERROR_GENERIC_MESSAGE);
             }
         } else {
-            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
+            NotificationManager.error(errors.INVALID_EMPLOYEE_ID_PARAMETER, errors.ERROR_GENERIC_MESSAGE);
         }
     }
 
@@ -102,17 +93,15 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
      * @private
      */
     private async verifyLogin(): Promise<boolean> {
-        let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
         let hasPerms = this.verifyPermissions(Roles.ADMIN);
         if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
         } else {
-            isLoggedIn = true;
+            return true;
         }
-
-        return isLoggedIn;
+        return false;
     }
 
     /**
@@ -143,15 +132,14 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     //#region JobTitles
     /**
      * Add an jobTitle to the database
-     * @param title The jobTitle
+     * @param titleName The new jobTitle name
      * @private
      */
-    readonly #addJobTitle = async (title: string): Promise<void> => {
-        let error = await API.createJobTitle(title);
+    readonly #addJobTitle = async (titleName: string): Promise<void> => {
+        const error = await API.createJobTitle(titleName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_CREATED);
-            let titles = this.state.titles;
-            titles.push(new JobTitle({name: title}));
+            const titles = [...this.state.titles, new JobTitle({ name: titleName })];
             this.setState({titles: titles});
             await this.fetchData();
         } else {
@@ -201,15 +189,14 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     //#region Skills
     /**
      * Add a skill to the database
-     * @param skill the skill
+     * @param skillName the new skill name
      * @private
      */
-    readonly #addSkill = async (skill: string): Promise<void> => {
-        let error = await API.createSkill(skill);
+    readonly #addSkill = async (skillName: string): Promise<void> => {
+        let error = await API.createSkill(skillName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_CREATED);
-            let skills = this.state.skills;
-            skills.push(new Skill({name: skill}));
+            const skills = [...this.state.skills, new Skill({ name: skillName })];
             this.setState({skills: skills});
             await this.fetchData();
         } else {
