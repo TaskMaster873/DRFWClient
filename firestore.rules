@@ -149,7 +149,12 @@ service cloud.firestore {
 
             match /unavailabilities/{unavailabilityId} {
                 allow read;
-                allow write;
+                allow write: if(isValidUnavailabilityCreate());
+            }
+
+            function isValidUnavailabilityCreate() {
+                let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
+                return isEmployee;
             }
         }
     }

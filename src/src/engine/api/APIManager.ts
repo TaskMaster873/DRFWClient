@@ -1309,7 +1309,7 @@ class APIManager extends Logger {
     }
 
     public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
-        if (!this.hasPermission(1)) {
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
             //Gestionnaire
             return errors.PERMISSION_DENIED;
         }
@@ -1323,6 +1323,7 @@ class APIManager extends Logger {
                 unavailabilities: list.recursiveExceptions,
                 start: list.start,
                 end: list.end,
+                isAccepted: false,
             },
         ).catch((error) => {
             errorMessage = this.getErrorMessageFromCode(error);

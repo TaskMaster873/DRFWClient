@@ -139,11 +139,12 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         let starts;
         let ends;
         let unavailabilitiesInCalendar = this.componentAvailability?.getListFromTheCalendar();
-        let sorted = unavailabilitiesInCalendar;
+        let datesList: DateOfUnavailabilityList = [];
         if (unavailabilitiesInCalendar) {
             //let unavailabilitiesFiltered = this.sortFromStart(unavailabilitiesInCalendar);
             console.log("calendar", unavailabilitiesInCalendar);
-            this.transformListIntoDateList(unavailabilitiesInCalendar);
+            datesList = this.transformListIntoDateList(unavailabilitiesInCalendar);
+            console.log("list de date", datesList);
         }
 
 
@@ -160,14 +161,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             recursiveExceptions: {
                 startDate: starts ?? undefined,
                 endDate: ends ?? undefined,
-                [DAYS.SUNDAY]: [],
-                [DAYS.MONDAY]: [],
-                [DAYS.TUESDAY]: [],
-                [DAYS.WEDNESDAY]: [],
-                [DAYS.THURSDAY]: [],
-                //It is to have acces more easily to the datepicker and calendar getters and their public methods
-                [DAYS.FRIDAY]: [],
-                [DAYS.SATURDAY]: []
+                [DAYS.SUNDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.SUNDAY, datesList),
+                [DAYS.MONDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.MONDAY, datesList),
+                [DAYS.TUESDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.TUESDAY, datesList),
+                [DAYS.WEDNESDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.WEDNESDAY, datesList),
+                [DAYS.THURSDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.THURSDAY, datesList),
+                [DAYS.FRIDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.FRIDAY, datesList),
+                [DAYS.SATURDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.SATURDAY, datesList)
             },
             start: start,
             end: end
@@ -178,7 +178,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         console.log(this.componentAvailability?.getListFromTheCalendar());
     };
 
-    private transformListIntoDateList(unavailabilitiesInCalendar: DayPilot.EventData[]) {
+    private transformListIntoDateList(unavailabilitiesInCalendar: DayPilot.EventData[]): DateOfUnavailabilityList {
         let listSortedByStart: DateOfUnavailabilityList = [];
 
         if (unavailabilitiesInCalendar.length != 0) {
@@ -188,6 +188,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
         }
 
+        return listSortedByStart;
 
 
 
