@@ -91,7 +91,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     readonly #onTimeRangeSelectedCalendar = (args: DayPilot.CalendarTimeRangeSelectedArgs): void => {
         let event = this.calendar?.events?.list;
         if (!event) {
-            console.log("les events", event);
             event = [];
         }
 
@@ -106,7 +105,13 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
         this.datePicker?.update({events: event});
         this.calendar?.update({events: event});
+        this.#getListOfTheCalendarEvents();
+        this.calendar?.clearSelection();
     };
+
+    readonly #getListOfTheCalendarEvents = (): void => {
+        console.log("all in the calendar",this.calendar?.events?.list);
+    }
 
     readonly #onBeforeCellRender = (args: any): void => {
         let cell = args.cell;
@@ -122,6 +127,10 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                 args.cell.properties.backColor = "#eeeeee";
             }
         }
+    }
+
+    public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
+        return this.calendar?.events.list;
     }
 
     public render(): JSX.Element {
