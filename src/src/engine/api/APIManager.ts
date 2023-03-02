@@ -1180,14 +1180,14 @@ class APIManager extends Logger {
 
         //Convert Daypilot datetimes to Timestamps
         let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
-        let convertedEndDay: Timestamp = this.getFirebaseTimestamp(day.addDays(1));
+        let convertedEndDay: Timestamp = new Timestamp(convertedStartDay.seconds + 86400, 0);
 
         //Query shifts
         let queryShifts = query(
             collection(this.#db, `shifts`),
             where("department", "==", department.name),
-            where("end", ">", convertedStartDay),
-            where("end", "<", convertedEndDay)
+            where("start", ">", convertedStartDay),
+            where("start", "<", convertedEndDay)
         );
 
         let snaps = await getDocs(queryShifts).catch((error) => {
@@ -1198,18 +1198,19 @@ class APIManager extends Logger {
         if (snaps) {
             for (let doc of snaps.docs) {
                 let shift = doc.data();
-
-                //Push shift object
-                shifts.push(new Shift({
-                    id: doc.id,
-                    employeeId: shift.employeeId,
-                    department: shift.department,
-                    start: this.getDayPilotDateString(shift.start),
-                    end: this.getDayPilotDateString(shift.end),
-                }));
+                //Validated end moment
+                if(shift.end < convertedEndDay) {
+                    //Push shift object
+                    shifts.push(new Shift({
+                        id: doc.id,
+                        employeeId: shift.employeeId,
+                        department: shift.department,
+                        start: this.getDayPilotDateString(shift.start),
+                        end: this.getDayPilotDateString(shift.end),
+                    }));
+                }
             }
         }
-
         return errorMessage ?? shifts;
     }
 
