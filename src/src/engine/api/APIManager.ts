@@ -56,13 +56,14 @@ import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
 import {EmployeeInfos} from "./types/APITypes";
 import {NotificationManager} from "./NotificationManager";
-import {SECONDS_IN_A_DAY} from "../utils/DateManager";
 
 type SubscriberCallback =
     () =>
         | void
         | (() => Promise<void>)
         | PromiseLike<void>;
+
+const SECONDS_IN_DAY: number = 86400;
 
 /**
  * The APIManager is responsible for all communication with the Firebase API.
@@ -1277,7 +1278,7 @@ class APIManager extends Logger {
 
         //Convert Daypilot datetimes to Timestamps
         let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
-        let convertedEndDay: Timestamp = new Timestamp(convertedStartDay.seconds + SECONDS_IN_A_DAY, 0);
+        let convertedEndDay: Timestamp = new Timestamp(convertedStartDay.seconds + SECONDS_IN_DAY, 0);
 
         //Query shifts
         let queryShifts = query(
