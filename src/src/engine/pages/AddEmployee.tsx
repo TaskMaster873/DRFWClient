@@ -33,6 +33,11 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         await this.fetchData();
     }
 
+    /**
+     * Fetch the data needed to load child components
+     * Data: departments, roles, jobTitles, skills
+     * @private
+     */
     private async fetchData(): Promise<void> {
         let isLoggedIn: boolean = await this.verifyLogin();
         if (!isLoggedIn) {

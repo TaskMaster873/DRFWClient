@@ -90,6 +90,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     }
 
+    //#region Departments
     public addDepartment = async (department: Department) : Promise<void> => {
         let errorMessage = await API.createDepartment(department);
         if (!errorMessage) {
@@ -120,6 +121,19 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     }
 
+    public deleteDepartment = async (department: Department) : Promise<void> => {
+        let errorMessage = await API.deleteDepartment(department);
+        if (!errorMessage && department.id) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
+            let departments = Utils.deleteElement(this.state.departments, department.id) as Department[];
+            this.setState({departments: departments});
+            await this.fetchData();
+        } else if(errorMessage) {
+            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+        }
+    }
+    //#endregion
+
     /**
      *
      * @returns La liste des employés
@@ -139,6 +153,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
                     departments={this.state.departments}
                     onAddDepartment={this.addDepartment}
                     onEditDepartment={this.editDepartment}
+                    onDeleteDepartment={this.deleteDepartment}
                 />
             </Container>
         );

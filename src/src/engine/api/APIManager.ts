@@ -818,24 +818,49 @@ class APIManager extends Logger {
             errors.DEPARTMENT_ALREADY_EXISTS
         );
         if (!errorMessage) {
-            if (departmentId) {
-                await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
-                    errorMessage = APIUtils.getErrorMessageFromCode(error);
-                });
-                let queryEmployeesInDepartment = await query(collection(this.#db, `employees`),
-                    where("department", "==", department.name))
-                let snaps = await getDocs(queryEmployeesInDepartment).catch((error) => {
-                    errorMessage = APIUtils.getErrorMessageFromCode(error);
-                });
-                if(snaps) {
-                    for (const snap of snaps.docs) {
-                        await updateDoc(doc(this.#db, `employees`, snap.id), {department: department.name})
-                    }
+            await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
+                return APIUtils.getErrorMessageFromCode(error);
+            });
+            let queryEmployeesInDepartment = await query(collection(this.#db, `employees`),
+                where("department", "==", department.name))
+            let snaps = await getDocs(queryEmployeesInDepartment).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+            if (snaps) {
+                for (const snap of snaps.docs) {
+                    await updateDoc(doc(this.#db, `employees`, snap.id), {department: department.name})
                 }
-            } else {
-                errorMessage = errors.INVALID_DEPARTMENT_ID;
             }
         }
+        return errorMessage;
+    }
+
+    /**
+     * This method is used to delete a jobTitle from the database
+     * @param department the department
+     */
+    public async deleteDepartment(department: Department): Promise<string | null> {
+        let errorMessage: string | null = null;
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+        if(department.id) {
+            let queryEmployeesInDepartment = await query(collection(this.#db, `employees`),
+                where("department", "==", department.name))
+            let snaps = await getDocs(queryEmployeesInDepartment).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+            if (snaps && snaps.docs.length > 0) {
+                return errors.EMPLOYEE_REMAINING_IN_DEPARTMENT;
+            }
+            await deleteDoc(doc(this.#db, `departments`, department.id)).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_DEPARTMENT_ID;
+        }
+
+
         return errorMessage;
     }
 
@@ -903,13 +928,9 @@ class APIManager extends Logger {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        if (titleId) {
-            await deleteDoc(doc(this.#db, `jobTitles`, titleId)).catch((error) => {
-                errorMessage = APIUtils.getErrorMessageFromCode(error);
-            });
-        } else {
-            errorMessage = errors.INVALID_SKILL_ID;
-        }
+        await deleteDoc(doc(this.#db, `jobTitles`, titleId)).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
 
         return errorMessage;
     }
@@ -936,6 +957,7 @@ class APIManager extends Logger {
         }
         return errorMessage;
     }
+
     /**
      * This method is used to edit a skill from the database
      * @param skill the skill
@@ -1445,7 +1467,7 @@ class APIManager extends Logger {
 
     /**
      * Create a pending unavailability list for the manager
-     * @param list 
+     * @param list
      * @returns {void}
      */
     public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
@@ -1471,9 +1493,11 @@ class APIManager extends Logger {
 
     }
 
-    public async getCurrentEmployeeunavailabilities() {}
+    public async getCurrentEmployeeunavailabilities() {
+    }
 
-    public async getOneEmployeeUnavailabilities() {}
+    public async getOneEmployeeUnavailabilities() {
+    }
 }
 
 /**

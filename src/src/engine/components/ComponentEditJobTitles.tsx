@@ -55,7 +55,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     }
 
     public render(): JSX.Element {
-        return <div><ComponentConfirmDeleteJobTitle closePrompt={this.#onShowConfirmDeleteJobTitles}
+        return <div><ComponentConfirmDeleteJobTitle closePrompt={this.#onShowConfirmDeleteJobTitle}
                                                     jobTitle={this.state.jobTitleToDelete}
                                                     onDeleteJobTitle={this.props.onDeleteJobTitle}/>
             <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
@@ -132,7 +132,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * @param value the Skill to delete
      * @private
      */
-    readonly #onShowConfirmDeleteJobTitles = (value?: JobTitle): void => {
+    readonly #onShowConfirmDeleteJobTitle = (value?: JobTitle): void => {
         this.setState({jobTitleToDelete: value});
     }
 

@@ -4,7 +4,6 @@ import {
     Department, departmentAdminTableHeads,
     DepartmentListProps,
     DepartmentListState,
-    DepartmentModifyDTO,
     departmentTableHeads
 } from "../types/Department";
 import { ComponentAddDepartment } from "./ComponentAddDepartment";
@@ -13,8 +12,11 @@ import { LinkContainer } from "react-router-bootstrap";
 import { Roles } from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
-import {BiEdit} from "react-icons/bi";
+import {BiEdit, BiTrash} from "react-icons/bi";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
+import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
+import {ComponentConfirmDeleteDepartment} from "./ComponentConfirmDeleteDepartment";
+import {JobTitle} from "../types/JobTitle";
 
 /**
  * Component that display the list of departments
@@ -22,12 +24,16 @@ import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
 
     public state: DepartmentListState = {
-        editedDepartment: undefined
+        editedDepartment: undefined,
+        departmentToDelete: undefined
     }
 
     public render(): JSX.Element {
         return (
             <div className="mt-5">
+                <ComponentConfirmDeleteDepartment closePrompt={this.#changeDeletePromptVisibility}
+                                                department={this.state.departmentToDelete}
+                                                onDeleteDepartment={this.props.onDeleteDepartment}/>
                 <h3>Liste des départements</h3>
                 <Table responsive bordered hover className="text-center">
                     <thead>
@@ -38,8 +44,8 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                     </tbody>
                 </Table>
                 {this.renderAddDepartmentComponent()}
-                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.#onEditDepartment}
-                                         departmentToEdit={this.state.editedDepartment} cancelEdit={this.#onCancelEdit} />
+                <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.props.onEditDepartment}
+                                         departmentToEdit={this.state.editedDepartment} cancelEdit={this.#changeEditPromptVisibility} />
             </div>
         );
     }
@@ -111,41 +117,33 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
         if (API.hasPermission(Roles.ADMIN)) {
             return (
                 <td key={`action ${index}`}>
-                    <a onClick={() => this.onEditMode(department)} className="adminActions mx-1">
+                    <a onClick={() => this.#changeEditPromptVisibility(department)} className="adminActions mx-1">
                         <BiEdit/>
+                    </a>
+                    <a onClick={() => this.#changeDeletePromptVisibility(department)} className="adminActions mx-1">
+                        <BiTrash/>
                     </a>
                 </td>
             );
         }
     }
 
-    private onEditMode(department: Department): void {
+    /**
+     * Shows the edit modal with department if no parameter close the prompt
+     * @param department The department
+     * @private
+     */
+    readonly #changeEditPromptVisibility = (department?: Department): void => {
         this.setState({editedDepartment: department});
     }
 
     /**
-     * Call the parent function to update the list of departments
-     * @param department The department that changed
+     * Shows the deletion confirmation modal
+     * @param department The department
      * @private
-     * @memberof ComponentDepartmentList
-     * @async
-     * @returns {Promise<void>}
-     * @throws {Error} If the parent function is not defined
      */
-    readonly #onAddDepartment = async (department: Department): Promise<void> => {
-        if (this.props.onAddDepartment !== null && this.props.onAddDepartment) {
-            await this.props.onAddDepartment(department);
-        }
-    }
-
-    readonly #onEditDepartment = async (departmentId: string, department: DepartmentModifyDTO): Promise<void> => {
-        if (this.props.onEditDepartment !== null && this.props.onEditDepartment) {
-            await this.props.onEditDepartment(departmentId, department);
-        }
-    }
-
-    readonly #onCancelEdit = (): void => {
-        this.setState({editedDepartment: undefined});
+    readonly #changeDeletePromptVisibility = (department?: Department): void => {
+        this.setState({departmentToDelete: department});
     }
 
     /**
@@ -157,7 +155,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
     private renderAddDepartmentComponent(): JSX.Element {
         if (API.isAuth() && API.hasPermission(Roles.ADMIN)) {
             return (
-                <ComponentAddDepartment employees={this.props.employees} onAddDepartment={this.#onAddDepartment}/>
+                <ComponentAddDepartment employees={this.props.employees} onAddDepartment={this.props.onAddDepartment}/>
             );
         } else {
             return <></>;

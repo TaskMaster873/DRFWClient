@@ -60,7 +60,7 @@ service cloud.firestore {
                 allow read;
                 allow create: if isValidDepartment(departmentId);
                 allow update: if isValidDepartment(departmentId);
-
+                allow delete: if isValidDepartmentDelete(departmentId);
             }
 
             function isValidDepartment(departmentId) {
@@ -69,6 +69,12 @@ service cloud.firestore {
 
                 return createdValidDepartment && hasFields
                        && getCurrentEmployeeRole(request.auth.uid) >= 3 && departmentFieldTypes();
+            }
+
+            function isValidDepartmentDelete(departmentId) {
+                let jobTitleExists = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
+
+                return !jobTitleExists && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
 
             function nameFieldTypes() {
@@ -104,8 +110,8 @@ service cloud.firestore {
                        && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
             }
 
-            function isValidJobTitleDelete(roleId) {
-                let jobTitleExists = existsAfter(/databases/$(database)/documents/roles/$(roleId));
+            function isValidJobTitleDelete(jobTitleId) {
+                let jobTitleExists = existsAfter(/databases/$(database)/documents/jobTitles/$(jobTitleId));
 
                 return !jobTitleExists && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
@@ -134,67 +140,44 @@ service cloud.firestore {
 
             match /shifts/{shiftId} {
                 allow read;
-                allow create: if isValidShiftCreate(shiftId);
-                allow update: if isValidShiftUpdate(shiftId);
-                allow delete: if isValidShiftDelete(shiftId);
+                allow create: if isValidShift(shiftId);
+                allow update: if isValidShift(shiftId);
+                allow delete: if isValidShiftDeletion(shiftId);
             }
 
-            function isValidShiftCreate(shiftId) {
-                let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
-                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'start']);
-                let shiftDepartment = request.resource.data.department;
-                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
-
-                return createdValidShift && hasFields && isAllowed && shiftFieldTypes();
-            }
-
-            function isValidShiftUpdate(shiftId) {
-                let updatedValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
-                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'start']);
-                let shiftDepartment = get(/databases/$(database)/documents/shifts/$(shiftId)).data.department;
-                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
-
-                return updatedValidShift && hasFields && isAllowed && shiftFieldTypes();
-            }
-
-            function isValidShiftDelete(shiftId) {
+            function isValidShiftDeletion(shiftId) {
                 let validShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
-                let shiftDepartment = get(/databases/$(database)/documents/shifts/$(shiftId)).data.department;
-                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
 
-                return !validShift && isAllowed;
+                return !validShift && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
 
-            function isManagerAllowed(documentDepartment) {
-                let isManager = getCurrentEmployeeRole(request.auth.uid) >= 2;
-                let employeeDepartment = get(/databases/$(database)/documents/employees/$(request.auth.uid)).data.department;
-                
-                return employeeDepartment == documentDepartment && isManager;
+            function isValidShift(shiftId) {
+                let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'projectName', 'start']);
+
+                return createdValidShift && hasFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
             }
 
-            function shiftFieldTypes() {
-                return request.resource.data.department is string &&
-                       request.resource.data.employeeId is string &&
-                       request.resource.data.start is timestamp &&
-                       request.resource.data.end is timestamp
+            match /projects/{projectId} {
+                allow read;
+                allow create: if isValidProject(projectId);
+                allow update: if isValidProject(projectId);
             }
 
-            match /unavailabilities/{unavailabilityId} {
-                allow read: if(isValidToReadUnavailabilities());
-                allow write: if(isValidUnavailabilityCreate());
+            function projectFieldTypes() {
+                return request.resource.data.name is string &&
+                       request.resource.data.start is timestamp
             }
 
-            function isValidToReadUnavailabilities() {
-                let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
-                return isEmployee;
-            }
+            function isValidProject(projectId) {
+                let createdValidProject = existsAfter(/databases/$(database)/documents/projects/$(projectId));
+                let hasFields = request.resource.data.keys().hasOnly(['name', 'start']);
 
-            function isValidUnavailabilityCreate() {
-                let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
-                let isSameEmployee = request.resource.data.employeeId == request.auth.uid;
-
-                return isEmployee && isSameEmployee;
+                return createdValidProject && hasFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && projectFieldTypes();
             }
         }
+
     }
 }
