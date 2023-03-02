@@ -33,17 +33,18 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         redirectTo: null
     }
 
-    /**
-     * Get the departments, roles and titles from the database and set the state of the component.
-     * Display a notification to the user if the operation was successful or not.
-     * @returns {Promise<void>}
-     */
+
     public async componentDidMount(): Promise<void> {
         document.title = "Modifier un Employé - TaskMaster";
 
         await this.fetchData();
     }
 
+    /**
+     * Get the departments, roles, jobTitles, skills and the editedEmployee from the id in the route params from the database and set the state of the component.
+     * Display a notification to the user if the operation was successful or not.
+     * @returns {Promise<void>}
+     */
     private async fetchData() {
         const isLoggedIn: boolean = await this.verifyLogin();
         if (!isLoggedIn) {

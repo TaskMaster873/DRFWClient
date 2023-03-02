@@ -71,6 +71,11 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         });
     }
 
+    /**
+     * Get the employees, the departments and the number of employee in the department from the database and set the state of the component.
+     * Display a notification to the user if the operation was successful or not.
+     * @returns {Promise<void>}
+     */
     public async fetchData() : Promise<void> {
         let _employees = API.getEmployees();
         let departments = await API.getDepartments();
@@ -109,6 +114,11 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     }
 
+    /**
+     * Edit a department in the database and display a notification to the user if the operation was successful or not.
+     * @param departmentId {string} The id of the department to edit
+     * @param department {DepartmentModifyDTO} The department to edit
+     */
     public editDepartment = async (departmentId: string, department: DepartmentModifyDTO) : Promise<void> => {
         let error = await API.editDepartment(departmentId, department);
         if (!error) {

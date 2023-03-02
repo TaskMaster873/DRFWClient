@@ -27,9 +27,9 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     }
 
     /**
-     * Fetch the data needed to load child components
-     * Data: departments, roles, jobTitles, skills
-     * @private
+     * Get the departments, the roles, the jobTitles and the skills from the database and set the state of the component.
+     * Display a notification to the user if the operation was successful or not.
+     * @returns {Promise<void>}
      */
     private async fetchData(): Promise<void> {
         let isLoggedIn: boolean = await this.verifyLogin();
