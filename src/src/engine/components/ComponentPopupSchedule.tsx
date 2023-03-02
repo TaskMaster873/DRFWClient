@@ -106,10 +106,10 @@ export function ComponentPopupSchedule(props: Props) {
 			<Form onSubmit={(e) => handleSubmit(e)} validated={validated} data-error={error}>
 				<Modal.Body>
 					<Form.Group className="mb-6">
-						<Form.Label >Employé assigné</Form.Label>
+						<Form.Label>Employé assigné</Form.Label>
 						<Form.Select
 							id="assignedEmployee"
-							onChange={(e) => setEmployeeId(e.target.value)} 
+							onChange={(e) => setEmployeeId(e.target.value)}
 							defaultValue={props.resource}
 						>
 							{props.employees.map((employee) => (
@@ -132,7 +132,7 @@ export function ComponentPopupSchedule(props: Props) {
 							onChange={(e) => {setStart(e.target.value);}}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidStartDate">
-							{errors.INVALID_DATE}
+							{errors.INVALID_DATETIME}
 						</Form.Control.Feedback>
 					</Form.Group>
 					<Form.Group className="mb-3">
@@ -145,7 +145,7 @@ export function ComponentPopupSchedule(props: Props) {
 							onChange={(e) => setEnd(e.target.value)}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidEndDate">
-							{errors.INVALID_DATE}
+							{errors.INVALID_DATETIME}
 						</Form.Control.Feedback>
 					</Form.Group>
 				</Modal.Body>
