@@ -13,4 +13,5 @@ export enum RoutesPath {
     AVAILABILITIES = '/availabilities',
     RESET_PASSWORD = '/reset-password',
     CHANGE_PASSWORD = '/change-password',
+    MANAGE_AVAILABILITIES = '/manage-availabilities',
 }

@@ -375,7 +375,6 @@ class APIManager extends Logger {
             this.isAuthenticated = true;
         }
 
-        await this.onEvent();
         return errorMessage;
     }
 
@@ -413,8 +412,6 @@ class APIManager extends Logger {
             });
 
             this.#employeeInfos.role = 0;
-
-            await this.onEvent();
         }
 
         return errorMessage;
@@ -472,6 +469,8 @@ class APIManager extends Logger {
 
                         console.log("user", user);
                         console.log("employeeInfos", this.#employeeInfos);
+                        
+                        await this.onEvent();
                     }
 
                     if (!resolved) {
