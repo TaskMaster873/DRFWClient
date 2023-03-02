@@ -11,6 +11,7 @@ import {Skill} from "../types/Skill";
 import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteSkill} from "./ComponentConfirmDeleteSkill";
+import {SkillActions} from "../types/Employee";
 
 interface EditSkillsState {
     skillToDelete?: Skill;
@@ -22,12 +23,9 @@ interface EditSkillsState {
     editError: FormErrorType;
 }
 
-interface EditSkillsProps {
+interface EditSkillsProps extends SkillActions {
     cancelEdit: () => void;
     skills: Skill[];
-    onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
-    onEditSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
-    onDeleteSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
     showEdit: boolean;
 }
 

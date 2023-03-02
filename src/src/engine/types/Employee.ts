@@ -98,16 +98,16 @@ export interface AddEmployeeProps extends SkillActions, JobTitleActions {
 export interface SkillActions {
     onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
     onEditSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
-    onDeleteSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
+    onDeleteSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface JobTitleActions {
     onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
     onEditJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
-    onDeleteJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
+    onDeleteJobTitle: (titleId: string) => PromiseLike<void> | Promise<void> | void;
 }
 
-export interface EditEmployeeProps {
+export interface EditEmployeeProps extends JobTitleActions, SkillActions {
     departments: Department[];
     roles: string[];
     jobTitles: JobTitle[];
@@ -115,8 +115,6 @@ export interface EditEmployeeProps {
     employeeId?: string | null;
     editedEmployee: EmployeeEditDTO | undefined;
     onEditEmployee: (employeeId: string, employee: EmployeeEditDTO) => PromiseLike<void> | Promise<void> | void;
-    onAddJobTitle: (employeeId: string, employee: EmployeeEditDTO) => PromiseLike<void> | Promise<void> | void;
-
 }
 
 export type EmployeeRoleList = string[];

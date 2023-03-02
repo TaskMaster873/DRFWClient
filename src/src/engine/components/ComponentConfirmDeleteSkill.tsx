@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 interface DeleteSkillProps {
     closePrompt: () => void;
     skill?: Skill | undefined;
-    onDeleteSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
+    onDeleteSkill: (skillId: string) => PromiseLike<void> | Promise<void> | void;
 }
 
 export class ComponentConfirmDeleteSkill extends React.Component<DeleteSkillProps, unknown> {
@@ -30,8 +30,8 @@ export class ComponentConfirmDeleteSkill extends React.Component<DeleteSkillProp
     }
 
     readonly #hideModal = (confirm: boolean = false) => {
-        if(confirm && this.props.skill) {
-            this.props.onDeleteSkill(this.props.skill);
+        if(confirm && this.props.skill?.id) {
+            this.props.onDeleteSkill(this.props.skill.id);
         }
         this.props.closePrompt();
     }

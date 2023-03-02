@@ -874,13 +874,13 @@ class APIManager extends Logger {
 
         return errorMessage;
     }
-    public async deleteJobTitle(title: JobTitle): Promise<string | null> {
+    public async deleteJobTitle(titleId: string): Promise<string | null> {
         let errorMessage: string | null = null;
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        if (title.id) {
-            await deleteDoc(doc(this.#db, `jobTitles`, title.id)).catch((error) => {
+        if (titleId) {
+            await deleteDoc(doc(this.#db, `jobTitles`, titleId)).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
         } else {
@@ -931,13 +931,17 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public async deleteSkill(skill: Skill): Promise<string | null> {
+    /**
+     * This method is used to delete a skill from the database
+     * @param skill
+     */
+    public async deleteSkill(skillId: string): Promise<string | null> {
         let errorMessage: string | null = null;
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        if (skill.id) {
-            await deleteDoc(doc(this.#db, `skills`, skill.id)).catch((error) => {
+        if (skillId) {
+            await deleteDoc(doc(this.#db, `skills`, skillId)).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
         } else {

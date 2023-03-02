@@ -11,6 +11,7 @@ import {JobTitle} from "../types/JobTitle";
 import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
+import {JobTitleActions} from "../types/Employee";
 
 interface EditJobTitlesState {
     jobTitleToDelete?: JobTitle;
@@ -22,12 +23,9 @@ interface EditJobTitlesState {
     editError: FormErrorType;
 }
 
-interface EditJobTitlesProps {
+interface EditJobTitlesProps extends JobTitleActions {
     cancelEdit: () => void;
     jobTitles: JobTitle[];
-    onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
-    onEditJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
-    onDeleteJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
     showEdit: boolean;
 }
 

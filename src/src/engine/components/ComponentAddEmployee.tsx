@@ -13,10 +13,11 @@ import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
 import {Skill} from "../types/Skill";
 import FormUtils from "../utils/FormUtils";
 import {JobTitle} from "../types/JobTitle";
+import {IoSettingsSharp} from "react-icons/io5";
 
 interface ComponentAddEmployeeState extends Employee {
-    showEditJobTitles: boolean,
-    showEditSkills: boolean,
+    showEditJobTitles: boolean;
+    showEditSkills: boolean;
     validated?: boolean;
     error: FormErrorType;
     password: string;
@@ -156,7 +157,9 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 <Row className="mb-3">
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
-                        <Button onClick={() => this.#onShowEditJobTitles()} className="float-end">+</Button>
+                        <Button onClick={() => this.#onShowEditJobTitles()} className="float-end">
+                            <IoSettingsSharp className="mb-05" />
+                        </Button>
                         {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
                             key={title.name}
                             type="checkbox"
@@ -170,7 +173,9 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Compétences</Form.Label>
-                        <Button onClick={() => this.#onShowEditSkills()} className="float-end">+</Button>
+                        <Button onClick={() => this.#onShowEditSkills()} className="float-end">
+                            <IoSettingsSharp className="mb-05" />
+                        </Button>
                         {this.props.skills.map((skill: Skill) => (<Form.Check
                             key={skill.name}
                             type="checkbox"
