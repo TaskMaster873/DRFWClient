@@ -1535,10 +1535,16 @@ class APIManager extends Logger {
 
 
     public async getCurrentEmployeeunavailabilities(): Promise<EmployeeAvailabilities | null> {
-        return this.getOneEmployeeUnavailabilities(this.#user?.uid);
+        if(this.#user?.uid)
+        {
+            return this.getOneEmployeeUnavailabilities(this.#user?.uid);
+        } else {
+            return null;
+        }
+        
     }
 
-    public async getOneEmployeeUnavailabilities(idEmployee?: string): Promise<EmployeeAvailabilities | null> {
+    public async getOneEmployeeUnavailabilities(idEmployee: string): Promise<EmployeeAvailabilities | null> {
         let errorMessage: string | null = null;
         let list: EmployeeAvailabilities = {
             recursiveExceptions: [],

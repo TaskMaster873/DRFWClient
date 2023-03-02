@@ -159,30 +159,28 @@ service cloud.firestore {
                        && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
             }
 
-            match /projects/{projectId} {
-                allow read;
-                allow create: if isValidProject(projectId);
-                allow update: if isValidProject(projectId);
-            }
-
             match /unavailabilities/{unavailabilityId} {
-                allow read: if(isValidToReadUnavailabilities());
-                allow write: if(isValidUnavailabilityCreate());
-                allow delete: if(isValidUnavailabilityDelete());
-            }
-
-            function isValidProject(projectId) {
-                let createdValidProject = existsAfter(/databases/$(database)/documents/projects/$(projectId));
-                let hasFields = request.resource.data.keys().hasOnly(['name', 'start']);
-
-                return createdValidProject && hasFields
-                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && projectFieldTypes();
+                allow read: if (isValidToReadUnavailabilities());
+                allow write: if (isValidUnavailabilityCreate());
+                allow delete: if (isValidUnavailabilityDelete());
             }
 
             function isValidUnavailabilityDelete() {
+                let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
+                let isGoodEmployee = request.resource.data.employeeId == request.auth.uid;
+                return isEmployee && isGoodEmployee;
+            }
+            function isValidUnavailabilityCreate() {
                  let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
+                 let isGoodEmployee = request.resource.data.employeeId == request.auth.uid;
 
-                return isEmployee
+                return isEmployee && isGoodEmployee;
+            }
+            function isValidToReadUnavailabilities() {
+                 let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
+                 let isGoodEmployee = request.resource.data.employeeId == request.auth.uid;
+                 
+                return isEmployee && isGoodEmployee;
             }
         }
 
