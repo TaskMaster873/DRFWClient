@@ -62,11 +62,18 @@ export type EmployeeAvailabilityExceptionList = EmployeeAvailabilityException[];
  * It is used to show the user his availabilities or to push his availabilities to his manager. 
  */
 export interface EmployeeAvailabilities {
-    /** When he can work */
+    /** When he cannot work */
     recursiveExceptions: RecursiveAvailabilitiesList;
-    /** When he can work */
-    //exception: EmployeeAvailabilityExceptionList;
+   
     employeeId: string;
+}
+
+export class EmployeeAvailabilitiesClass {
+    public recursiveList: EmployeeRecursiveExceptionList;
+
+    constructor(list: EmployeeRecursiveExceptionList) {
+       this.recursiveList = list;
+	}
 }
 
 export type RecursiveAvailabilitiesList = RecursiveAvailabilities[];

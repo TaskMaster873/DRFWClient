@@ -52,7 +52,7 @@ import {
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 
-import {EmployeeAvailabilitiesForCreate} from "../types/EmployeeAvailabilities";
+import {DAYS, EmployeeAvailabilities, EmployeeAvailabilitiesForCreate, RecursiveAvailabilitiesList} from "../types/EmployeeAvailabilities";
 import {JobTitle} from "../types/JobTitle";
 import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
@@ -1438,9 +1438,51 @@ class APIManager extends Logger {
 
     }
 
-    public async getCurrentEmployeeunavailabilities() {}
+    public async getCurrentEmployeeunavailabilities(): Promise<EmployeeAvailabilities | null> {
+        return this.getOneEmployeeUnavailabilities(this.#user?.uid);
+    }
 
-    public async getOneEmployeeUnavailabilities() {}
+    public async getOneEmployeeUnavailabilities(idEmployee?: string): Promise<EmployeeAvailabilities | null> {
+        let errorMessage: string | null = null;
+        let list: EmployeeAvailabilities = {
+            recursiveExceptions: [],
+            employeeId: idEmployee ?? ""
+        };
+        let listOfRecursive: RecursiveAvailabilitiesList = [];
+
+        if (this.isAuthenticated) {
+            let queryUnavailability = query(
+                collection(this.#db, `unavailabilities`),
+                where("employeeId", "==", list.employeeId)
+            );
+
+            let snaps = await getDocs(queryUnavailability).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+
+            if (snaps) {
+                snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
+                    let data = doc.data();
+                    listOfRecursive.push(
+                        {
+                            startDate: data.start,
+                            endDate: data.end,
+                            [DAYS.SUNDAY]: data.unavailabilities[DAYS.SUNDAY],
+                            [DAYS.MONDAY]: data.unavailabilities[DAYS.MONDAY],
+                            [DAYS.TUESDAY]: data.unavailabilities[DAYS.TUESDAY],
+                            [DAYS.WEDNESDAY]: data.unavailabilities[DAYS.WEDNESDAY],
+                            [DAYS.THURSDAY]: data.unavailabilities[DAYS.THURSDAY],
+                            [DAYS.FRIDAY]: data.unavailabilities[DAYS.FRIDAY],
+                            [DAYS.SATURDAY]: data.unavailabilities[DAYS.SATURDAY]
+                        }
+                    );
+                });
+                list.recursiveExceptions = listOfRecursive;
+            }
+        }
+
+        return errorMessage ?? list;
+    }
 }
 
 /**
