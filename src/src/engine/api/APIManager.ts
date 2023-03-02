@@ -1399,7 +1399,7 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
 
-        let errorMessage: string | null = null;
+        let errorMessage: string | undefined;
 
         //Delete Shift
         await deleteDoc(doc(this.#db, `shifts`, shift.id)
@@ -1407,7 +1407,7 @@ class APIManager extends Logger {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
-        if (errorMessage) return errorMessage;
+        return errorMessage;
     }
 
     /**
