@@ -73,9 +73,9 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
         } else {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
