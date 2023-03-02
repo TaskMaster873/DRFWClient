@@ -8,6 +8,7 @@ import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import {Container} from "react-bootstrap";
+import Utils from "../utils/Utils";
 
 /**
  * Ceci est la page pour les departments
@@ -97,6 +98,9 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             let departments = this.state.departments;
             let employeeNb = this.state.employeeNb;
 
+            departments.push(department);
+            employeeNb.push(0);
+
             this.setState({departments: departments, employeeNb: employeeNb});
             await this.fetchData();
         } else {
@@ -108,16 +112,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         let errorMessage = await API.editDepartment(departmentId, department);
         if (!errorMessage) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
-            let departments = this.state.departments;
-            let oldDepartment = departments.find(elem => elem.departmentId == departmentId);
-            if(oldDepartment) {
-                let employeeIndex = departments.findIndex(elem => elem.departmentId == departmentId);
-                if (department && employeeIndex != -1) {
-                    departments[employeeIndex] = department;
-                    this.setState({departments: departments});
-                }
-            }
-            departments.push(department);
+            let departments = Utils.editElement(this.state.departments, departmentId, department) as Department[];
             this.setState({departments: departments});
             await this.fetchData();
         } else {

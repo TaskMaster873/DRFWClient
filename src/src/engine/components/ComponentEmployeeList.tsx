@@ -189,20 +189,20 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
     }
 
     private renderAdminActions(index: number, employee: Employee): JSX.Element | undefined {
-        if (employee.employeeId && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
+        if (employee.id && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
             let component: JSX.Element = <CgUnavailable/>;
             if (!employee.isActive) {
                 component = <CgCheckO/>
             }
             return (
                 <td key={`action ${index}`}>
-                    <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.employeeId}`} className="adminActions mx-1">
+                    <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
                         <BiEdit/>
                     </LinkContainer>
                     <a className="adminActions ms-1 mx-1" onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>
                 </td>
             );
-        } else if (employee.employeeId && API.hasPermission(Roles.ADMIN)) {
+        } else if (employee.id && API.hasPermission(Roles.ADMIN)) {
             return (
                 <td key={`action ${index}`}></td>
             );

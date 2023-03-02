@@ -42,13 +42,13 @@ service cloud.firestore {
 
             function isValidEmployeeUpdate(employeeId) {
                 let hasEmployeeFields = request.resource.data.keys().hasOnly(
-                ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
+                    ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
                 let hasActiveFields = request.resource.data.keys().hasOnly(
-                ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive']);
+                    ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive']);
                 let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
 
                 return createdValidEmployee && (hasEmployeeFields && employeeFieldTypes()) ||
-                (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType()) && getCurrentEmployeeRole(request.auth.uid) >= 3;
+                       (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType()) && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
 
             function departmentFieldTypes() {
@@ -60,6 +60,7 @@ service cloud.firestore {
                 allow read;
                 allow create: if isValidDepartment(departmentId);
                 allow update: if isValidDepartment(departmentId);
+
             }
 
             function isValidDepartment(departmentId) {
@@ -77,6 +78,7 @@ service cloud.firestore {
             match /roles/{roleId} {
                 allow read;
                 allow create: if isValidRole(roleId);
+                allow update: if isValidRole(roleId);
             }
 
             function isValidRole(roleId) {
@@ -90,6 +92,8 @@ service cloud.firestore {
             match /jobTitles/{jobTitleId} {
                 allow read;
                 allow create: if isValidJobTitle(jobTitleId);
+                allow update: if isValidJobTitle(jobTitleId);
+                allow delete: if isValidJobTitleDelete(jobTitleId);
             }
 
             function isValidJobTitle(jobTitleId) {
@@ -98,6 +102,34 @@ service cloud.firestore {
 
                 return createdValidJobTitle && hasFields
                        && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+            }
+
+            function isValidJobTitleDelete(roleId) {
+                let jobTitleExists = existsAfter(/databases/$(database)/documents/roles/$(roleId));
+
+                return !jobTitleExists && getCurrentEmployeeRole(request.auth.uid) >= 3;
+            }
+
+            match /skills/{skillId} {
+                allow read;
+                allow create: if isValidSkill(skillId);
+                allow update: if isValidSkill(skillId);
+                allow delete: if isValidSkillDelete(skillId);
+            }
+
+            function isValidSkill(skillId) {
+                let createdValidJobTitle = existsAfter(/databases/$(database)/documents/skills/$(skillId));
+                let hasFields = request.resource.data.keys().hasOnly(['name']);
+
+                return createdValidJobTitle && hasFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+            }
+
+            function isValidSkillDelete(roleId) {
+                let skillExists = existsAfter(/databases/$(database)/documents/roles/$(roleId));
+
+                return !skillExists
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
 
             match /shifts/{shiftId} {

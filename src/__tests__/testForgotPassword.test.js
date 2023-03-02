@@ -62,6 +62,6 @@ test("Valid email should submit form", async () => {
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputEmail = document.getElementById("email");
+    const inputEmail = document.getElementsByName("email")[0];
     return {form, inputEmail};
 }

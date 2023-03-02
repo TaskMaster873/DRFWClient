@@ -1,5 +1,5 @@
 import {Employee} from "./Employee";
-import {FormErrorType} from "../messages/FormMessages";
+import {IdElement} from "./Global";
 
 export interface DepartmentsState {
     employees: Employee[];
@@ -15,14 +15,14 @@ export interface DepartmentListState {
 /**
  * Contient tous les renseignements des employés de l'application web
  */
-export class Department {
-    public departmentId?: string;
+export class Department implements IdElement {
+    public id?: string;
     public name: string;
     public director: string;
 
     constructor(department: DepartmentDTO) {
-        this.departmentId = department.departmentId;
-		this.name = department.name;
+        this.id = department.id;
+        this.name = department.name;
         this.director = department.director;
 	}
 }
@@ -42,7 +42,7 @@ export interface DepartmentModifyDTO {
 }
 
 export interface DepartmentDTO {
-    readonly departmentId?: string;
+    readonly id?: string;
     readonly name: string;
     readonly director: string;
 }
