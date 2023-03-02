@@ -1,9 +1,15 @@
 import React from "react";
-import {DAYS, EmployeeAvailabilities, EmployeeRecursiveException} from "../types/EmployeeAvailabilities";
+import {DAYS, EmployeeAvailabilities, EventsForUnavailability, EmployeeRecursiveException, RecursiveAvailabilities, RecursiveAvailabilitiesList, EmployeeAvailabilitiesForCreate, EmployeeRecursiveExceptionList, DateOfUnavailabilityList} from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
-import { DayPilot } from "daypilot-pro-react";
+import {DateManager} from '../utils/DateManager';
+import {DayPilot} from "daypilot-pro-react";
 
 import '../../deps/css/daypilot_custom.css';
+import {ComponentAvailabilitiesPopup} from "../components/ComponentAvailabilitiesPopup";
+import {Timestamp} from "firebase/firestore";
+import {API} from "../api/APIManager";
+import {Container} from "react-bootstrap";
+
 
 export interface AvailabilitiesState {
     availabilities: EmployeeAvailabilities;
@@ -20,10 +26,15 @@ export interface AvailabilitiesState {
  * NON TERMINER
  */
 let curr = new Date;
-let firstDay = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0,0,0,0));
-let lastDay = new Date ((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0,0,0,0));
+let firstDay = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay()))).setHours(0, 0, 0, 0));
+let lastDay = new Date((new Date(curr.setDate(curr.getDate() - curr.getDay() + 6))).setHours(0, 0, 0, 0));
 
 export class Availabilities extends React.Component<unknown, AvailabilitiesState> {
+
+
+    //It is to have acces more easily to the datepicker and calendar getters and their public methods
+    private componentAvailabilitiesRef: React.RefObject<ComponentAvailabilities> = React.createRef();
+
     //It is a placeholder value, because the db doesn't exist for now.
     public state: AvailabilitiesState = {
         availabilities: {
@@ -34,17 +45,16 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                         endTime: 60
                     },
                 ],
-                //time not available
                 [DAYS.MONDAY]: [
                     {
                         startTime: 60,
-                        endTime: 60+60
+                        endTime: 60 + 60
                     }
                 ],
                 [DAYS.TUESDAY]: [
                     {
                         startTime: 120,
-                        endTime: 120+60
+                        endTime: 120 + 60
                     }
                 ],
                 [DAYS.WEDNESDAY]: [],
@@ -71,9 +81,14 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         currentWeekStart: firstDay,
         currentWeekEnd: lastDay,
         timesUnavailable: [],
-        popupActive: false,
+        popupActive: true,
         selectedDate: new Date,
     };
+
+
+    get componentAvailability() {
+        return this.componentAvailabilitiesRef?.current;
+    }
 
     public componentDidMount() {
         document.title = "Disponibilitées - TaskMaster";
@@ -89,7 +104,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     readonly #getStartData = (): DayPilot.EventData[] => {
         return this.computeAllAvailabilities(this.state.currentWeekStart, this.state.currentWeekEnd, this.state.selectedDate);
-    }
+    };
 
     readonly #onTimeRangeSelected = (start: Date, end: Date, selectedDate: Date): DayPilot.EventData[] => {
         return this.computeAllAvailabilities(start, end, selectedDate);
@@ -98,25 +113,84 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     public render(): JSX.Element {
         return (
             <div>
-                <button type="button" className="btn btn-primary">Primary</button>
+                <Container className="justify-content-end">
+                    <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Sauvegarder</button>
+                </Container>
                 <ComponentAvailabilities getStartData={this.#getStartData}
-                                         onTimeRangeSelected={this.#onTimeRangeSelected}
-                                         isCellInStartToEndTimeRange={this.#isCellInStartToEndTimeRange}
-                                         startDate={new DayPilot.Date(this.state.currentWeekStart)}
-                                         selectionDay={new DayPilot.Date(this.state.selectedDate)}
-                                         employeeAvailabilities={this.state.timesUnavailable} />
+                    onTimeRangeSelected={this.#onTimeRangeSelected}
+                    isCellInStartToEndTimeRange={this.#isCellInStartToEndTimeRange}
+                    startDate={new DayPilot.Date(this.state.currentWeekStart)}
+                    selectionDay={new DayPilot.Date(this.state.selectedDate)}
+                    employeeAvailabilities={this.state.timesUnavailable}
+                    ref={this.componentAvailabilitiesRef} />
+                <ComponentAvailabilitiesPopup
+                    hideModal={this.#hideModal}
+                    isShown={this.state.popupActive}
+                    start={this.toUTC(this.state.currentWeekStart)}
+                    end={this.toUTC(this.state.currentWeekEnd)}
+                    availabilityAdd={this.#createNewAvailabilityRequest}
+                />
             </div>
         );
     }
 
-    /**
-     * This function will compute all the availabilities for the current week and the selected day.
-     * @description This function will compute all the availabilities for the current week and the selected day.
-     * @param startDate
-     * @param day
-     * @param numberOfMinutes
-     * @private
-     */
+    readonly #createNewAvailabilityRequest = async (start?: Timestamp, end?: Timestamp): Promise<void> => {
+        let starts;
+        let ends;
+        let unavailabilitiesInCalendar = this.componentAvailability?.getListFromTheCalendar();
+        let datesList: DateOfUnavailabilityList = [];
+        if (unavailabilitiesInCalendar) {
+            //let unavailabilitiesFiltered = this.sortFromStart(unavailabilitiesInCalendar);
+            console.log("calendar", unavailabilitiesInCalendar);
+            datesList = this.transformListIntoDateList(unavailabilitiesInCalendar);
+            console.log("list de date", datesList);
+        }
+
+
+        if (start) {
+            starts = DateManager.getDayPilotDateString(start);
+        }
+        if (end) {
+            ends = DateManager.getDayPilotDateString(end);
+        }
+        // let date = this.toUTC(this.state.currentWeekStart).addHours(2);
+        //let ok = date.getHours()*60 + date.getMinutes();
+        //console.log("ok", ok);
+        let listCreate: EmployeeAvailabilitiesForCreate = {
+            recursiveExceptions: {
+                startDate: starts ?? undefined,
+                endDate: ends ?? undefined,
+                [DAYS.SUNDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.SUNDAY, datesList),
+                [DAYS.MONDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.MONDAY, datesList),
+                [DAYS.TUESDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.TUESDAY, datesList),
+                [DAYS.WEDNESDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.WEDNESDAY, datesList),
+                [DAYS.THURSDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.THURSDAY, datesList),
+                [DAYS.FRIDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.FRIDAY, datesList),
+                [DAYS.SATURDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.SATURDAY, datesList)
+            },
+            start: start,
+            end: end
+        };
+
+        await API.pushAvailabilitiesToManager(listCreate);
+
+        console.log(this.componentAvailability?.getListFromTheCalendar());
+    };
+
+    private transformListIntoDateList(unavailabilitiesInCalendar: DayPilot.EventData[]): DateOfUnavailabilityList {
+        let listSortedByStart: DateOfUnavailabilityList = [];
+        for (let eventData of unavailabilitiesInCalendar) {
+            listSortedByStart.push({start: new Date(eventData.start as string), end: new Date(eventData.end as string)});
+        }
+
+        return listSortedByStart;
+
+    }
+
+    readonly #hideModal = (active: boolean): void => {
+        this.setState({popupActive: active});
+    };
+
     private convertRecursiveExceptionDate(startDate: Date, day: number, numberOfMinutes: number): Date {
         const date = new Date(startDate);
         date.setDate(date.getDate() + day);
@@ -193,7 +267,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                             let startDateTime = new Date(startDate.toDateLocal());
                             let endDateTime = new Date(endDate.toDateLocal());
 
-                            if(eventStart.getTime() <= startDateTime.getTime() && endDateTime.getTime() <= eventEnd.getTime()) {
+                            if (eventStart.getTime() <= startDateTime.getTime() && endDateTime.getTime() <= eventEnd.getTime()) {
                                 return true;
                             }
                         }
@@ -203,7 +277,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         }
 
         return false;
-    }
+    };
 
     /**
      * This function will compute all the availabilities for the current week and the selected day.

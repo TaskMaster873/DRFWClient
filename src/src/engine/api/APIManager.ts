@@ -51,6 +51,8 @@ import {
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
+
+import {EmployeeAvailabilitiesForCreate} from "../types/EmployeeAvailabilities";
 import {JobTitle} from "../types/JobTitle";
 import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
@@ -460,7 +462,7 @@ class APIManager extends Logger {
                         this.isAuthenticated = true;
                         this.#user = user;
                         let result = await this.getEmployeeInfos(user.uid);
-                        if(typeof result === "string") {
+                        if (typeof result === "string") {
                             NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
                             this.#employeeInfos.role = 0;
                             this.#employeeInfos.department = undefined;
@@ -818,7 +820,7 @@ class APIManager extends Logger {
             queryDepartment,
             errors.DEPARTMENT_ALREADY_EXISTS
         );
-        if(!errorMessage) {
+        if (!errorMessage) {
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
                     errorMessage = APIUtils.getErrorMessageFromCode(error);
@@ -1132,8 +1134,8 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         let employeeInfos: EmployeeInfos = {role: 0, department: undefined};
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
-                errorMessage = APIUtils.getErrorMessageFromCode(error);
-            });
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
         if (employee) {
             employeeInfos = employee.data() as EmployeeInfos;
         }
@@ -1400,7 +1402,7 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
 
-        let errorMessage: string | null = null;
+        let errorMessage: string | undefined;
 
         //Delete Shift
         await deleteDoc(doc(this.#db, `shifts`, shift.id)
@@ -1408,8 +1410,40 @@ class APIManager extends Logger {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
-        if (errorMessage) return errorMessage;
+        return errorMessage;
     }
+
+    /**
+     * Create a pending unavailability list for the manager
+     * @param list 
+     * @returns {void}
+     */
+    public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
+
+        let errorMessage: string | null = null;
+
+        //Create unavailability
+        await addDoc(collection(this.#db, `unavailabilities`),
+            {
+                employeeId: this.#user?.uid,
+                unavailabilities: list.recursiveExceptions,
+                start: list.start,
+                end: list.end,
+                isAccepted: false,
+            },
+        ).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+
+    }
+
+    public async getCurrentEmployeeunavailabilities() {}
+
+    public async getOneEmployeeUnavailabilities() {}
 }
 
 /**

@@ -1,5 +1,5 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react";
-
+import {Timestamp} from "firebase/firestore";
 /** 
  * Enum for all days name 
 */
@@ -35,7 +35,7 @@ interface EmployeeAvailabilityException {
 /**
  * Contains a list of {@link EmployeeRecursiveExceptionList} for everyDays that will be recursive every weeks
  */
-interface RecursiveAvailabilities {
+export interface RecursiveAvailabilities {
     startDate?: string;
     endDate?: string;
     [DAYS.SUNDAY]: EmployeeRecursiveExceptionList;
@@ -78,3 +78,18 @@ export interface EventsForUnavailability {
 }
 
 export type EventsForUnavailabilityList = EventsForUnavailability[];
+
+export interface EmployeeAvailabilitiesForCreate {
+    recursiveExceptions: RecursiveAvailabilities;
+    employeeId?: string;
+    start?: Timestamp;
+    end?: Timestamp;
+}
+
+export interface DateOfUnavailability {
+    start: Date,
+    end: Date
+}
+
+export type DateOfUnavailabilityList = DateOfUnavailability[];
+
