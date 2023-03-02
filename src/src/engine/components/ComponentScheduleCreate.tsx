@@ -13,7 +13,7 @@ interface ScheduleCreateProps {
 	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
 	editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
 	deleteShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
-};
+}
 
 interface ScheduleCreateState {
 	/** is the popup child active or not */
@@ -28,7 +28,7 @@ interface ScheduleCreateState {
 	resource: string;
 	/** Popup taskType */
 	taskType: EventManipulationType;
-};
+}
 
 export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps, ScheduleCreateState> {
 	public state: ScheduleCreateState = {
