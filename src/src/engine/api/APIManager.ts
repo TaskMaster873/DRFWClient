@@ -1417,13 +1417,13 @@ class APIManager extends Logger {
      */
     public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
         if (!this.hasPermission(Roles.EMPLOYEE)) {
-            //Gestionnaire
+            //Is not an Employee
             return errors.PERMISSION_DENIED;
         }
 
         let errorMessage: string | null = null;
 
-        //Create Shift
+        //Create unavailability
         await addDoc(collection(this.#db, `unavailabilities`),
             {
                 employeeId: this.#user?.uid,
@@ -1435,8 +1435,12 @@ class APIManager extends Logger {
         ).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
-        if (errorMessage) return errorMessage;
+
     }
+
+    public async getCurrentEmployeeunavailabilities() {}
+
+    public async getOneEmployeeUnavailabilities() {}
 }
 
 /**
