@@ -1,5 +1,5 @@
 import React from "react";
-import {Form} from "react-bootstrap";
+import {Col, Container, Form, Row} from "react-bootstrap";
 import {FormErrorType} from "../messages/FormMessages";
 import {Department} from "../types/Department";
 
@@ -40,18 +40,20 @@ export class SelectDepartment extends React.Component<Props, State> {
 
     public render(): JSX.Element {
         return (
-            <Form
-                noValidate
-                validated={this.state.validated}
-                
-                data-error={this.state.error}
-            >
-                <Form.Select aria-label="Department selector" onChange={(e) => {this.#handleChange(e)}}>
-                    {this.props.departments.map((department, index: number) => (
-                        <option value={index} key={index}>{department.name}</option>
-                    ))}
-                </Form.Select>
-            </Form>
+            <Container className="mt-3 d-inline-flex">
+                <Form
+                    noValidate
+                    validated={this.state.validated}
+                    data-error={this.state.error}
+                >
+                    <Form.Label>Département</Form.Label>
+                    <Form.Select aria-label="Department selector" onChange={(e) => {this.#handleChange(e);}}>
+                        {this.props.departments.map((department, index: number) => (
+                            <option value={index} key={index}>{department.name}</option>
+                        ))}
+                    </Form.Select>
+                </Form>
+            </Container>
         );
     }
 }
