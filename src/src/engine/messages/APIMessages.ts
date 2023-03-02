@@ -11,7 +11,8 @@ export const errors = {
     INVALID_SKILL_ID: "L'identifiant de la compétence est invalide",
     EMPLOYEE_NOT_FOUND: "L'employé spécifié n'a pas été trouvé",
     INVALID_JOB_TITLE_ID: "L'identifiant du corps d'emploi est invalide",
-    AUTHENTIFICATION_ERROR: "Une erreur d'authentification s'est produite, veuillez réessayer ultérieurement"
+    AUTHENTIFICATION_ERROR: "Une erreur d'authentification s'est produite, veuillez réessayer ultérieurement",
+    EMPLOYEE_REMAINING_IN_DEPARTMENT: "Des employés sont toujours présents dans le département"
 
 }
 

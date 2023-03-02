@@ -71,6 +71,11 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         });
     }
 
+    /**
+     * Get the employees, the departments and the number of employee in the department from the database and set the state of the component.
+     * Display a notification to the user if the operation was successful or not.
+     * @returns {Promise<void>}
+     */
     public async fetchData() : Promise<void> {
         let _employees = API.getEmployees();
         let departments = await API.getDepartments();
@@ -90,9 +95,10 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     }
 
+    //#region Departments
     public addDepartment = async (department: Department) : Promise<void> => {
-        let errorMessage = await API.createDepartment(department);
-        if (!errorMessage) {
+        let error = await API.createDepartment(department);
+        if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
 
             let departments = this.state.departments;
@@ -104,21 +110,39 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             this.setState({departments: departments, employeeNb: employeeNb});
             await this.fetchData();
         } else {
-            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
 
+    /**
+     * Edit a department in the database and display a notification to the user if the operation was successful or not.
+     * @param departmentId {string} The id of the department to edit
+     * @param department {DepartmentModifyDTO} The department to edit
+     */
     public editDepartment = async (departmentId: string, department: DepartmentModifyDTO) : Promise<void> => {
-        let errorMessage = await API.editDepartment(departmentId, department);
-        if (!errorMessage) {
+        let error = await API.editDepartment(departmentId, department);
+        if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
             let departments = Utils.editElement(this.state.departments, departmentId, department) as Department[];
             this.setState({departments: departments});
             await this.fetchData();
         } else {
-            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
+
+    public deleteDepartment = async (department: Department) : Promise<void> => {
+        let error = await API.deleteDepartment(department);
+        if (!error && department.id) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
+            let departments = Utils.deleteElement(this.state.departments, department.id) as Department[];
+            this.setState({departments: departments});
+            await this.fetchData();
+        } else if(error) {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+        }
+    }
+    //#endregion
 
     /**
      *
@@ -139,6 +163,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
                     departments={this.state.departments}
                     onAddDepartment={this.addDepartment}
                     onEditDepartment={this.editDepartment}
+                    onDeleteDepartment={this.deleteDepartment}
                 />
             </Container>
         );

@@ -8,7 +8,7 @@ import {Params, useParams} from "react-router-dom";
 import {NotificationManager} from "../api/NotificationManager";
 
 export function EmployeeWrapper(): JSX.Element {
-    let parameters: Readonly<Params<string>> = useParams();
+    const parameters: Readonly<Params<string>> = useParams();
     return (
         <EmployeesInternal  {...{params: parameters}}/>
     );
@@ -41,7 +41,7 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
     public async componentDidMount() {
         document.title = "Employés " + this.props.params.id + " - TaskMaster";
 
-        let fetchedData = await API.getEmployees(this.props.params.id);
+        const fetchedData: Employee[] | string = await API.getEmployees(this.props.params.id);
         if (typeof fetchedData === "string") {
             NotificationManager.error(errors.GET_EMPLOYEES, fetchedData);
 
@@ -58,39 +58,38 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
      * @return {Promise<void>} A promise that resolves when the employee is deactivated
      * @param employee
      */
-    readonly #changeEmployeeActivation = async(employee: Employee) : Promise<void> => {
-        if (employee) {
-            employee.isActive = !employee.isActive;
+    readonly #changeEmployeeActivation = async (employee: Employee): Promise<void> => {
+        employee.isActive = !employee.isActive;
+        const error = await API.changeEmployeeActivation(employee);
 
-            let error = await API.changeEmployeeActivation(employee);
-            if (!error) {
-                let employees: Employee[] | null = this.state.employees;
-                if(employees) {
-                    let oldEmployee = employees.find(elem => elem.id == employee.id);
-
-                    if(oldEmployee) {
-                        oldEmployee.isActive = employee.isActive;
-
-                        this.refreshList(oldEmployee, employees);
-
-                        if(employee.isActive) {
-                            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_ACTIVATED);
-                        } else {
-                            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
-                        }
-                    } else {
-                        NotificationManager.error(errors.SERVER_ERROR, errors.EMPLOYEE_NOT_FOUND);
-                    }
-                } else {
-                    NotificationManager.error(errors.SERVER_ERROR, errors.ERROR_GENERIC_MESSAGE);
-                }
-            } else {
-                NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
-            }
-        } else {
-            NotificationManager.error(errors.SERVER_ERROR, errors.ERROR_GENERIC_MESSAGE);
+        if (error) {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+            return;
         }
-    }
+
+        const employees = this.state.employees;
+
+        if (!employees) {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errors.SERVER_ERROR);
+            return;
+        }
+
+        const oldEmployee = employees.find((elem: Employee) => elem.id === employee.id);
+
+        if (!oldEmployee) {
+            NotificationManager.error(errors.SERVER_ERROR, errors.EMPLOYEE_NOT_FOUND);
+            return;
+        }
+
+        oldEmployee.isActive = employee.isActive;
+        this.refreshList(oldEmployee, employees);
+
+        if (employee.isActive) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_ACTIVATED);
+        } else {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
+        }
+    };
 
     /**
      * Used to refresh the list of employees
@@ -100,7 +99,7 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
      * @return {void}
      */
     private refreshList(employee: Employee, employees: Employee[]) {
-        let employeeIndex = employees.findIndex(elem => elem.id == employee.id);
+        const employeeIndex = employees.findIndex(elem => elem.id == employee.id);
         if (employee && employeeIndex != -1) {
             employees[employeeIndex] = employee;
             this.setState({employees: employees});

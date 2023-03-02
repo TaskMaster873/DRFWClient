@@ -6,9 +6,17 @@ import Button from "react-bootstrap/Button";
 interface DeleteJobTitleProps {
     closePrompt: () => void;
     jobTitle?: JobTitle | undefined;
-    onDeleteJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
+    onDeleteJobTitle: (titleId: string) => PromiseLike<void> | Promise<void> | void;
 }
 
+/**
+ * This is the modal popup to confirm the deletion of the JobTitle
+ * @param props The props of the component
+ * @constructor
+ * @category Components
+ * @subcategory JobTitle
+ * @hideconstructor
+ */
 export class ComponentConfirmDeleteJobTitle extends React.Component<DeleteJobTitleProps, unknown> {
     public render(): JSX.Element {
         return (<Modal show={this.props.jobTitle != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>
@@ -30,8 +38,8 @@ export class ComponentConfirmDeleteJobTitle extends React.Component<DeleteJobTit
     }
 
     readonly #hideModal = (confirm: boolean = false) => {
-        if(confirm && this.props.jobTitle) {
-            this.props.onDeleteJobTitle(this.props.jobTitle);
+        if(confirm && this.props.jobTitle?.id) {
+            this.props.onDeleteJobTitle(this.props.jobTitle.id);
         }
         this.props.closePrompt();
     }

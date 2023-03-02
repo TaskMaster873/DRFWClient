@@ -1,30 +1,30 @@
 import React from "react";
 import {Modal} from "react-bootstrap";
-import {Skill} from "../types/Skill";
+import {Department} from "../types/Department";
 import Button from "react-bootstrap/Button";
 
-interface DeleteSkillProps {
+interface DeleteDepartmentProps {
     closePrompt: () => void;
-    skill?: Skill | undefined;
-    onDeleteSkill: (skillId: string) => PromiseLike<void> | Promise<void> | void;
+    department?: Department | undefined;
+    onDeleteDepartment: (department: Department) => PromiseLike<void> | Promise<void> | void;
 }
 
 /**
- * This is the modal popup to confirm the deletion of the Skill
+ * This is the modal popup to confirm the deletion of the Department
  * @param props The props of the component
  * @constructor
  * @category Components
- * @subcategory Skill
+ * @subcategory Department
  * @hideconstructor
  */
-export class ComponentConfirmDeleteSkill extends React.Component<DeleteSkillProps, unknown> {
+export class ComponentConfirmDeleteDepartment extends React.Component<DeleteDepartmentProps, unknown> {
     public render(): JSX.Element {
-        return (<Modal show={this.props.skill != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>
+        return (<Modal show={this.props.department != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmation de suppression</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>Voulez-vous vraiment supprimer le corps d'emploi {this.props.skill?.name} ?</p>
+                    <p>Voulez-vous vraiment supprimer le département {this.props.department?.name} ?</p>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="primary" onClick={() => this.#hideModal(true)}>
@@ -38,8 +38,8 @@ export class ComponentConfirmDeleteSkill extends React.Component<DeleteSkillProp
     }
 
     readonly #hideModal = (confirm: boolean = false) => {
-        if(confirm && this.props.skill?.id) {
-            this.props.onDeleteSkill(this.props.skill.id);
+        if(confirm && this.props.department) {
+            this.props.onDeleteDepartment(this.props.department);
         }
         this.props.closePrompt();
     }

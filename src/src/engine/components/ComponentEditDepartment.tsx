@@ -19,6 +19,14 @@ export interface DepartmentEditState {
     error: FormErrorType;
 }
 
+/**
+ * This is the form to edit a department
+ * @param props The props of the component
+ * @constructor
+ * @category Components
+ * @subcategory Department
+ * @hideconstructor
+ */
 export class ComponentEditDepartment extends React.Component<DepartmentEditProps, DepartmentEditState> {
     public state: DepartmentEditState = {
         validated: false,
@@ -77,6 +85,10 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
         </Modal>
     }
 
+    /**
+     * Function that hides the modal when close button is clicked
+     * @private
+     */
     private hideModal(): void {
         this.props.cancelEdit();
     }

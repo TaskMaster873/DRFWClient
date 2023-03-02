@@ -11,14 +11,20 @@ import {API} from "../api/APIManager";
 import {RegexUtil} from "../utils/RegexValidator";
 import {JobTitle} from "../types/JobTitle";
 import FormUtils from "../utils/FormUtils";
+import {Skill} from "../types/Skill";
+import {ComponentEditSkills} from "./ComponentEditSkills";
+import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
+import {IoSettingsSharp} from "react-icons/io5";
 
 interface ComponentEditEmployeeState {
+    showEditJobTitles: boolean;
+    showEditSkills: boolean;
     validated?: boolean;
     error: FormErrorType;
 }
 
 /**
- * This is the form to add an employee
+ * This is the form to edit an employee
  * @param props The props of the component
  * @constructor
  * @category Components
@@ -27,6 +33,8 @@ interface ComponentEditEmployeeState {
  */
 export class ComponentEditEmployee extends React.Component<EditEmployeeProps, ComponentEditEmployeeState> {
     public state: ComponentEditEmployeeState = {
+        showEditJobTitles: false,
+        showEditSkills: false,
         validated: false,
         error: FormErrorType.NO_ERROR,
     };
@@ -45,11 +53,9 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 validated={this.state.validated}
                 onSubmit={this.#handleSubmit}
                 onChange={this.#handleChange}
-                data-error={this.state.error}
-            >
+                data-error={this.state.error}>
                 <Row className="mb-3 mt-3">
-
-                    <Form.Group as={Col} md="4">
+                    <Form.Group as={Col} md="3">
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control
                             name="firstName"
@@ -63,7 +69,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.REQUIRED_FIRSTNAME}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} md="4">
+                    <Form.Group as={Col} md="3">
                         <Form.Label>Nom</Form.Label>
                         <Form.Control
                             name="lastName"
@@ -77,7 +83,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.REQUIRED_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} md="4">
+                    <Form.Group as={Col} md="3">
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
                             name="phoneNumber"
@@ -92,9 +98,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.INVALID_PHONE_NUMBER}
                         </Form.Control.Feedback>
                     </Form.Group>
-                </Row>
-                <Row className="mb-3">
-                    <Form.Group as={Col} md="4">
+                    <Form.Group as={Col} md="3">
                         <Form.Label>Département</Form.Label>
                         <Form.Select required name="department" id="department" value={this.props.editedEmployee?.department} onChange={this.#handleSelect}>
                             {this.props.departments.map((department: Department, index: number) =>
@@ -104,17 +108,39 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             {errors.REQUIRED_DEPARTMENT_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
+                </Row>
+                <Row className="mb-3">
                     <Form.Group as={Col} md="4">
-                        <Form.Label className="w-100">Corps d'emploi <Button onClick={() => this.props.onAddJobTitle} className="float-end">+</Button></Form.Label>
-                        {this.props.jobTitles.length != 0 ? this.props.jobTitles.map((title: JobTitle) =>
-                            <Form.Check
-                            name={title.name}
+                        <Form.Label>Corps d'emploi</Form.Label>
+                        <Button onClick={() => this.#onShowEditJobTitles()} className="float-end">
+                            <IoSettingsSharp className="mb-05" />
+                        </Button>
+                        {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
                             key={title.name}
                             type="checkbox"
-                            className="jobTitles"
+                            name={title.name}
                             label={title.name}
-                            value={this.props.editedEmployee?.jobTitles}
-                        />) : <p className="mt-1 noneJobTitle">Aucun title d'emplois</p>}
+                        />))}
+                        <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)}
+                                                showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
+                                                onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}
+                                                onDeleteJobTitle={this.props.onDeleteJobTitle}></ComponentEditJobTitles>
+                    </Form.Group>
+                    <Form.Group as={Col} md="4">
+                        <Form.Label>Compétences</Form.Label>
+                        <Button onClick={() => this.#onShowEditSkills()} className="float-end">
+                            <IoSettingsSharp className="mb-05" />
+                        </Button>
+                        {this.props.skills.map((skill: Skill) => (<Form.Check
+                            key={skill.name}
+                            type="checkbox"
+                            name={skill.name}
+                            label={skill.name}
+                        />))}
+                        <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
+                                             showEdit={this.state.showEditSkills} skills={this.props.skills}
+                                             onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}
+                                             onDeleteSkill={this.props.onDeleteSkill}></ComponentEditSkills>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
@@ -136,8 +162,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     <Button
                         onClick={() => history.back()}
                         className="mb-3 me-4 btn-lg"
-                        variant="secondary"
-                    >
+                        variant="secondary">
                         Retour
                     </Button>
                     <Button className="mb-3 btn-lg" variant="primary" type="submit">
@@ -148,17 +173,20 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         </Container>;
     }
 
-    /**
-     * TODO
-     * Generate automatically a password for new employee and ask them to change it on the first login.
-     */
+    readonly #onShowEditJobTitles = (value: boolean = true): void => {
+        this.setState({showEditJobTitles: value})
+    }
+
+    readonly #onShowEditSkills = (value: boolean = true): void => {
+        this.setState({showEditSkills: value})
+    }
 
     /**
-     * Handle the form submission. Validate the form and attempt to create the employee.
+     * Handle the form submission. Validate the form and attempt to edit the employee.
      * @param event The form submission event. Contains the form data to be validated.
      * @private
      * @returns {Promise<void>}
-     * @memberof CreateEmployee
+     * @memberof EditEmployee
      */
     readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         let errorType = FormUtils.validateForm(event);
@@ -189,7 +217,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
      * Handle the change of a form element. Update the state with the new value.
      * @param event The change event. Contains the new value of the form element.
      * @returns {void}
-     * @memberof CreateEmployee
+     * @memberof EditEmployee
      * @private
      */
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {

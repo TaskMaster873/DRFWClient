@@ -6,16 +6,16 @@ import {Employee} from "../types/Employee";
 import {HeightSpecType, EventManipulationType, ViewType, EventDeleteHandlingType, ColumnsType} from "../types/StatesForDaypilot";
 import {Container} from "react-bootstrap";
 
-type Props = {
+interface ScheduleCreateProps {
 	currentDay: DayPilot.Date;
 	events: EventForCalendar[];
 	employees: Employee[];
 	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
 	editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
 	deleteShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
-};
+}
 
-type State = {
+interface ScheduleCreateState {
 	/** is the popup child active or not */
 	isShowingModal: boolean;
 	/** Shift id and serves as a unique DayPilot marker */
@@ -28,10 +28,10 @@ type State = {
 	resource: string;
 	/** Popup taskType */
 	taskType: EventManipulationType;
-};
+}
 
-export class ComponentScheduleCreate extends React.Component<Props, State> {
-	public state: State = {
+export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps, ScheduleCreateState> {
+	public state: ScheduleCreateState = {
 		isShowingModal: false,
 		currentEventId: "",
 		start: "",
@@ -40,7 +40,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 		taskType: EventManipulationType.CREATE,
 	};
 
-	constructor(props: Props) {
+	constructor(props: ScheduleCreateProps) {
 		super(props);
 	}
 

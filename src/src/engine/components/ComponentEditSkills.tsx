@@ -11,6 +11,7 @@ import {Skill} from "../types/Skill";
 import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteSkill} from "./ComponentConfirmDeleteSkill";
+import {SkillActions} from "../types/Employee";
 
 interface EditSkillsState {
     skillToDelete?: Skill;
@@ -22,21 +23,18 @@ interface EditSkillsState {
     editError: FormErrorType;
 }
 
-interface EditSkillsProps {
+interface EditSkillsProps extends SkillActions {
     cancelEdit: () => void;
     skills: Skill[];
-    onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
-    onEditSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
-    onDeleteSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
     showEdit: boolean;
 }
 
 /**
- * This is the form to add a department
+ * This is the modal form to edit a Skill
  * @param props The props of the component
  * @constructor
  * @category Components
- * @subcategory Department
+ * @subcategory JobTitle
  * @hideconstructor
  */
 export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSkillsState> {
@@ -121,18 +119,35 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         </div>
     }
 
+    /**
+     * The function that hides the modal when the exit button is clicked
+     */
     readonly hideModal = (): void => {
         this.props.cancelEdit();
     }
 
+    /**
+     * When the delete button is clicked show the deletion confirmation window
+     * @param value the Skill to delete
+     * @private
+     */
     readonly #onShowConfirmDeleteSkills = (value?: Skill): void => {
         this.setState({skillToDelete: value});
     }
 
-
+    /**
+     * Render edit and delete actions
+     * @param skill The Skill
+     * @private
+     */
     private renderActions(skill: Skill): JSX.Element {
         if (this.state.editedSkill == skill) {
-            return <div><button className="transparentButton me-2" type="submit"><BiCheck className="adminActions"/></button> <CgUnavailable onClick={() => this.editSkill(undefined)} className="adminActions ms-1"/></div>
+            return <div>
+                <button className="transparentButton me-2" type="submit">
+                    <BiCheck className="adminActions"/>
+                </button>
+                <CgUnavailable onClick={() => this.editSkill()} className="adminActions ms-1"/>
+            </div>
         } else {
             return <div>
                 <BiPencil onClick={() => this.editSkill(skill)} className="adminActions me-2"/>
@@ -141,10 +156,20 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         }
     }
 
-    private editSkill(skill: Skill | undefined) {
+    /**
+     * Change the current edited skill
+     * @param skill The skill to edit
+     * @private
+     */
+    private editSkill(skill?: Skill) {
         this.setState({editedSkill: skill});
     }
 
+    /**
+     * Shows the deletion confirmation modal
+     * @param skill
+     * @private
+     */
     private showDeletePrompt(skill: Skill) {
         this.setState({skillToDelete: skill});
     }

@@ -10,6 +10,7 @@ export interface DepartmentsState {
 
 export interface DepartmentListState {
     editedDepartment?: Department;
+    departmentToDelete?: Department;
 }
 
 /**
@@ -53,6 +54,7 @@ export interface DepartmentListProps {
     departments: Department[],
     onAddDepartment: (department) => PromiseLike<void> | Promise<void> | void;
     onEditDepartment: (departmentId: string, department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
+    onDeleteDepartment: (department: Department) => PromiseLike<void> | Promise<void> | void;
 }
 
 
