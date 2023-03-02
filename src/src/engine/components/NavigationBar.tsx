@@ -2,21 +2,19 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { LinkContainer } from "react-router-bootstrap";
-import { API } from "../api/APIManager";
-
+import {LinkContainer} from "react-router-bootstrap";
+import {API} from "../api/APIManager";
 import Logo from "../../deps/images/logo.png";
-
 import {ComponentUserActionDropdown} from "./ComponentUserActionDropdown";
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faClock, faClipboard, faBuilding } from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faCalendar, faClock, faClipboard, faBuilding, faAddressBook, faCalendarDays} from '@fortawesome/free-solid-svg-icons';
 import {RoutesPath} from "../RoutesPath";
-import { ComponentNavItem as NavItem } from "./ComponentNavItem";
+import {ComponentNavItem as NavItem} from "./ComponentNavItem";
+import {Roles} from "../types/Roles";
 
-interface NavigationBarState {
-    showCreateSchedule: boolean;
-}
+interface State {
+    toggle: boolean;
+};
 
 /**
  * This is the navigation bar component, it is displayed on every page. It shows the links to the different pages and the login button.
@@ -27,52 +25,23 @@ interface NavigationBarState {
  * @hideconstructor
  * @see NavigationBarState
  */
-export class NavigationBar extends React.Component<unknown, NavigationBarState> {
-    private _isMountedAPI: boolean = false;
-
-    public state: NavigationBarState = {
-        showCreateSchedule: false,
+export class NavigationBar extends React.Component<unknown, State> {
+    public state: State = {
+        toggle: false
     };
 
     constructor(props) {
         super(props);
-
-        API.subscribeToEvent(this.onAPIEvent.bind(this));
+        API.subscribeToEvent(this.toggle.bind(this));
     }
 
-    public componentDidMount() : void{
-        this._isMountedAPI = true;
-    }
-
-    public componentWillUnmount() : void {
-        this._isMountedAPI = false;
-    }
-
-    /**
-     * This function returns the links to the admin commands if the user is an admin
-     * @returns {JSX.Element[]} The links to the admin commands
-     * @private
-     * @category Components
-     * @subcategory Navigation
-     * @hideconstructor
-     */
-    private async onAPIEvent(): Promise<void> {
-        return new Promise((resolve) => {
-            if (this._isMountedAPI) {
-                this.setState({
-                    showCreateSchedule: true
-                }, () => {
-                    resolve();
-                });
-            } else {
-                resolve();
-            }
-        });
+    private async toggle(): Promise<void> {
+        this.setState({toggle: !this.state.toggle});
     }
 
     public render(): JSX.Element {
         return (
-            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{ fontSize: 15 }}>
+            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{fontSize: 15}}>
                 <Container fluid={true}>
                     <LinkContainer to="/">
                         <Navbar.Brand>
@@ -83,21 +52,12 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
                                 width={50}
                                 height={60}
                             />
-
                             TaskMaster
                         </Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
-                        <Nav activeKey="">
-                            {this.adminCommandLinks()}
-
-                            <NavItem icon={<FontAwesomeIcon icon={faCalendar} />} link={RoutesPath.SCHEDULE} label="Mon horaire" description="Gérez votre emploi du temps" />
-                            <NavItem icon={<FontAwesomeIcon icon={faClock} />} link={RoutesPath.AVAILABILITIES} label="Mes disponibilités" description="Gérez vos disponibilités" />
-                            <NavItem icon={<FontAwesomeIcon icon={faClipboard} />} link={RoutesPath.DEPARTMENTS} label="Départements" description="Voir tous les départements" />
-                            <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
-                        </Nav>
-
+                        {this.generalLinks()}
                         <Nav className="ms-auto">
                             {this.loginButton()}
                         </Nav>
@@ -131,21 +91,34 @@ export class NavigationBar extends React.Component<unknown, NavigationBarState> 
     }
 
     /**
-     * This function returns the links to the admin commands if the user is an admin
-     * @returns {JSX.Element[]} The links to the admin commands
+     * This function returns the links used to navigate the website
+     * @returns {JSX.Element} The navigation links
      * @category Components
      * @subcategory Navigation
      * @hideconstructor
-     * @see adminCommandLinks
-     * @see NavigationBarState
+     * @see generalLinks
      * @private
      */
-    private adminCommandLinks(): JSX.Element | undefined {
-        if (this.state.showCreateSchedule) {
+    private generalLinks(): JSX.Element {
+        if (API.hasPermission(Roles.MANAGER)) {
             return (
-                <LinkContainer to={RoutesPath.CREATE_SCHEDULE}>
-                    <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
-                </LinkContainer>
+                <Nav activeKey="">
+                    <NavItem icon={<FontAwesomeIcon icon={faCalendarDays} />} link={RoutesPath.CREATE_SCHEDULE} label="Création d'horaire" description="Gérez les quarts de travail" />
+                    <NavItem icon={<FontAwesomeIcon icon={faClipboard} />} link={RoutesPath.MANAGE_AVAILABILITIES} label="Gestion des disponibilités" description="Gérez les demandes de disponibilités" />
+                    <NavItem icon={<FontAwesomeIcon icon={faCalendar} />} link={RoutesPath.SCHEDULE} label="Mon horaire" description="Consultez vos quarts de travail" />
+                    <NavItem icon={<FontAwesomeIcon icon={faClock} />} link={RoutesPath.AVAILABILITIES} label="Mes disponibilités" description="Modifier vos disponibilités" />
+                    <NavItem icon={<FontAwesomeIcon icon={faAddressBook} />} link={RoutesPath.DEPARTMENTS} label="Départements" description="Voir tous les départements" />
+                    <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
+                </Nav>
+            );
+        } else {
+            return (
+                <Nav activeKey="">
+                    <NavItem icon={<FontAwesomeIcon icon={faCalendar} />} link={RoutesPath.SCHEDULE} label="Mon horaire" description="Consultez vos quarts de travail" />
+                    <NavItem icon={<FontAwesomeIcon icon={faClock} />} link={RoutesPath.AVAILABILITIES} label="Mes disponibilités" description="Modifier vos disponibilités" />
+                    <NavItem icon={<FontAwesomeIcon icon={faAddressBook} />} link={RoutesPath.DEPARTMENTS} label="Départements" description="Voir tous les départements" />
+                    <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
+                </Nav>
             );
         }
     }
