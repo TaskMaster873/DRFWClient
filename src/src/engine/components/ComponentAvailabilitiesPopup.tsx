@@ -11,7 +11,7 @@ import {DateManager} from '../utils/DateManager';
 type Props = {
 	availabilityAdd: (start?: Timestamp, end?: Timestamp) => Promise<void>;
 	//eventEdit: (shiftEvent: EventForShiftEdit) => Promise<void>;
-	hideModal: () => void;
+	hideModal: (hide: boolean) => void;
 	isShown: boolean;
 	start: DayPilot.Date;
 	end: DayPilot.Date;
@@ -23,8 +23,6 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 	const [start, setStart] = useState<string | null>(null);
 	const [end, setEnd] = useState<string | null>(null);
 	const [disabled, setDisabled] = useState<boolean>(false);
-	const min = DayPilot.Date.today().addDays(-2);
-	const max = min.addDays(10);
 
 	/**
 	 * Verify if the form is valid and if it is, it sends the data to the parent
@@ -39,40 +37,24 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 		if (!isValid) {
 			errorType = FormErrorType.INVALID_FORM;
 		}
-		console.log(event);
 		event.preventDefault();
 		event.stopPropagation();
-
 		setValidated(true);
 		setError(errorType);
 
 		if (errorType === FormErrorType.NO_ERROR) {
 			setDisabled(true);
-			props.availabilityAdd(DateManager.getFirebaseTimestamp(props.start), DateManager.getFirebaseTimestamp(props.end));
+			props.availabilityAdd(DateManager.getFirebaseTimestamp(start ?? props.start), DateManager.getFirebaseTimestamp(end ?? props.end));
 			closeModal();
 		}
 	};
 
-	
-
-	/**
-	 * Send a shift edit object to the page
-	 */
-	const sendEditEvent = async () => {
-		/*let eventToReturn: EventForShiftEdit = {
-			id: props.id,
-			employeeId: props.resource,
-			start: start ?? props.start,
-			end: end ?? props.end,
-		};
-		await props.eventEdit(eventToReturn);*/
-	};
 
 	/**
 	 * Hides the modal window and resets its data
 	 */
 	const closeModal = () => {
-		props.hideModal();
+		props.hideModal(true);
 		setDisabled(false);
 		setValidated(false);
 		setError(FormErrorType.NO_ERROR);
@@ -81,7 +63,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 	};
 
 	return (
-		<Modal show={props.isShown} >
+		<Modal show={!props.isShown} >
 			<Modal.Header closeButton onClick={() => closeModal()}>
 				<Modal.Title>Les dates de commencement et de fin</Modal.Title>
 			</Modal.Header>
@@ -93,9 +75,6 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 							id="start"
 							type="datetime-local"
 							defaultValue={props.start}
-							step="1800"
-							min={min}
-							max={max}
 							onChange={(e) => {setStart(e.target.value);}}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidStartDate">
@@ -108,9 +87,6 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 							id="end"
 							type="datetime-local"
 							defaultValue={props.end}
-							step="1800"
-							min={min}
-							max={max}
 							onChange={(e) => setEnd(e.target.value)}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidEndDate">

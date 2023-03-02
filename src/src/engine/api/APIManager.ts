@@ -460,7 +460,7 @@ class APIManager extends Logger {
                         this.isAuthenticated = true;
                         this.#user = user;
                         let result = await this.getEmployeeInfos(user.uid);
-                        if(typeof result === "string") {
+                        if (typeof result === "string") {
                             NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
                             this.#employeeInfos.role = 0;
                             this.#employeeInfos.department = undefined;
@@ -818,7 +818,7 @@ class APIManager extends Logger {
             queryDepartment,
             errors.DEPARTMENT_ALREADY_EXISTS
         );
-        if(!errorMessage) {
+        if (!errorMessage) {
             if (departmentId) {
                 await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
                     errorMessage = APIUtils.getErrorMessageFromCode(error);
@@ -1132,8 +1132,8 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         let employeeInfos: EmployeeInfos = {role: 0, department: undefined};
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
-                errorMessage = APIUtils.getErrorMessageFromCode(error);
-            });
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
         if (employee) {
             employeeInfos = employee.data() as EmployeeInfos;
         }
@@ -1410,6 +1410,11 @@ class APIManager extends Logger {
         if (errorMessage) return errorMessage;
     }
 
+    /**
+     * Create a pending unavailability list for the manager
+     * @param list 
+     * @returns {void}
+     */
     public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
         if (!this.hasPermission(Roles.EMPLOYEE)) {
             //Gestionnaire
@@ -1430,7 +1435,6 @@ class APIManager extends Logger {
         ).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
-        console.log("created");
         if (errorMessage) return errorMessage;
     }
 }

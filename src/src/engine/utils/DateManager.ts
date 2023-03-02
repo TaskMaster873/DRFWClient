@@ -1,6 +1,5 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react"; import {Timestamp} from "firebase/firestore";
 import {DateOfUnavailabilityList, DAYS, EmployeeRecursiveExceptionList} from "../types/EmployeeAvailabilities";
-;
 
 export class InternalDateManager {
     public convertTimestampToDayPilotDate(time: string): string {
@@ -45,6 +44,12 @@ export class InternalDateManager {
         return date.toISOString().slice(0, -5);
     }
 
+    /**
+     * 
+     * @param days of the week
+     * @param listOfDates of all unavailabilities
+     * @returns {EmployeeRecursiveExceptionList} that has the good day ofthe week
+     */
     public getCertainDayOfWeekUnavailabilities(days: DAYS, listOfDates: DateOfUnavailabilityList): EmployeeRecursiveExceptionList {
         let listToReturn: EmployeeRecursiveExceptionList = [];
 
@@ -56,6 +61,11 @@ export class InternalDateManager {
         return listToReturn;
     }
 
+    /**
+     * 
+     * @param date 
+     * @returns the number of minutes from the start of the day given in param
+     */
     public getMinutes(date: Date): number {
         return date.getHours() * 60 + date.getMinutes();
     }

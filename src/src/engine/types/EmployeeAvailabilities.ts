@@ -83,11 +83,11 @@ export interface EmployeeAvailabilitiesForCreate {
     recursiveExceptions: RecursiveAvailabilities;
     employeeId?: string;
     start?: Timestamp;
-    end?:Timestamp;
+    end?: Timestamp;
 }
 
 export interface DateOfUnavailability {
-    start: Date ,
+    start: Date,
     end: Date
 }
 

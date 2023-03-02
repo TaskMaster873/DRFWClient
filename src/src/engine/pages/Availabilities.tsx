@@ -45,7 +45,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                         endTime: 60
                     },
                 ],
-                //time not available
                 [DAYS.MONDAY]: [
                     {
                         startTime: 60,
@@ -82,7 +81,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         currentWeekStart: firstDay,
         currentWeekEnd: lastDay,
         timesUnavailable: [],
-        popupActive: false,
+        popupActive: true,
         selectedDate: new Date,
     };
 
@@ -115,7 +114,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return (
             <div>
                 <Container className="justify-content-end">
-                    <button type="button" className="btn btn-primary" onClick={() => this.#openPopup()}>Sauvegarder</button>
+                    <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Sauvegarder</button>
                 </Container>
                 <ComponentAvailabilities getStartData={this.#getStartData}
                     onTimeRangeSelected={this.#onTimeRangeSelected}
@@ -125,7 +124,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                     employeeAvailabilities={this.state.timesUnavailable}
                     ref={this.componentAvailabilitiesRef} />
                 <ComponentAvailabilitiesPopup
-                    hideModal={this.#onCloseClicked}
+                    hideModal={this.#hideModal}
                     isShown={this.state.popupActive}
                     start={this.toUTC(this.state.currentWeekStart)}
                     end={this.toUTC(this.state.currentWeekEnd)}
@@ -180,33 +179,16 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     private transformListIntoDateList(unavailabilitiesInCalendar: DayPilot.EventData[]): DateOfUnavailabilityList {
         let listSortedByStart: DateOfUnavailabilityList = [];
-
-        if (unavailabilitiesInCalendar.length != 0) {
-            for (let eventData of unavailabilitiesInCalendar) {
-                listSortedByStart.push({start: new Date(eventData.start as string), end: new Date(eventData.end as string)});
-            }
-
+        for (let eventData of unavailabilitiesInCalendar) {
+            listSortedByStart.push({start: new Date(eventData.start as string), end: new Date(eventData.end as string)});
         }
 
         return listSortedByStart;
 
-
-
     }
 
-    /*  private tranformShiftsToMinutes(list: DayPilot.Date[]): EmployeeRecursiveExceptionList  {
-          let listToReturn: EmployeeRecursiveExceptionList = [];
-          for(let date of list) {
-              date.toDate();
-          }
-          return null;
-      }*/
-
-    readonly #openPopup = (): void => {
-        this.setState({popupActive: true});
-    };
-    readonly #onCloseClicked = (): void => {
-        this.setState({popupActive: false});
+    readonly #hideModal = (active: boolean): void => {
+        this.setState({popupActive: active});
     };
 
     private convertRecursiveExceptionDate(startDate: Date, day: number, numberOfMinutes: number): Date {

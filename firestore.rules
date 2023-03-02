@@ -180,13 +180,20 @@ service cloud.firestore {
             }
 
             match /unavailabilities/{unavailabilityId} {
-                allow read;
+                allow read: if(isValidToReadUnavailabilities());
                 allow write: if(isValidUnavailabilityCreate());
+            }
+
+            function isValidToReadUnavailabilities() {
+                let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
+                return isEmployee;
             }
 
             function isValidUnavailabilityCreate() {
                 let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
-                return isEmployee;
+                let isSameEmployee = request.resource.data.employeeId == request.auth.uid;
+
+                return isEmployee && isSameEmployee;
             }
         }
     }
