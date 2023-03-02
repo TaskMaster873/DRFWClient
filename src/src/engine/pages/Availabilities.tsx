@@ -1,5 +1,11 @@
 import React from "react";
-import {DAYS, EmployeeAvailabilities, EventsForUnavailability, EmployeeRecursiveException, RecursiveAvailabilities, RecursiveAvailabilitiesList, EmployeeAvailabilitiesForCreate, EmployeeRecursiveExceptionList, DateOfUnavailabilityList} from "../types/EmployeeAvailabilities";
+import {
+    DateOfUnavailabilityList,
+    DAYS,
+    EmployeeAvailabilities,
+    EmployeeAvailabilitiesForCreate,
+    EmployeeRecursiveException
+} from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
 import {DateManager} from '../utils/DateManager';
 import {DayPilot} from "daypilot-pro-react";

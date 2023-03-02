@@ -92,8 +92,8 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
 
     //#region Departments
     public addDepartment = async (department: Department) : Promise<void> => {
-        let errorMessage = await API.createDepartment(department);
-        if (!errorMessage) {
+        let error = await API.createDepartment(department);
+        if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
 
             let departments = this.state.departments;
@@ -105,31 +105,31 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             this.setState({departments: departments, employeeNb: employeeNb});
             await this.fetchData();
         } else {
-            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
 
     public editDepartment = async (departmentId: string, department: DepartmentModifyDTO) : Promise<void> => {
-        let errorMessage = await API.editDepartment(departmentId, department);
-        if (!errorMessage) {
+        let error = await API.editDepartment(departmentId, department);
+        if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
             let departments = Utils.editElement(this.state.departments, departmentId, department) as Department[];
             this.setState({departments: departments});
             await this.fetchData();
         } else {
-            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
 
     public deleteDepartment = async (department: Department) : Promise<void> => {
-        let errorMessage = await API.deleteDepartment(department);
-        if (!errorMessage && department.id) {
+        let error = await API.deleteDepartment(department);
+        if (!error && department.id) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
             let departments = Utils.deleteElement(this.state.departments, department.id) as Department[];
             this.setState({departments: departments});
             await this.fetchData();
-        } else if(errorMessage) {
-            NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
+        } else if(error) {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
     //#endregion

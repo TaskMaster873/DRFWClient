@@ -52,7 +52,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
     public async componentDidMount(): Promise<void> {
         document.title = "Création d'horaire - TaskMaster";
 
-        let isLoggedIn: boolean = await this.verifyLogin();
+        const isLoggedIn: boolean = await this.verifyLogin();
         if (isLoggedIn) {
             let fetchedDepartments = await API.getDepartments();
             if (typeof fetchedDepartments === "string") {
@@ -89,7 +89,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
         let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        let hasPerms = this.verifyPermissions(Roles.MANAGER);
+        const hasPerms = this.verifyPermissions(Roles.MANAGER);
         if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
         } else {
@@ -117,13 +117,13 @@ export class CreateSchedule extends React.Component<unknown, State> {
      */
     readonly #changeDepartment = async (currentDepartment: Department, departments?: Department[]): Promise<void> => {
         //Get all employees of this department
-        let fetchedEmployees = await API.getEmployees(currentDepartment.name);
+        const fetchedEmployees = await API.getEmployees(currentDepartment.name);
         //Manage errors
         if (typeof fetchedEmployees === "string") {
             NotificationManager.error(errors.GET_EMPLOYEES, fetchedEmployees);
             this.setState({fetchState: FetchState.ERROR});
         } else {
-            this.getShifts(currentDepartment, departments, fetchedEmployees);
+            await this.getShifts(currentDepartment, departments, fetchedEmployees);
         }
     };
 
@@ -135,7 +135,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
      */
     private getShifts = async (currentDepartment: Department, departments?: Department[], employees?: Employee[]): Promise<void> => {
         //Get all daily shifts of this department
-        let fetchedShifts = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), currentDepartment);
+        const fetchedShifts = await API.getDailyScheduleForDepartment(DayPilot.Date.today(), currentDepartment);
         //Manage errors
         if (typeof fetchedShifts === "string") {
             NotificationManager.error(errors.GET_SHIFTS, fetchedShifts);
@@ -157,9 +157,9 @@ export class CreateSchedule extends React.Component<unknown, State> {
      * @param shiftEvent The shift to add
      */
     readonly #addShift = async (shiftEvent: EventForShiftCreation): Promise<void> => {
-        let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
+        const currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
         //Create Shift
-        let error = await API.createShift({
+        const error = await API.createShift({
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
             end: shiftEvent.end,
@@ -179,9 +179,9 @@ export class CreateSchedule extends React.Component<unknown, State> {
      * @param shiftEvent The shift to add
      */
     readonly #editShift = async (shiftEvent: EventForShiftEdit): Promise<void> => {
-        let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
+        const currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
         //Create Shift
-        let error = await API.editShift({
+        const error = await API.editShift({
             id: shiftEvent.id,
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
@@ -202,9 +202,9 @@ export class CreateSchedule extends React.Component<unknown, State> {
      * @param shiftEvent The id of the shift to delete
      */
     readonly #deleteShift = async (shiftEvent: EventForShiftEdit): Promise<void> => {
-        let currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
+        const currentDepartment = this.state.currentDepartment ? this.state.currentDepartment : {name: "", director: ""};
         //Delete shift
-        let error = await API.deleteShift({
+        const error = await API.deleteShift({
             id: shiftEvent.id,
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
@@ -226,10 +226,10 @@ export class CreateSchedule extends React.Component<unknown, State> {
      * @returns the converted shifts
      */
     private getEventsForCalendarFromShifts(shifts: Shift[]): EventForCalendar[] {
-        let events: EventForCalendar[] = [];
-        for (let shift of shifts) {
-            let startText = DateManager.convertTimestampToDayPilotDate(shift.start);
-            let endText = DateManager.convertTimestampToDayPilotDate(shift.end);
+        const events: EventForCalendar[] = [];
+        for (const shift of shifts) {
+            const startText = DateManager.convertTimestampToDayPilotDate(shift.start);
+            const endText = DateManager.convertTimestampToDayPilotDate(shift.end);
             events.push({
                 id: shift.id,
                 text: `${startText} à ${endText}`,

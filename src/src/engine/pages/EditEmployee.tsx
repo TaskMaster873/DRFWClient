@@ -1,10 +1,6 @@
 import React from "react";
 import {API} from "../api/APIManager";
-import {
-    AddEmployeeState,
-    EmployeeEditDTO,
-    EmployeeProps,
-} from "../types/Employee";
+import {AddEmployeeState, EmployeeEditDTO, EmployeeProps,} from "../types/Employee";
 
 import {errors, successes} from "../messages/FormMessages";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
@@ -17,7 +13,7 @@ import Utils from "../utils/Utils";
 import {Skill} from "../types/Skill";
 
 export function EditEmployeeWrapper(): JSX.Element {
-    let parameters: Readonly<Params<string>> = useParams();
+    const parameters: Readonly<Params<string>> = useParams();
     return (
         <EditEmployeeInternal  {...{params: parameters}}/>
     );
@@ -49,7 +45,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     }
 
     private async fetchData() {
-        let isLoggedIn: boolean = await this.verifyLogin();
+        const isLoggedIn: boolean = await this.verifyLogin();
         if (!isLoggedIn) {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
             return;
@@ -95,7 +91,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     private async verifyLogin(): Promise<boolean> {
         await API.awaitLogin;
 
-        let hasPerms = this.verifyPermissions(Roles.ADMIN);
+        const hasPerms = this.verifyPermissions(Roles.ADMIN);
         if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
         } else {
@@ -121,11 +117,11 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
      * @param employee {EmployeeCreateDTO} The employee to edit
      */
     readonly #editEmployee = async (employeeId: string, employee: EmployeeEditDTO): Promise<void> => {
-        let error = await API.editEmployee(employeeId, employee);
+        const error = await API.editEmployee(employeeId, employee);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_EDITED);
         } else {
-            NotificationManager.error(error, errors.ERROR_GENERIC_MESSAGE);
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     }
 
@@ -154,10 +150,10 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
      */
     readonly #editJobTitle = async (title: JobTitle): Promise<void> => {
         if (title.id) {
-            let error = await API.editJobTitle(title);
+            const error = await API.editJobTitle(title);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_EDITED);
-                let titles = Utils.editElement(this.state.titles, title.id, title) as JobTitle[];
+                const titles = Utils.editElement(this.state.titles, title.id, title) as JobTitle[];
                 this.setState({titles: titles});
                 await this.fetchData();
             } else {
@@ -173,10 +169,10 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
      */
     readonly #deleteJobTitle = async (titleId: string): Promise<void> => {
         if (titleId) {
-            let error = await API.deleteJobTitle(titleId);
+            const error = await API.deleteJobTitle(titleId);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_DELETED);
-                let titles = Utils.deleteElement(this.state.titles, titleId) as JobTitle[];
+                const titles = Utils.deleteElement(this.state.titles, titleId) as JobTitle[];
                 this.setState({titles: titles});
                 await this.fetchData();
             } else {
@@ -193,7 +189,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
      * @private
      */
     readonly #addSkill = async (skillName: string): Promise<void> => {
-        let error = await API.createSkill(skillName);
+        const error = await API.createSkill(skillName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_CREATED);
             const skills = [...this.state.skills, new Skill({ name: skillName })];
@@ -211,10 +207,10 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
      */
     readonly #editSkill = async (skill: Skill): Promise<void> => {
         if (skill.id) {
-            let error = await API.editSkill(skill);
+            const error = await API.editSkill(skill);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
-                let skills = Utils.editElement(this.state.skills, skill.id, skill) as Skill[];
+                const skills = Utils.editElement(this.state.skills, skill.id, skill) as Skill[];
                 this.setState({skills: skills});
                 await this.fetchData();
             } else if (error) {
@@ -230,10 +226,10 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
      */
     readonly #deleteSkill = async (skillId: string): Promise<void> => {
         if (skillId) {
-            let error = await API.deleteSkill(skillId);
+            const error = await API.deleteSkill(skillId);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_EDITED);
-                let skills = Utils.deleteElement(this.state.skills, skillId) as Skill[];
+                const skills = Utils.deleteElement(this.state.skills, skillId) as Skill[];
                 this.setState({skills: skills});
                 await this.fetchData();
             } else {

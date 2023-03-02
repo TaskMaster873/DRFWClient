@@ -6,7 +6,7 @@ import {ComponentLoading} from "../components/ComponentLoading";
 import {errors} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {RoutesPath} from "../RoutesPath";
-import { Navigate } from "react-router-dom";
+import {Navigate} from "react-router-dom";
 import {Roles} from "../types/Roles";
 
 interface ScheduleState {
