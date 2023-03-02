@@ -14,8 +14,7 @@ import {Container} from "react-bootstrap";
 export interface AvailabilitiesState {
     availabilities: EmployeeAvailabilities;
     timesUnavailable: DayPilot.EventData[];
-    popupActive: boolean;
-
+    popupInactive: boolean;
     currentWeekStart: Date;
     currentWeekEnd: Date;
     selectedDate: Date;
@@ -38,50 +37,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     //It is a placeholder value, because the db doesn't exist for now.
     public state: AvailabilitiesState = {
         availabilities: {
-            recursiveExceptions: [{
-                [DAYS.SUNDAY]: [
-                    {
-                        startTime: 0,
-                        endTime: 60
-                    },
-                ],
-                [DAYS.MONDAY]: [
-                    {
-                        startTime: 60,
-                        endTime: 60 + 60
-                    }
-                ],
-                [DAYS.TUESDAY]: [
-                    {
-                        startTime: 120,
-                        endTime: 120 + 60
-                    }
-                ],
-                [DAYS.WEDNESDAY]: [],
-                [DAYS.THURSDAY]: [],
-                [DAYS.FRIDAY]: [],
-                [DAYS.SATURDAY]: [],
-
-            }, {
-                startDate: "2023-02-19T00:00:00",
-                endDate: "2023-02-26T23:59:59",
-                [DAYS.SUNDAY]: [],
-                //time not available
-                [DAYS.MONDAY]: [],
-                [DAYS.TUESDAY]: [],
-                [DAYS.WEDNESDAY]: [],
-                [DAYS.THURSDAY]: [],
-
-                [DAYS.FRIDAY]: [],
-                [DAYS.SATURDAY]: [],
-
-            }],
-            employeeId: "",
+            recursiveExceptions: [],
+            employeeId: ""
         },
         currentWeekStart: firstDay,
         currentWeekEnd: lastDay,
         timesUnavailable: [],
-        popupActive: true,
+        popupInactive: true,
         selectedDate: new Date,
     };
 
@@ -90,8 +52,9 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return this.componentAvailabilitiesRef?.current;
     }
 
-    public componentDidMount() {
+    public async componentDidMount() {
         document.title = "Disponibilitées - TaskMaster";
+
     }
 
     private isInTimeRangeFromStartDate(date: Date, startDate: Date): boolean {
@@ -102,7 +65,16 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return date <= endDate;
     }
 
-    readonly #getStartData = (): DayPilot.EventData[] => {
+    readonly #getStartData = async (): Promise<DayPilot.EventData[]> => {
+       
+        let recursiveException = await API.getCurrentEmployeeunavailabilities();
+        console.log(recursiveException);
+        if (recursiveException) {
+            //we need to do the 2 because Daypilot cannot render correctly
+            this.setState({availabilities:recursiveException});
+            this.state.availabilities = recursiveException;
+        }
+        console.log(this.state);
         return this.computeAllAvailabilities(this.state.currentWeekStart, this.state.currentWeekEnd, this.state.selectedDate);
     };
 
@@ -116,7 +88,8 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                 <Container className="justify-content-end">
                     <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Sauvegarder</button>
                 </Container>
-                <ComponentAvailabilities getStartData={this.#getStartData}
+                <ComponentAvailabilities
+                    getStartData={this.#getStartData}
                     onTimeRangeSelected={this.#onTimeRangeSelected}
                     isCellInStartToEndTimeRange={this.#isCellInStartToEndTimeRange}
                     startDate={new DayPilot.Date(this.state.currentWeekStart)}
@@ -125,7 +98,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                     ref={this.componentAvailabilitiesRef} />
                 <ComponentAvailabilitiesPopup
                     hideModal={this.#hideModal}
-                    isShown={this.state.popupActive}
+                    isShown={this.state.popupInactive}
                     start={this.toUTC(this.state.currentWeekStart)}
                     end={this.toUTC(this.state.currentWeekEnd)}
                     availabilityAdd={this.#createNewAvailabilityRequest}
@@ -188,7 +161,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
     readonly #hideModal = (active: boolean): void => {
-        this.setState({popupActive: active});
+        this.setState({popupInactive: active});
     };
 
     private convertRecursiveExceptionDate(startDate: Date, day: number, numberOfMinutes: number): Date {
@@ -303,8 +276,10 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             if (recursive.endDate && canRenderData) {
                 if (!this.isInTimeRangeFromEndDate(end, new Date(recursive.endDate))) {
                     canRenderData = false;
+                    
                 }
             }
+            console.log(canRenderData);
 
             if (canRenderData) {
                 for (let day in recursive) {

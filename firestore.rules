@@ -182,6 +182,7 @@ service cloud.firestore {
             match /unavailabilities/{unavailabilityId} {
                 allow read: if(isValidToReadUnavailabilities());
                 allow write: if(isValidUnavailabilityCreate());
+                allow delete: if(isValidUnavailabilityDelete());
             }
 
             function isValidToReadUnavailabilities() {
@@ -194,6 +195,12 @@ service cloud.firestore {
                 let isSameEmployee = request.resource.data.employeeId == request.auth.uid;
 
                 return isEmployee && isSameEmployee;
+            }
+
+            function isValidUnavailabilityDelete() {
+                 let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
+
+                return isEmployee 
             }
         }
     }

@@ -1299,7 +1299,7 @@ class APIManager extends Logger {
             for (let doc of snaps.docs) {
                 let shift = doc.data();
                 //Validated end moment
-                if(shift.end < convertedEndDay) {
+                if (shift.end < convertedEndDay) {
                     //Push shift object
                     shifts.push(new Shift({
                         id: doc.id,
@@ -1414,6 +1414,41 @@ class APIManager extends Logger {
     }
 
     /**
+     * Check if the unavailability already exist with the same dates in the DB
+     * @param list 
+     */
+    private async checkUnavailabilityAlreadyExists(list: EmployeeAvailabilitiesForCreate): Promise<string | null> {
+        let errorMessage: string | null = null;
+        let queryUnavailability = query(
+            collection(this.#db, `unavailabilities`),
+            where("employeeId", "==", this.#user?.uid)
+        );
+
+        let snaps = await getDocs(queryUnavailability).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+        console.log("snaps",snaps);
+        if (snaps) {
+            for(let document of snaps.docs) {
+                let data = document.data();
+                if (!data.isAccepted) {
+                    if (data.start.seconds == list.start?.seconds && data.end.seconds == list.end?.seconds) {
+                            console.log("data",data, document.id);
+                            
+                            await deleteDoc(doc(this.#db, `unavailabilities`, document.id)
+                            ).catch((error) => {
+                            errorMessage = APIUtils.getErrorMessageFromCode(error);
+                            });
+                    }
+                }
+
+        };
+        
+        }
+        return errorMessage;
+    }
+
+    /**
      * Create a pending unavailability list for the manager
      * @param list 
      * @returns {void}
@@ -1427,6 +1462,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
 
         //Create unavailability
+        await this.checkUnavailabilityAlreadyExists(list);
         await addDoc(collection(this.#db, `unavailabilities`),
             {
                 employeeId: this.#user?.uid,
@@ -1440,6 +1476,7 @@ class APIManager extends Logger {
         });
 
     }
+
 
     public async getCurrentEmployeeunavailabilities(): Promise<EmployeeAvailabilities | null> {
         return this.getOneEmployeeUnavailabilities(this.#user?.uid);
@@ -1466,19 +1503,22 @@ class APIManager extends Logger {
             if (snaps) {
                 snaps.docs.forEach((doc: QueryDocumentSnapshot) => {
                     let data = doc.data();
-                    listOfRecursive.push(
-                        {
-                            startDate: data.start,
-                            endDate: data.end,
-                            [DAYS.SUNDAY]: data.unavailabilities[DAYS.SUNDAY],
-                            [DAYS.MONDAY]: data.unavailabilities[DAYS.MONDAY],
-                            [DAYS.TUESDAY]: data.unavailabilities[DAYS.TUESDAY],
-                            [DAYS.WEDNESDAY]: data.unavailabilities[DAYS.WEDNESDAY],
-                            [DAYS.THURSDAY]: data.unavailabilities[DAYS.THURSDAY],
-                            [DAYS.FRIDAY]: data.unavailabilities[DAYS.FRIDAY],
-                            [DAYS.SATURDAY]: data.unavailabilities[DAYS.SATURDAY]
-                        }
-                    );
+                    if (data.isAccepted) {
+                        listOfRecursive.push(
+                            {
+                                startDate: new Date((data.start.seconds) * 1000),
+                                endDate: new Date((data.end.seconds) * 1000),
+                                [DAYS.SUNDAY]: data.unavailabilities[DAYS.SUNDAY],
+                                [DAYS.MONDAY]: data.unavailabilities[DAYS.MONDAY],
+                                [DAYS.TUESDAY]: data.unavailabilities[DAYS.TUESDAY],
+                                [DAYS.WEDNESDAY]: data.unavailabilities[DAYS.WEDNESDAY],
+                                [DAYS.THURSDAY]: data.unavailabilities[DAYS.THURSDAY],
+                                [DAYS.FRIDAY]: data.unavailabilities[DAYS.FRIDAY],
+                                [DAYS.SATURDAY]: data.unavailabilities[DAYS.SATURDAY]
+                            }
+                        );
+                    }
+
                 });
                 list.recursiveExceptions = listOfRecursive;
             }

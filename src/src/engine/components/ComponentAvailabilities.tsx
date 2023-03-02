@@ -5,7 +5,7 @@ import "../../deps/css/navigator_default.css";
 interface ComponentAvailabilitiesProps {
     employeeAvailabilities: DayPilot.EventData[];
     onTimeRangeSelected: (start: Date, end: Date, selectedDate: Date) => DayPilot.EventData[];
-    getStartData: () => DayPilot.EventData[];
+    getStartData: () => Promise<DayPilot.EventData[]>;
     startDate: DayPilot.Date;
     selectionDay: DayPilot.Date;
     isCellInStartToEndTimeRange: (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date) => boolean;
@@ -43,9 +43,9 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         return this.datePickerRef?.current?.control;
     }
 
-    public componentDidMount(): void {
-        let events = this.props.getStartData();
-
+    public async componentDidMount(): Promise<void> {
+        let events = await this.props.getStartData();
+        console.log(events);
         this.calendar?.update({
             events: events
         });
