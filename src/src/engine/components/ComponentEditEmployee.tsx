@@ -59,7 +59,6 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control
                             name="firstName"
-                            id="firstName"
                             required
                             type="text"
                             placeholder="Prénom"
@@ -73,7 +72,6 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         <Form.Label>Nom</Form.Label>
                         <Form.Control
                             name="lastName"
-                            id="lastName"
                             required
                             type="text"
                             placeholder="Nom"
@@ -87,7 +85,6 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
                             name="phoneNumber"
-                            id="phoneNumber"
                             required
                             type="tel"
                             pattern={RegexUtil.phoneNumberRegex}
@@ -100,7 +97,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="3">
                         <Form.Label>Département</Form.Label>
-                        <Form.Select required name="department" id="department" value={this.props.editedEmployee?.department} onChange={this.#handleSelect}>
+                        <Form.Select required name="department" value={this.props.editedEmployee?.department} onChange={this.#handleSelect}>
                             {this.props.departments.map((department: Department, index: number) =>
                                 <option key={index} value={department.name}>{department.name}</option>)}
                         </Form.Select>
@@ -118,8 +115,9 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
                             key={title.name}
                             type="checkbox"
-                            name={title.name}
+                            name="titles"
                             label={title.name}
+                            value={title.name}
                         />))}
                         <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)}
                                                 showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
@@ -131,12 +129,13 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         <Button onClick={() => this.#onShowEditSkills()} className="float-end">
                             <IoSettingsSharp className="mb-05" />
                         </Button>
-                        {this.props.skills.map((skill: Skill) => (<Form.Check
-                            key={skill.name}
+                        {this.props.skills.map((skill: Skill) => (<div key={skill.name}><Form.Check
                             type="checkbox"
-                            name={skill.name}
+                            name="skills"
                             label={skill.name}
-                        />))}
+                            value={skill.name}
+                        />
+                            </div>))}
                         <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
                                              showEdit={this.state.showEditSkills} skills={this.props.skills}
                                              onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}
@@ -193,7 +192,21 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
 
         let eventTarget: any = event.target;
         let formData = new FormData(eventTarget);
-        let formDataObj: EmployeeEditDTO = Object.fromEntries(formData.entries()) as unknown as EmployeeEditDTO;
+        let formDataObj: any = {};
+        formDataObj = {
+            ...Object.fromEntries(formData.entries())
+        };
+
+        // Iterate over all checked checkbox elements and create an array that contains each of them
+        document.querySelectorAll('input[type="checkbox"]:checked').forEach((checkbox: any) => {
+            let fieldName = checkbox.name;
+            if (fieldName) {
+                if (typeof(formDataObj[fieldName]) === "string") {
+                    formDataObj[fieldName] = [];
+                }
+                formDataObj[fieldName].push(checkbox.value);
+            }
+        });
 
         this.setState({
             validated: true,
@@ -222,7 +235,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
      */
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
-        let name: string = target.id;
+        let name: string = target.name;
 
         let value;
         if (target.type === "checkbox") {
@@ -246,7 +259,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         const target = event.target;
         this.setState({
             ...this.state, ...{
-                [target.id]: target.value
+                [target.name]: target.value
             }
         });
     }
