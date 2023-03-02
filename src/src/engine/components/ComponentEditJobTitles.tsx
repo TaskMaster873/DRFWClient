@@ -30,11 +30,11 @@ interface EditJobTitlesProps extends JobTitleActions {
 }
 
 /**
- * This is the form to add a department
+ * This is the modal form to edit a JobTitle
  * @param props The props of the component
  * @constructor
  * @category Components
- * @subcategory Department
+ * @subcategory JobTitle
  * @hideconstructor
  */
 export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, EditJobTitlesState> {
@@ -120,14 +120,27 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         </div>
     }
 
+    /**
+     * The function that hides the modal when the exit button is clicked
+     */
     readonly hideModal = (): void => {
         this.props.cancelEdit();
     }
 
+    /**
+     * When the delete button is clicked show the deletion confirmation window
+     * @param value the Skill to delete
+     * @private
+     */
     readonly #onShowConfirmDeleteJobTitles = (value?: JobTitle): void => {
         this.setState({jobTitleToDelete: value});
     }
 
+    /**
+     * Render edit and delete actions of the jobTitle
+     * @param title The JobTitle
+     * @private
+     */
     private renderActions(title: JobTitle): JSX.Element {
         if (this.state.editedJobTitle == title) {
             return <div>
@@ -143,10 +156,20 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         }
     }
 
+    /**
+     * Change the current edited JobTitle
+     * @param title The JobTitle to edit
+     * @private
+     */
     readonly #editJobTitle = (title?: JobTitle): void => {
         this.setState({editedJobTitle: title});
     }
 
+    /**
+     * Shows the deletion confirmation modal
+     * @param title The JobTitle
+     * @private
+     */
     readonly #showDeletePrompt = (title: JobTitle): void => {
         this.setState({jobTitleToDelete: title});
     }

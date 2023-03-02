@@ -24,7 +24,7 @@ interface ComponentEditEmployeeState {
 }
 
 /**
- * This is the form to add an employee
+ * This is the form to edit an employee
  * @param props The props of the component
  * @constructor
  * @category Components
@@ -182,16 +182,11 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
     }
 
     /**
-     * TODO
-     * Generate automatically a password for new employee and ask them to change it on the first login.
-     */
-
-    /**
-     * Handle the form submission. Validate the form and attempt to create the employee.
+     * Handle the form submission. Validate the form and attempt to edit the employee.
      * @param event The form submission event. Contains the form data to be validated.
      * @private
      * @returns {Promise<void>}
-     * @memberof CreateEmployee
+     * @memberof EditEmployee
      */
     readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         let errorType = FormUtils.validateForm(event);
@@ -222,7 +217,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
      * Handle the change of a form element. Update the state with the new value.
      * @param event The change event. Contains the new value of the form element.
      * @returns {void}
-     * @memberof CreateEmployee
+     * @memberof EditEmployee
      * @private
      */
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {

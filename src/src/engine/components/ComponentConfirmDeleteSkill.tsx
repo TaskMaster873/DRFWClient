@@ -9,6 +9,14 @@ interface DeleteSkillProps {
     onDeleteSkill: (skillId: string) => PromiseLike<void> | Promise<void> | void;
 }
 
+/**
+ * This is the modal popup to confirm the deletion of the Skill
+ * @param props The props of the component
+ * @constructor
+ * @category Components
+ * @subcategory Skill
+ * @hideconstructor
+ */
 export class ComponentConfirmDeleteSkill extends React.Component<DeleteSkillProps, unknown> {
     public render(): JSX.Element {
         return (<Modal show={this.props.skill != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>

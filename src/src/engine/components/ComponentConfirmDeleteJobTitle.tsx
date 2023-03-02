@@ -9,6 +9,14 @@ interface DeleteJobTitleProps {
     onDeleteJobTitle: (titleId: string) => PromiseLike<void> | Promise<void> | void;
 }
 
+/**
+ * This is the modal popup to confirm the deletion of the JobTitle
+ * @param props The props of the component
+ * @constructor
+ * @category Components
+ * @subcategory JobTitle
+ * @hideconstructor
+ */
 export class ComponentConfirmDeleteJobTitle extends React.Component<DeleteJobTitleProps, unknown> {
     public render(): JSX.Element {
         return (<Modal show={this.props.jobTitle != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>

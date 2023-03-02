@@ -21,7 +21,6 @@ import {
     getDocs,
     getFirestore,
     query,
-    QueryDocumentSnapshot,
     QuerySnapshot,
     setDoc,
     Timestamp,
@@ -58,7 +57,6 @@ import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
 import {EmployeeInfos} from "./types/APITypes";
 import {NotificationManager} from "./NotificationManager";
-import {forEach} from "react-bootstrap/ElementChildren";
 
 type SubscriberCallback =
     () =>
