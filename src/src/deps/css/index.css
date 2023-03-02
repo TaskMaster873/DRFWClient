@@ -43,6 +43,10 @@ code {
     height: 90vh;
 }
 
+.mb-05 {
+    margin-bottom: 0.15em;
+}
+
 #root {
     overflow-x: hidden;
 }

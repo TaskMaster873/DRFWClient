@@ -55,7 +55,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
     public async componentDidMount(): Promise<void> {
         document.title = "Création d'horaire - TaskMaster";
 
-        let isLoggedIn: boolean = await this.verifyLogin();
+        const isLoggedIn: boolean = await this.verifyLogin();
         if (isLoggedIn) {
             let fetchedDepartments = await API.getDepartments();
             if (typeof fetchedDepartments === "string") {
@@ -92,7 +92,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
         let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        let hasPerms = this.verifyPermissions(Roles.MANAGER);
+        const hasPerms = this.verifyPermissions(Roles.MANAGER);
         if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
         } else {
@@ -162,7 +162,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
      */
     readonly #addShift = async (shiftEvent: EventForShiftCreation): Promise<void> => {
         //Create Shift
-        let error = await API.createShift({
+        const error = await API.createShift({
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
             end: shiftEvent.end,
@@ -180,7 +180,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
      */
     readonly #editShift = async (shiftEvent: EventForShiftEdit): Promise<void> => {
         //Create Shift
-        let error = await API.editShift({
+        const error = await API.editShift({
             id: shiftEvent.id,
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
@@ -199,7 +199,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
      */
     readonly #deleteShift = async (shiftEvent: EventForShiftEdit): Promise<void> => {
         //Delete shift
-        let error = await API.deleteShift({
+        const error = await API.deleteShift({
             id: shiftEvent.id,
             employeeId: shiftEvent.employeeId,
             start: shiftEvent.start,
@@ -241,10 +241,10 @@ export class CreateSchedule extends React.Component<unknown, State> {
      * @returns the converted shifts
      */
     private getEventsForCalendarFromShifts(shifts: Shift[]): EventForCalendar[] {
-        let events: EventForCalendar[] = [];
-        for (let shift of shifts) {
-            let startText = DateManager.convertTimestampToDayPilotDate(shift.start);
-            let endText = DateManager.convertTimestampToDayPilotDate(shift.end);
+        const events: EventForCalendar[] = [];
+        for (const shift of shifts) {
+            const startText = DateManager.convertTimestampToDayPilotDate(shift.start);
+            const endText = DateManager.convertTimestampToDayPilotDate(shift.end);
             events.push({
                 id: shift.id,
                 text: `${startText} à ${endText}`,

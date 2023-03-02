@@ -11,6 +11,7 @@ import {JobTitle} from "../types/JobTitle";
 import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
+import {JobTitleActions} from "../types/Employee";
 
 interface EditJobTitlesState {
     jobTitleToDelete?: JobTitle;
@@ -22,21 +23,18 @@ interface EditJobTitlesState {
     editError: FormErrorType;
 }
 
-interface EditJobTitlesProps {
+interface EditJobTitlesProps extends JobTitleActions {
     cancelEdit: () => void;
     jobTitles: JobTitle[];
-    onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
-    onEditJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
-    onDeleteJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
     showEdit: boolean;
 }
 
 /**
- * This is the form to add a department
+ * This is the modal form to edit a JobTitle
  * @param props The props of the component
  * @constructor
  * @category Components
- * @subcategory Department
+ * @subcategory JobTitle
  * @hideconstructor
  */
 export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, EditJobTitlesState> {
@@ -57,7 +55,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     }
 
     public render(): JSX.Element {
-        return <div><ComponentConfirmDeleteJobTitle closePrompt={this.#onShowConfirmDeleteJobTitles}
+        return <div><ComponentConfirmDeleteJobTitle closePrompt={this.#onShowConfirmDeleteJobTitle}
                                                     jobTitle={this.state.jobTitleToDelete}
                                                     onDeleteJobTitle={this.props.onDeleteJobTitle}/>
             <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
@@ -122,14 +120,27 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         </div>
     }
 
+    /**
+     * The function that hides the modal when the exit button is clicked
+     */
     readonly hideModal = (): void => {
         this.props.cancelEdit();
     }
 
-    readonly #onShowConfirmDeleteJobTitles = (value?: JobTitle): void => {
+    /**
+     * When the delete button is clicked show the deletion confirmation window
+     * @param value the Skill to delete
+     * @private
+     */
+    readonly #onShowConfirmDeleteJobTitle = (value?: JobTitle): void => {
         this.setState({jobTitleToDelete: value});
     }
 
+    /**
+     * Render edit and delete actions of the jobTitle
+     * @param title The JobTitle
+     * @private
+     */
     private renderActions(title: JobTitle): JSX.Element {
         if (this.state.editedJobTitle == title) {
             return <div>
@@ -145,10 +156,20 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         }
     }
 
+    /**
+     * Change the current edited JobTitle
+     * @param title The JobTitle to edit
+     * @private
+     */
     readonly #editJobTitle = (title?: JobTitle): void => {
         this.setState({editedJobTitle: title});
     }
 
+    /**
+     * Shows the deletion confirmation modal
+     * @param title The JobTitle
+     * @private
+     */
     readonly #showDeletePrompt = (title: JobTitle): void => {
         this.setState({jobTitleToDelete: title});
     }
