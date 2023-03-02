@@ -4,8 +4,10 @@ import {EventForCalendar, EventForShiftCreation, EventForShiftEdit} from "../typ
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 import {Employee} from "../types/Employee";
 import {HeightSpecType, EventManipulationType, ViewType, EventDeleteHandlingType, ColumnsType} from "../types/StatesForDaypilot";
+import {Container} from "react-bootstrap";
 
 interface ScheduleCreateProps {
+	currentDay: DayPilot.Date;
 	events: EventForCalendar[];
 	employees: Employee[];
 	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
@@ -44,7 +46,7 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
 
 	public render(): JSX.Element {
 		return (
-			<div>
+			<Container className="mt-3 mb-3">
 				<DayPilotCalendar
 					businessBeginsHour={8}
 					businessEndsHour={20}
@@ -56,7 +58,7 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
 					onEventMoved={this.#onEventMoved}
 					onEventResized={this.#onEventResized}
 					onEventDelete={this.#onEventDelete}
-					startDate={DayPilot.Date.today()}
+					startDate={this.props.currentDay}
 					columns={this.getEmployeeColumns()}
 					events={this.props.events}
 					heightSpec={HeightSpecType.Full}
@@ -75,7 +77,7 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
 					taskType={this.state.taskType}
 					employees={this.props.employees}
 				/>
-			</div>
+			</Container>
 		);
 	}
 

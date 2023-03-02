@@ -1,4 +1,5 @@
-import {DayPilot} from "@daypilot/daypilot-lite-react"; import {Timestamp} from "firebase/firestore";
+import {DayPilot} from "@daypilot/daypilot-lite-react"; 
+import {Timestamp} from "firebase/firestore";
 import {DateOfUnavailabilityList, DAYS, EmployeeRecursiveExceptionList} from "../types/EmployeeAvailabilities";
 
 export class InternalDateManager {
