@@ -92,7 +92,7 @@ export class ComponentScheduleCreate extends React.Component<Props, State> {
 		if (this.props.employees.length > 0) {
 			for (let employee of this.props.employees) {
 				listToReturn.push({
-					id: employee.employeeId ?? "1",
+					id: employee.id ?? "1",
 					name: `${employee.firstName} ${employee.lastName}`
 				});
 			}

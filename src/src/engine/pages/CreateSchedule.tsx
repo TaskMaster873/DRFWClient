@@ -65,7 +65,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
                 //If current user is a manager, limit access to other departments
                 if (!this.verifyPermissions(Roles.ADMIN)) {
                     fetchedDepartments = fetchedDepartments.filter(d =>
-                        d.name === API.getCurrentEmployee()?.department
+                        d.name === API.getCurrentEmployeeInfos()?.department
                     );
                 }
                 await this.#changeDepartment(fetchedDepartments[0], fetchedDepartments);

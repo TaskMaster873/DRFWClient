@@ -113,9 +113,9 @@ export function ComponentPopupSchedule(props: Props) {
 							defaultValue={props.resource}
 						>
 							{props.employees.map((employee) => (
-								<option
-									value={employee.employeeId}
-									key={employee.employeeId}
+								<option 
+									value={employee.id}
+									key={employee.id}
 								>
 									{employee.firstName} {employee.lastName}
 								</option>

@@ -107,8 +107,8 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
             error: errorType,
         });
 
-        if (errorType === FormErrorType.NO_ERROR && this.props.departmentToEdit?.departmentId) {
-            await this.props.onEditDepartment(this.props.departmentToEdit?.departmentId, formDataObj);
+        if (errorType === FormErrorType.NO_ERROR && this.props.departmentToEdit?.id) {
+            await this.props.onEditDepartment(this.props.departmentToEdit?.id, formDataObj);
         }
     }
 }

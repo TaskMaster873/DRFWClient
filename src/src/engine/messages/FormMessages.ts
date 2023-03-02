@@ -13,6 +13,7 @@ export const errors = {
     REQUIRED_OLD_PASSWORD: "L'ancien mot de passe est requis",
     REQUIRED_ROLE: "Le rôle de l'employé est requis",
     REQUIRED_DEPARTMENT_NAME: "Le nom du département est requis",
+    REQUIRED_JOB_TITLE_NAME: "Le nom du corps d'emploi est requis",
     INVALID_EMAIL: "L'adresse courriel est invalide",
     INVALID_PHONE_NUMBER: "Le numéro de téléphone est invalide",
     INVALID_INITIAL_PASSWORD: "Le mot de passe initial doit contenir un minimum de 6 caractères, une minuscule, une majuscule et un caractère spécial",
@@ -20,7 +21,7 @@ export const errors = {
     INVALID_LOGIN: "Le numéro d'employé ou le mot de passe spécifié est invalide",
     INVALID_DATETIME: "La date doit être un multiple d'une demi-heure.",
     INVALID_DATE: "La date est invalide",
-    DEPARTMENT_ALREADY_EXIST: "Le département existe déjà",
+    DEPARTMENT_ALREADY_EXISTS: "Le département existe déjà",
     MESSAGE_SCHEDULE_UNAVALIBLE: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
     SERVER_ERROR: "Une erreur s'est produite, veuillez réessayer plus tard",
     REQUIRED_DEPARTMENT_DIRECTOR: "Le directeur de département est requis",
@@ -43,15 +44,20 @@ export const successes = {
     EMAIL_SENT: "Un courriel a bien été envoyé !",
     EMPLOYEE_CREATED: "Un nouvel employé a été ajouté avec succès !",
     DEPARTMENT_CREATED: "Un nouveau département a été ajouté avec succès !",
+    JOB_TITLE_CREATED: "Un nouveau corps d'emploi a été ajouté avec succès !",
+    SKILL_CREATED: "Un nouvelle compétence a été ajouté avec succès !",
     LOGIN_SUCCESS: "Vous êtes maintenant connecté !",
     LOGOUT_SUCCESS: "Vous êtes maintenant déconnecté !",
     CHANGE_PASSWORD: "Le changement de mot de passe a bien été effectué !",
     RESET_PASSWORD: "Le mot de passe a bien été mis à jour !",
     EMPLOYEE_ACTIVATED: "L'employé a bien été activé !",
     EMPLOYEE_DEACTIVATED: "L'employé a bien été désactivé !",
-    EMPLOYEE_EDITED: `L'employé a bien été modifié !`,
-    DEPARTMENT_EDITED: `Le département a bien été modifié`
-
+    EMPLOYEE_EDITED: "L'employé a bien été modifié !",
+    DEPARTMENT_EDITED: "Le département a bien été modifié !",
+    JOB_TITLE_EDITED: "Le corps d'emploi a bien été modifié !",
+    SKILL_EDITED: "La compétence a bien été modifié !",
+    JOB_TITLE_DELETED: "Le corps d'emploi a bien été supprimé !",
+    SKILL_DELETED: "La compétence a bien été supprimé !"
 }
 
 export const info = {

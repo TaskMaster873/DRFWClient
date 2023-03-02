@@ -63,7 +63,6 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
                             <Form.Control
                                 required
                                 name="oldPassword"
-                                id="oldPassword"
                                 className="row mt-1"
                                 type="password"
                                 pattern={RegexUtil.goodPasswordRegex}
@@ -78,7 +77,6 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
                             <Form.Control
                                 required
                                 name="newPassword"
-                                id="newPassword"
                                 className="row mt-1"
                                 type="password"
                                 pattern={RegexUtil.goodPasswordRegex}
@@ -93,7 +91,7 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
                                 Retour
                             </Button>
                             <Button
-                                id="submitChangePassword"
+                                name="submitChangePassword"
                                 className="mt-4"
                                 size="lg"
                                 variant="primary"
@@ -154,10 +152,10 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
     readonly #handleChange = async (event: React.ChangeEvent<HTMLFormElement>): Promise<void> => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
+        const name = target.name;
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({...this.state, ...{
