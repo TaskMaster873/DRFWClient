@@ -21,6 +21,7 @@ import {
     getDocs,
     getFirestore,
     query,
+    QueryDocumentSnapshot,
     QuerySnapshot,
     setDoc,
     Timestamp,
