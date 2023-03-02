@@ -51,6 +51,7 @@ export interface EmployeeCreateDTO {
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
+    readonly hasChangedDefaultPassword: boolean;
 }
 
 export interface EmployeeDTO {
