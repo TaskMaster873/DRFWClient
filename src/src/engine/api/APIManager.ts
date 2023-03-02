@@ -56,6 +56,7 @@ import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
 import {EmployeeInfos} from "./types/APITypes";
 import {NotificationManager} from "./NotificationManager";
+import {SECONDS_IN_A_DAY} from "../utils/DateManager";
 
 type SubscriberCallback =
     () =>
@@ -1276,7 +1277,7 @@ class APIManager extends Logger {
 
         //Convert Daypilot datetimes to Timestamps
         let convertedStartDay: Timestamp = this.getFirebaseTimestamp(day);
-        let convertedEndDay: Timestamp = new Timestamp(convertedStartDay.seconds + 86400, 0);
+        let convertedEndDay: Timestamp = new Timestamp(convertedStartDay.seconds + SECONDS_IN_A_DAY, 0);
 
         //Query shifts
         let queryShifts = query(

@@ -1,5 +1,8 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react"; import {Timestamp} from "firebase/firestore";
 
+export const SECONDS_IN_A_DAY = 86400;
+
+
 export class InternalDateManager {
     public convertTimestampToDayPilotDate(time: string): string {
         return DayPilot.Date.parse(time, "yyyy-MM-ddTHH:mm:ss").toString("H:mm");
