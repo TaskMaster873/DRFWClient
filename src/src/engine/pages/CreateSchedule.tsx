@@ -126,7 +126,6 @@ export class CreateSchedule extends React.Component<unknown, State> {
             NotificationManager.error(errors.GET_EMPLOYEES, fetchedEmployees);
             this.setState({fetchState: FetchState.ERROR});
         } else {
-            console.log(this.state.currentDay);
             await this.getShifts(currentDepartment, this.state.currentDay, departments, fetchedEmployees);
         }
     };
