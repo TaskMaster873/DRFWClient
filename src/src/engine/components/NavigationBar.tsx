@@ -12,7 +12,7 @@ import {RoutesPath} from "../RoutesPath";
 import {ComponentNavItem as NavItem} from "./ComponentNavItem";
 import {Roles} from "../types/Roles";
 
-type State = {
+interface State {
     toggle: boolean;
 };
 
