@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
 
-
 interface ComponentAvailabilitiesProps {
     employeeAvailabilities: DayPilot.EventData[];
     onTimeRangeSelected: (start: Date, end: Date, selectedDate: Date) => DayPilot.EventData[];
@@ -52,7 +51,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
     public async componentDidMount(): Promise<void> {
         let events = await this.props.getStartData();
-        console.log(events);
         this.calendar?.update({
             events: events
         });
