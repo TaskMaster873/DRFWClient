@@ -28,18 +28,29 @@ import {RoutesPath} from "./RoutesPath";
 
 import { ReactNotifications } from 'react-notifications-component';
 import {RouteNotFound} from "./pages/RouteNotFound";
+import {FirstResetPassword} from "./pages/FirstResetPassword";
 
 interface EngineState {
     showSpinner: boolean;
+    forceResetPassword: boolean;
 }
 
 export class Engine extends React.Component<unknown, EngineState> {
     public state: EngineState = {
-        showSpinner: true
+        showSpinner: true,
+        forceResetPassword: false
     };
 
     constructor(props: unknown) {
         super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private onEvent() : void {
+        this.setState({
+            forceResetPassword: !(API.hasChangedDefaultPassword || !API.isAuth())
+        });
     }
 
     public componentDidMount(): void {
@@ -49,14 +60,30 @@ export class Engine extends React.Component<unknown, EngineState> {
     public async verifyLogin(): Promise<void> {
         await API.awaitLogin;
 
-        this.setState({showSpinner: false});
+        this.setState({
+            showSpinner: false,
+
+            // We show the reset password prompt if the user is logged in and has not reset their password
+            forceResetPassword: !(API.hasChangedDefaultPassword || !API.isAuth())
+        });
     }
 
     public render(): JSX.Element {
         if (this.state.showSpinner) {
-            return (<React.StrictMode>
-                <ComponentLoading/>
-            </React.StrictMode>);
+            return (
+                <React.StrictMode>
+                    <ComponentLoading/>
+                </React.StrictMode>
+            );
+        } else if(this.state.forceResetPassword) {
+            return (
+                <Router>
+                    <ReactNotifications />
+                    <Routes>
+                        <Route path='*' element={<FirstResetPassword/>}/>
+                    </Routes>
+                </Router>
+            );
         } else {
             return (
                 <Router>

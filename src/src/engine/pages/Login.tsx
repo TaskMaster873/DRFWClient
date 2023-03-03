@@ -8,12 +8,12 @@ import {NotificationManager} from "../api/NotificationManager";
 /**
  * Login page.
  */
-export class Login extends React.Component {
+export class Login extends React.Component<unknown, unknown> {
     public componentDidMount() {
         document.title = "Connexion - TaskMaster";
     }
 
-    private async onLoginRequest(email: string, password: string) : Promise<boolean> {
+    readonly #onLoginRequest = async (email: string, password: string) : Promise<boolean> => {
         let errorMessage = await API.loginWithPassword(email, password);
 
         if (errorMessage === null) {
@@ -28,7 +28,7 @@ export class Login extends React.Component {
     public render(): JSX.Element {
         return (
             <Container>
-                <ComponentLogin onLoginRequest={this.onLoginRequest} />
+                <ComponentLogin onLoginRequest={this.#onLoginRequest} />
             </Container>
         );
     }

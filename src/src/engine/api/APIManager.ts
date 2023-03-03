@@ -103,7 +103,17 @@ class APIManager extends Logger {
     #performance!: FirebasePerformance;
     #db!: Firestore;
     #user: FirebaseAuth.User | null = null;
-    #employeeInfos: EmployeeInfos = {role: 0, department: undefined};
+    #employeeInfos: Employee = {
+        email: "",
+        firstName: "",
+        jobTitles: [],
+        lastName: "",
+        phoneNumber: "",
+        skills: [],
+        role: 0,
+        department: '',
+        hasChangedDefaultPassword: false
+    };
 
     /**
      * Global variables of APIManager.
@@ -137,6 +147,18 @@ class APIManager extends Logger {
     //endregion
 
     //region GETTERS
+
+    /**
+     * Return if the user has changed the default password.
+     * @readonly
+     * @type {boolean}
+     * @memberof APIManager
+     * @returns {boolean} Whether the user has changed the default password.
+     */
+    get hasChangedDefaultPassword(): boolean {
+        return this.#employeeInfos.hasChangedDefaultPassword;
+    }
+
     /**
      * Returns the current user role.
      * @readonly
@@ -645,6 +667,25 @@ class APIManager extends Logger {
                 });
 
                 if (!errorMessage) {
+                    if(this.hasChangedDefaultPassword) {
+                        let employeeId = this.#user?.uid;
+
+                        if(employeeId && this.#employeeInfos.department) {
+                            let employeeEdit: EmployeeEditDTO = {
+                                department: this.#employeeInfos.department,
+                                firstName: this.#employeeInfos.firstName,
+                                jobTitles: this.#employeeInfos.jobTitles,
+                                lastName: this.#employeeInfos.lastName,
+                                phoneNumber: this.#employeeInfos.phoneNumber,
+                                role: this.#employeeInfos.role,
+                                skills: this.#employeeInfos.skills,
+                                hasChangedDefaultPassword: true
+                            }
+
+                            await this.editEmployee(employeeId, this.#employeeInfos);
+                        }
+                    }
+
                     // Prompt the user to re-provide their sign-in credentials
                     let reAuth = await FirebaseAuth.reauthenticateWithCredential(
                         user,
@@ -1186,13 +1227,20 @@ class APIManager extends Logger {
      */
     public async getEmployeeInfos(uid: string): Promise<EmployeeInfos | string> {
         let errorMessage: string | null = null;
-        let employeeInfos: EmployeeInfos = {role: 0, department: undefined};
+        let employeeInfos: EmployeeInfos = {
+            role: 0,
+            department: undefined,
+            hasChangedDefaultPassword: false
+        };
+
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
+
         if (employee) {
             employeeInfos = employee.data() as EmployeeInfos;
         }
+
         return errorMessage ?? employeeInfos;
     }
 
