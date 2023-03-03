@@ -21,15 +21,11 @@ import {
     getDocs,
     getFirestore,
     query,
-    QueryDocumentSnapshot,
     QuerySnapshot,
-    runTransaction,
     setDoc,
     Timestamp,
-    Transaction,
     updateDoc,
     where,
-    writeBatch,
 } from "firebase/firestore";
 
 import {FirebasePerformance, getPerformance} from "firebase/performance";
@@ -138,7 +134,7 @@ class APIManager extends Logger {
 
         this.loadFirebase();
 
-        // Stupid JEST doesn't support web workers.
+        // JEST doesn't support web workers.
         try {
             if (process === null || process === undefined) {
                 this.registerServiceWorker();
@@ -435,11 +431,6 @@ class APIManager extends Logger {
             await FirebaseAuth.signOut(this.#auth).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
-
-            this.#employeeInfos.role = 0;
-            this.isAuthenticated = false;
-
-            await this.onEvent();
         }
 
         return errorMessage;
@@ -480,26 +471,45 @@ class APIManager extends Logger {
                 this.#auth,
                 async (user: FirebaseAuth.User | null) => {
                     this.log("Auth state changed!");
-
                     if (user === null || !user) {
                         this.isAuthenticated = false;
+                        this.#employeeInfos = {
+                            email: "",
+                            firstName: "",
+                            jobTitles: [],
+                            lastName: "",
+                            phoneNumber: "",
+                            skills: [],
+                            role: 0,
+                            department: '',
+                            hasChangedDefaultPassword: false
+                        };
+                        
                     } else {
                         this.isAuthenticated = true;
                         this.#user = user;
                         let result = await this.getEmployeeInfos(user.uid);
                         if (typeof result === "string") {
                             NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
-                            this.#employeeInfos.role = 0;
-                            this.#employeeInfos.department = '';
+                            this.#employeeInfos = {
+                                email: "",
+                                firstName: "",
+                                jobTitles: [],
+                                lastName: "",
+                                phoneNumber: "",
+                                skills: [],
+                                role: 0,
+                                department: '',
+                                hasChangedDefaultPassword: false
+                            };
                         } else {
                             this.#employeeInfos = result as Employee;
                         }
 
                         console.log("user", user);
                         console.log("employeeInfos", this.#employeeInfos);
-
-                        await this.onEvent();
                     }
+                    await this.onEvent();
 
                     if (!resolved) {
                         resolved = true;
