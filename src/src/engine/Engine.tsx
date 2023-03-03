@@ -28,6 +28,7 @@ import {RoutesPath} from "./RoutesPath";
 
 import { ReactNotifications } from 'react-notifications-component';
 import {RouteNotFound} from "./pages/RouteNotFound";
+import {ManageAvailabilities} from "./pages/ManageAvailabilities";
 
 interface EngineState {
     showSpinner: boolean;
@@ -76,6 +77,7 @@ export class Engine extends React.Component<unknown, EngineState> {
                         <Route path={RoutesPath.FORGOT_PASSWORD} element={<ForgotPassword/>}/>
                         <Route path={RoutesPath.RESET_PASSWORD} element={<ResetPassword/>}/>
                         <Route path={RoutesPath.CHANGE_PASSWORD} element={<ChangePassword/>}/>
+                        <Route path={RoutesPath.MANAGE_AVAILABILITIES} element={<ManageAvailabilities/>}/>
                         <Route path='*' element={<RouteNotFound/>}/>
                     </Routes>
                 </Router>

@@ -58,10 +58,8 @@ export class CreateSchedule extends React.Component<unknown, State> {
         const isLoggedIn: boolean = await this.verifyLogin();
         if (isLoggedIn) {
             let fetchedDepartments = await API.getDepartments();
-            if (typeof fetchedDepartments === "string") {
-                NotificationManager.error(errors.GET_DEPARTMENTS, fetchedDepartments);
-                this.setState({fetchState: FetchState.ERROR});
-            } else {
+            if (this.manageError(fetchedDepartments, errors.GET_DEPARTMENTS)) {
+                fetchedDepartments = fetchedDepartments as Department[];
                 //If current user is a manager, limit access to other departments
                 if (!this.verifyPermissions(Roles.ADMIN)) {
                     fetchedDepartments = fetchedDepartments.filter(d =>
@@ -120,7 +118,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
      */
     readonly #changeDepartment = async (currentDepartment: Department, departments?: Department[]): Promise<void> => {
         //Get all employees of this department
-        let fetchedEmployees = await API.getEmployees(currentDepartment.name);
+        const fetchedEmployees = await API.getEmployees(currentDepartment.name);
         if (this.manageError(fetchedEmployees, errors.CREATE_SHIFT)) {
             await this.getShifts(this.state.currentDay, currentDepartment, departments, fetchedEmployees as Employee[]);
         }
@@ -128,7 +126,8 @@ export class CreateSchedule extends React.Component<unknown, State> {
 
     /**
      * Fetch shifts and refresh state with all data (End of function chain)
-     * @param currentDepartment The department to fetch the shifts from
+     * @param currentDay OPTIONAL. The current day to fetch the shifts from
+     * @param currentDepartment OPTIONAL. The department to fetch the shifts from
      * @param departments OPTIONAL. The departments to set in state
      * @param employees OPTIONAL. The employees to set in state
      */
@@ -139,7 +138,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
         employees?: Employee[]
     ): Promise<void> => {
         //Get all daily shifts of this department
-        let fetchedShifts = await API.getDailyScheduleForDepartment(
+        const fetchedShifts = await API.getDailyScheduleForDepartment(
             currentDay || this.state.currentDay,
             currentDepartment || this.state.currentDepartment
         );
