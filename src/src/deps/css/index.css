@@ -134,6 +134,16 @@ code {
     color: black!important;
 }
 
+.dropdown-item:active {
+    color: white!important;
+    background-color: white!important;
+}
+.dropdown-variants-primary {
+    color: white!important;
+    background-color: white!important;
+}
+
+
 @media only screen and (max-width: 990px) {
     .navbar-nav .nav-link {
         width: 100%;
