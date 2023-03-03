@@ -483,9 +483,9 @@ class APIManager extends Logger {
                         if (typeof result === "string") {
                             NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
                             this.#employeeInfos.role = 0;
-                            this.#employeeInfos.department = undefined;
+                            this.#employeeInfos.department = '';
                         } else {
-                            this.#employeeInfos = result;
+                            this.#employeeInfos = result as Employee;
                         }
 
                         console.log("user", user);
@@ -635,6 +635,34 @@ class APIManager extends Logger {
     }
 
     /**
+     * This method is used to edit an employee.
+     * @param employeeId The id of the employee to edit.
+     * @param employee The employee data.
+     * @method editEmployee
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the employee was edited successfully, and the error message if it was not.
+     */
+    public async changeEmployeeResetToggle(employeeId: string): Promise<string | null> {
+        let errorMessage: string | null = null;
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            return errors.PERMISSION_DENIED;
+        }
+
+        if (employeeId) {
+            await updateDoc(doc(this.#db, `employees`, employeeId), {
+                hasChangedDefaultPassword: true
+            }).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_EMPLOYEE_ID;
+        }
+        return errorMessage;
+    }
+
+    /**
      * This method is used to change the password of the current user.
      * @param oldPassword The old password.
      * @param newPassword The new password.
@@ -671,18 +699,11 @@ class APIManager extends Logger {
                         let employeeId = this.#user?.uid;
 
                         if(employeeId && this.#employeeInfos.department) {
-                            let employeeEdit: EmployeeEditDTO = {
-                                department: this.#employeeInfos.department,
-                                firstName: this.#employeeInfos.firstName,
-                                jobTitles: this.#employeeInfos.jobTitles,
-                                lastName: this.#employeeInfos.lastName,
-                                phoneNumber: this.#employeeInfos.phoneNumber,
-                                role: this.#employeeInfos.role,
-                                skills: this.#employeeInfos.skills,
-                                hasChangedDefaultPassword: true
-                            }
+                            errorMessage = await this.changeEmployeeResetToggle(employeeId);
 
-                            await this.editEmployee(employeeId, this.#employeeInfos);
+                            if(errorMessage) {
+                                return errorMessage;
+                            }
                         }
                     }
 
@@ -1086,6 +1107,7 @@ class APIManager extends Logger {
                         jobTitles: data.jobTitles,
                         skills: data.skills,
                         role: data.role,
+                        hasChangedDefaultPassword: data.hasChangedDefaultPassword || false
                     })
                 );
             }

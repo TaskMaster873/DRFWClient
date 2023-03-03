@@ -78,7 +78,7 @@ export interface EmployeeEditDTO {
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
-    readonly hasChangedDefaultPassword: boolean;
+    readonly hasChangedDefaultPassword?: boolean;
 }
 
 export let employeeAdminTableHeads : string[] =

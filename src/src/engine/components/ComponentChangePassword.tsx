@@ -120,9 +120,10 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
 
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
-            event.preventDefault();
-            event.stopPropagation();
         }
+
+        event.preventDefault();
+        event.stopPropagation();
 
         this.setState({
             validated: true,
