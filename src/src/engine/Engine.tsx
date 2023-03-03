@@ -66,6 +66,7 @@ export class Engine extends React.Component<unknown, EngineState> {
                     <Routes>
                         <Route path={RoutesPath.INDEX} element={<Index/>}/>
                         <Route path={RoutesPath.SCHEDULE} element={<ScheduleEmployee/>}/>
+                        <Route path={RoutesPath.SCHEDULE_WITH_PARAM} element={<ScheduleEmployee />}/>
                         <Route path={RoutesPath.CREATE_SCHEDULE} element={<CreateSchedule/>}/>
                         <Route path={RoutesPath.DEPARTMENTS} element={<Departments/>}/>
                         <Route path={`${RoutesPath.DEPARTMENTS}${RoutesPath.EMPLOYEE_WITH_PARAM}`} element={<EmployeeWrapper/>}/>

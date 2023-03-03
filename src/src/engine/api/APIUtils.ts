@@ -1,6 +1,7 @@
 import {Logger} from "../Logger";
-import {getDocs} from "firebase/firestore";
+import {getDocs, DocumentData} from "firebase/firestore";
 import {errors} from "../messages/APIMessages";
+import {Query} from "css-select/lib/types";
 
 /**
  * The InternalAPIUtils is responsible for storing useful methods often used in the API.

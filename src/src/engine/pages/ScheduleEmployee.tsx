@@ -6,8 +6,12 @@ import {ComponentLoading} from "../components/ComponentLoading";
 import {errors} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {RoutesPath} from "../RoutesPath";
-import {Navigate} from "react-router-dom";
+import {Navigate, Params, useParams} from "react-router-dom";
 import {Roles} from "../types/Roles";
+
+export interface ScheduleProps {
+    params: Readonly<Params>;
+}
 
 interface ScheduleState {
     list: Shift[];
@@ -21,10 +25,17 @@ enum enumStateOfFetching {
     OK = 2,
 }
 
+export function ScheduleEmployee(): JSX.Element {
+    const parameters: Readonly<Params<string>> = useParams();
+    return (
+        <ScheduleEmployeeInternal  {...{params: parameters}}/>
+    );
+}
+
 /**
  * Page qui affiche l'horaire des employés
  */
-export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
+export class ScheduleEmployeeInternal extends React.Component<ScheduleProps, ScheduleState> {
     public state: ScheduleState = {
         list: [],
         fetchState: enumStateOfFetching.WAITING,
@@ -36,25 +47,16 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
 
         let isLoggedIn: boolean = await this.verifyLogin();
         if(isLoggedIn) {
-            let shifts = await this.loadShiftsFromAPI();
-            if (typeof shifts === "string") {
-                this.setState({fetchState: enumStateOfFetching.ERROR});
-                NotificationManager.error(errors.GET_SHIFTS, errors.ERROR_GENERIC_MESSAGE);
+            let result = await this.loadShiftsFromAPI();
+            if (typeof result === "string") {
+                this.redirectTo(RoutesPath.INDEX);
+                NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, result);
             } else {
-                this.setState({list: shifts, fetchState: enumStateOfFetching.OK});
+                this.setState({list: result, fetchState: enumStateOfFetching.OK});
             }
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
-    }
-
-    /**
-     * Verify if the user has the permission to access this page
-     * @param role
-     * @private
-     */
-    private verifyPermissions(role: Roles): boolean {
-        return API.hasPermission(role);
     }
 
     /**
@@ -65,8 +67,8 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        let hasPerms = this.verifyPermissions(Roles.EMPLOYEE);
-        if (!API.isAuth() || !hasPerms) {
+        let hasPerms = API.hasPermission(Roles.EMPLOYEE);
+        if (!API.hasPermission(Roles.ADMIN) && !API.isAuth() || !hasPerms || (this.props.params && !API.isManagerPermitted(API.getCurrentEmployeeInfos().department))) {
             this.redirectTo(RoutesPath.INDEX);
         } else {
             isLoggedIn = true;
@@ -88,6 +90,9 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
 
     // I did this function if we need to do something before the return (if there is some changes)
     private async loadShiftsFromAPI(): Promise<Shift[] | string> {
+        if(this.props.params.id) {
+            return await API.getScheduleForOneEmployee(this.props.params.id);
+        }
         return await API.getCurrentEmployeeSchedule();
     }
 

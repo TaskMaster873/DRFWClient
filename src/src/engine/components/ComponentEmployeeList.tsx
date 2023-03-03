@@ -9,6 +9,7 @@ import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 import {FilterUtils} from "../utils/FilterUtils";
+import {AiOutlineSchedule} from "react-icons/ai";
 
 export interface EmployeeListProps {
     employees: Employee[] | null;
@@ -204,10 +205,14 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
             if (!employee.isActive) {
                 component = <CgCheckO/>
             }
+
             return (
                 <td key={`action ${index}`}>
                     <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
                         <BiEdit/>
+                    </LinkContainer>
+                    <LinkContainer to={`${RoutesPath.SCHEDULE}${employee.id}`} className="adminActions mx-1">
+                        <AiOutlineSchedule/>
                     </LinkContainer>
                     <a className="adminActions ms-1 mx-1"
                        onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>
