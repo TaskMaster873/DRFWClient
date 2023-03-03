@@ -1690,8 +1690,6 @@ class APIManager extends Logger {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
                 //Push unavailability object
-                
-
             }
         }
         return errorMessage ?? unavailabilities;
