@@ -165,8 +165,6 @@ function displayListItem(array) {
     return ``
 }
 
-
-
 function getFields() {
     const table = document.querySelector("table");
     const ths = document.querySelectorAll("th");
