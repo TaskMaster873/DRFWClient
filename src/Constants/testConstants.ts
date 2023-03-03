@@ -28,8 +28,8 @@ const employee = new Employee({
     phoneNumber: "418-532-5323",
     department: "Construction",
     isActive: true,
-    jobTitles: [],
-    skills: [],
+    jobTitles: ["Manager"],
+    skills: ["Gestion de personnel"],
     role: 1,
 });
 
@@ -66,8 +66,8 @@ const employeeWithId2 = new Employee({
     isActive: true,
     phoneNumber: "976-433-1062",
     department: "Marketing",
-    jobTitles: [],
-    skills: [],
+    jobTitles: ["Manager"],
+    skills: ["Gestion de personnel"],
     role: 1
 });
 
