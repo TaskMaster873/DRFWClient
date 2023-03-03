@@ -154,10 +154,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         let unavailabilitiesInCalendar = this.componentAvailability?.getListFromTheCalendar();
         let datesList: DateOfUnavailabilityList = [];
         if (unavailabilitiesInCalendar) {
-            //let unavailabilitiesFiltered = this.sortFromStart(unavailabilitiesInCalendar);
-            console.log("calendar", unavailabilitiesInCalendar);
             datesList = this.transformListIntoDateList(unavailabilitiesInCalendar);
-            console.log("list de date", datesList);
         }
 
         //format start
@@ -349,7 +346,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
                 }
             }
-            console.log(canRenderData);
 
             if (canRenderData) {
                 for (let day in recursive) {

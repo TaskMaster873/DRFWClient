@@ -1530,7 +1530,6 @@ class APIManager extends Logger {
         //Create unavailability
          let isUpdated = await this.unavailabilityUpdate(list)
         if (!isUpdated && typeof isUpdated === "boolean") {
-            console.log("isAdded = true");
             await addDoc(collection(this.#db, `unavailabilities`),
                 {
                     employeeId: this.#user?.uid,
