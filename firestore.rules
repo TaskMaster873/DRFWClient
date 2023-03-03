@@ -152,6 +152,41 @@ service cloud.firestore {
                 return createdValidShift && hasFields && isAllowed && shiftFieldTypes();
             }
 
+            match /unavailabilities/{unavailabilityId} {
+                allow read;
+                allow write: if isValidUnavailabilityCreate(unavailabilityId);
+                allow update: if isValidForUpdate(unavailabilityId);
+
+            }
+
+            function isValidForUpdate(unavailabilityId) {
+                 let updateValidUnavailability = existsAfter(/databases/$(database)/documents/shifts/$(unavailabilityId));
+                 let employeeId = request.resource.data.employeeId;
+                 let employeeDepartment = get(/databases/$(database)/documents/employees/$(employeeId)).data.department;
+                 let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowedUnavailabilities(employeeDepartment) || isTheSameEmployee(employeeId);
+
+                return updateValidUnavailability && isAllowed;
+            }
+
+            function isValidUnavailabilityCreate(unavailabilityId) {
+                let createdValidUnavailability = existsAfter(/databases/$(database)/documents/unavailabilities/$(unavailabilityId));
+                 let employeeId = request.resource.data.employeeId;
+                 let employeeDepartment = get(/databases/$(database)/documents/employees/$(employeeId)).data.department;
+                 let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowedUnavailabilities(employeeDepartment) || isTheSameEmployee(employeeId);
+
+                return createdValidUnavailability && isAllowed;
+            }
+             function isTheSameEmployee(employeeId) {
+                let isTheSameEmployee = employeeId == request.auth.uid;
+                return isTheSameEmployee;
+             }
+
+
+             function isManagerAllowedUnavailabilities(employeeDepartment) {
+                let isManager = getCurrentEmployeeRole(request.auth.uid) == 2;
+                let department = get(/databases/$(database)/documents/employees/$(request.auth.uid)).data.department;
+                return employeeDepartment == department && isManager;
+             }
             function isValidShiftUpdate(shiftId) {
                 let updatedValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
                 let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'start']);
@@ -172,7 +207,7 @@ service cloud.firestore {
             function isManagerAllowed(documentDepartment) {
                 let isManager = getCurrentEmployeeRole(request.auth.uid) >= 2;
                 let employeeDepartment = get(/databases/$(database)/documents/employees/$(request.auth.uid)).data.department;
-                
+
                 return employeeDepartment == documentDepartment && isManager;
             }
 
@@ -181,6 +216,7 @@ service cloud.firestore {
                        request.resource.data.employeeId is string &&
                        request.resource.data.start is timestamp &&
                        request.resource.data.end is timestamp
+
             }
         }
 
