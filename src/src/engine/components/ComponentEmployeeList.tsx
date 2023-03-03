@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Col, Form, Row, Table} from "react-bootstrap";
+import {Button, Col, Form, ListGroup, Row, Table} from "react-bootstrap";
 import {Employee, employeeTableHeads, employeeAdminTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {API} from "../api/APIManager";
@@ -73,7 +73,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         let list: Employee[] = !!(this.props.employees) ? this.props.employees : [];
         let searchTerm: string = event.target.value;
 
-        if(searchTerm) {
+        if (searchTerm) {
             this.updateList(FilterUtils.filterEmployeeList(list, searchTerm));
         } else {
             this.updateList(list);
@@ -116,7 +116,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
             return [
                 <tr key={"firstCol"}>
                     <td colSpan={10}>
-                        <ComponentLoadingBarSpinner />
+                        <ComponentLoadingBarSpinner/>
                     </td>
                 </tr>
             ]
@@ -137,10 +137,20 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                     <td key={"departmentId " + index}>{employee.department}</td>
                     <td key={"actif " + index}>{employee.isActive ? "Oui" : "Non"}</td>
                     <td key={"jobTitles " + index}>
-                        {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
+                        <ListGroup variant="flush">
+                            {employee.jobTitles.map((title: string) => (
+                                <ListGroup.Item key={title}>{title}</ListGroup.Item>
+                            ))}
+                        </ListGroup>
                     </td>
 
-                    <td key={"skills " + index}>{employee.skills}</td>
+                    <td key={"skills " + index}>
+                        <ListGroup variant="flush">
+                            {employee.skills.map((skill: string) => (
+                                <ListGroup.Item key={skill}>{skill}</ListGroup.Item>
+                            ))}
+                        </ListGroup>
+                    </td>
                     {this.renderAdminActions(index, employee)}
                 </tr>
             ));
@@ -164,13 +174,13 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         let list: Employee[] | null = this.state.filteredList !== null ? this.state.filteredList : this.props.employees;
 
         return (
-            <Table responsive bordered hover className="text-center">
+            <Table responsive bordered className="text-center">
                 <thead>
-                    {this.renderTableHeads()}
+                {this.renderTableHeads()}
                 </thead>
 
                 <tbody>
-                    {this.getEmployeeList(list)}
+                {this.getEmployeeList(list)}
                 </tbody>
             </Table>
         );
@@ -199,7 +209,8 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                     <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
                         <BiEdit/>
                     </LinkContainer>
-                    <a className="adminActions ms-1 mx-1" onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>
+                    <a className="adminActions ms-1 mx-1"
+                       onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>
                 </td>
             );
         } else if (employee.id && API.hasPermission(Roles.ADMIN)) {

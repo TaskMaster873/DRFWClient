@@ -36,8 +36,8 @@ interface EmployeeAvailabilityException {
  * Contains a list of {@link EmployeeRecursiveExceptionList} for everyDays that will be recursive every weeks
  */
 export interface RecursiveAvailabilities {
-    startDate?: string;
-    endDate?: string;
+    startDate?: Date;
+    endDate?: Date;
     [DAYS.SUNDAY]: EmployeeRecursiveExceptionList;
     [DAYS.MONDAY]: EmployeeRecursiveExceptionList;
     [DAYS.TUESDAY]: EmployeeRecursiveExceptionList;
@@ -58,17 +58,18 @@ export type EmployeeRecursiveExceptionList = EmployeeRecursiveException[];
 export type EmployeeAvailabilityExceptionList = EmployeeAvailabilityException[];
 
 /**
- * Should contains a {@link RecursiveAvailabilities }, {@link EmployeeAvailabilityExceptionList} and a employeeId : string.
+ * Should contains a {@link RecursiveAvailabilities } that contains the unavailabilities, {@link EmployeeAvailabilityExceptionList} and a employeeId : string.
  * It is used to show the user his availabilities or to push his availabilities to his manager. 
  */
 export interface EmployeeAvailabilities {
-    /** When he can work */
     recursiveExceptions: RecursiveAvailabilitiesList;
-    /** When he can work */
-    //exception: EmployeeAvailabilityExceptionList;
+   
     employeeId: string;
 }
 
+/**
+ * contains a list of {RecursiveAvailabilities}
+ */
 export type RecursiveAvailabilitiesList = RecursiveAvailabilities[];
 
 export interface EventsForUnavailability {
@@ -79,17 +80,24 @@ export interface EventsForUnavailability {
 
 export type EventsForUnavailabilityList = EventsForUnavailability[];
 
+/**
+ * It is all the informations used for 
+ */
 export interface EmployeeAvailabilitiesForCreate {
     recursiveExceptions: RecursiveAvailabilities;
     employeeId?: string;
-    start?: Timestamp;
-    end?: Timestamp;
 }
-
+/**
+ * It is used for date convert
+ */
 export interface DateOfUnavailability {
     start: Date,
     end: Date
 }
 
+/**
+ * List of date to convert
+ */
 export type DateOfUnavailabilityList = DateOfUnavailability[];
 
+export const unavailabilitiesTableHeads: string[] = ["#", "Prénom", "Nom", "Début", "Fin", "Actions"]

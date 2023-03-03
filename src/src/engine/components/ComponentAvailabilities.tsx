@@ -2,10 +2,11 @@ import React, {Component} from 'react';
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
 
+
 interface ComponentAvailabilitiesProps {
     employeeAvailabilities: DayPilot.EventData[];
     onTimeRangeSelected: (start: Date, end: Date, selectedDate: Date) => DayPilot.EventData[];
-    getStartData: () => DayPilot.EventData[];
+    getStartData: () => Promise<DayPilot.EventData[]>;
     startDate: DayPilot.Date;
     selectionDay: DayPilot.Date;
     isCellInStartToEndTimeRange: (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date) => boolean;
@@ -35,17 +36,23 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.props = props;
     }
 
+    /**
+     * @returns the calendar that has a ref in the component
+     */
     get calendar() {
         return this.calendarRef?.current?.control;
     }
 
+    /**
+     * @return the datePicker that is a child of the component
+     */
     get datePicker() {
         return this.datePickerRef?.current?.control;
     }
 
-    public componentDidMount(): void {
-        let events = this.props.getStartData();
-
+    public async componentDidMount(): Promise<void> {
+        let events = await this.props.getStartData();
+        console.log(events);
         this.calendar?.update({
             events: events
         });
@@ -105,14 +112,13 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
         this.datePicker?.update({events: event});
         this.calendar?.update({events: event});
-        this.#getListOfTheCalendarEvents();
         this.calendar?.clearSelection();
     };
 
-    readonly #getListOfTheCalendarEvents = (): void => {
-        console.log("all in the calendar",this.calendar?.events?.list);
-    }
-
+    /**
+     * 
+     * @param args is the args that the method has by DayPilot 
+     */
     readonly #onBeforeCellRender = (args: any): void => {
         let cell = args.cell;
         let start: DayPilot.Date = cell.start;
@@ -129,6 +135,10 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         }
     }
 
+    /**
+     * 
+     * @returns all events in the calendar in {DayPilot.EventData[]} or undefined if the calendar is undefined
+     */
     public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
         return this.calendar?.events.list;
     }
