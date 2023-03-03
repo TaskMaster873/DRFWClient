@@ -100,3 +100,4 @@ export interface DateOfUnavailability {
  */
 export type DateOfUnavailabilityList = DateOfUnavailability[];
 
+export const unavailabilitiesTableHeads: string[] = ["#", "Prénom", "Nom", "Début", "Fin", "Actions"]

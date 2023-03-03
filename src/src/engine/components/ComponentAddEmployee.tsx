@@ -162,8 +162,9 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                         {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
                             key={title.name}
                             type="checkbox"
-                            name={title.name}
+                            name="jobTitles"
                             label={title.name}
+                            value={title.name}
                         />))}
                         <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)}
                             showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
@@ -178,7 +179,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                         {this.props.skills.map((skill: Skill) => (<Form.Check
                             key={skill.name}
                             type="checkbox"
-                            name={skill.name}
+                            name="skills"
                             label={skill.name}
                         />))}
                         <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
@@ -269,20 +270,27 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         const target = event.target;
         let name: string = target.name;
 
-        let value;
+        let value = target.value;
         if (target.type === "checkbox") {
-            value = target.checked;
+            let array: string[] = this.state[name];
+            if(target.checked) {
+                array.push(value);
+            } else {
+                let index = array.findIndex((elem: string) => elem === value);
+                array.splice(index, 1);
+            }
+            this.setState({...this.state, ...{
+                    [name]: array,
+                }});
         } else {
-            value = target.value;
+            this.setState({...this.state, ...{
+                    [name]: value,
+            }});
         }
 
         if (!name) {
             throw new Error("Name is undefined for element in form.");
         }
-
-        this.setState({...this.state, ...{
-            [name]: value,
-        }});
     }
 
     readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {

@@ -118,18 +118,32 @@ test("Employee fields should match employee infos 2", async () => {
     checkFieldValues(ths, trs, tds, employees2);
 });
 
+/**
+ * Check the length values of the displayed list
+ * @param ths Table Heads
+ */
 function verifyTableLength(ths, trs, tds, list) {
     expect(ths.length).toBe(employeeTableHeads.length);
     expect(trs.length).toBe(list.length + 1);
     expect(tds.length).toBe((employeeTableHeads.length) * list.length);
 }
 
+/**
+ * Check each value of table heads to equal the ones of the expected array
+ * @param ths Table Heads
+ */
 function checkTableHeads(ths) {
     for (let i = 0; i < ths.length; i++) {
         expect(ths[i].innerHTML).toBe(employeeTableHeads[i]);
     }
 }
 
+/**
+ * Verify every first element of each row to be the row index
+ * @param ths Table Heads
+ * @param trs Table Rows
+ * @param tds Table Data Cell
+ */
 function verifyEmployeeNumber(ths, trs, tds) {
     /*
         i: nombre total de "table data"
@@ -142,6 +156,13 @@ function verifyEmployeeNumber(ths, trs, tds) {
     }
 }
 
+/**
+ * Verify the innerHTML of every element of each row to be equal to the list of employees
+ * @param ths Table Heads
+ * @param trs Table Rows
+ * @param tds Table Data Cell
+ * @param list The list of employees
+ */
 function checkFieldValues(ths, trs, tds, list) {
     /*
         i: nombre total de "table data"
@@ -153,13 +174,29 @@ function checkFieldValues(ths, trs, tds, list) {
         expect(tds[i * ths.length + 4].innerHTML).toBe(list[i].phoneNumber);
         expect(tds[i * ths.length + 5].innerHTML).toBe(list[i].department);
         expect(tds[i * ths.length + 6].innerHTML).toBe("Oui");
-        expect(tds[i * ths.length + 7].innerHTML).toBe("");
-        expect(tds[i * ths.length + 8].innerHTML).toBe("");
+        expect(tds[i * ths.length + 7].innerHTML).toBe(`<div class="list-group list-group-flush">${expectedListItems(list[i].jobTitles)}</div>`);
+        expect(tds[i * ths.length + 8].innerHTML).toBe(`<div class="list-group list-group-flush">${expectedListItems(list[i].skills)}</div>`);
     }
 }
 
+/**
+ * Returns each list item to expect in the interface
+ * @param array
+ * @returns {string}
+ */
+function expectedListItems(array) {
+    let listItems = ``;
+    if(array.size === 0) return listItems;
+    for (const elem of array) {
+        listItems +=`<div class="list-group-item">${elem}</div>`
+    }
+    return listItems;
+}
 
-
+/**
+ * Get all the fields needed in tests
+ * @returns {{tds: NodeListOf<HTMLElementTagNameMap[string]>, trs: NodeListOf<HTMLElementTagNameMap[string]>, table: HTMLTableElement, ths: NodeListOf<HTMLElementTagNameMap[string]>}}
+ */
 function getFields() {
     const table = document.querySelector("table");
     const ths = document.querySelectorAll("th");

@@ -378,7 +378,6 @@ class APIManager extends Logger {
             this.isAuthenticated = true;
         }
 
-        await this.onEvent();
         return errorMessage;
     }
 
@@ -416,8 +415,6 @@ class APIManager extends Logger {
             });
 
             this.#employeeInfos.role = 0;
-
-            await this.onEvent();
         }
 
         return errorMessage;
@@ -475,6 +472,8 @@ class APIManager extends Logger {
 
                         console.log("user", user);
                         console.log("employeeInfos", this.#employeeInfos);
+
+                        await this.onEvent();
                     }
 
                     if (!resolved) {
@@ -1390,7 +1389,7 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
 
-        let errorMessage: string | null = null;
+        let errorMessage: string | undefined;
 
         //Create Shift
         await addDoc(collection(this.#db, `shifts`),
@@ -1404,7 +1403,7 @@ class APIManager extends Logger {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
-        if (errorMessage) return errorMessage;
+        return errorMessage;
     }
 
     /**
@@ -1424,7 +1423,7 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
 
-        let errorMessage: string | null = null;
+        let errorMessage: string | undefined;
 
         //Edit Shift
         await setDoc(doc(this.#db, `shifts`, shift.id),
@@ -1438,7 +1437,7 @@ class APIManager extends Logger {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
-        if (errorMessage) return errorMessage;
+        return errorMessage;
     }
 
     /**
@@ -1478,7 +1477,7 @@ class APIManager extends Logger {
      * @async
      * @public
      * @memberof APIManager
-     * @returns {Promise<string | boolean>} boolean if the request was successful or it doesn't need to update, 
+     * @returns {Promise<string | boolean>} boolean if the request was successful or it doesn't need to update,
      * and the error message if it has an error in Firebase.
      * @param list
      */
@@ -1570,7 +1569,7 @@ class APIManager extends Logger {
         return returnList;
     }
     /**
-     * 
+     *
      * @param idEmployee to get the unavailabilities
      * @returns the list of unavailabilities
      */
