@@ -111,12 +111,18 @@ export class NavigationBar extends React.Component<unknown, State> {
                     <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
                 </Nav>
             );
-        } else {
+        } else if(API.hasPermission(Roles.EMPLOYEE)) {
             return (
                 <Nav activeKey="">
                     <NavItem icon={<FontAwesomeIcon icon={faCalendar} />} link={RoutesPath.SCHEDULE} label="Mon horaire" description="Consultez vos quarts de travail" />
                     <NavItem icon={<FontAwesomeIcon icon={faClock} />} link={RoutesPath.AVAILABILITIES} label="Mes disponibilités" description="Modifier vos disponibilités" />
                     <NavItem icon={<FontAwesomeIcon icon={faAddressBook} />} link={RoutesPath.DEPARTMENTS} label="Départements" description="Voir tous les départements" />
+                    <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
+                </Nav>
+            );
+        } else {
+            return (
+                <Nav activeKey="">
                     <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
                 </Nav>
             );
