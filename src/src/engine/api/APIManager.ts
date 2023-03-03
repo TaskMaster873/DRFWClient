@@ -1620,6 +1620,73 @@ class APIManager extends Logger {
 
         return errorMessage ?? list;
     }
+
+     /**
+     * This function fetches all pending unavailabilities for one department
+     * @param departmentName the name of the department to fetch
+     * @returns a string if its an error, a list of Unavailabilities if its not
+     */
+     public async getPendingUnavailabilitiesForDepartment(departmentName: string): Promise<string | any[]> {
+        let errorMessage: string | null = null;
+        let unavailabilities: any[] = [];
+        //Validate permissions
+        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && departmentName === this.#employeeInfos.department;
+        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
+            return errors.PERMISSION_DENIED;
+        }
+
+        //Query unavailabilities
+        let queryShifts = query(
+            collection(this.#db, `unavailabilities`),
+            where("department", "==", departmentName),
+            where("isAccepted", "==", false)
+        );
+
+        let snaps = await getDocs(queryShifts).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+
+        //Parse recieved data
+        if (snaps) {
+            for (let doc of snaps.docs) {
+                let unavailability = doc.data();
+                //Push unavailability object
+                
+
+            }
+        }
+        return errorMessage ?? unavailabilities;
+    }
+
+    public async getAllPendingUnavailabilities(): Promise<string | any[]> {
+        let errorMessage: string | null = null;
+        let unavailabilities: any[] = [];
+        //Validate permissions
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
+
+        //Query unavailabilities
+        let queryShifts = query(
+            collection(this.#db, `unavailabilities`),
+            where("isAccepted", "==", false)
+        );
+
+        let snaps = await getDocs(queryShifts).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+
+        //Parse recieved data
+        if (snaps) {
+            for (let doc of snaps.docs) {
+                let unavailability = doc.data();
+                //Push unavailability object
+                
+
+            }
+        }
+        return errorMessage ?? unavailabilities;
+    }
 }
 
 /**
