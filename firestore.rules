@@ -186,7 +186,7 @@ service cloud.firestore {
                 let isManager = getCurrentEmployeeRole(request.auth.uid) == 2;
                 let department = get(/databases/$(database)/documents/employees/$(request.auth.uid)).data.department;
                 return employeeDepartment == department && isManager;
-
+             }
             function isValidShiftUpdate(shiftId) {
                 let updatedValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
                 let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'start']);
