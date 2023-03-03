@@ -17,7 +17,15 @@ import {API} from "../api/APIManager";
 import {Container} from "react-bootstrap";
 import {NotificationManager} from "../api/NotificationManager";
 import {errors} from "../messages/FormMessages";
+import {RoutesPath} from "../RoutesPath";
+import {Roles} from "../types/Roles";
+import {Navigate} from "react-router-dom";
 
+enum FetchState {
+    WAITING = 0,
+    ERROR = 1,
+    OK = 2,
+}
 
 export interface AvailabilitiesState {
     availabilities: EmployeeAvailabilities;
@@ -26,6 +34,8 @@ export interface AvailabilitiesState {
     currentWeekStart: Date;
     currentWeekEnd: Date;
     selectedDate: Date;
+    fetchState: FetchState;
+    redirectTo: string | null;
 }
 
 /**
@@ -52,6 +62,8 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         timesUnavailable: [],
         popupInactive: true,
         selectedDate: new Date,
+        fetchState: FetchState.WAITING,
+        redirectTo: null
     };
 
     /**
@@ -92,22 +104,29 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
      * @returns  Promise<DayPilot.EventData[]>
      */
     readonly #getStartData = async (): Promise<DayPilot.EventData[]> => {
+        const isLoggedIn: boolean = await this.verifyLogin();
+        if (isLoggedIn) {
 
-        let recursiveException = await API.getCurrentEmployeeUnavailabilities();
-        if (typeof recursiveException === "string") {
-            NotificationManager.error(errors.GET_DEPARTMENTS, recursiveException);
-        }
-        else {
-            if (recursiveException) {
-                //we need to do the 2 because Daypilot cannot render correctly
-                this.setState({availabilities: recursiveException});
-                this.state.availabilities = recursiveException;
+            //If current user is a manager, limit access to other departments
+            if (!this.verifyPermissions(Roles.EMPLOYEE)) {
+                let recursiveException = await API.getCurrentEmployeeUnavailabilities();
+                if (this.manageError(recursiveException, errors.GET_AVAILABILITIES)) {
+                    if (typeof recursiveException === "string") {
+                    NotificationManager.error(errors.GET_AVAILABILITIES, recursiveException);
+
+                    }
+                    else if (recursiveException ) {
+                        //we need to do the 2 because Daypilot cannot render correctly
+                        this.setState({availabilities: recursiveException});
+                        this.state.availabilities = recursiveException;
+                    }
+                }
             }
-
+           
+        } else {
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
         return this.computeAllAvailabilities(this.state.currentWeekStart, this.state.currentWeekEnd);
-
-
     };
     /**
      * 
@@ -120,28 +139,33 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     };
 
     public render(): JSX.Element {
-        return (
-            <div>
-                <Container className="justify-content-end">
-                    <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Sauvegarder</button>
-                </Container>
-                <ComponentAvailabilities
-                    getStartData={this.#getStartData}
-                    onTimeRangeSelected={this.#onTimeRangeSelected}
-                    isCellInStartToEndTimeRange={this.#isCellInStartToEndTimeRange}
-                    startDate={new DayPilot.Date(this.state.currentWeekStart)}
-                    selectionDay={new DayPilot.Date(this.state.selectedDate)}
-                    employeeAvailabilities={this.state.timesUnavailable}
-                    ref={this.componentAvailabilitiesRef} />
-                <ComponentAvailabilitiesPopup
-                    hideModal={this.#hideModal}
-                    isShown={this.state.popupInactive}
-                    start={this.toUTC(this.state.currentWeekStart)}
-                    end={this.toUTC(this.state.currentWeekEnd)}
-                    availabilityAdd={this.#createNewAvailabilityRequest}
-                />
-            </div>
-        );
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo} />);
+        } else {
+            return (
+                <div>
+                    <ComponentAvailabilities
+                        getStartData={this.#getStartData}
+                        onTimeRangeSelected={this.#onTimeRangeSelected}
+                        isCellInStartToEndTimeRange={this.#isCellInStartToEndTimeRange}
+                        startDate={new DayPilot.Date(this.state.currentWeekStart)}
+                        selectionDay={new DayPilot.Date(this.state.selectedDate)}
+                        employeeAvailabilities={this.state.timesUnavailable}
+                        ref={this.componentAvailabilitiesRef} />
+                    <ComponentAvailabilitiesPopup
+                        hideModal={this.#hideModal}
+                        isShown={this.state.popupInactive}
+                        start={this.toUTC(this.state.currentWeekStart)}
+                        end={this.toUTC(this.state.currentWeekEnd)}
+                        availabilityAdd={this.#createNewAvailabilityRequest}
+                    />
+                     <Container className="justify-content-end d-flex mt-3 mb-4 ">
+                        <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Transmettre</button>
+                    </Container>
+                </div>
+            );
+        }
+
     }
     /**
      * 
@@ -194,6 +218,44 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             return false;
         }
         return true;
+    }
+
+    /**
+    * Verify if the user has the permission to access this page
+    * @param role
+    * @private
+    */
+    private verifyPermissions(role: Roles): boolean {
+        return API.hasPermission(role);
+    }
+
+    /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
+        await API.awaitLogin;
+
+        const hasPerms = this.verifyPermissions(Roles.EMPLOYEE);
+        if (!API.isAuth() || !hasPerms) {
+            this.redirectTo(RoutesPath.INDEX);
+        } else {
+            isLoggedIn = true;
+        }
+
+        return isLoggedIn;
+    }
+
+    /**
+     * Redirect to a path
+     * @param path
+     * @private
+     */
+    private redirectTo(path: string): void {
+        this.setState({
+            redirectTo: path
+        });
     }
 
     /**
