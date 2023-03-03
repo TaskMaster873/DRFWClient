@@ -41,12 +41,15 @@ service cloud.firestore {
             function isValidEmployeeUpdate(employeeId) {
                 let hasEmployeeFields = request.resource.data.keys().hasOnly(
                     ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
+                let hasChangePasswordField = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive', 'hasChangedDefaultPassword']);
                 let hasActiveFields = request.resource.data.keys().hasOnly(
                     ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive']);
-                let validEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
 
-                return validEmployee && (hasEmployeeFields && employeeFieldTypes()) ||
-                       (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType()) && getCurrentEmployeeRole(request.auth.uid) >= 3;
+                let isValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
+
+                return isValidEmployee && (((hasEmployeeFields && employeeFieldTypes())
+                       || (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType())
+                          && getCurrentEmployeeRole(request.auth.uid) >= 3) || hasChangePasswordField);
             }
 
             function departmentFieldTypes() {

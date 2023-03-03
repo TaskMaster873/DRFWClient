@@ -24,6 +24,7 @@ export class Employee {
     public jobTitles: string[];
     public skills: string[];
     public role: number;
+    public hasChangedDefaultPassword: boolean;
 
     constructor(employee: EmployeeDTO) {
         this.id = employee.employeeId;
@@ -36,6 +37,7 @@ export class Employee {
         this.jobTitles = employee.jobTitles;
         this.skills = employee.skills;
         this.role = employee.role;
+        this.hasChangedDefaultPassword = employee.hasChangedDefaultPassword;
 	}
 }
 
@@ -51,6 +53,7 @@ export interface EmployeeCreateDTO {
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
+    readonly hasChangedDefaultPassword: boolean;
 }
 
 export interface EmployeeDTO {
@@ -64,8 +67,8 @@ export interface EmployeeDTO {
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
+    readonly hasChangedDefaultPassword: boolean;
 }
-
 
 export interface EmployeeEditDTO {
     readonly firstName: string;
@@ -75,6 +78,7 @@ export interface EmployeeEditDTO {
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
+    readonly hasChangedDefaultPassword?: boolean;
 }
 
 export let employeeAdminTableHeads : string[] =

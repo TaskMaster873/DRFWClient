@@ -33,6 +33,7 @@ interface ComponentAddEmployeeState extends Employee {
  */
 export class ComponentAddEmployee extends React.Component<AddEmployeeProps, ComponentAddEmployeeState> {
     public state: ComponentAddEmployeeState = {
+        hasChangedDefaultPassword: false,
         department: "",
         email: "",
         id: "",
@@ -46,7 +47,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         showEditJobTitles: false,
         showEditSkills: false,
         skills: [],
-        validated: false,
+        validated: false
     };
 
     public props: AddEmployeeProps;
@@ -253,7 +254,8 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 department: this.state.department,
                 jobTitles: this.state.jobTitles,
                 skills: this.state.skills, // @ts-ignore
-                role: parseInt(this.state.role)
+                role: parseInt(this.state.role),
+                hasChangedDefaultPassword: false
             }
             this.props.onAddEmployee(this.state.password, employee);
         }

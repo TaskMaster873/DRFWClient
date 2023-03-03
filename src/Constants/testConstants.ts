@@ -31,6 +31,7 @@ const employee = new Employee({
     jobTitles: ["Manager"],
     skills: ["Gestion de personnel"],
     role: 1,
+    hasChangedDefaultPassword: true
 });
 
 const employee2 = new Employee({
@@ -43,6 +44,7 @@ const employee2 = new Employee({
     jobTitles: [],
     skills: [],
     role: 2,
+    hasChangedDefaultPassword: true
 });
 
 const employeeWithId = new Employee({
@@ -55,7 +57,8 @@ const employeeWithId = new Employee({
     department: "Marketing",
     jobTitles: [],
     skills: [],
-    role: 1
+    role: 1,
+    hasChangedDefaultPassword: true
 });
 
 const employeeWithId2 = new Employee({
@@ -68,13 +71,13 @@ const employeeWithId2 = new Employee({
     department: "Marketing",
     jobTitles: ["Manager"],
     skills: ["Gestion de personnel"],
-    role: 1
+    role: 1,
+    hasChangedDefaultPassword: true
 });
 
 const employees = [employee];
 const employees2 = [employee, employee2];
 const employeesWithIds = [employeeWithId];
-const employeesWithIds2 = [employeeWithId, employeeWithId2];
 
 const department = new Department({
     name: "Informatique", director: "Jasmin"
@@ -89,6 +92,6 @@ const departments2: Department[] = [department, department2];
 
 const employeeNb: number[] = [1, 2];
 
-export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2, employeesWithIds, employeesWithIds2, department, department2, departments, departments2, employeeNb};
+export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2, employeesWithIds, department, department2, departments, departments2, employeeNb};
 
 

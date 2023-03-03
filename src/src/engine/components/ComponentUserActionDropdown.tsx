@@ -93,12 +93,12 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                     variant={'primary'}
                     title={'Paramètres'}
                 >
-                    <Dropdown.Item href={RoutesPath.INDEX} eventKey="1" id="logoutLink" className="dropDownMenuText" onClick={this.#logout}>
-                        Se déconnecter
+                    <Dropdown.Item eventKey="1">
+                        <Nav.Link id="logoutLink" className="dropDownMenuText" onClick={this.#logout}>Se déconnecter</Nav.Link>
                     </Dropdown.Item>
                     <Dropdown.Divider />
-                    <Dropdown.Item href={RoutesPath.CHANGE_PASSWORD} eventKey="1" id="changePassword" className="dropDownMenuText" onClick={this.#changePassword}>
-                        Changer mon mot de passe
+                    <Dropdown.Item eventKey="2">
+                        <Nav.Link id="changePassword" className="dropDownMenuText" onClick={this.#changePassword}>Changer mon mot de passe</Nav.Link>
                     </Dropdown.Item>
                 </DropdownButton>
             );

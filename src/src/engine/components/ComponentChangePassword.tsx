@@ -11,11 +11,14 @@ import {Navigate} from "react-router-dom";
 import {NotificationManager} from "../api/NotificationManager";
 
 interface ChangePasswordState {
-    oldPassword: string;
     newPassword: string;
     validated: boolean;
     error: FormErrorType;
     redirectTo: string | null;
+}
+
+interface ChangePasswordProps {
+    onChangePasswordCallback?: () => void;
 }
 
 /**
@@ -24,17 +27,20 @@ interface ChangePasswordState {
  * @param props - Not used
  * @return {JSX.Element} - The component
  */
-export class ComponentChangePassword extends React.Component<unknown, ChangePasswordState> {
+export class ComponentChangePassword extends React.Component<ChangePasswordProps, ChangePasswordState> {
     public state: ChangePasswordState = {
-        oldPassword: "",
         newPassword: "",
         validated: false,
         redirectTo: null,
         error: FormErrorType.NO_ERROR
     };
 
+    public props: ChangePasswordProps;
+
     constructor(props) {
         super(props);
+
+        this.props = props;
     }
 
     public render(): JSX.Element {
@@ -58,20 +64,6 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
                     <Form noValidate validated={this.state.validated} onSubmit={this.#handleSubmit}
                           onChange={this.#handleChange}
                           data-error={this.state.error}>
-                        <Form.Group>
-                            <Form.Label htmlFor="oldPassword" className="mt-2">Ancien mot de passe</Form.Label>
-                            <Form.Control
-                                required
-                                name="oldPassword"
-                                className="row mt-1"
-                                type="password"
-                                pattern={RegexUtil.goodPasswordRegex}
-                                placeholder="Entrez l'ancien mot de passe"
-                            />
-                            <Form.Control.Feedback type="invalid" id="invalidOldPassword">
-                                {errors.REQUIRED_OLD_PASSWORD}
-                            </Form.Control.Feedback>
-                        </Form.Group>
                         <Form.Group>
                             <Form.Label htmlFor="newPassword" className="mt-4">Nouveau mot de passe </Form.Label>
                             <Form.Control
@@ -120,9 +112,10 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
 
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
-            event.preventDefault();
-            event.stopPropagation();
         }
+
+        event.preventDefault();
+        event.stopPropagation();
 
         this.setState({
             validated: true,
@@ -130,14 +123,18 @@ export class ComponentChangePassword extends React.Component<unknown, ChangePass
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let error = await API.changePassword(this.state.oldPassword, this.state.newPassword);
+            let error = await API.changePassword(this.state.newPassword);
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.CHANGE_PASSWORD);
 
-                // Redirect to the home page
-                this.setState({
-                    redirectTo: RoutesPath.INDEX
-                });
+                if(API.hasChangedDefaultPassword) {
+                    // Redirect to the home page
+                    this.setState({
+                        redirectTo: RoutesPath.INDEX
+                    });
+                } else if(this.props.onChangePasswordCallback) {
+                    this.props.onChangePasswordCallback();
+                }
             } else {
                 NotificationManager.error(error, errors.ERROR_FORM);
             }

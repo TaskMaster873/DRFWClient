@@ -21,15 +21,11 @@ import {
     getDocs,
     getFirestore,
     query,
-    QueryDocumentSnapshot,
     QuerySnapshot,
-    runTransaction,
     setDoc,
     Timestamp,
-    Transaction,
     updateDoc,
     where,
-    writeBatch,
 } from "firebase/firestore";
 
 import {FirebasePerformance, getPerformance} from "firebase/performance";
@@ -107,7 +103,17 @@ class APIManager extends Logger {
     #performance!: FirebasePerformance;
     #db!: Firestore;
     #user: FirebaseAuth.User | null = null;
-    #employeeInfos: EmployeeInfos = {role: 0, department: ""};
+    #employeeInfos: Employee = {
+        email: "",
+        firstName: "",
+        jobTitles: [],
+        lastName: "",
+        phoneNumber: "",
+        skills: [],
+        role: 0,
+        department: '',
+        hasChangedDefaultPassword: false
+    };
 
     /**
      * Global variables of APIManager.
@@ -128,7 +134,7 @@ class APIManager extends Logger {
 
         this.loadFirebase();
 
-        // Stupid JEST doesn't support web workers.
+        // JEST doesn't support web workers.
         try {
             if (process === null || process === undefined) {
                 this.registerServiceWorker();
@@ -141,6 +147,18 @@ class APIManager extends Logger {
     //endregion
 
     //region GETTERS
+
+    /**
+     * Return if the user has changed the default password.
+     * @readonly
+     * @type {boolean}
+     * @memberof APIManager
+     * @returns {boolean} Whether the user has changed the default password.
+     */
+    get hasChangedDefaultPassword(): boolean {
+        return this.#employeeInfos.hasChangedDefaultPassword;
+    }
+
     /**
      * Returns the current user role.
      * @readonly
@@ -413,8 +431,6 @@ class APIManager extends Logger {
             await FirebaseAuth.signOut(this.#auth).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
-
-            this.#employeeInfos.role = 0;
         }
 
         return errorMessage;
@@ -455,26 +471,45 @@ class APIManager extends Logger {
                 this.#auth,
                 async (user: FirebaseAuth.User | null) => {
                     this.log("Auth state changed!");
-
                     if (user === null || !user) {
                         this.isAuthenticated = false;
+                        this.#employeeInfos = {
+                            email: "",
+                            firstName: "",
+                            jobTitles: [],
+                            lastName: "",
+                            phoneNumber: "",
+                            skills: [],
+                            role: 0,
+                            department: '',
+                            hasChangedDefaultPassword: false
+                        };
+                        
                     } else {
                         this.isAuthenticated = true;
                         this.#user = user;
                         let result = await this.getEmployeeInfos(user.uid);
                         if (typeof result === "string") {
                             NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
-                            this.#employeeInfos.role = 0;
-                            this.#employeeInfos.department = "";
+                            this.#employeeInfos = {
+                                email: "",
+                                firstName: "",
+                                jobTitles: [],
+                                lastName: "",
+                                phoneNumber: "",
+                                skills: [],
+                                role: 0,
+                                department: '',
+                                hasChangedDefaultPassword: false
+                            };
                         } else {
-                            this.#employeeInfos = result;
+                            this.#employeeInfos = result as Employee;
                         }
 
                         console.log("user", user);
                         console.log("employeeInfos", this.#employeeInfos);
-
-                        await this.onEvent();
                     }
+                    await this.onEvent();
 
                     if (!resolved) {
                         resolved = true;
@@ -617,8 +652,32 @@ class APIManager extends Logger {
     }
 
     /**
+     * This method is used to edit an employee.
+     * @param employeeId The id of the employee to edit.
+     * @param employee The employee data.
+     * @method editEmployee
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the employee was edited successfully, and the error message if it was not.
+     */
+    public async changeEmployeeResetToggle(employeeId: string): Promise<string | null> {
+        let errorMessage: string | null = null;
+
+        if (employeeId) {
+            await updateDoc(doc(this.#db, `employees`, employeeId), {
+                hasChangedDefaultPassword: true
+            }).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_EMPLOYEE_ID;
+        }
+        return errorMessage;
+    }
+
+    /**
      * This method is used to change the password of the current user.
-     * @param oldPassword The old password.
      * @param newPassword The new password.
      * @returns {Promise<string | null>} Null if the password was changed successfully, and the error message if it was not.
      * @memberof APIManager
@@ -627,7 +686,6 @@ class APIManager extends Logger {
      * @public
      */
     public async changePassword(
-        oldPassword: string,
         newPassword: string
     ): Promise<string | null> {
         let errorMessage: string | null = null;
@@ -636,10 +694,17 @@ class APIManager extends Logger {
             if (this.elementExist(user.email)) {
                 let email = user.email || "";
 
-                const credential = FirebaseAuth.EmailAuthProvider.credential(
-                    email,
-                    oldPassword
-                );
+                if(!this.hasChangedDefaultPassword) {
+                    let employeeId = this.#user?.uid;
+
+                    if(employeeId && this.#employeeInfos.department) {
+                        errorMessage = await this.changeEmployeeResetToggle(employeeId);
+
+                        if(errorMessage) {
+                            return errorMessage;
+                        }
+                    }
+                }
 
                 await FirebaseAuth.updatePassword(
                     user,
@@ -647,6 +712,11 @@ class APIManager extends Logger {
                 ).catch((error) => {
                     errorMessage = APIUtils.getErrorMessageFromCode(error);
                 });
+
+                const credential = FirebaseAuth.EmailAuthProvider.credential(
+                    email,
+                    newPassword
+                );
 
                 if (!errorMessage) {
                     // Prompt the user to re-provide their sign-in credentials
@@ -657,7 +727,10 @@ class APIManager extends Logger {
                         errorMessage = APIUtils.getErrorMessageFromCode(error);
                     });
 
-                    this.#user = reAuth?.user || null;
+                    if(reAuth?.user) {
+                        this.#user = reAuth?.user || null;
+                        this.isAuthenticated = false;
+                    }
                 }
             }
         }
@@ -1049,6 +1122,7 @@ class APIManager extends Logger {
                         jobTitles: data.jobTitles,
                         skills: data.skills,
                         role: data.role,
+                        hasChangedDefaultPassword: data.hasChangedDefaultPassword || false
                     })
                 );
             }
@@ -1190,13 +1264,20 @@ class APIManager extends Logger {
      */
     public async getEmployeeInfos(uid: string): Promise<EmployeeInfos | string> {
         let errorMessage: string | null = null;
-        let employeeInfos: EmployeeInfos = {role: 0, department: ""};
+        let employeeInfos: EmployeeInfos = {
+            role: 0,
+            department: undefined,
+            hasChangedDefaultPassword: false
+        };
+
         let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
+
         if (employee) {
             employeeInfos = employee.data() as EmployeeInfos;
         }
+
         return errorMessage ?? employeeInfos;
     }
 
