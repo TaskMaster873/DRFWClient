@@ -137,10 +137,12 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                     <td key={"departmentId " + index}>{employee.department}</td>
                     <td key={"actif " + index}>{employee.isActive ? "Oui" : "Non"}</td>
                     <td key={"jobTitles " + index}>
-                        {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : ""}
+                        {employee.jobTitles != undefined ? employee.jobTitles.join(", ") : " - "}
                     </td>
 
-                    <td key={"skills " + index}>{employee.skills}</td>
+                    <td key={"skills " + index}>
+                        {employee.skills != undefined ? employee.skills.join(", ") : " - "}
+                    </td>
                     {this.renderAdminActions(index, employee)}
                 </tr>
             ));

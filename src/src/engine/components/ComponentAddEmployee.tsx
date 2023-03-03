@@ -181,7 +181,6 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             type="checkbox"
                             name="skills"
                             label={skill.name}
-                            value={skill.name}
                         />))}
                         <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
                             showEdit={this.state.showEditSkills} skills={this.props.skills}

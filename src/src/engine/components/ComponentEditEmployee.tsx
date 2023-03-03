@@ -115,9 +115,10 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
                             key={title.name}
                             type="checkbox"
-                            name="titles"
+                            name="jobTitles"
                             label={title.name}
                             value={title.name}
+                            defaultChecked={this.props.editedEmployee?.jobTitles.includes(title.name)}
                         />))}
                         <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)}
                                                 showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
@@ -134,6 +135,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             name="skills"
                             label={skill.name}
                             value={skill.name}
+                            defaultChecked={this.props.editedEmployee?.skills.includes(skill.name)}
                         />
                             </div>))}
                         <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
@@ -207,6 +209,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 formDataObj[fieldName].push(checkbox.value);
             }
         });
+        console.log(formDataObj);
 
         this.setState({
             validated: true,
@@ -220,8 +223,9 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 department: formDataObj.department,
                 jobTitles: formDataObj.jobTitles ?? [],
                 skills: formDataObj.skills ?? [],
-                role: formDataObj.role
+                role: parseInt(formDataObj.role)
             }
+            console.log(employee);
             this.props.onEditEmployee(this.props.employeeId, employee);
         }
     }
