@@ -1337,8 +1337,17 @@ class APIManager extends Logger {
     public async getScheduleForOneEmployee(idEmployee?: string): Promise<Shift[] | string> {
         let errorMessage: string | null = null;
         let shifts: Shift[] = [];
+        if (!idEmployee) {
+            return errors.INVALID_EMPLOYEE_ID;
+        }
+        let document = await getDoc(doc(this.#db, `employees`, idEmployee)).catch((error) => {
+            return APIUtils.getErrorMessageFromCode(error);
+        });
 
-        if (this.isAuthenticated) {
+        if(typeof document !== "string" && !document.exists()) {
+            return errors.INVALID_EMPLOYEE_ID;
+        }
+        if (!errorMessage) {
             let queryShifts = query(
                 collection(this.#db, `shifts`),
                 where("employeeId", "==", idEmployee)
@@ -1402,8 +1411,7 @@ class APIManager extends Logger {
         let shifts: Shift[] = [];
 
         //Validate permissions
-        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && department.name === this.#employeeInfos.department;
-        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
+        if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(department.name)) {
             return errors.PERMISSION_DENIED;
         }
 
@@ -1454,8 +1462,7 @@ class APIManager extends Logger {
      */
     public async createShift(shift: ShiftCreateDTO): Promise<void | string> {
         //Check if user has permission
-        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#employeeInfos?.department;
-        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
+        if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(shift.department)) {
             //Manager or less
             return errors.PERMISSION_DENIED;
         }
@@ -1488,8 +1495,7 @@ class APIManager extends Logger {
      */
     public async editShift(shift: Shift): Promise<void | string> {
         //Check if user has permission
-        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && shift.department === this.#employeeInfos?.department;
-        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
+        if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(shift.department)) {
             //Manager or less
             return errors.PERMISSION_DENIED;
         }
@@ -1521,8 +1527,7 @@ class APIManager extends Logger {
      * @param shift
      */
     public async deleteShift(shift: Shift): Promise<void | string> {
-        let isManagerPermitted = !this.hasPermission(Roles.MANAGER) || shift.department !== this.#employeeInfos?.department;
-        if (!this.hasPermission(Roles.ADMIN) && isManagerPermitted) {
+        if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(shift.department)) {
             return errors.PERMISSION_DENIED;
         }
         //Check if user has permission
@@ -1540,6 +1545,10 @@ class APIManager extends Logger {
         });
 
         return errorMessage;
+    }
+
+    public isManagerPermitted(department: string) {
+        return this.hasPermission(Roles.MANAGER) && department === this.#employeeInfos?.department;
     }
 
     /**
@@ -1579,7 +1588,7 @@ class APIManager extends Logger {
                             isAdded = true;
                         break;
                     }
-                };
+                }
             }
         }
         return errorMessage ?? isAdded;
