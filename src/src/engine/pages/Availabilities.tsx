@@ -213,6 +213,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
      * @memberof Availabilities
      */
     readonly #isCellInStartToEndTimeRange = (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date): boolean => {
+        if(this.state.availabilities.recursiveExceptions.length == 0) return false;
         for (let recursive of this.state.availabilities.recursiveExceptions) {
             let canRenderWeeklyData: boolean = true;
             if (recursive.startDate) {
