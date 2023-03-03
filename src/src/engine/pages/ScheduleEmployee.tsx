@@ -15,14 +15,8 @@ export interface ScheduleProps {
 
 interface ScheduleState {
     list: Shift[];
-    fetchState: enumStateOfFetching;
+    isLoading: boolean;
     redirectTo: string | null;
-}
-
-enum enumStateOfFetching {
-    WAITING = 0,
-    ERROR = 1,
-    OK = 2,
 }
 
 export function ScheduleEmployee(): JSX.Element {
@@ -38,7 +32,7 @@ export function ScheduleEmployee(): JSX.Element {
 export class ScheduleEmployeeInternal extends React.Component<ScheduleProps, ScheduleState> {
     public state: ScheduleState = {
         list: [],
-        fetchState: enumStateOfFetching.WAITING,
+        isLoading: true,
         redirectTo: null
     };
 
@@ -52,7 +46,7 @@ export class ScheduleEmployeeInternal extends React.Component<ScheduleProps, Sch
                 this.redirectTo(RoutesPath.INDEX);
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, result);
             } else {
-                this.setState({list: result, fetchState: enumStateOfFetching.OK});
+                this.setState({list: result, isLoading: false});
             }
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
@@ -102,14 +96,12 @@ export class ScheduleEmployeeInternal extends React.Component<ScheduleProps, Sch
         }
 
         let listData: Shift[] = this.state.list;
-        if (this.state.fetchState === enumStateOfFetching.WAITING) {
+        if (this.state.isLoading) {
             return (
                 <ComponentLoading />
             );
-        } else if (this.state.fetchState === enumStateOfFetching.OK) {
-            return (<ComponentEmployeeScheduleView shifts={listData}/>);
         } else {
-            return (<ComponentEmployeeScheduleView shifts={[]}/>);
+            return (<ComponentEmployeeScheduleView shifts={listData}/>);
         }
     }
 }
