@@ -130,9 +130,7 @@ describe("Test TaskMaster Client component", () => {
             </MemoryRouter>
         );
         const {form} = getFields();
-        act(() => {
-            fireEvent.submit(form);
-        });
+        fireEvent.submit(form);
         expect(eventAddCalls).toBe(1);
         expect(eventEditCalls).toBe(0);
     });

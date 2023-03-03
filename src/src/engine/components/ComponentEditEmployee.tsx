@@ -209,8 +209,6 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 formDataObj[fieldName].push(checkbox.value);
             }
         });
-        console.log(formDataObj);
-
         this.setState({
             validated: true,
             error: errorType
@@ -225,7 +223,6 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 skills: formDataObj.skills ?? [],
                 role: parseInt(formDataObj.role)
             }
-            console.log(employee);
             this.props.onEditEmployee(this.props.employeeId, employee);
         }
     }

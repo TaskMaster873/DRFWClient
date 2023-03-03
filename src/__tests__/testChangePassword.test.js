@@ -60,9 +60,7 @@ test("Valid old and new password should submit form", async () => {
     await user.type(inputOldPassword, testConstants.validPassword);
     await user.type(inputNewPassword, testConstants.validNewPassword);
 
-    await act(async () => {
-        fireEvent.submit(form);
-    });
+    fireEvent.submit(form);
 
     expect(inputOldPassword.value).toBe(testConstants.validPassword);
     expect(inputNewPassword.value).toBe(testConstants.validNewPassword);
