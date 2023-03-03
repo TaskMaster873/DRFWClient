@@ -1473,36 +1473,48 @@ class APIManager extends Logger {
     }
 
     /**
-     * Check if the unavailability already exist with the same dates in the DB
+     * Check if the unavailability already exist with the same dates in the DB and if it is yes, it update with the new data and return true
+     * @method checkUnavailabilityShouldUpdate
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | boolean>} boolean if the request was successful or it doesn't need to update, 
+     * and the error message if it has an error in Firebase.
      * @param list
      */
-    private async checkUnavailabilityAlreadyExists(list: EmployeeAvailabilitiesForCreate): Promise<unknown | null> {
-        let errorMessage: unknown | null = null;
+    private async unavailabilityUpdate(list: EmployeeAvailabilitiesForCreate): Promise<string | boolean> {
+        let errorMessage: string | undefined;
+        let isAdded = false;
         let queryUnavailability = query(
             collection(this.#db, `unavailabilities`),
             where("employeeId", "==", this.#user?.uid)
         );
 
-
         let snaps = await getDocs(queryUnavailability).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
+
         if (snaps) {
-            const batch = writeBatch(this.#db);
+            //check if a document with the same dates and that is not accepted already exists
             for (let document of snaps.docs) {
                 let data = document.data();
-
                 if (!data.isAccepted) {
-                    if (data.start.seconds == list.start?.seconds && data.end.seconds == list.end?.seconds) {
-                         batch.delete(doc(this.#db, `unavailabilities`, document.id))
-                    }
-                }
+                    if (data.unavailabilities.startDate === list.recursiveExceptions.startDate
+                        && data.unavailabilities.endDate === list.recursiveExceptions.endDate) {
+                        await updateDoc(doc(this.#db, `unavailabilities`, document.id),
+                            {unavailabilities: list.recursiveExceptions}).catch((error) => {
+                                errorMessage = APIUtils.getErrorMessageFromCode(error);
 
-            };
-            await batch.commit();
-            return errorMessage;
+                            });
+                            isAdded = true;
+                        break;
+                    }
+                };
+            }
         }
+        return errorMessage ?? isAdded;
     }
+
     /**
      * Create a pending unavailability list for the manager
      * @param list
@@ -1514,48 +1526,62 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
 
-        let errorMessage: string | null = null;
+        let errorMessage: string | undefined;
 
         //Create unavailability
-        await this.checkUnavailabilityAlreadyExists(list);
-        await addDoc(collection(this.#db, `unavailabilities`),
-            {
-                employeeId: this.#user?.uid,
-                unavailabilities: list.recursiveExceptions,
-                start: list.start,
-                end: list.end,
-                isAccepted: false,
-            },
-        ).catch((error) => {
-            errorMessage = APIUtils.getErrorMessageFromCode(error);
-        });
+         let isUpdated = await this.unavailabilityUpdate(list)
+        if (!isUpdated && typeof isUpdated === "boolean") {
+            console.log("isAdded = true");
+            await addDoc(collection(this.#db, `unavailabilities`),
+                {
+                    employeeId: this.#user?.uid,
+                    unavailabilities: list.recursiveExceptions,
+                    isAccepted: false,
+                },
+            ).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+            //return the error
+        } else if(typeof isUpdated === "string") {
+            errorMessage = isUpdated;
+            return errorMessage;
+        }
+
 
     }
 
     /**
-     * 
-     * @returns the unavailabilities list for the current user
+     * get the current employee unavailabilities
+     * @method getCurrentEmployeeunavailabilities
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | boolean>} Nothing if the request was successful, and the error message if it was not.
+     * @param list
      */
-    public async getCurrentEmployeeunavailabilities(): Promise<EmployeeAvailabilities | null> {
-        if (this.#user?.uid) {
-            return this.getOneEmployeeUnavailabilities(this.#user?.uid);
-        } else {
-            return null;
-        }
+    public async getCurrentEmployeeUnavailabilities(): Promise<EmployeeAvailabilities | string> {
+        let returnList: string | EmployeeAvailabilities;
 
+        if (this.#user?.uid) {
+            returnList = await this.getOneEmployeeUnavailabilities(this.#user?.uid);
+        } else {
+            returnList = errors.PERMISSION_DENIED;
+        }
+        return returnList;
     }
     /**
      * 
      * @param idEmployee to get the unavailabilities
      * @returns the list of unavailabilities
      */
-    public async getOneEmployeeUnavailabilities(idEmployee: string): Promise<EmployeeAvailabilities | null> {
+    public async getOneEmployeeUnavailabilities(idEmployee: string): Promise<EmployeeAvailabilities | string> {
         let errorMessage: string | null = null;
         //default value
         let list: EmployeeAvailabilities = {
             recursiveExceptions: [],
             employeeId: idEmployee ?? ""
         };
+        //list that will return
         let listOfRecursive: RecursiveAvailabilitiesList = [];
         if (this.isAuthenticated) {
             let queryUnavailability = query(
@@ -1568,9 +1594,10 @@ class APIManager extends Logger {
             });
 
             if (snaps) {
+                //push all the recursiveExceptions  in the list
                 for (let document of snaps.docs) {
                     let data = document.data();
-                    console.log("data", data);
+                    //need to be accepted to be showed
                     if (data.isAccepted) {
                         listOfRecursive.push(
                             {

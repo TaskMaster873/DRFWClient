@@ -58,24 +58,18 @@ export type EmployeeRecursiveExceptionList = EmployeeRecursiveException[];
 export type EmployeeAvailabilityExceptionList = EmployeeAvailabilityException[];
 
 /**
- * Should contains a {@link RecursiveAvailabilities }, {@link EmployeeAvailabilityExceptionList} and a employeeId : string.
+ * Should contains a {@link RecursiveAvailabilities } that contains the unavailabilities, {@link EmployeeAvailabilityExceptionList} and a employeeId : string.
  * It is used to show the user his availabilities or to push his availabilities to his manager. 
  */
 export interface EmployeeAvailabilities {
-    /** When he cannot work */
     recursiveExceptions: RecursiveAvailabilitiesList;
    
     employeeId: string;
 }
 
-export class EmployeeAvailabilitiesClass {
-    public recursiveList: EmployeeRecursiveExceptionList;
-
-    constructor(list: EmployeeRecursiveExceptionList) {
-       this.recursiveList = list;
-	}
-}
-
+/**
+ * contains a list of {RecursiveAvailabilities}
+ */
 export type RecursiveAvailabilitiesList = RecursiveAvailabilities[];
 
 export interface EventsForUnavailability {
@@ -86,17 +80,23 @@ export interface EventsForUnavailability {
 
 export type EventsForUnavailabilityList = EventsForUnavailability[];
 
+/**
+ * It is all the informations used for 
+ */
 export interface EmployeeAvailabilitiesForCreate {
     recursiveExceptions: RecursiveAvailabilities;
     employeeId?: string;
-    start?: Timestamp;
-    end?: Timestamp;
 }
-
+/**
+ * It is used for date convert
+ */
 export interface DateOfUnavailability {
     start: Date,
     end: Date
 }
 
+/**
+ * List of date to convert
+ */
 export type DateOfUnavailabilityList = DateOfUnavailability[];
 

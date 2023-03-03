@@ -161,24 +161,27 @@ service cloud.firestore {
 
             match /unavailabilities/{unavailabilityId} {
                 allow read;
-                allow write: if isValidUnavailabilityCreate();
-                allow delete: if isValidUnavailabilityDelete();
+                allow write: if isValidUnavailabilityCreate(unavailabilityId);
+                allow update: if isValidForUpdate(unavailabilityId);
+               
             }
 
-            function isValidUnavailabilityDelete() {
-                 let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
-                 let employeeId = request.resource.data.employeeId;
-                 let employeeDepartment = get(/databases/$(database)/documents/employees/$(employeeId)).data.department;
-                 let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowedUnavailabilities(employeeDepartment) || isTheSameEmployee(employeeId);
-                 return isEmployee && isAllowed;
-            }
-            function isValidUnavailabilityCreate() {
-                 let isEmployee = getCurrentEmployeeRole(request.auth.uid) >=1;
+            function isValidForUpdate(unavailabilityId) {
+                 let updateValidUnavailability = existsAfter(/databases/$(database)/documents/shifts/$(unavailabilityId));
                  let employeeId = request.resource.data.employeeId;
                  let employeeDepartment = get(/databases/$(database)/documents/employees/$(employeeId)).data.department;
                  let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowedUnavailabilities(employeeDepartment) || isTheSameEmployee(employeeId);
 
-                return isEmployee && isAllowed;
+                return updateValidUnavailability && isAllowed;
+            }
+
+            function isValidUnavailabilityCreate(unavailabilityId) {
+                let createdValidUnavailability = existsAfter(/databases/$(database)/documents/unavailabilities/$(unavailabilityId));
+                 let employeeId = request.resource.data.employeeId;
+                 let employeeDepartment = get(/databases/$(database)/documents/employees/$(employeeId)).data.department;
+                 let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowedUnavailabilities(employeeDepartment) || isTheSameEmployee(employeeId);
+
+                return createdValidUnavailability && isAllowed;
             }
              function isTheSameEmployee(employeeId) {
                 let isTheSameEmployee = employeeId == request.auth.uid;
