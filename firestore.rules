@@ -30,8 +30,6 @@ service cloud.firestore {
                        getCurrentEmployeeRole(request.auth.uid) > request.resource.data.role
             }
 
-
-
             function isValidEmployee(employeeId) {
                 let hasEmployeeFields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
                 let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
@@ -43,12 +41,14 @@ service cloud.firestore {
             function isValidEmployeeUpdate(employeeId) {
                 let hasEmployeeFields = request.resource.data.keys().hasOnly(
                     ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
+                let hasChangePasswordField = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive', 'hasChangedDefaultPassword']);
                 let hasActiveFields = request.resource.data.keys().hasOnly(
                     ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive']);
-                let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
+                let isValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
 
-                return createdValidEmployee && (hasEmployeeFields && employeeFieldTypes()) ||
-                       (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType()) && getCurrentEmployeeRole(request.auth.uid) >= 3;
+                return isValidEmployee && (((hasEmployeeFields && employeeFieldTypes())
+                       || (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType())
+                          && getCurrentEmployeeRole(request.auth.uid) >= 3) || hasChangePasswordField);
             }
 
             function departmentFieldTypes() {

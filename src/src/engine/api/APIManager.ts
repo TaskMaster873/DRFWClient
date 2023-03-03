@@ -433,6 +433,9 @@ class APIManager extends Logger {
             });
 
             this.#employeeInfos.role = 0;
+            this.isAuthenticated = false;
+
+            await this.onEvent();
         }
 
         return errorMessage;
@@ -646,9 +649,6 @@ class APIManager extends Logger {
      */
     public async changeEmployeeResetToggle(employeeId: string): Promise<string | null> {
         let errorMessage: string | null = null;
-        if (!this.hasPermission(Roles.EMPLOYEE)) {
-            return errors.PERMISSION_DENIED;
-        }
 
         if (employeeId) {
             await updateDoc(doc(this.#db, `employees`, employeeId), {
@@ -664,7 +664,6 @@ class APIManager extends Logger {
 
     /**
      * This method is used to change the password of the current user.
-     * @param oldPassword The old password.
      * @param newPassword The new password.
      * @returns {Promise<string | null>} Null if the password was changed successfully, and the error message if it was not.
      * @memberof APIManager
@@ -673,7 +672,6 @@ class APIManager extends Logger {
      * @public
      */
     public async changePassword(
-        oldPassword: string,
         newPassword: string
     ): Promise<string | null> {
         let errorMessage: string | null = null;
@@ -682,10 +680,17 @@ class APIManager extends Logger {
             if (this.elementExist(user.email)) {
                 let email = user.email || "";
 
-                const credential = FirebaseAuth.EmailAuthProvider.credential(
-                    email,
-                    oldPassword
-                );
+                if(!this.hasChangedDefaultPassword) {
+                    let employeeId = this.#user?.uid;
+
+                    if(employeeId && this.#employeeInfos.department) {
+                        errorMessage = await this.changeEmployeeResetToggle(employeeId);
+
+                        if(errorMessage) {
+                            return errorMessage;
+                        }
+                    }
+                }
 
                 await FirebaseAuth.updatePassword(
                     user,
@@ -694,19 +699,12 @@ class APIManager extends Logger {
                     errorMessage = APIUtils.getErrorMessageFromCode(error);
                 });
 
+                const credential = FirebaseAuth.EmailAuthProvider.credential(
+                    email,
+                    newPassword
+                );
+
                 if (!errorMessage) {
-                    if(this.hasChangedDefaultPassword) {
-                        let employeeId = this.#user?.uid;
-
-                        if(employeeId && this.#employeeInfos.department) {
-                            errorMessage = await this.changeEmployeeResetToggle(employeeId);
-
-                            if(errorMessage) {
-                                return errorMessage;
-                            }
-                        }
-                    }
-
                     // Prompt the user to re-provide their sign-in credentials
                     let reAuth = await FirebaseAuth.reauthenticateWithCredential(
                         user,
@@ -715,7 +713,10 @@ class APIManager extends Logger {
                         errorMessage = APIUtils.getErrorMessageFromCode(error);
                     });
 
-                    this.#user = reAuth?.user || null;
+                    if(reAuth?.user) {
+                        this.#user = reAuth?.user || null;
+                        this.isAuthenticated = false;
+                    }
                 }
             }
         }

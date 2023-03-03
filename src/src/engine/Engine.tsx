@@ -68,6 +68,10 @@ export class Engine extends React.Component<unknown, EngineState> {
         });
     }
 
+    readonly #onChangePasswordCallbackParent = () => {
+        window.location.reload();
+    }
+
     public render(): JSX.Element {
         if (this.state.showSpinner) {
             return (
@@ -80,7 +84,7 @@ export class Engine extends React.Component<unknown, EngineState> {
                 <Router>
                     <ReactNotifications />
                     <Routes>
-                        <Route path='*' element={<FirstResetPassword/>}/>
+                        <Route path='*' element={<FirstResetPassword onChangePasswordCallbackParent={this.#onChangePasswordCallbackParent}/>}/>
                     </Routes>
                 </Router>
             );
