@@ -6,6 +6,9 @@ import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ChangePassword} from "../src/engine/pages/ChangePassword.tsx";
+import {act} from "react-dom/test-utils";
+
+jest.mock("../src/engine/api/APIManager");
 
 let user;
 beforeEach(async () => {
@@ -57,7 +60,9 @@ test("Valid old and new password should submit form", async () => {
     await user.type(inputOldPassword, testConstants.validPassword);
     await user.type(inputNewPassword, testConstants.validNewPassword);
 
-    fireEvent.submit(form);
+    await act(async () => {
+        fireEvent.submit(form);
+    });
 
     expect(inputOldPassword.value).toBe(testConstants.validPassword);
     expect(inputNewPassword.value).toBe(testConstants.validNewPassword);

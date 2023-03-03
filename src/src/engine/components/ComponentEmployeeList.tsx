@@ -174,7 +174,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         let list: Employee[] | null = this.state.filteredList !== null ? this.state.filteredList : this.props.employees;
 
         return (
-            <Table responsive bordered hover className="text-center">
+            <Table responsive bordered className="text-center">
                 <thead>
                 {this.renderTableHeads()}
                 </thead>

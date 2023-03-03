@@ -45,8 +45,8 @@ service cloud.firestore {
                     ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive']);
                 let validEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
 
-                return validEmployee /*&& (hasEmployeeFields && employeeFieldTypes()) ||
-                       (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType())*/ && getCurrentEmployeeRole(request.auth.uid) >= 3;
+                return validEmployee && (hasEmployeeFields && employeeFieldTypes()) ||
+                       (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType()) && getCurrentEmployeeRole(request.auth.uid) >= 3;
             }
 
             function departmentFieldTypes() {
