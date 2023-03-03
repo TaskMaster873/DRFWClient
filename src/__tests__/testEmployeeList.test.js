@@ -153,9 +153,16 @@ function checkFieldValues(ths, trs, tds, list) {
         expect(tds[i * ths.length + 4].innerHTML).toBe(list[i].phoneNumber);
         expect(tds[i * ths.length + 5].innerHTML).toBe(list[i].department);
         expect(tds[i * ths.length + 6].innerHTML).toBe("Oui");
-        expect(tds[i * ths.length + 7].innerHTML).toBe("");
-        expect(tds[i * ths.length + 8].innerHTML).toBe("");
+        expect(tds[i * ths.length + 7].innerHTML).toBe(`<div class="list-group list-group-flush">${displayListItem(list[i].jobTitles)}</div>`);
+        expect(tds[i * ths.length + 8].innerHTML).toBe(`<div class="list-group list-group-flush">${displayListItem(list[i].skills)}</div>`);
     }
+}
+
+function displayListItem(array) {
+    if(array[0]) {
+        return `<div class="list-group-item">${array[0]}</div>`
+    }
+    return ``
 }
 
 
