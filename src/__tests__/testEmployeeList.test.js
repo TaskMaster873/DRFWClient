@@ -173,7 +173,7 @@ function checkFieldValues(ths, trs, tds, list) {
         expect(tds[i * ths.length + 3].innerHTML).toBe(list[i].email);
         expect(tds[i * ths.length + 4].innerHTML).toBe(list[i].phoneNumber);
         expect(tds[i * ths.length + 5].innerHTML).toBe(list[i].department);
-        expect(tds[i * ths.length + 6].innerHTML).toBe(list[i].isActive);
+        expect(tds[i * ths.length + 6].innerHTML).toBe(list[i].isActive ? "Oui" : "Non");
         expect(tds[i * ths.length + 7].innerHTML).toBe(`<div class="list-group list-group-flush">${expectedListItems(list[i].jobTitles)}</div>`);
         expect(tds[i * ths.length + 8].innerHTML).toBe(`<div class="list-group list-group-flush">${expectedListItems(list[i].skills)}</div>`);
     }
