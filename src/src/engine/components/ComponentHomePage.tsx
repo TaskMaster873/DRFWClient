@@ -37,7 +37,7 @@ export class ComponentHomePage extends React.Component<unknown, unknown> {
     }
 
     public render(): JSX.Element {
-        if(API.isAuth()) {
+        if(API.isAuth() && !API.hasChangedDefaultPassword) {
             return (
                 <Navigate to={RoutesPath.SCHEDULE}></Navigate>
             );
