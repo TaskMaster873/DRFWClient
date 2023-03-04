@@ -92,7 +92,6 @@ const SECONDS_IN_DAY: number = 86400;
  * @property {Map<string, Task>} tasks - A map of tasks that are currently being executed.
  */
 class APIManager extends Logger {
-
     //region Attributes
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
@@ -165,17 +164,6 @@ class APIManager extends Logger {
      */
     public get userRole(): number {
         return this.#employeeInfos.role;
-    }
-
-    /**
-     * This method returns the current employee name.
-     * @readonly
-     * @type {string}
-     * @memberof APIManager
-     * @returns {string} The current employee name.
-     */
-    public getEmployeeName(): string {
-        return this.#user?.displayName || this.#user?.email || "Anonyme";
     }
 
     public getCurrentEmployeeInfos(): EmployeeInfos {
@@ -266,6 +254,8 @@ class APIManager extends Logger {
     /**
      * Used to generate unique task IDs for the web worker.
      * @private
+     * @method generateTaskId
+     * @returns {string}
      */
     private generateTaskId(): string {
         return Math.random().toString(36).substring(2);
@@ -333,6 +323,8 @@ class APIManager extends Logger {
     /**
      * Listen for messages from the web worker.
      * @private
+     * @method listenWorkerEvents
+     * @memberof APIManager
      */
     private listenWorkerEvents(): void {
         if (this.#worker !== null && this.#worker) {
@@ -343,6 +335,8 @@ class APIManager extends Logger {
     /**
      * This method call all the subscribers to the login/logout event.
      * @private
+     * @async
+     * @method onEvent
      */
     private async onEvent(): Promise<void> {
         for (let subscriber of this.subscribers) {
@@ -353,6 +347,9 @@ class APIManager extends Logger {
     /**
      * This method is used to subscribe to the login/logout event.
      * @param subscriber
+     * @memberof APIManager
+     * @method subscribeToEvent
+     * @public
      */
     public subscribeToEvent(subscriber: SubscriberCallback): void {
         this.subscribers.push(subscriber);
@@ -419,6 +416,8 @@ class APIManager extends Logger {
      * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
      * @memberof APIManager
      * @method logout
+     * @async
+     * @public
      */
     public async logout(): Promise<string | null> {
         this.log("Logging out user...");
@@ -442,13 +441,13 @@ class APIManager extends Logger {
      * @method verifyEmailAddress
      * @async
      */
-    private async verifyEmailAddress(
-        user: FirebaseAuth.User
-    ): Promise<string | null> {
+    private async verifyEmailAddress(): Promise<string | null> {
         let errorMessage: string | null = null;
-        await FirebaseAuth.sendEmailVerification(user).catch((error) => {
-            errorMessage = APIUtils.getErrorMessageFromCode(error);
-        });
+        if(this.#user) {
+            await FirebaseAuth.sendEmailVerification(this.#user).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        }
         return errorMessage;
     }
 
@@ -689,6 +688,8 @@ class APIManager extends Logger {
                             return errorMessage;
                         }
                     }
+
+                    errorMessage = await this.verifyEmailAddress();
                 }
 
                 await FirebaseAuth.updatePassword(
@@ -901,6 +902,11 @@ class APIManager extends Logger {
     /**
      * This method is used to delete a jobTitle from the database
      * @param department the department
+     * @method deleteDepartment
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the department was deleted successfully, and the error message if it was not.
      */
     public async deleteDepartment(department: Department): Promise<string | null> {
         let errorMessage: string | null = null;
@@ -930,6 +936,12 @@ class APIManager extends Logger {
     /**
      * This method is used to add a jobTitle to the database
      * @param titleName the new jobTitle name
+     * @returns {Promise<string | null>} Null if the jobTitle was added successfully, and the error message if it was not.
+     * @method createJobTitle
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the jobTitle was added successfully, and the error message if it was not.
      */
     public async createJobTitle(
         titleName: string
@@ -958,6 +970,12 @@ class APIManager extends Logger {
     /**
      * This method is used to edit a jobTitle from the database
      * @param jobTitle the jobTitle
+     * @returns {Promise<string | null>} Null if the jobTitle was edited successfully, and the error message if it was not.
+     * @method editJobTitle
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | null>} Null if the jobTitle was edited successfully, and the error message if it was not.
      */
     public async editJobTitle(jobTitle: JobTitle): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
@@ -985,6 +1003,8 @@ class APIManager extends Logger {
     /**
      * This method is used to delete a jobTitle from the database
      * @param titleId the jobTitle identifier generated by the Firestore API
+     * @returns {Promise<string | null>} the error message if an error occurred, null otherwise
+     * @private
      */
     public async deleteJobTitle(titleId: string): Promise<string | null> {
         let errorMessage: string | null = null;
@@ -1001,6 +1021,8 @@ class APIManager extends Logger {
     /**
      * This method is used to add a skill to the database
      * @param skill the skill
+     * @returns {Promise<string | null>} the error message if an error occurred, null otherwise
+     * @private
      */
     public async createSkill(skill: string): Promise<string | null> {
         if (!this.hasPermission) {
@@ -1024,6 +1046,8 @@ class APIManager extends Logger {
     /**
      * This method is used to edit a skill from the database
      * @param skill the skill
+     * @returns {Promise<string | null>} the error message if an error occurred, null otherwise
+     * @private
      */
     public async editSkill(skill: Skill): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
@@ -1050,6 +1074,8 @@ class APIManager extends Logger {
     /**
      * This method is used to delete a skill from the database
      * @param skillId the skill identifier generated by Firestore API
+     * @returns {Promise<string | null>} the error message if an error occurred, null otherwise
+     * @private
      */
     public async deleteSkill(skillId: string): Promise<string | null> {
         let errorMessage: string | null = null;
@@ -1289,6 +1315,14 @@ class APIManager extends Logger {
         return errorMessage ?? jobTitles;
     }
 
+    /**
+     * This method is used to get the skills list. If the request was not successful, it will return an error message.
+     * @method getSkills
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<EmployeeSkillList | string>} The skills if the request was successful, and the error message if it was not.
+     */
     public async getSkills(): Promise<EmployeeSkillList | string> {
         let errorMessage: string | null = null;
         let skills: Skill[] = [];
@@ -1421,7 +1455,7 @@ class APIManager extends Logger {
             where("start", ">=", convertedStartDay),
             where("start", "<", convertedEndDay)
         );
-        
+
         let snaps = await getDocs(queryShifts).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
@@ -1624,7 +1658,7 @@ class APIManager extends Logger {
     }
 
     /**
-     * get the current employee unavailabilities
+     * Get the current employee unavailabilities
      * @method getCurrentEmployeeunavailabilities
      * @async
      * @public
@@ -1644,7 +1678,7 @@ class APIManager extends Logger {
     }
 
     /**
-     *
+     * Get the unavailabilities of an employee
      * @param idEmployee to get the unavailabilities
      * @returns the list of unavailabilities
      */
@@ -1733,6 +1767,12 @@ class APIManager extends Logger {
         return errorMessage ?? unavailabilities;
     }
 
+    /**
+     * This function fetches all pending unavailabilities for one department
+     * @param departmentName the name of the department to fetch
+     * @returns a string if its an error, a list of Unavailabilities if its not
+     * @todo implement this function
+     */
     public async getAllPendingUnavailabilities(): Promise<string | any[]> {
         let errorMessage: string | null = null;
         let unavailabilities: any[] = [];

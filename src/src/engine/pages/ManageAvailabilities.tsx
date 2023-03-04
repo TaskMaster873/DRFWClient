@@ -24,6 +24,7 @@ type State = {
     redirectTo: string | null;
 };
 
+// This page is not done.
 export class ManageAvailabilities extends React.Component<unknown, State> {
     public state: State = {
         employees: [],
@@ -34,7 +35,7 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
 
     /**
      * Called when the page is loaded
-     * @description This function is called when the page is loaded. It will set the title of the 
+     * @description This function is called when the page is loaded. It will set the title of the
      * page and call the API to get the list of availabilities and employees.
      * @returns {Promise<void>}
      * @memberof ManageAvailabilities
