@@ -32,7 +32,7 @@ import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {
     Employee, EmployeeCreateDTO,
-    EmployeeEditDTO,
+    EmployeeEditDTO, EmployeeInfos,
     EmployeeJobTitleList,
     EmployeeRoleList,
     EmployeeSkillList
@@ -59,7 +59,6 @@ import {
 import {JobTitle} from "../types/JobTitle";
 import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
-import {EmployeeInfos} from "./types/APITypes";
 import {NotificationManager} from "./NotificationManager";
 
 type SubscriberCallback =

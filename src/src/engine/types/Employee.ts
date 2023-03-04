@@ -134,3 +134,9 @@ export interface AddEmployeeState {
     editedEmployee?: EmployeeEditDTO;
     redirectTo: string | null;
 }
+
+export interface EmployeeInfos {
+    role: number;
+    department: string;
+    hasChangedDefaultPassword: boolean;
+}
