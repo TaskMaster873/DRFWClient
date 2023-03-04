@@ -2,100 +2,64 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import { LinkContainer } from "react-router-bootstrap";
-import { NotificationManager } from 'react-notifications';
-
-/* === Images === */
-// @ts-ignore
+import {LinkContainer} from "react-router-bootstrap";
+import {API} from "../api/APIManager";
 import Logo from "../../deps/images/logo.png";
-import { API } from "../api/APIManager";
-import { errors, successes } from "../messages/FormMessages";
+import {ComponentUserActionDropdown} from "./ComponentUserActionDropdown";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faCalendar, faClock, faClipboard, faBuilding, faAddressBook, faCalendarDays} from '@fortawesome/free-solid-svg-icons';
+import {RoutesPath} from "../RoutesPath";
+import {ComponentNavItem as NavItem} from "./ComponentNavItem";
+import {Roles} from "../types/Roles";
+
+interface State {
+    toggle: boolean;
+};
 
 /**
- * Ceci est le composant de la barre de navigation qu'on retrouve presque partout dans le site
+ * This is the navigation bar component, it is displayed on every page. It shows the links to the different pages and the login button.
+ * @returns {JSX.Element}
+ * @constructor
+ * @category Components
+ * @subcategory Navigation
+ * @hideconstructor
+ * @see NavigationBarState
  */
-
-interface NavigationBarType {
-    showCreateSchedule: boolean;
-}
-
-export class NavigationBar extends React.Component<any, NavigationBarType> {
-    private _isMountedAPI: boolean = false;
-
-    public state: NavigationBarType = {
-        showCreateSchedule: false,
+export class NavigationBar extends React.Component<unknown, State> {
+    public state: State = {
+        toggle: false
     };
+
     constructor(props) {
         super(props);
-
-        API.subscribeToEvent(this.onEvent.bind(this));
+        API.subscribeToEvent(this.toggle.bind(this));
     }
 
-    public componentDidMount() {
-        this._isMountedAPI = true;
+    private async toggle(): Promise<void> {
+        this.setState({toggle: !this.state.toggle});
     }
-
-    public componentWillUnmount() {
-        this._isMountedAPI = false;
-    }
-
-    private async onEvent(): Promise<void> {
-        return new Promise((resolve) => {
-            if (this._isMountedAPI) {
-                this.setState({
-                    showCreateSchedule: true
-                }, () => {
-                    resolve();
-                });
-            } else {
-                resolve();
-            }
-        });
-    }
-
 
     public render(): JSX.Element {
         return (
-            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{ fontSize: 15 }}>
-                <Container>
+            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{fontSize: 15}}>
+                <Container fluid={true}>
                     <LinkContainer to="/">
                         <Navbar.Brand>
                             <img
                                 className="me-3"
-                                src={Logo}
+                                src={Logo as any}
                                 alt="Logo TaskMaster"
                                 width={50}
                                 height={60}
                             />
-                            Task Master</Navbar.Brand>
+                            TaskMaster
+                        </Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
-                        {/* eslint-disable-next-line no-restricted-globals */}
-                        <Nav activeKey={location.pathname}>
-                            {this.showWhenAdmin()}
-                            <LinkContainer to="/schedule">
-                                <Nav.Link>Mon horaire</Nav.Link>
-                            </LinkContainer>
-
-                            <LinkContainer to="/availabilities">
-                                <Nav.Link>Mes disponibilités</Nav.Link>
-                            </LinkContainer>
-
-                            <LinkContainer to="/departments">
-                                <Nav.Link>Départements</Nav.Link>
-                            </LinkContainer>
-
-                            <LinkContainer to="/about">
-                                <Nav.Link>À propos</Nav.Link>
-                            </LinkContainer>
-                        </Nav>
-                        {/* eslint-disable-next-line no-restricted-globals */}
-                        <Nav activeKey={location.pathname} className="ms-auto">
+                        {this.generalLinks()}
+                        <Nav className="ms-auto">
                             {this.loginButton()}
-                            <LinkContainer to="/memes">
-                                <Nav.Link>Dank memes</Nav.Link>
-                            </LinkContainer>
                         </Nav>
                     </Navbar.Collapse>
                 </Container>
@@ -104,47 +68,64 @@ export class NavigationBar extends React.Component<any, NavigationBarType> {
     }
 
     /**
-     *
-     * @returns se déconnecter si la personne est connectée
+     * If the user is logged in, it returns the logout button, otherwise it returns the login button
+     * @returns {JSX.Element} The login or logout button
+     * @private
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     * @see loginButton
      */
     private loginButton(): JSX.Element {
         if (API.isAuth()) {
             return (
-                <LinkContainer to="/login">
-                    <Nav.Link id="logoutLink" onClick={this.logOut}>Se déconnecter</Nav.Link>
-                </LinkContainer>
+                <ComponentUserActionDropdown />
             );
         } else {
             return (
-                <LinkContainer to="/login">
+                <LinkContainer to={RoutesPath.LOGIN}>
                     <Nav.Link id="loginLink">Connexion</Nav.Link>
                 </LinkContainer>
             );
         }
     }
-    /**
-     * 
-     * @returns les pages que seulement l'admin peut voir dans le navbar
-     */
-    private showWhenAdmin(): JSX.Element {
-        if (this.state.showCreateSchedule) {
-            return (<LinkContainer to="/create-schedule">
-                <Nav.Link id="create-schedule">Création d'employés</Nav.Link>
-                </LinkContainer>)
-        } else {
-            return (<></>);
-        }
-    }
 
     /**
-     * Je ne sais pas si il faudrait le garder
+     * This function returns the links used to navigate the website
+     * @returns {JSX.Element} The navigation links
+     * @category Components
+     * @subcategory Navigation
+     * @hideconstructor
+     * @see generalLinks
+     * @private
      */
-    private async logOut(): Promise<void> {
-        let error = await API.logout();
-        if (!error) {
-            NotificationManager.success(successes.successGenericMessage, successes.logout);
+    private generalLinks(): JSX.Element {
+        if (API.hasPermission(Roles.MANAGER)) {
+            return (
+                <Nav activeKey="">
+                    <NavItem icon={<FontAwesomeIcon icon={faCalendarDays} />} link={RoutesPath.CREATE_SCHEDULE} label="Création d'horaire" description="Gérez les quarts de travail" />
+                    <NavItem icon={<FontAwesomeIcon icon={faClipboard} />} link={RoutesPath.MANAGE_AVAILABILITIES} label="Gestion des disponibilités" description="Gérez les demandes de disponibilités" />
+                    <NavItem icon={<FontAwesomeIcon icon={faCalendar} />} link={RoutesPath.SCHEDULE} label="Mon horaire" description="Consultez vos quarts de travail" />
+                    <NavItem icon={<FontAwesomeIcon icon={faClock} />} link={RoutesPath.AVAILABILITIES} label="Mes disponibilités" description="Modifier vos disponibilités" />
+                    <NavItem icon={<FontAwesomeIcon icon={faAddressBook} />} link={RoutesPath.DEPARTMENTS} label="Départements" description="Voir tous les départements" />
+                    <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
+                </Nav>
+            );
+        } else if (API.hasPermission(Roles.EMPLOYEE)) {
+            return (
+                <Nav activeKey="">
+                    <NavItem icon={<FontAwesomeIcon icon={faCalendar} />} link={RoutesPath.SCHEDULE} label="Mon horaire" description="Consultez vos quarts de travail" />
+                    <NavItem icon={<FontAwesomeIcon icon={faClock} />} link={RoutesPath.AVAILABILITIES} label="Mes disponibilités" description="Modifier vos disponibilités" />
+                    <NavItem icon={<FontAwesomeIcon icon={faAddressBook} />} link={RoutesPath.DEPARTMENTS} label="Départements" description="Voir tous les départements" />
+                    <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
+                </Nav>
+            );
         } else {
-            NotificationManager.error(error, errors.errorLogout);
+            return (
+                <Nav activeKey="">
+                    <NavItem icon={<FontAwesomeIcon icon={faBuilding} />} link={RoutesPath.ABOUT} label="À propos" description="À propos de TaskMaster" />
+                </Nav>
+            );
         }
     }
 }

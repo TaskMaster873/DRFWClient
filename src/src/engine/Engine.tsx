@@ -1,84 +1,118 @@
 import React from "react";
-import {BrowserRouter as Router, Route, Routes, useParams, Params} from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
-import "../deps/css/Engine.css";
+//#region CSS
 import "../deps/css/index.css";
+import 'react-notifications-component/dist/theme.css';
+import 'animate.css/animate.compat.css'
+//#endregion
 
 import {Index} from "./pages";
-import {Schedule} from "./pages/scheduleEmployee";
-import {Employees} from "./pages/employees";
-import {About} from "./pages/about";
-import {Login} from "./pages/login";
-import {Memes} from "./pages/memes";
-import {AddEmployee} from "./pages/addEmployee";
+import {ScheduleEmployee} from "./pages/ScheduleEmployee";
+import {EmployeeWrapper} from "./pages/Employees";
+import {About} from "./pages/About";
+import {Login} from "./pages/Login";
+import {AddEmployee} from "./pages/AddEmployee";
+import {EditEmployeeWrapper} from "./pages/EditEmployee";
 import {NavigationBar} from "./components/NavigationBar";
-import {ChangePassword} from "./pages/changePassword";
-import {Departments} from "./pages/departments";
-import {Availabilities} from "./pages/availabilities";
+import {ChangePassword} from "./pages/ChangePassword";
+import {Departments} from "./pages/Departments";
+import {Availabilities} from "./pages/Availabilities";
 import {API} from "./api/APIManager";
-import {ResetPassword} from "./pages/resetPassword";
-import {NotificationContainer} from 'react-notifications';
-import { ComponentLoading } from "./components/ComponentLoading";
-import { ForgotPassword } from "./pages/forgotPassword";
-import 'react-notifications/lib/notifications.css';
-import { CreateSchedule } from "./pages/createSchedule";
+import {ResetPassword} from "./pages/ResetPassword";
+import {ComponentLoading} from "./components/ComponentLoading";
+import {ForgotPassword} from "./pages/ForgotPassword";
 
-function EmployeeWrapper(): any {
-    let parameters: Readonly<Params<string>> = useParams();
-    return (
-        <Employees  {...{params: parameters}}/>
-    );
+import {CreateSchedule} from "./pages/CreateSchedule";
+import {RoutesPath} from "./RoutesPath";
+
+import { ReactNotifications } from 'react-notifications-component';
+import {RouteNotFound} from "./pages/RouteNotFound";
+
+import {FirstResetPassword} from "./pages/FirstResetPassword";
+import {ManageAvailabilities} from "./pages/ManageAvailabilities";
+
+interface EngineState {
+    showSpinner: boolean;
+    forceResetPassword: boolean;
 }
 
-export class Engine extends React.Component {
-    private showSpinner: boolean = true;
+export class Engine extends React.Component<unknown, EngineState> {
+    public state: EngineState = {
+        showSpinner: true,
+        forceResetPassword: false
+    };
 
-    constructor(props) {
+    constructor(props: unknown) {
         super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private onEvent() : void {
+        this.setState({
+            forceResetPassword: !(API.hasChangedDefaultPassword || !API.isAuth())
+        });
     }
 
     public componentDidMount(): void {
         this.verifyLogin();
     }
 
-    public verifyLogin(): void {
-        if (API.awaitLogin) {
-            API.awaitLogin.then(() => {
-                this.showSpinner = false;
+    public async verifyLogin(): Promise<void> {
+        await API.awaitLogin;
 
-                this.forceUpdate();
-            });
-        }
+        this.setState({
+            showSpinner: false,
+
+            // We show the reset password prompt if the user is logged in and has not reset their password
+            forceResetPassword: !(API.hasChangedDefaultPassword || !API.isAuth())
+        });
+    }
+
+    readonly #onChangePasswordCallbackParent = () => {
+        window.location.reload();
     }
 
     public render(): JSX.Element {
-        if (this.showSpinner) {
-            return (<React.StrictMode>
-                <ComponentLoading/>
-            </React.StrictMode>);
-        } else {
+        if (this.state.showSpinner) {
             return (
                 <React.StrictMode>
-                    <Router>
-                        <NavigationBar/>
-                        <NotificationContainer/>
-                        <Routes>
-                            <Route path="/" element={<Index/>}/>
-                            <Route path="/schedule" element={<Schedule/>}/>
-                            <Route path="/create-schedule" element={<CreateSchedule/>}/>
-                            <Route path="/departments" element={<Departments/>}/>
-                            <Route path="/employees/:id" element={<EmployeeWrapper/>}/>
-                            <Route path="/about" element={<About/>}/>
-                            <Route path="/login" element={<Login/>}/>
-                            <Route path="/memes" element={<Memes/>}/>
-                            <Route path="/add-employee" element={<AddEmployee/>}/>
-                            <Route path="/availabilities" element={<Availabilities/>}/>
-                            <Route path="/forgot-password" element={<ForgotPassword/>}/>
-                            <Route path="/reset-password" element={<ResetPassword/>}/>
-                            <Route path="/change-password" element={<ChangePassword/>}/>
-                        </Routes>
-                    </Router>
+                    <ComponentLoading/>
                 </React.StrictMode>
+            );
+        } else if(this.state.forceResetPassword) {
+            return (
+                <Router>
+                    <ReactNotifications />
+                    <Routes>
+                        <Route path='*' element={<FirstResetPassword onChangePasswordCallbackParent={this.#onChangePasswordCallbackParent}/>}/>
+                    </Routes>
+                </Router>
+            );
+        } else {
+            return (
+                <Router>
+                    <NavigationBar/>
+                    <ReactNotifications />
+                    <Routes>
+                        <Route path={RoutesPath.INDEX} element={<Index/>}/>
+                        <Route path={RoutesPath.SCHEDULE} element={<ScheduleEmployee/>}/>
+                        <Route path={RoutesPath.CREATE_SCHEDULE} element={<CreateSchedule/>}/>
+                        <Route path={RoutesPath.DEPARTMENTS} element={<Departments/>}/>
+                        <Route path={`${RoutesPath.DEPARTMENTS}${RoutesPath.EMPLOYEE_WITH_PARAM}`} element={<EmployeeWrapper/>}/>
+                        <Route path={RoutesPath.ABOUT} element={<About/>}/>
+                        <Route path={RoutesPath.LOGIN} element={<Login/>}/>
+                        <Route path={RoutesPath.ADD_EMPLOYEE} element={<AddEmployee/>}/>
+                        <Route path={RoutesPath.EDIT_EMPLOYEE_WITH_PARAM} element={<EditEmployeeWrapper/>}/>
+                        <Route path={RoutesPath.AVAILABILITIES} element={<Availabilities/>}/>
+                        <Route path={RoutesPath.FORGOT_PASSWORD} element={<ForgotPassword/>}/>
+                        <Route path={RoutesPath.RESET_PASSWORD} element={<ResetPassword/>}/>
+                        <Route path={RoutesPath.CHANGE_PASSWORD} element={<ChangePassword/>}/>
+                        <Route path={RoutesPath.MANAGE_AVAILABILITIES} element={<ManageAvailabilities/>}/>
+                        <Route path='*' element={<RouteNotFound/>}/>
+                    </Routes>
+                </Router>
             );
         }
     }

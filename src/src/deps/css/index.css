@@ -1,23 +1,151 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-size: 100%;
+    background-position: top;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    font-size: 18px;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
 .auth-form {
-  width: 500px;
-  margin: 0 auto;
-  padding-left: 0;
+    width: 500px;
+    margin: 0 auto;
+    padding-left: 0;
 }
 
 .departmentName {
-  color: #0a58ca;
+    color: #0a58ca;
+}
+
+:root {
+    --side_bar_width: 300px;
+}
+
+.navbar-brand {
+    font-size: 25px;
+}
+
+.navbar {
+    background-color: #20232a;
+}
+
+.vh-90 {
+    height: 90vh;
+}
+
+.mb-05 {
+    margin-bottom: 0.15em;
+}
+
+#root {
+    overflow-x: hidden;
+}
+
+.loadingBar {
+    height: 40vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bigLoading {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.adminActions {
+    text-decoration: none;
+    cursor: pointer;
+    color: black;
+    padding: 0 !important;
+}
+
+.transparentButton {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.navbar-dark.bg-dark {
+    background-color:#141414 !important;
+}
+
+.navbar-nav {
+    display:flex;
+    gap:10px;
+    align-items: center;
+}
+
+.nav-link {
+    display:flex;
+    align-items: center;
+    gap:15px;
+    border:1px solid rgba(255,255,255,0);
+    border-radius:15px;
+    padding:5px 15px !important;
+    padding-right: 25px !important;
+}
+
+.nav-link.active {
+    border:1px solid rgba(255,255,255,0.1);
+}
+
+.nav-link > .navIcon {
+    font-size:20px;
+}
+
+.nav-link > .navItem > .navLabel {
+    font-size:14px;
+    color:rgba(255,255,255,0.7);
+}
+
+.nav-link > .navItem > .navDescription {
+    font-size:11px;
+    color:rgba(255,255,255,0.5);
+}
+
+.nav-link.active > .navItem > .navLabel {
+    color:rgba(255,255,255,1);
+}
+
+.nav-link.active > .navItem > .navDescription {
+    font-size:11px;
+    color:rgba(255,255,255,0.5);
+}
+
+.dropdown-menu {
+    right: 0; left: auto!important;
+}
+.dropDownMenuText {
+    color: black!important;
+}
+
+.dropdown-item:active {
+    color: white!important;
+    background-color: white!important;
+}
+.dropdown-variants-primary {
+    color: white!important;
+    background-color: white!important;
+}
+
+
+@media only screen and (max-width: 990px) {
+    .navbar-nav .nav-link {
+        width: 100%;
+    }
 }

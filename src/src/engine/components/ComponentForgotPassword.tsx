@@ -1,14 +1,11 @@
-import React, {useState} from "react";
+import React, {ChangeEventHandler, useState} from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {errors, FormErrorType, info} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
-import {NotificationManager} from "react-notifications";
-
-/* === Images === */
-// @ts-ignore
 import Logo from "../../deps/images/logo.png";
-
+import {NotificationManager} from "../api/NotificationManager";
+import FormUtils from "../utils/FormUtils";
 /***
  * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un courriel
  */
@@ -18,16 +15,7 @@ export function ComponentForgotPassword() {
     const [error, setError] = useState(FormErrorType.NO_ERROR);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-        let errorType = FormErrorType.NO_ERROR;
-
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
+        let errorType = FormUtils.validateForm(event);
 
         setValidated(true);
         setError(errorType);
@@ -36,9 +24,9 @@ export function ComponentForgotPassword() {
             let errorMessage = await API.sendResetPassword(email);
             //Regarde si l'erreur est null
             if (!errorMessage) {
-                NotificationManager.info(info.emailSent, info.passwordReset);
+                NotificationManager.info(info.EMAIL_SENT, info.PASSWORD_RESET);
             } else {
-                NotificationManager.error(errorMessage, errors.errorGenericMessage);
+                NotificationManager.error(errorMessage, errors.ERROR_GENERIC_MESSAGE);
             }
         }
     };
@@ -48,7 +36,7 @@ export function ComponentForgotPassword() {
             <div className="me-4">
                 <img
                     className="mx-auto d-block mt-5"
-                    src={Logo}
+                    src={Logo as any}
                     alt="Logo TaskMaster"
                     width={50}
                     height={60}
@@ -67,7 +55,6 @@ export function ComponentForgotPassword() {
                     </Form.Label>
                     <Form.Control
                         required
-                        id="email"
                         name="email"
                         className="row mt-1"
                         type="email"
@@ -78,7 +65,7 @@ export function ComponentForgotPassword() {
                         }}
                     />
                     <Form.Control.Feedback type="invalid" id="invalidEmail">
-                        {errors.invalidEmail}
+                        {errors.INVALID_EMAIL}
                     </Form.Control.Feedback>
                 </Form.Group>
                 <div className="mt-4 me-4 d-block text-center mx-auto">

@@ -1,10 +1,12 @@
 import {Department} from "./Department";
 import {Params} from "react-router-dom";
+import {Skill} from "./Skill";
+import {JobTitle} from "./JobTitle";
 
 /**
  * Liste d'employé
  */
-export interface EmployeeList {
+export interface StateEmployeeList {
     list : Employee[];
 }
 
@@ -12,28 +14,30 @@ export interface EmployeeList {
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
-    employeeId?: string;
-    lastName: string;
-    firstName: string;
-    email: string;
-    phoneNumber: string;
-    isActive: boolean = true;
-    department: string;
-    jobTitles: string[];
-    skills: string[];
-    role: number;
+    public id?: string;
+    public lastName: string;
+    public firstName: string;
+    public email: string;
+    public phoneNumber: string;
+    public isActive: boolean;
+    public department: string;
+    public jobTitles: string[];
+    public skills: string[];
+    public role: number;
+    public hasChangedDefaultPassword: boolean;
 
     constructor(employee: EmployeeDTO) {
-        this.employeeId = employee.employeeId;
-		this.firstName = employee.firstName;
+        this.id = employee.id;
+        this.firstName = employee.firstName;
         this.lastName = employee.lastName;
         this.email = employee.email;
         this.isActive = employee.isActive;
-		this.phoneNumber = employee.phoneNumber;
+        this.phoneNumber = employee.phoneNumber;
         this.department = employee.department;
         this.jobTitles = employee.jobTitles;
         this.skills = employee.skills;
         this.role = employee.role;
+        this.hasChangedDefaultPassword = employee.hasChangedDefaultPassword;
 	}
 }
 
@@ -45,14 +49,16 @@ export interface EmployeeCreateDTO {
     readonly lastName: string;
     readonly email: string;
 	readonly phoneNumber: string;
+    readonly isActive: boolean;
 	readonly department: string;
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
+    readonly hasChangedDefaultPassword: boolean;
 }
 
 export interface EmployeeDTO {
-    readonly employeeId?: string;
+    readonly id?: string;
     readonly firstName: string;
     readonly lastName: string;
     readonly email: string;
@@ -62,26 +68,75 @@ export interface EmployeeDTO {
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
+    readonly hasChangedDefaultPassword: boolean;
 }
 
-export let employeeTableHeads : string[] =
+export interface EmployeeEditDTO {
+    readonly firstName: string;
+    readonly lastName: string;
+    readonly phoneNumber: string;
+    readonly department: string;
+    readonly jobTitles: string[];
+    readonly skills: string[];
+    readonly role: number;
+    readonly hasChangedDefaultPassword?: boolean;
+}
+
+export let employeeAdminTableHeads : string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
+
+export let employeeTableHeads : string[] =
+    ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
 
 export interface EmployeeProps {
     params: Readonly<Params>;
 }
 
-export interface EmployeeListProps {
-    employees: Employee[] | null;
-    filteredList: Employee[] | null;
-    department: string | null;
-    onEditEmployee: (employee) => PromiseLike<void> | Promise<void> | void;
-    onDeactivateEmployee: (employee) => PromiseLike<void> | Promise<void> | void;
-}
-
-export interface AddEmployeeProps {
+export interface AddEmployeeProps extends SkillActions, JobTitleActions {
     departments: Department[];
     roles: string[];
-    jobTitles: string[];
-    onDataChange: (password, employee) => PromiseLike<void> | Promise<void> | void;
+    jobTitles: JobTitle[];
+    skills: Skill[];
+    onAddEmployee: (password : string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
+}
+
+export interface SkillActions {
+    onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
+    onEditSkill: (skill: Skill) => PromiseLike<void> | Promise<void> | void;
+    onDeleteSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;
+}
+
+export interface JobTitleActions {
+    onAddJobTitle: (title: string) => PromiseLike<void> | Promise<void> | void;
+    onEditJobTitle: (title: JobTitle) => PromiseLike<void> | Promise<void> | void;
+    onDeleteJobTitle: (titleId: string) => PromiseLike<void> | Promise<void> | void;
+}
+
+export interface EditEmployeeProps extends JobTitleActions, SkillActions {
+    departments: Department[];
+    roles: string[];
+    jobTitles: JobTitle[];
+    skills: Skill[];
+    employeeId?: string | null;
+    editedEmployee: EmployeeEditDTO | undefined;
+    onEditEmployee: (employeeId: string, employee: EmployeeEditDTO) => PromiseLike<void> | Promise<void> | void;
+}
+
+export type EmployeeRoleList = string[];
+export type EmployeeJobTitleList = JobTitle[];
+export type EmployeeSkillList = Skill[];
+
+export interface AddEmployeeState {
+    departments: Department[];
+    roles: EmployeeRoleList;
+    titles: EmployeeJobTitleList;
+    skills: EmployeeSkillList;
+    editedEmployee?: EmployeeEditDTO;
+    redirectTo: string | null;
+}
+
+export interface EmployeeInfos {
+    role: number;
+    department: string;
+    hasChangedDefaultPassword: boolean;
 }

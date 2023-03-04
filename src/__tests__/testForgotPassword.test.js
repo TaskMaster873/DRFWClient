@@ -5,7 +5,7 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {ForgotPassword} from "../src/engine/pages/forgotPassword";
+import {ForgotPassword} from "../src/engine/pages/ForgotPassword";
 import {API} from "../src/engine/api/APIManager";
 
 let user;
@@ -62,6 +62,6 @@ test("Valid email should submit form", async () => {
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputEmail = document.getElementById("email");
+    const inputEmail = document.getElementsByName("email")[0];
     return {form, inputEmail};
 }

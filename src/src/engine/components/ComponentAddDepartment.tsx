@@ -3,38 +3,48 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {errors, FormErrorType, successes} from "../messages/FormMessages";
+import {errors, FormErrorType} from "../messages/FormMessages";
+import {DepartmentModifyDTO} from "../types/Department";
+import {Employee} from "../types/Employee";
+import FormUtils from "../utils/FormUtils";
 
-import {AddDepartmentProps, Department} from "../types/Department";
-import { Employee } from "../types/Employee";
+interface AddDepartmentState {
+    name: string;
+    director: string;
+    validated?: boolean;
+    error: FormErrorType;
+}
+
+interface AddDepartmentProps {
+    employees: Employee[];
+    onAddDepartment: (department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
+}
 
 /**
- *
- * Ceci est le composant pour ajouter les employés
+ * This is the form to add a department
+ * @param props The props of the component
+ * @constructor
+ * @category Components
+ * @subcategory Department
+ * @hideconstructor
  */
-export class ComponentAddDepartment extends React.Component<AddDepartmentProps> {
-    public state: {
-        name: string;
-        director: string;
-        validated?: boolean;
-        error: FormErrorType;
+export class ComponentAddDepartment extends React.Component<AddDepartmentProps, AddDepartmentState> {
+    public state: AddDepartmentState = {
+        name: "",
+        director: "",
+        validated: false,
+        error: FormErrorType.NO_ERROR
     };
+
+    public props: AddDepartmentProps;
 
     constructor(props: AddDepartmentProps) {
         super(props);
-        this.state = {
-            name: "",
-            director: "",
-            validated: false,
-            error: FormErrorType.NO_ERROR
-        };
 
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleSelect = this.handleSelect.bind(this);
+        this.props = props;
     }
 
-    public componentDidUpdate(prevProps: AddDepartmentProps) : void {
+    public componentDidUpdate(prevProps: AddDepartmentProps): void {
         if (prevProps.employees !== this.props.employees && this.props.employees.length > 0) {
             let firstEmployee: Employee = this.props.employees[0];
             this.setState({
@@ -48,8 +58,8 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
             <Form
                 noValidate
                 validated={this.state.validated}
-                onSubmit={this.handleSubmit}
-                onChange={this.handleChange}
+                onSubmit={this.#handleSubmit}
+                onChange={this.#handleChange}
                 data-error={this.state.error}
             >
                 <Row className="mb-3">
@@ -57,23 +67,24 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
                     <Form.Group as={Col} md="3">
                         <Form.Label className="mt-2">Nom</Form.Label>
                         <Form.Control
-                            id="name"
+                            name="name"
                             required
                             type="text"
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredDepartmentName}
+                            {errors.REQUIRED_DEPARTMENT_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="3">
                         <Form.Label className="mt-2">Directeur</Form.Label>
-                        <Form.Select required id="director" value={this.state.director} onChange={this.handleSelect}>
-                            {this.props.employees.map((employee, index) => (
-                                <option key={`${index}`} value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
+                        <Form.Select required name="director" value={this.state.director} onChange={this.#handleSelect}>
+                            {this.props.employees.map((employee: Employee, index: number) => (
+                                <option key={`${index}`}
+                                        value={`${employee.firstName} ${employee.lastName}`}>{`${employee.firstName} ${employee.lastName}`}</option>))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredDepartmentDirector}
+                            {errors.REQUIRED_DEPARTMENT_DIRECTOR}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
@@ -84,23 +95,13 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
         );
     }
 
-    private async onDataChange(department: Department) : Promise<void> {
-        if(this.props.onDataChange !== null && this.props.onDataChange) {
-            await this.props.onDataChange(department);
-        }
-    }
-
-    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        let errorType = FormErrorType.NO_ERROR;
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
+    /**
+     * Function that is called when the form is submitted.
+     * @param event The event that triggered the function
+     * @private
+     */
+    readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+        let errorType = FormUtils.validateForm(event);
 
         this.setState({
             validated: true,
@@ -108,28 +109,43 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps> 
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let department = new Department({name: this.state.name, director: this.state.director});
-            await this.onDataChange(department);
-
+            await this.props.onAddDepartment({name: this.state.name, director: this.state.director});
         }
     }
 
-    private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
+    /**
+     * Function that is called when the form is changed. This update the state of the component.
+     * @param event The event that triggered the function
+     * @private
+     */
+    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
         const value = target.type === "checkbox" ? target.checked : target.value;
-        const name = target.id;
+        const name = target.name;
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({
-            [name]: value,
+            ...this.state, ...{
+                [name]: value,
+            }
         });
     }
 
-    private handleSelect(event: ChangeEvent<HTMLSelectElement>) : void {
+    /**
+     * Function that is called when the select is changed. This update the state of the component.
+     * @param event The event that triggered the function
+     * @private
+     */
+    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
         const target = event.target;
-        this.setState({[target.id]: target.value});
+
+        this.setState({
+            ...this.state, ...{
+                [target.name]: target.value
+            }
+        });
     }
 }

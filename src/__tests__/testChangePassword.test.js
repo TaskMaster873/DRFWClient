@@ -5,7 +5,9 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {ChangePassword} from "../src/engine/pages/changePassword";
+import {ChangePassword} from "../src/engine/pages/ChangePassword.tsx";
+
+jest.mock("../src/engine/api/APIManager");
 
 let user;
 beforeEach(async () => {
@@ -14,37 +16,19 @@ beforeEach(async () => {
 });
 
 test("should render form inputs", async () => {
-    const {inputOldPassword, form, inputNewPassword} = getFields();
+    const {form, inputNewPassword} = getFields();
 
     expect(form).not.toBeNull();
-    expect(inputOldPassword).not.toBeNull();
     expect(inputNewPassword).not.toBeNull();
-    expect(inputOldPassword).toHaveAttribute("type", "password");
     expect(inputNewPassword).toHaveAttribute("type", "password");
 });
 
 describe("Empty Fields change password validation", () => {
-    test("Empty old password should show error", async () => {
-        const {inputOldPassword, form, inputNewPassword} = getFields();
-
-        await user.type(inputNewPassword, testConstants.validNewPassword);
-
-        fireEvent.submit(form);
-
-        expect(inputOldPassword.value).toBe("");
-        expect(inputNewPassword.value).toBe(testConstants.validNewPassword);
-        expect(form.classList.contains("was-validated")).toBeTruthy();
-        expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
-    });
-
     test("Empty new password should show error", async () => {
-        const {inputOldPassword, form, inputNewPassword} = getFields();
-
-        await user.type(inputOldPassword, testConstants.validPassword);
+        const {inputNewPassword, form} = getFields();
 
         fireEvent.submit(form);
 
-        expect(inputOldPassword.value).toBe(testConstants.validPassword);
         expect(inputNewPassword.value).toBe("");
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
@@ -54,12 +38,10 @@ describe("Empty Fields change password validation", () => {
 test("Valid old and new password should submit form", async () => {
     const {inputOldPassword, form, inputNewPassword} = getFields();
 
-    await user.type(inputOldPassword, testConstants.validPassword);
     await user.type(inputNewPassword, testConstants.validNewPassword);
 
     fireEvent.submit(form);
 
-    expect(inputOldPassword.value).toBe(testConstants.validPassword);
     expect(inputNewPassword.value).toBe(testConstants.validNewPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
@@ -67,7 +49,6 @@ test("Valid old and new password should submit form", async () => {
 
 function getFields() {
     const form = document.querySelector("form");
-    const inputOldPassword = document.getElementById("oldPassword");
-    const inputNewPassword = document.getElementById("newPassword");
-    return {inputNewPassword, form, inputOldPassword};
+    const inputNewPassword = document.getElementsByName("newPassword")[0];
+    return {inputNewPassword, form};
 }

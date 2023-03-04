@@ -6,11 +6,15 @@ import { Engine } from "./engine/Engine";
 export class Application {
     private rootElem: HTMLElement | null = null;
     private root: ReactDOM.Root | null = null;
-
-    constructor() {
-
-    }
     
+    public start() {
+        this.registerEvents();
+    }
+
+    private registerEvents() {
+        this.renderCore();
+    }
+
     private defineRoot(): void {
         if(this.rootElem === null || !this.rootElem) {
             this.rootElem = document.createElement("div");
@@ -21,9 +25,19 @@ export class Application {
             document.body.appendChild(this.rootElem);
         }
     }
+    
+    private renderCore(): void {
+        this.defineRoot();
+        
+        if (this.rootElem !== null && this.rootElem) {
+            this.root = ReactDOM.createRoot(this.rootElem);
 
-    private registerEvents() {
-        this.renderCore();
+            this.root.render(
+                <Engine />
+            );
+        } else {
+            console.error("Root element is null or undefined!");
+        }
     }
 
     private elementExists(element: any): boolean {
@@ -36,23 +50,4 @@ export class Application {
         }
     }
 
-    private renderCore(): void {
-        this.defineRoot();
-        
-        if (this.rootElem !== null && this.rootElem) {
-            this.root = ReactDOM.createRoot(this.rootElem);
-
-            this.root.render(
-                <React.StrictMode>
-                    <Engine />
-                </React.StrictMode>
-            );
-        } else {
-            console.error("Root element is null or undefined!");
-        }
-    }
-
-    public start() {
-        this.registerEvents();
-    }
 }

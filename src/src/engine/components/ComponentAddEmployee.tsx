@@ -3,40 +3,62 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import {errors, FormErrorType} from "../messages/FormMessages";
-import {Container} from "react-bootstrap";
+import { errors, FormErrorType } from "../messages/FormMessages";
+import { Container } from "react-bootstrap";
 import {AddEmployeeProps, Employee, EmployeeCreateDTO} from "../types/Employee";
+import {RegexUtil} from "../utils/RegexValidator";
+import {API} from "../api/APIManager";
+import {ComponentEditSkills} from "./ComponentEditSkills";
+import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
+import {Skill} from "../types/Skill";
+import FormUtils from "../utils/FormUtils";
+import {JobTitle} from "../types/JobTitle";
+import {IoSettingsSharp} from "react-icons/io5";
+
+interface ComponentAddEmployeeState extends Employee {
+    showEditJobTitles: boolean;
+    showEditSkills: boolean;
+    validated?: boolean;
+    error: FormErrorType;
+    password: string;
+}
 
 /**
- *
- * Ceci est le composant pour ajouter les employés
+ * This is the form to add an employee
+ * @param props The props of the component
+ * @constructor
+ * @category Components
+ * @subcategory Employee
+ * @hideconstructor
  */
-export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
-    public state: {
-        clientId: string; firstName: string; lastName: string; email: string; phoneNumber: string; password: string; role: number; department: string; jobTitles: string[]; skills: string[]; validated?: boolean; error: FormErrorType;
+export class ComponentAddEmployee extends React.Component<AddEmployeeProps, ComponentAddEmployeeState> {
+    public state: ComponentAddEmployeeState = {
+        department: "",
+        email: "",
+        error: FormErrorType.NO_ERROR,
+        firstName: "",
+        jobTitles: [],
+        lastName: "",
+        password: "",
+        phoneNumber: "",
+        role: 0,
+        showEditJobTitles: false,
+        showEditSkills: false,
+        skills: [],
+        validated: false,
+        isActive: false,
+        hasChangedDefaultPassword: false,
     };
+
+    public props: AddEmployeeProps;
+
     constructor(props: AddEmployeeProps) {
         super(props);
-        this.state = {
-            clientId: "",
-            firstName: "",
-            lastName: "",
-            email: "",
-            phoneNumber: "",
-            password: "",
-            role: 0,
-            department: "",
-            jobTitles: [],
-            skills: [],
-            validated: false,
-            error: FormErrorType.NO_ERROR,
-        };
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSelect = this.handleSelect.bind(this);
+
+        this.props = props;
     }
 
-    componentDidUpdate(prevProps: AddEmployeeProps) {
+    public componentDidUpdate(prevProps: AddEmployeeProps) : void {
         if (prevProps.departments !== this.props.departments && this.props.departments.length > 0) {
             this.setState({
                 department: this.props.departments[0].name
@@ -49,47 +71,46 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
             <Form
                 noValidate
                 validated={this.state.validated}
-                onSubmit={this.handleSubmit}
-                onChange={this.handleChange}
+                onSubmit={this.#handleSubmit}
+                onChange={this.#handleChange}
                 data-error={this.state.error}
             >
                 <Row className="mb-3 mt-3">
-
                     <Form.Group as={Col} md="4">
                         <Form.Label>Prénom</Form.Label>
                         <Form.Control
-                            id="firstName"
+                            name="firstName"
                             required
                             type="text"
                             placeholder="Prénom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredFirstName}
+                            {errors.REQUIRED_FIRSTNAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Nom</Form.Label>
                         <Form.Control
-                            id="lastName"
+                            name="lastName"
                             required
                             type="text"
                             placeholder="Nom"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredName}
+                            {errors.REQUIRED_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Adresse courriel</Form.Label>
                         <Form.Control
-                            id="email"
+                            name="email"
                             required
                             type="email"
-                            pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-                            placeholder="exemple@exemple.com"
+                            pattern={RegexUtil.emailGoodRegex}
+                            placeholder="exemple@exemple.ca"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidEmail}
+                            {errors.INVALID_EMAIL}
                         </Form.Control.Feedback>
                     </Form.Group>
 
@@ -98,60 +119,87 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                     <Form.Group as={Col} md="4">
                         <Form.Label>Numéro de téléphone</Form.Label>
                         <Form.Control
-                            id="phoneNumber"
+                            name="phoneNumber"
                             required
                             type="tel"
-                            pattern="^(\+?1 ?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$"
-                            placeholder="000-000-0000"
+                            pattern={RegexUtil.phoneNumberRegex}
+                            placeholder="0 (000)-000-0000"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidPhoneNumber}
+                            {errors.INVALID_PHONE_NUMBER}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Mot de passe initial</Form.Label>
                         <Form.Control
-                            id="password"
+                            name="password"
                             required
                             type="password"
-                            pattern='^.*(?=.{6,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!&$%&? "]).*$'
+                            pattern={RegexUtil.goodPasswordRegex}
                             placeholder="Mot de passe"
                         />
                         <Form.Control.Feedback type="invalid">
-                            {errors.invalidInitialPassword}
+                            {errors.INVALID_INITIAL_PASSWORD}
                         </Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Département</Form.Label>
-                        <Form.Select required id="department" value={this.state.department}
-                                     onChange={this.handleSelect}>
+                        <Form.Select required name="department" value={this.state.department}
+                                     onChange={this.#handleSelect}>
                             {this.props.departments.map((department, index) => (
                                 <option key={`${index}`} value={`${department.name}`}>{`${department.name}`}</option>))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredDepartmentName}
+                            {errors.REQUIRED_DEPARTMENT_NAME}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
                 <Row className="mb-3">
-                    <Form.Group as={Col} md="6">
+                    <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
-                        {this.props.jobTitles.map((corps) => (<Form.Check
-                            key={`${corps}`}
+                        <Button onClick={() => this.#onShowEditJobTitles()} className="float-end">
+                            <IoSettingsSharp className="mb-05" />
+                        </Button>
+                        {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
+                            key={title.name}
                             type="checkbox"
-                            id={`${corps}`}
-                            className="jobTitles"
-                            label={`${corps}`}
+                            name="jobTitles"
+                            label={title.name}
+                            value={title.name}
                         />))}
+                        <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)}
+                            showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
+                            onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}
+                            onDeleteJobTitle={this.props.onDeleteJobTitle}></ComponentEditJobTitles>
                     </Form.Group>
-                    <Form.Group as={Col} md="6">
+                    <Form.Group as={Col} md="4">
+                        <Form.Label>Compétences</Form.Label>
+                        <Button onClick={() => this.#onShowEditSkills()} className="float-end">
+                            <IoSettingsSharp className="mb-05" />
+                        </Button>
+                        {this.props.skills.map((skill: Skill) => (<Form.Check
+                            key={skill.name}
+                            type="checkbox"
+                            name="skills"
+                            label={skill.name}
+                            value={skill.name}
+                        />))}
+                        <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
+                            showEdit={this.state.showEditSkills} skills={this.props.skills}
+                            onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}
+                            onDeleteSkill={this.props.onDeleteSkill}></ComponentEditSkills>
+                    </Form.Group>
+                    <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required id="role" value={this.state.role} onChange={this.handleSelect}>
-                            {this.props.roles.map((role, index) => (
-                                <option key={`${index}`} value={`${index}`}>{`${role}`}</option>))}
+                        <Form.Select required name="role" value={this.state.role} onChange={this.#handleSelect}>
+                            {this.props.roles.map((role: string, index: number) => {
+                                if(API.hasLowerPermission(index)) {
+                                    return <option key={index} value={index}>{role}</option>
+                                }
+                            })}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
-                            {errors.requiredRole}
+                            {errors.REQUIRED_ROLE}
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Row>
@@ -171,24 +219,33 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
         </Container>);
     }
 
+    readonly #onShowEditJobTitles = (value: boolean = true): void => {
+        this.setState({showEditJobTitles: value})
+    }
+
+    readonly #onShowEditSkills = (value: boolean = true): void => {
+        this.setState({showEditSkills: value})
+    }
+
     /**
      * TODO
      * Generate automatically a password for new employee and ask them to change it on the first login.
      */
-    private async handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
-        const form = event.currentTarget;
-        let isValid = form.checkValidity();
 
-        event.preventDefault();
-        event.stopPropagation();
-
-        let errorType = FormErrorType.NO_ERROR;
-        if (!isValid) {
-            errorType = FormErrorType.INVALID_FORM;
-        }
+    /**
+     * Handle the form submission. Validate the form and attempt to create the employee.
+     * @param event The form submission event. Contains the form data to be validated.
+     * @private
+     * @returns {Promise<void>}
+     * @memberof CreateEmployee
+     */
+    readonly #handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+        let errorType = FormUtils.validateForm(event);
         this.setState({
-            validated: true, error: errorType,
+            validated: true,
+            error: errorType
         });
+
         if (errorType === FormErrorType.NO_ERROR) {
             let employee: EmployeeCreateDTO = {
                 firstName: this.state.firstName,
@@ -196,35 +253,54 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps> {
                 email: this.state.email,
                 phoneNumber: this.state.phoneNumber,
                 department: this.state.department,
+                isActive: this.state.isActive,
                 jobTitles: this.state.jobTitles,
                 skills: this.state.skills, // @ts-ignore
-                role: parseInt(this.state.role)
-            }
-            this.props.onDataChange(this.state.password, employee);
-
+                role: parseInt(this.state.role),
+                hasChangedDefaultPassword: this.state.hasChangedDefaultPassword
+            };
+            this.props.onAddEmployee(this.state.password, employee);
         }
     }
 
-    private handleChange(event: React.ChangeEvent<HTMLFormElement>): void {
+    /**
+     * Handle the change of a form element. Update the state with the new value.
+     * @param event The change event. Contains the new value of the form element.
+     * @returns {void}
+     * @memberof CreateEmployee
+     * @private
+     */
+    readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
-        let name = target.id;
-        let value;
+        let name: string = target.name;
+
+        let value = target.value;
         if (target.type === "checkbox") {
-            value = target.checked;
+            let array: string[] = this.state[name];
+            if(target.checked) {
+                array.push(value);
+            } else {
+                let index = array.findIndex((elem: string) => elem === value);
+                array.splice(index, 1);
+            }
+            this.setState({...this.state, ...{
+                    [name]: array,
+                }});
         } else {
-            value = target.value;
-        }
-        if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            this.setState({...this.state, ...{
+                    [name]: value,
+            }});
         }
 
-        this.setState({
-            [name]: value,
-        });
+        if (!name) {
+            throw new Error("Name is undefined for element in form.");
+        }
     }
 
-    private handleSelect(event: ChangeEvent<HTMLSelectElement>) {
+    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
         const target = event.target;
-        this.setState({[target.id]: target.value});
+        this.setState({...this.state, ...{
+            [target.name]: target.value
+        }});
     }
 }

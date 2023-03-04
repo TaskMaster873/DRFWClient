@@ -1,79 +1,89 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 
-export interface ShiftsList {
-  shifts: Shift[];
-}
-
 export interface ShiftForCalendar {
-  text: string,
-  start: string;
-  end: string;
+    text: string,
+    start: string;
+    end: string;
 }
 
+/**
+ * Shift class
+ * @class Shift
+ * @classdesc Shift class
+ * @property {string} projectName - Project name
+ * @property {string} department - Department name
+ * @property {string} start - Start date
+ * @property {string} end - End date
+ * @property {string} employeeId - Employee id
+ * @description This class is used to create a Shift that will be used in the calendar
+ */
 export class Shift {
-  employeeName?: string;
-  projectName: string = "";
-  department: string = "";
-  start: string = "";
-  end: string = "";
-  employeeId: string = "";
+    public id: string = "";
+    public department: string = "";
+    public start: string = "";
+    public end: string = "";
+    public employeeId: string = "";
 
-  constructor(shift: ShiftDTO) {
-    this.employeeName = shift.employeeName;
-    this.employeeId = shift.employeeId;
-    this.department = shift.department;
-    this.projectName = shift.projectName;
-    this.start = shift.start;
-    this.end = shift.end;
- }
+    constructor(shift: ShiftDTO) {
+        this.id = shift.id;
+        this.employeeId = shift.employeeId;
+        this.department = shift.department;
+        this.start = shift.start;
+        this.end = shift.end;
+    }
+}
+
+export interface ShiftCreateDTO {
+    readonly employeeId: string;
+    readonly department: string;
+    readonly start: string;
+    readonly end: string;
 }
 
 export interface ShiftDTO {
-  readonly employeeName?: string;
-  readonly employeeId: string;
-  readonly department: string;
-  readonly start: string;
-  readonly end: string;
-  readonly projectName: string;
-
-
-}
-
-/**
- * Ceci sont les données qu'on a besoin pour afficher à la bonne place le shift
- */
-export interface ShiftForEventCreation {
-  employeeId: string;
-  start: string;
-  end: string;
-  department: string;
-  projectName?: string;
-  employeeName:string;
+    readonly id: string;
+    readonly employeeId: string;
+    readonly department: string;
+    readonly start: string;
+    readonly end: string;
 }
 
 export interface EventForShiftCreation {
-  employeeId: string;
-  start: DayPilot.Date;
-  end: DayPilot.Date;
-  department?: string;
-  projectName?: string;
+    employeeId: string;
+    start: DayPilot.Date;
+    end: DayPilot.Date;
+}
+
+export interface EventForShiftEdit {
+    id: string;
+    employeeId: string;
+    start: DayPilot.Date;
+    end: DayPilot.Date;
 }
 
 /**
- * Event serait les shifts avec toutes les données pour l'afficher dans l'horaire
+ * Event would be the shifts with all the data to display it in the schedule
  *
  */
 export interface EventForCalendar {
-  readonly id: number; //id unique dans le tableau d'horaire
-  text?: string; // le nom de l'event
-  start: DayPilot.date;//heure de début
-  end: DayPilot.date; //heure de fin
-  resource?: string;//l'id de la personne qui l'a
-  barColor?: string; // couleur de la barre
-  backColor?: string;
-  employeeId?: string;
+    /** unique id in schedule board */
+    readonly id: string; 
+    /** what is written in the calendar */ 
+    text?: string; 
+    /** time where it start */
+    start: DayPilot.date;
+    /** end of the event */
+    end: DayPilot.date; 
+    /** the column where it will be */
+    resource?: string;
+    /** color of de bar */
+    barColor?: string; 
+    /** color of what's remaining */
+    backColor?: string;
+    /** id of the employee that has the shift */
+    employeeId?: string;
 }
 
 export interface EventForCalendarList {
-  Event: Event[];
+    Event: Event[];
 }

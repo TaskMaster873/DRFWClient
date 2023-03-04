@@ -1,101 +1,183 @@
 /**
  * @jest-environment jsdom
  */
-
 import "@testing-library/jest-dom";
 import MatchMediaMock from "jest-matchmedia-mock";
-import { render } from "@testing-library/react";
-import {testConstants} from "../Constants/testConstants";
+import {fireEvent, render} from "@testing-library/react";
+import {employeeWithId, employeesWithIds, testConstants} from "../Constants/testConstants";
+import {EventManipulationType} from "../src/engine/types/StatesForDaypilot";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import {MemoryRouter} from "react-router-dom";
+import {act} from "react-dom/test-utils";
 
 let user;
 let matchMedia;
 
 describe("Test TaskMaster Client component", () => {
-  beforeAll(() => {
-    matchMedia = new MatchMediaMock();
-  });
+    beforeAll(() => {
+        matchMedia = new MatchMediaMock();
+    });
 
-  beforeEach(async() => {
-    user = userEvent.setup();
-    /*const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
-     render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);*/
-  })
-  afterEach(() => {
-    matchMedia.clear();
-  });
-  test("jsdom is Initialized", () => {
-    const element = document.createElement("div");
-    expect(element).not.toBeNull();
-  });
+    beforeEach(async () => {
+        user = userEvent.setup();
+        /*const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
+         render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);*/
+    })
+    afterEach(() => {
+        matchMedia.clear();
+    });
+    test("jsdom is Initialized", () => {
+        const element = document.createElement("div");
+        expect(element).not.toBeNull();
+    });
 
-  test("Test if match media is defined", () => {
-    const mediaQuery = "(prefers-color-scheme: light)";
-    const firstListener = jest.fn();
-    const secondListener = jest.fn();
-    const mql = window.matchMedia(mediaQuery);
+    test("Test if match media is defined", () => {
+        const mediaQuery = "(prefers-color-scheme: light)";
+        const firstListener = jest.fn();
+        const secondListener = jest.fn();
+        const mql = window.matchMedia(mediaQuery);
 
-    mql.addListener((ev) => ev.matches && firstListener());
-    mql.addListener((ev) => ev.matches && secondListener());
+        mql.addListener((ev) => ev.matches && firstListener());
+        mql.addListener((ev) => ev.matches && secondListener());
 
-    matchMedia.useMediaQuery(mediaQuery);
+        matchMedia.useMediaQuery(mediaQuery);
 
-    expect(firstListener).toBeCalledTimes(1);
-    expect(secondListener).toBeCalledTimes(1);
-  });
+        expect(firstListener).toBeCalledTimes(1);
+        expect(secondListener).toBeCalledTimes(1);
+    });
 
-  test("test all are not rendered when isShowing is false", async () => {
-    const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
-    render(<MemoryRouter><ComponentPopupSchedule isShowing={false} /></MemoryRouter>);
-    const { form, inputName, inputColor } = getFields();
+    test("test all are not rendered when modal is not shown", async () => {
+        const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
+        render(
+            <MemoryRouter>
+                <ComponentPopupSchedule
+                    eventAdd={() => {
+                    }}
+                    eventEdit={() => {
+                    }}
+                    hideModal={() => {
+                    }}
+                    isShown={false}
+                    id={"..."}
+                    start={"2022-10-10T00:00:00"}
+                    end={"2022-10-10T02:00:00"}
+                    resource={employeeWithId.id}
+                    taskType={EventManipulationType.CREATE}
+                    employees={employeesWithIds}
+                />
+            </MemoryRouter>
+        );
+        const {form, inputAssignedEmployee, inputStart, inputEnd} = getFields();
 
-    expect(form).toBeNull();
+        expect(form).toBeNull();
+        expect(inputAssignedEmployee).toBeNull();
+        expect(inputStart).toBeNull();
+        expect(inputEnd).toBeNull();
+    });
 
-    expect(inputName).toBeNull();
-    expect(inputColor).toBeNull();
- });
+    test("test all are rendered when modal is shown", async () => {
+        const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
+        render(
+            <MemoryRouter>
+                <ComponentPopupSchedule
+                    eventAdd={() => {
+                    }}
+                    eventEdit={() => {
+                    }}
+                    hideModal={() => {
+                    }}
+                    isShown={true}
+                    id={"..."}
+                    start={"2022-10-10T00:00:00"}
+                    end={"2022-10-10T02:00:00"}
+                    resource={employeeWithId.id}
+                    taskType={EventManipulationType.CREATE}
+                    employees={employeesWithIds}
+                />
+            </MemoryRouter>
+        );
+        const {form, inputAssignedEmployee, inputStart, inputEnd} = getFields();
 
-  test("test all are rendered when isShowing is true", async () => {
-    const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
-    render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);
-    const { form, inputName, inputColor } = getFields();
+        expect(form).not.toBeNull();
+        expect(inputAssignedEmployee).not.toBeNull();
+        expect(inputStart).not.toBeNull();
+        expect(inputEnd).not.toBeNull();
+    });
 
-    expect(form).not.toBeNull();
+    test("test submit sends Create event when set to do so", async () => {
+        let eventAddCalls = 0;
+        let eventEditCalls = 0;
+        const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
+        render(
+            <MemoryRouter>
+                <ComponentPopupSchedule
+                    eventAdd={() => {
+                        eventAddCalls += 1
+                    }}
+                    eventEdit={() => {
+                        eventEditCalls += 1
+                    }}
+                    hideModal={() => {
+                    }}
+                    isShown={true}
+                    id={""}
+                    start={testConstants.validStartDate}
+                    end={testConstants.validEndDate}
+                    resource={employeeWithId.id}
+                    taskType={EventManipulationType.CREATE}
+                    employees={employeesWithIds}
+                />
+            </MemoryRouter>
+        );
+        const {form} = getFields();
+        fireEvent.submit(form);
+        expect(eventAddCalls).toBe(1);
+        expect(eventEditCalls).toBe(0);
+    });
 
-    expect(inputName).not.toBeNull();
-    expect(inputColor).not.toBeNull();
-  });
+    test("test submit sends Edit event when set to do so", async () => {
+        let eventAddCalls = 0;
+        let eventEditCalls = 0;
+        const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
+        render(
+            <MemoryRouter>
+                <ComponentPopupSchedule
+                    eventAdd={() => {
+                        eventAddCalls += 1
+                    }}
+                    eventEdit={() => {
+                        eventEditCalls += 1
+                    }}
+                    hideModal={() => {
+                    }}
+                    isShown={true}
+                    id={testConstants.validId}
+                    start={testConstants.validStartDate}
+                    end={testConstants.validEndDate}
+                    resource={employeeWithId.id}
+                    taskType={EventManipulationType.EDIT}
+                    employees={employeesWithIds}
+                />
+            </MemoryRouter>
+        );
+        const {form} = getFields();
 
-  test("test user add a name in the input for the name, should change de value of the input", async () => {
-    const { ComponentPopupSchedule } = require("../src/engine/components/ComponentPopupSchedule");
-     render(<MemoryRouter><ComponentPopupSchedule isShowing={true} /></MemoryRouter>);
-    const { form, inputName, inputColor } = getFields();
+        fireEvent.submit(form);
 
-    await user.type(inputName, testConstants.validName);
-   
-    expect(inputName.value).toBe(testConstants.validName);
-  });
-
-  /* test("test user add a different color in the color input, should change de value of the input", async () => {
-    const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
-    user = userEvent.setup();
-    render(<ComponentPopupSchedule isShowing={true}/>);
-    const { form, inputName, inputColor } = getFields();
-    fireEvent.change(inputColor, { target: { value: '#ff6464' } });
-    /*console.log("input",inputColor.value);
-    userEvent.click(inputColor);
-    userEvent.type(inputColor, testPopupConstant.validRGBColor);
-    expect(inputColor).toHaveValue("#ff6464");
-  });*/
+        expect(eventEditCalls).toBe(1);
+        expect(eventAddCalls).toBe(0);
+    });
 });
+
 function getFields() {
-  const form = document.querySelector("form");
-  const inputName = document.getElementById("nameOfEvent");
-  const inputColor = document.getElementById("colorOfEvent");
-  return {
-    form,
-    inputName,
-    inputColor,
-  };
+    const form = document.querySelector("form");
+    const inputAssignedEmployee = document.getElementById("assignedEmployee")
+    const inputStart = document.getElementById("start");
+    const inputEnd = document.getElementById("end");
+    return {
+        form,
+        inputAssignedEmployee,
+        inputStart,
+        inputEnd,
+    };
 }

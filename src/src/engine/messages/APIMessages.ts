@@ -1,15 +1,25 @@
 export const errors = {
-    error: "Erreur",
-    invalidLogin: "Les informations d'identification sont erronées",
-    departmentAlreadyExists: "Le département est déjà existant",
-    employeeAlreadyExists: "L'emploi est déjà existant",
-    permissionDenied: "Vous n'avez pas les autorisations requises pour effectuer cette action",
-    defaultMessage: "Une erreur s'est produite, Veuillez réessayer ultérieurement",
+    DEFAULT: "Une erreur s'est produite, Veuillez réessayer ultérieurement",
+    INVALID_LOGIN: "Les informations d'identification sont erronées",
+    DEPARTMENT_ALREADY_EXISTS: "Le département est déjà existant",
+    EMPLOYEE_ALREADY_EXISTS: "L'emploi est déjà existant",
+    JOB_TITLE_ALREADY_EXISTS: "Le corps d'emploi est déjà existant",
+    SKILL_ALREADY_EXISTS: "La compétence est déjà existante",
+    PERMISSION_DENIED: "Vous n'avez pas les autorisations requises pour effectuer cette action",
+    INVALID_EMPLOYEE_ID: "L'identifiant de l'employé est invalide",
+    INVALID_DEPARTMENT_ID: "L'identifiant du département est invalide",
+    INVALID_SKILL_ID: "L'identifiant de la compétence est invalide",
+    EMPLOYEE_NOT_FOUND: "L'employé spécifié n'a pas été trouvé",
+    INVALID_JOB_TITLE_ID: "L'identifiant du corps d'emploi est invalide",
+    AUTHENTIFICATION_ERROR: "Une erreur d'authentification s'est produite, veuillez réessayer ultérieurement",
+    EMPLOYEE_REMAINING_IN_DEPARTMENT: "Des employés sont toujours présents dans le département"
+
 }
 
 export const successes = {
-    success: "Succès !",
-    emailSent: "Un courriel a bien été envoyé",
-    employeeCreated: "Un nouvel employé a été ajouté avec succès !",
-    departmentCreated: "Un nouveau département a été ajouté avec succès !"
+    EMAIL_SENT: "Un courriel a bien été envoyé",
+    EMPLOYEE_CREATED: "Un nouvel employé a été ajouté avec succès !",
+    DEPARTMENT_CREATED: "Un nouveau département a été ajouté avec succès !",
+    AVAILABILITY_CREATED: "Votre demande de disponibilités est envoyée",
+    CREATED: "Succès"
 }

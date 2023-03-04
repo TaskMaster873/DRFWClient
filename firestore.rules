@@ -1,118 +1,227 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
+    match /databases/{database}/documents {
+        match /{document=**} {
 
-      function hasMinPermission(id, permissionLevel) {
-      	let employeeRole = get(/databases/$(database)/documents/employees/$(id)).data.role;
+            function getCurrentEmployeeRole(id) {
+                return get(/databases/$(database)/documents/employees/$(id)).data.role;
+            }
 
-        return employeeRole >= permissionLevel
-      }
+            match /employees/{employeeId} {
+                allow read;
+                allow create: if isValidEmployee(employeeId);
+                allow update: if isValidEmployeeUpdate(employeeId);
+            }
 
-      match /employees/{employeeId} {
-      	allow read;
-        allow create: if isValidEmployee(employeeId);
-        allow update:  if isValidUpdateEmployee(employeeId);
-      }
+            function employeeActiveFieldType() {
+                return request.resource.data.isActive is bool;
+            }
 
-      function employeeFieldTypes() {
-      	return request.resource.data.firstName is string &&
-        request.resource.data.lastName is string &&
-        request.resource.data.phoneNumber is string &&
-        request.resource.data.department is string &&
-        request.resource.data.jobTitles is list &&
-        request.resource.data.skills is list &&
-        request.resource.data.role is number
-      }
+            function employeeFieldTypes() {
+                return request.resource.data.firstName is string &&
+                       request.resource.data.lastName is string &&
+                       request.resource.data.phoneNumber is string &&
+                       request.resource.data.email is string &&
+                       request.resource.data.email.matches('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$') &&
+                       request.resource.data.department is string &&
+                       request.resource.data.jobTitles is list &&
+                       request.resource.data.skills is list &&
+                       request.resource.data.role is number &&
+                       getCurrentEmployeeRole(request.auth.uid) > request.resource.data.role
+            }
 
-      function isValidEmployee(employeeId) {
-        let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
-        let hasOnlyfields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email',
-        'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
+            function isValidEmployee(employeeId) {
+                let hasEmployeeFields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive', 'hasChangedDefaultPassword']);
+                let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
+
+                return createdValidEmployee && hasEmployeeFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && employeeFieldTypes();
+            }
+
+            function isValidEmployeeUpdate(employeeId) {
+                let hasEmployeeFields = request.resource.data.keys().hasOnly(
+                    ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
+                let hasChangePasswordField = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive', 'hasChangedDefaultPassword']);
+                let hasActiveFields = request.resource.data.keys().hasOnly(
+                    ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive']);
+
+                let isValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
+
+                return isValidEmployee && (((hasEmployeeFields && employeeFieldTypes())
+                       || (hasActiveFields && employeeFieldTypes() && employeeActiveFieldType())
+                          && getCurrentEmployeeRole(request.auth.uid) >= 3) || hasChangePasswordField);
+            }
+
+            function departmentFieldTypes() {
+                return request.resource.data.name is string &&
+                       request.resource.data.director is string
+            }
+
+            match /departments/{departmentId} {
+                allow read;
+                allow create: if isValidDepartment(departmentId);
+                allow update: if isValidDepartment(departmentId);
+                allow delete: if isValidDepartmentDelete(departmentId);
+            }
+
+            function isValidDepartment(departmentId) {
+                let createdValidDepartment = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
+                let hasFields = request.resource.data.keys().hasOnly(['name', 'director']);
+
+                return createdValidDepartment && hasFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && departmentFieldTypes();
+            }
+
+            function isValidDepartmentDelete(departmentId) {
+                let jobTitleExists = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
+
+                return !jobTitleExists && getCurrentEmployeeRole(request.auth.uid) >= 3;
+            }
+
+            function nameFieldTypes() {
+                return request.resource.data.name is string
+            }
+
+            match /roles/{roleId} {
+                allow read;
+                allow create: if isValidRole(roleId);
+                allow update: if isValidRole(roleId);
+            }
+
+            function isValidRole(roleId) {
+                let createdValidRole = existsAfter(/databases/$(database)/documents/roles/$(roleId));
+                let hasFields = request.resource.data.keys().hasOnly(['name']);
+
+                return createdValidRole && hasFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+            }
+
+            match /jobTitles/{jobTitleId} {
+                allow read;
+                allow create: if isValidJobTitle(jobTitleId);
+                allow update: if isValidJobTitle(jobTitleId);
+                allow delete: if isValidJobTitleDelete(jobTitleId);
+            }
+
+            function isValidJobTitle(jobTitleId) {
+                let createdValidJobTitle = existsAfter(/databases/$(database)/documents/jobTitles/$(jobTitleId));
+                let hasFields = request.resource.data.keys().hasOnly(['name']);
+
+                return createdValidJobTitle && hasFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+            }
+
+            function isValidJobTitleDelete(jobTitleId) {
+                let jobTitleExists = existsAfter(/databases/$(database)/documents/jobTitles/$(jobTitleId));
+
+                return !jobTitleExists && getCurrentEmployeeRole(request.auth.uid) >= 3;
+            }
+
+            match /skills/{skillId} {
+                allow read;
+                allow create: if isValidSkill(skillId);
+                allow update: if isValidSkill(skillId);
+                allow delete: if isValidSkillDelete(skillId);
+            }
+
+            function isValidSkill(skillId) {
+                let createdValidJobTitle = existsAfter(/databases/$(database)/documents/skills/$(skillId));
+                let hasFields = request.resource.data.keys().hasOnly(['name']);
+
+                return createdValidJobTitle && hasFields
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3 && nameFieldTypes();
+            }
+
+            function isValidSkillDelete(roleId) {
+                let skillExists = existsAfter(/databases/$(database)/documents/roles/$(roleId));
+
+                return !skillExists
+                       && getCurrentEmployeeRole(request.auth.uid) >= 3;
+            }
+
+            match /shifts/{shiftId} {
+                allow read;
+                allow create: if isValidShiftCreate(shiftId);
+                allow update: if isValidShiftUpdate(shiftId);
+                allow delete: if isValidShiftDelete(shiftId);
+            }
+
+            function isValidShiftCreate(shiftId) {
+                let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'start']);
+                let shiftDepartment = request.resource.data.department;
+                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
+
+                return createdValidShift && hasFields && isAllowed && shiftFieldTypes();
+            }
+
+            match /unavailabilities/{unavailabilityId} {
+                allow read;
+                allow write: if isValidUnavailabilityCreate(unavailabilityId);
+                allow update: if isValidForUpdate(unavailabilityId);
+
+            }
+
+            function isValidForUpdate(unavailabilityId) {
+                 let updateValidUnavailability = existsAfter(/databases/$(database)/documents/shifts/$(unavailabilityId));
+                 let employeeId = request.resource.data.employeeId;
+                 let employeeDepartment = get(/databases/$(database)/documents/employees/$(employeeId)).data.department;
+                 let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowedUnavailabilities(employeeDepartment) || isTheSameEmployee(employeeId);
+
+                return updateValidUnavailability && isAllowed;
+            }
+
+            function isValidUnavailabilityCreate(unavailabilityId) {
+                let createdValidUnavailability = existsAfter(/databases/$(database)/documents/unavailabilities/$(unavailabilityId));
+                 let employeeId = request.resource.data.employeeId;
+                 let employeeDepartment = get(/databases/$(database)/documents/employees/$(employeeId)).data.department;
+                 let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowedUnavailabilities(employeeDepartment) || isTheSameEmployee(employeeId);
+
+                return createdValidUnavailability && isAllowed;
+            }
+             function isTheSameEmployee(employeeId) {
+                let isTheSameEmployee = employeeId == request.auth.uid;
+                return isTheSameEmployee;
+             }
 
 
-        return createdValidEmployee && hasOnlyfields
-        && hasMinPermission(request.auth.uid, 3) && employeeFieldTypes();
-      }
+             function isManagerAllowedUnavailabilities(employeeDepartment) {
+                let isManager = getCurrentEmployeeRole(request.auth.uid) == 2;
+                let department = get(/databases/$(database)/documents/employees/$(request.auth.uid)).data.department;
+                return employeeDepartment == department && isManager;
+             }
+            function isValidShiftUpdate(shiftId) {
+                let updatedValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+                let hasFields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'start']);
+                let shiftDepartment = get(/databases/$(database)/documents/shifts/$(shiftId)).data.department;
+                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
 
-      function employeeActiveFieldType() {
-      	return request.resource.data.isActive is bool;
-      }
+                return updatedValidShift && hasFields && isAllowed && shiftFieldTypes();
+            }
 
+            function isValidShiftDelete(shiftId) {
+                let validShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
+                let shiftDepartment = get(/databases/$(database)/documents/shifts/$(shiftId)).data.department;
+                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowed(shiftDepartment);
 
-      function isValidUpdateEmployee(employeeId) {
-  			let validEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
-        let hasOnlyFields = request.resource.data.keys().hasOnly(
-        ['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role'])
-        || request.resource.data.keys().hasOnly(['isActive']);
+                return !validShift && isAllowed;
+            }
 
-  			return validEmployee /*&& hasOnlyFields*/ && hasMinPermission(request.auth.uid, 3)
-        /*&& (employeeFieldTypes() || employeeActiveFieldType()*/;
-			}
+            function isManagerAllowed(documentDepartment) {
+                let isManager = getCurrentEmployeeRole(request.auth.uid) >= 2;
+                let employeeDepartment = get(/databases/$(database)/documents/employees/$(request.auth.uid)).data.department;
 
-      function departmentFieldTypes() {
-      	return request.resource.data.name is string &&
-        request.resource.data.director is string
-      }
+                return employeeDepartment == documentDepartment && isManager;
+            }
 
-      match /departments/{departmentId} {
-      	allow read;
-        allow create: if isValidDepartment(departmentId);
+            function shiftFieldTypes() {
+                return request.resource.data.department is string &&
+                       request.resource.data.employeeId is string &&
+                       request.resource.data.start is timestamp &&
+                       request.resource.data.end is timestamp
 
-      }
+            }
+        }
 
-      function isValidDepartment(departmentId) {
-        let createdValidDepartment = existsAfter(/databases/$(database)/documents/departments/$(departmentId));
-        let hasAllfields = request.resource.data.keys().hasOnly(['name', 'director']);
-
-        return createdValidDepartment && hasAllfields && request.auth != null
-        && hasMinPermission(request.auth.uid, 3) && departmentFieldTypes();
-      }
-
-      function nameFieldTypes() {
-      	return request.resource.data.name is string
-      }
-
-      match /roles/{roleId} {
-      	allow read;
-        allow create: if isValidRole(roleId);
-      }
-
-      function isValidRole(roleId) {
-        let createdValidRole = existsAfter(/databases/$(database)/documents/roles/$(roleId));
-        let hasAllfields = request.resource.data.keys().hasOnly(['name']);
-
-        return createdValidRole && hasAllfields
-        && hasMinPermission(request.auth.uid, 4) && nameFieldTypes();
-      }
-
-      match /jobTitles/{jobTitleId} {
-      	allow read;
-        allow create: if isValidJobTitle(jobTitleId);
-      }
-
-      function isValidJobTitle(jobTitleId) {
-        let createdValidJobTitle = existsAfter(/databases/$(database)/documents/jobTitles/$(jobTitleId));
-        let hasAllfields = request.resource.data.keys().hasOnly(['name']);
-
-        return createdValidJobTitle && hasAllfields
-        && hasMinPermission(request.auth.uid, 3) && nameFieldTypes();
-      }
-
-      match /shifts/{shiftId} {
-    		allow read;allow create: if isValidShift(shiftId);
-        allow create: if isValidShift(shiftId);
-        allow update: if isValidShift(shiftId);
-    	}
-
-      function isValidShift(shiftId) {
-        let createdValidShift = existsAfter(/databases/$(database)/documents/shifts/$(shiftId));
-        let hasAllfields = request.resource.data.keys().hasOnly(['department', 'employeeId', 'end', 'projectName', 'start']);
-
-        return createdValidShift && hasAllfields
-        && hasMinPermission(request.auth.uid, 3) && nameFieldTypes();
-      }
     }
-
-  }
 }

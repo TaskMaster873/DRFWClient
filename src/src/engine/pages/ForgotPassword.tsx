@@ -1,5 +1,5 @@
-import { Container } from "react-bootstrap";
-import { ComponentForgotPassword } from "../components/ComponentForgotPassword";
+import {Container} from "react-bootstrap";
+import {ComponentForgotPassword} from "../components/ComponentForgotPassword";
 
 /**
  * La page pour envoyer le courriel de réinitialisation de mot de passe
