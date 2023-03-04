@@ -53,7 +53,7 @@ export interface DepartmentListProps {
     employeeNb: number[],
     departments: Department[],
     onAddDepartment: (department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
-    onEditDepartment: (departmentId: string, department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
+    onEditDepartment: (departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string) => PromiseLike<void> | Promise<void> | void;
     onDeleteDepartment: (department: Department) => PromiseLike<void> | Promise<void> | void;
 }
 

@@ -9,7 +9,7 @@ import {Employee} from "../types/Employee";
 
 export interface DepartmentEditProps {
     employees: Employee[],
-    onEditDepartment: (departmentId: string, department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
+    onEditDepartment: (departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string) => PromiseLike<void> | Promise<void> | void;
     departmentToEdit?: Department;
     cancelEdit: () => PromiseLike<void> | Promise<void> | void;
 }
@@ -120,7 +120,7 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
         });
 
         if (errorType === FormErrorType.NO_ERROR && this.props.departmentToEdit?.id) {
-            await this.props.onEditDepartment(this.props.departmentToEdit?.id, formDataObj);
+            await this.props.onEditDepartment(this.props.departmentToEdit?.id, formDataObj, this.props.departmentToEdit?.name);
         }
     }
 }

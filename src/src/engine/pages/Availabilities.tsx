@@ -14,7 +14,6 @@ import '../../deps/css/daypilot_custom.css';
 import {ComponentAvailabilitiesPopup} from "../components/ComponentAvailabilitiesPopup";
 import {Timestamp} from "firebase/firestore";
 import {API} from "../api/APIManager";
-import {Button, Container} from "react-bootstrap";
 import {NotificationManager} from "../api/NotificationManager";
 import {errors} from "../messages/FormMessages";
 import {RoutesPath} from "../RoutesPath";
