@@ -863,13 +863,14 @@ class APIManager extends Logger {
      * This method is used to edit a department.
      * @param departmentId
      * @param department The department data.
+     * @param oldDepartmentName The old department name
      * @method editDepartment
      * @async
      * @public
      * @memberof APIManager
      * @returns {Promise<string | null>} Null if the department was edited successfully, and the error message if it was not.
      */
-    public async editDepartment(departmentId: string, department: DepartmentModifyDTO): Promise<string | null> {
+    public async editDepartment(departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string): Promise<string | null> {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
@@ -886,7 +887,7 @@ class APIManager extends Logger {
                 return APIUtils.getErrorMessageFromCode(error);
             });
             let queryEmployeesInDepartment = await query(collection(this.#db, `employees`),
-                where("department", "==", department.name));
+                where("department", "==", oldDepartmentName));
             let snaps = await getDocs(queryEmployeesInDepartment).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
@@ -1653,8 +1654,6 @@ class APIManager extends Logger {
             errorMessage = isUpdated;
             return errorMessage;
         }
-
-
     }
 
     /**
@@ -1801,6 +1800,23 @@ class APIManager extends Logger {
             }
         }
         return errorMessage ?? unavailabilities;
+    }
+
+    async changeUnavailabilityAcceptedValue(unavailability: any) {
+        let errorMessage: string | null = null;
+
+        if (unavailability.id) {
+            if (!this.hasPermission) {
+                return errors.PERMISSION_DENIED;
+            }
+            await updateDoc(doc(this.#db, `unavailabilities`, unavailability.id), {isAccepted: unavailability.isAccepted}).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_UNAVAILABILITY_ID;
+        }
+
+        return errorMessage;
     }
 }
 

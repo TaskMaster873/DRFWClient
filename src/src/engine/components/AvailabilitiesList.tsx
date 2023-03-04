@@ -4,11 +4,14 @@ import {NotificationManager} from "../api/NotificationManager";
 import {errors} from "../messages/FormMessages";
 import {Employee} from "../types/Employee";
 import {unavailabilitiesTableHeads} from "../types/EmployeeAvailabilities";
+import {API} from "../api/APIManager";
+import {CgCheckO, CgUnavailable} from "react-icons/cg";
 
 
 type Props = {
     employees: Employee[];
     unavailabilities: any[];
+    onChangeAcceptedValue: (unavailability: any) => PromiseLike<void> | Promise<void> | void;
 };
 
 export class AvailabilitiesList extends React.Component<Props> {
@@ -59,6 +62,7 @@ export class AvailabilitiesList extends React.Component<Props> {
                     <td key={"end " + index}>
                         {unavailability.end}
                     </td>
+                    {this.renderActions(index, unavailability)}
                 </tr>
             ));
         } else {
@@ -70,6 +74,19 @@ export class AvailabilitiesList extends React.Component<Props> {
                 </tr>
             ];
         }
+    }
+
+    private renderActions(index: number, unavailability: any): JSX.Element | undefined {
+            let component: JSX.Element = <CgUnavailable/>;
+            if (!unavailability.isAccepted) {
+                component = <CgCheckO/>
+            }
+            return (
+                <td key={`action ${index}`}>
+                    <a className="adminActions ms-1 mx-1"
+                       onClick={() => this.props.onChangeAcceptedValue(unavailability)}>{component}</a>
+                </td>
+            );
     }
 
     public render(): JSX.Element {

@@ -118,9 +118,10 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
      * Edit a department in the database and display a notification to the user if the operation was successful or not.
      * @param departmentId {string} The id of the department to edit
      * @param department {DepartmentModifyDTO} The department to edit
+     * @param oldDepartmentName The old department name
      */
-    public editDepartment = async (departmentId: string, department: DepartmentModifyDTO) : Promise<void> => {
-        let error = await API.editDepartment(departmentId, department);
+    public editDepartment = async (departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string) : Promise<void> => {
+        let error = await API.editDepartment(departmentId, department, oldDepartmentName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
             let departments = Utils.editElement(this.state.departments, departmentId, department) as Department[];

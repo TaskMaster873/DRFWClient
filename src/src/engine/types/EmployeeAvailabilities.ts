@@ -63,7 +63,6 @@ export type EmployeeAvailabilityExceptionList = EmployeeAvailabilityException[];
  */
 export interface EmployeeAvailabilities {
     recursiveExceptions: RecursiveAvailabilitiesList;
-   
     employeeId: string;
 }
 
