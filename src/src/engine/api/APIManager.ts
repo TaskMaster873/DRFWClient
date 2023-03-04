@@ -31,8 +31,7 @@ import {
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {
-    Employee,
-    EmployeeCreateDTO,
+    Employee, EmployeeCreateDTO,
     EmployeeEditDTO,
     EmployeeJobTitleList,
     EmployeeRoleList,
@@ -51,7 +50,12 @@ import {
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 
-import {DAYS, EmployeeAvailabilities, EmployeeAvailabilitiesForCreate, RecursiveAvailabilitiesList} from "../types/EmployeeAvailabilities";
+import {
+    DAYS,
+    EmployeeAvailabilities,
+    EmployeeAvailabilitiesForCreate,
+    RecursiveAvailabilitiesList
+} from "../types/EmployeeAvailabilities";
 import {JobTitle} from "../types/JobTitle";
 import {APIUtils} from "./APIUtils";
 import {Skill} from "../types/Skill";
@@ -103,13 +107,7 @@ class APIManager extends Logger {
     #performance!: FirebasePerformance;
     #db!: Firestore;
     #user: FirebaseAuth.User | null = null;
-    #employeeInfos: Employee = {
-        email: "",
-        firstName: "",
-        jobTitles: [],
-        lastName: "",
-        phoneNumber: "",
-        skills: [],
+    #employeeInfos: EmployeeInfos = {
         role: 0,
         department: '',
         hasChangedDefaultPassword: false
@@ -276,7 +274,7 @@ class APIManager extends Logger {
 
     /**
      * This function is used to send a message to the web worker to create a new user.
-     * @param {EmployeeCreateDTO} employee The employee data of the new user.
+     * @param {Employee} employee The employee data of the new user.
      * @param {string} password The password of the new user.
      * @private
      * @async
@@ -285,7 +283,7 @@ class APIManager extends Logger {
      * @memberof APIManager
      */
     private requestUserCreationFromWorker(
-        employee: EmployeeCreateDTO,
+        employee: Employee,
         password: string
     ): Promise<CreatedAccountData> {
         return new Promise((resolve) => {
@@ -474,17 +472,11 @@ class APIManager extends Logger {
                     if (user === null || !user) {
                         this.isAuthenticated = false;
                         this.#employeeInfos = {
-                            email: "",
-                            firstName: "",
-                            jobTitles: [],
-                            lastName: "",
-                            phoneNumber: "",
-                            skills: [],
                             role: 0,
                             department: '',
                             hasChangedDefaultPassword: false
                         };
-                        
+
                     } else {
                         this.isAuthenticated = true;
                         this.#user = user;
@@ -492,18 +484,12 @@ class APIManager extends Logger {
                         if (typeof result === "string") {
                             NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
                             this.#employeeInfos = {
-                                email: "",
-                                firstName: "",
-                                jobTitles: [],
-                                lastName: "",
-                                phoneNumber: "",
-                                skills: [],
                                 role: 0,
                                 department: '',
                                 hasChangedDefaultPassword: false
                             };
                         } else {
-                            this.#employeeInfos = result as Employee;
+                            this.#employeeInfos = result as EmployeeInfos;
                         }
 
                         console.log("user", user);
@@ -694,13 +680,13 @@ class APIManager extends Logger {
             if (this.elementExist(user.email)) {
                 let email = user.email || "";
 
-                if(!this.hasChangedDefaultPassword) {
+                if (!this.hasChangedDefaultPassword) {
                     let employeeId = this.#user?.uid;
 
-                    if(employeeId && this.#employeeInfos.department) {
+                    if (employeeId && this.#employeeInfos.department) {
                         errorMessage = await this.changeEmployeeResetToggle(employeeId);
 
-                        if(errorMessage) {
+                        if (errorMessage) {
                             return errorMessage;
                         }
                     }
@@ -727,7 +713,7 @@ class APIManager extends Logger {
                         errorMessage = APIUtils.getErrorMessageFromCode(error);
                     });
 
-                    if(reAuth?.user) {
+                    if (reAuth?.user) {
                         this.#user = reAuth?.user || null;
                         this.isAuthenticated = false;
                     }
@@ -1111,8 +1097,8 @@ class APIManager extends Logger {
             for (const doc of snaps.docs) {
                 let data = doc.data();
                 employees.push(
-                    new Employee({
-                        employeeId: doc.id,
+                    {
+                        id: doc.id,
                         firstName: data.firstName,
                         lastName: data.lastName,
                         email: data.email,
@@ -1123,7 +1109,7 @@ class APIManager extends Logger {
                         skills: data.skills,
                         role: data.role,
                         hasChangedDefaultPassword: data.hasChangedDefaultPassword || false
-                    })
+                    }
                 );
             }
         }
@@ -1266,7 +1252,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
         let employeeInfos: EmployeeInfos = {
             role: 0,
-            department: undefined,
+            department: "",
             hasChangedDefaultPassword: false
         };
 
@@ -1354,7 +1340,7 @@ class APIManager extends Logger {
             return APIUtils.getErrorMessageFromCode(error);
         });
 
-        if(typeof document !== "string" && !document.exists()) {
+        if (typeof document !== "string" && !document.exists()) {
             return errors.INVALID_EMPLOYEE_ID;
         }
         if (!errorMessage) {
@@ -1592,10 +1578,10 @@ class APIManager extends Logger {
                         && data.unavailabilities.endDate === list.recursiveExceptions.endDate) {
                         await updateDoc(doc(this.#db, `unavailabilities`, document.id),
                             {unavailabilities: list.recursiveExceptions}).catch((error) => {
-                                errorMessage = APIUtils.getErrorMessageFromCode(error);
+                            errorMessage = APIUtils.getErrorMessageFromCode(error);
 
-                            });
-                            isAdded = true;
+                        });
+                        isAdded = true;
                         break;
                     }
                 }
@@ -1618,7 +1604,7 @@ class APIManager extends Logger {
         let errorMessage: string | undefined;
 
         //Create unavailability
-         let isUpdated = await this.unavailabilityUpdate(list)
+        let isUpdated = await this.unavailabilityUpdate(list)
         if (!isUpdated && typeof isUpdated === "boolean") {
             await addDoc(collection(this.#db, `unavailabilities`),
                 {
@@ -1630,7 +1616,7 @@ class APIManager extends Logger {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
             //return the error
-        } else if(typeof isUpdated === "string") {
+        } else if (typeof isUpdated === "string") {
             errorMessage = isUpdated;
             return errorMessage;
         }
@@ -1657,6 +1643,7 @@ class APIManager extends Logger {
         }
         return returnList;
     }
+
     /**
      *
      * @param idEmployee to get the unavailabilities
@@ -1710,12 +1697,12 @@ class APIManager extends Logger {
         return errorMessage ?? list;
     }
 
-     /**
+    /**
      * This function fetches all pending unavailabilities for one department
      * @param departmentName the name of the department to fetch
      * @returns a string if its an error, a list of Unavailabilities if its not
      */
-     public async getPendingUnavailabilitiesForDepartment(departmentName: string): Promise<string | any[]> {
+    public async getPendingUnavailabilitiesForDepartment(departmentName: string): Promise<string | any[]> {
         let errorMessage: string | null = null;
         let unavailabilities: any[] = [];
         //Validate permissions
@@ -1740,7 +1727,7 @@ class APIManager extends Logger {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
                 //Push unavailability object
-                
+
 
             }
         }
@@ -1770,7 +1757,7 @@ class APIManager extends Logger {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
                 //Push unavailability object
-                
+
 
             }
         }

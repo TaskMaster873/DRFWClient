@@ -1,7 +1,7 @@
 import React from "react";
 import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {API} from "../api/APIManager";
-import {AddEmployeeState, EmployeeCreateDTO,} from "../types/Employee";
+import {AddEmployeeState, Employee, EmployeeCreateDTO} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
@@ -90,7 +90,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     /**
      * Add an employee to the database
      * @param password {string} The password of the employee
-     * @param employee {EmployeeCreateDTO} The employee to add
+     * @param employee {Employee} The employee to add
      * @private
      */
     readonly #addEmployee = async (password: string, employee: EmployeeCreateDTO): Promise<void> => {

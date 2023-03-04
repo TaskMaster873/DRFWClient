@@ -61,7 +61,7 @@ describe("Test TaskMaster Client component", () => {
                     id={"..."}
                     start={"2022-10-10T00:00:00"}
                     end={"2022-10-10T02:00:00"}
-                    resource={employeeWithId.employeeId}
+                    resource={employeeWithId.id}
                     taskType={EventManipulationType.CREATE}
                     employees={employeesWithIds}
                 />
@@ -90,7 +90,7 @@ describe("Test TaskMaster Client component", () => {
                     id={"..."}
                     start={"2022-10-10T00:00:00"}
                     end={"2022-10-10T02:00:00"}
-                    resource={employeeWithId.employeeId}
+                    resource={employeeWithId.id}
                     taskType={EventManipulationType.CREATE}
                     employees={employeesWithIds}
                 />
@@ -123,7 +123,7 @@ describe("Test TaskMaster Client component", () => {
                     id={""}
                     start={testConstants.validStartDate}
                     end={testConstants.validEndDate}
-                    resource={employeeWithId.employeeId}
+                    resource={employeeWithId.id}
                     taskType={EventManipulationType.CREATE}
                     employees={employeesWithIds}
                 />
@@ -154,7 +154,7 @@ describe("Test TaskMaster Client component", () => {
                     id={testConstants.validId}
                     start={testConstants.validStartDate}
                     end={testConstants.validEndDate}
-                    resource={employeeWithId.employeeId}
+                    resource={employeeWithId.id}
                     taskType={EventManipulationType.EDIT}
                     employees={employeesWithIds}
                 />

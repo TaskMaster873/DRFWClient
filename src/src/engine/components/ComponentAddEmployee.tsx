@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { errors, FormErrorType } from "../messages/FormMessages";
 import { Container } from "react-bootstrap";
-import { AddEmployeeProps, Employee, EmployeeCreateDTO } from "../types/Employee";
+import {AddEmployeeProps, Employee, EmployeeCreateDTO} from "../types/Employee";
 import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
 import {ComponentEditSkills} from "./ComponentEditSkills";
@@ -33,10 +33,8 @@ interface ComponentAddEmployeeState extends Employee {
  */
 export class ComponentAddEmployee extends React.Component<AddEmployeeProps, ComponentAddEmployeeState> {
     public state: ComponentAddEmployeeState = {
-        hasChangedDefaultPassword: false,
         department: "",
         email: "",
-        id: "",
         error: FormErrorType.NO_ERROR,
         firstName: "",
         jobTitles: [],
@@ -47,7 +45,9 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         showEditJobTitles: false,
         showEditSkills: false,
         skills: [],
-        validated: false
+        validated: false,
+        isActive: false,
+        hasChangedDefaultPassword: false,
     };
 
     public props: AddEmployeeProps;
@@ -182,6 +182,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             type="checkbox"
                             name="skills"
                             label={skill.name}
+                            value={skill.name}
                         />))}
                         <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
                             showEdit={this.state.showEditSkills} skills={this.props.skills}
@@ -252,11 +253,13 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 email: this.state.email,
                 phoneNumber: this.state.phoneNumber,
                 department: this.state.department,
+                isActive: this.state.isActive,
                 jobTitles: this.state.jobTitles,
                 skills: this.state.skills, // @ts-ignore
                 role: parseInt(this.state.role),
-                hasChangedDefaultPassword: false
-            }
+                hasChangedDefaultPassword: this.state.hasChangedDefaultPassword
+            };
+            console.log(employee);
             this.props.onAddEmployee(this.state.password, employee);
         }
     }

@@ -115,7 +115,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     /**
      * Edit an employee in the database and display a notification to the user if the operation was successful or not.
      * @param employeeId {string} The id of the employee to edit
-     * @param employee {EmployeeCreateDTO} The employee to edit
+     * @param employee {EmployeeEditDTO} The employee to edit
      */
     readonly #editEmployee = async (employeeId: string, employee: EmployeeEditDTO): Promise<void> => {
         const error = await API.editEmployee(employeeId, employee);
