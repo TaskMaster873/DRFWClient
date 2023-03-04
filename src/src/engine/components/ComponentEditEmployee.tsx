@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
-import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
+import {EditEmployeeProps, Employee, EmployeeEditDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {API} from "../api/APIManager";
 import {RegexUtil} from "../utils/RegexValidator";
@@ -17,6 +17,8 @@ import {ComponentEditJobTitles} from "./ComponentEditJobTitles";
 import {IoSettingsSharp} from "react-icons/io5";
 
 interface ComponentEditEmployeeState {
+    department?: string;
+    role?: number;
     showEditJobTitles: boolean;
     showEditSkills: boolean;
     validated?: boolean;
@@ -33,6 +35,8 @@ interface ComponentEditEmployeeState {
  */
 export class ComponentEditEmployee extends React.Component<EditEmployeeProps, ComponentEditEmployeeState> {
     public state: ComponentEditEmployeeState = {
+        department: "",
+        role: 0,
         showEditJobTitles: false,
         showEditSkills: false,
         validated: false,
@@ -44,6 +48,15 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
     constructor(props: EditEmployeeProps) {
         super(props);
         this.props = props;
+    }
+
+    componentDidUpdate(prevProps: EditEmployeeProps) {
+        if (prevProps.editedEmployee !== this.props.editedEmployee) {
+            this.setState({
+                department: this.props.editedEmployee?.department,
+                role: this.props.editedEmployee?.role
+            });
+        }
     }
 
     public render(): JSX.Element {
@@ -97,7 +110,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="3">
                         <Form.Label>Département</Form.Label>
-                        <Form.Select required name="department" value={this.props.editedEmployee?.department} onChange={this.#handleSelect}>
+                        <Form.Select required name="department" value={this.state.department} onChange={this.#handleSelect}>
                             {this.props.departments.map((department: Department, index: number) =>
                                 <option key={index} value={department.name}>{department.name}</option>)}
                         </Form.Select>
@@ -145,8 +158,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required name="role" id="role" value={this.props.editedEmployee?.role} onChange={this.#handleSelect}
-                                     defaultValue={this.props.editedEmployee?.role}>
+                        <Form.Select required name="role" id="role" value={this.state.role} onChange={this.#handleSelect}>
                             {this.props.roles.map((role: string, index: number) => {
                                 if(API.hasLowerPermission(index)) {
                                     return <option key={index} value={index}>{role}</option>
