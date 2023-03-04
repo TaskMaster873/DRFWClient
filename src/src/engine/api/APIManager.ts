@@ -892,7 +892,6 @@ class APIManager extends Logger {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
             if (snaps) {
-                console.log(snaps);
                 for (const snap of snaps.docs) {
                     await updateDoc(doc(this.#db, `employees`, snap.id), {department: department.name});
                 }
