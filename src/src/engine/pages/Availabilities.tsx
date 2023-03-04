@@ -20,6 +20,7 @@ import {errors} from "../messages/FormMessages";
 import {RoutesPath} from "../RoutesPath";
 import {Roles} from "../types/Roles";
 import {Navigate} from "react-router-dom";
+import {successes} from "../messages/APIMessages";
 
 enum FetchState {
     WAITING = 0,
@@ -204,6 +205,9 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             },
         };
         let error = await API.pushAvailabilitiesToManager(listCreate);
+        if(error) {
+            NotificationManager.success(successes.AVAILABILITY_CREATED, successes.CREATED );
+        }
     };
 
     /**
