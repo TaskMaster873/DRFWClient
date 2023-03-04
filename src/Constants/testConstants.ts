@@ -22,57 +22,59 @@ export const testPopupConstant = {
 };
 
 const employee = new Employee({
+    id: "1234",
     firstName: "George",
     lastName: "Belleau",
     email: "georgeBelleau@gmail.com",
     phoneNumber: "418-532-5323",
     department: "Construction",
-    isActive: true,
     jobTitles: ["Manager"],
     skills: ["Gestion de personnel"],
+    isActive: false,
+    hasChangedDefaultPassword: false,
     role: 1,
-    hasChangedDefaultPassword: true
 });
 
 const employee2 = new Employee({
+    id: "1234",
     firstName: "Mathieu",
     lastName: "Bédard",
     email: "mathieubedard@gmail.com",
-    isActive: true,
     phoneNumber: "418-325-2222",
     department: "Informatique",
     jobTitles: [],
     skills: [],
+    isActive: false,
+    hasChangedDefaultPassword: false,
     role: 2,
-    hasChangedDefaultPassword: true
 });
 
 const employeeWithId = new Employee({
-    employeeId: "123",
+    id: "1234",
     firstName: "David",
     lastName: "Gol",
     email: "test@test.test",
-    isActive: true,
     phoneNumber: "977-333-2954",
     department: "Marketing",
     jobTitles: [],
     skills: [],
+    isActive: false,
+    hasChangedDefaultPassword: false,
     role: 1,
-    hasChangedDefaultPassword: true
 });
 
 const employeeWithId2 = new Employee({
-    employeeId: "1234",
+    id: "1234",
     firstName: "John",
     lastName: "Trenta",
     email: "jtrenta@hotmail.com",
-    isActive: true,
     phoneNumber: "976-433-1062",
     department: "Marketing",
     jobTitles: ["Manager"],
     skills: ["Gestion de personnel"],
+    isActive: false,
+    hasChangedDefaultPassword: false,
     role: 1,
-    hasChangedDefaultPassword: true
 });
 
 const employees = [employee];

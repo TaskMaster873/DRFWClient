@@ -31,7 +31,7 @@ service cloud.firestore {
             }
 
             function isValidEmployee(employeeId) {
-                let hasEmployeeFields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role']);
+                let hasEmployeeFields = request.resource.data.keys().hasOnly(['firstName', 'lastName', 'email', 'phoneNumber', 'department', 'jobTitles', 'skills', 'role', 'isActive', 'hasChangedDefaultPassword']);
                 let createdValidEmployee = existsAfter(/databases/$(database)/documents/employees/$(employeeId));
 
                 return createdValidEmployee && hasEmployeeFields

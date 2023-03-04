@@ -1,7 +1,7 @@
 import React from "react";
 import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {API} from "../api/APIManager";
-import {AddEmployeeState, EmployeeCreateDTO,} from "../types/Employee";
+import {AddEmployeeState, Employee, EmployeeCreateDTO} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";

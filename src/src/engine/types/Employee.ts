@@ -19,7 +19,7 @@ export class Employee {
     public firstName: string;
     public email: string;
     public phoneNumber: string;
-    public isActive?: boolean = true;
+    public isActive: boolean;
     public department: string;
     public jobTitles: string[];
     public skills: string[];
@@ -27,7 +27,7 @@ export class Employee {
     public hasChangedDefaultPassword: boolean;
 
     constructor(employee: EmployeeDTO) {
-        this.id = employee.employeeId;
+        this.id = employee.id;
         this.firstName = employee.firstName;
         this.lastName = employee.lastName;
         this.email = employee.email;
@@ -49,6 +49,7 @@ export interface EmployeeCreateDTO {
     readonly lastName: string;
     readonly email: string;
 	readonly phoneNumber: string;
+    readonly isActive: boolean;
 	readonly department: string;
     readonly jobTitles: string[];
     readonly skills: string[];
@@ -57,7 +58,7 @@ export interface EmployeeCreateDTO {
 }
 
 export interface EmployeeDTO {
-    readonly employeeId?: string;
+    readonly id?: string;
     readonly firstName: string;
     readonly lastName: string;
     readonly email: string;
@@ -132,4 +133,10 @@ export interface AddEmployeeState {
     skills: EmployeeSkillList;
     editedEmployee?: EmployeeEditDTO;
     redirectTo: string | null;
+}
+
+export interface EmployeeInfos {
+    role: number;
+    department: string;
+    hasChangedDefaultPassword: boolean;
 }
