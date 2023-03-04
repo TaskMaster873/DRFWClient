@@ -1,5 +1,5 @@
 import React from 'react';
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "@daypilot/daypilot-lite-react";
+import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import {Shift, ShiftForCalendar} from '../types/Shift';
 import {DayPilotCalendarSettings} from '../types/StatesForDaypilot';
 
@@ -88,12 +88,11 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 
 	public render(): JSX.Element {
 		return (
-			<div className='flex_Hundred'>
+			<div className='flex_hundred'>
 				<div className='left'>
-
 					<DayPilotNavigator
 						//how many days showed at a time
-						selectMode={"week"}
+						selectMode={"Week"}
 						//month showed at the same time
 						showMonths={3}
 						//when we change month, it skip to the other 3 months
@@ -110,10 +109,12 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 						ref={this.datePickerRef}
 					/>
 				</div>
+
 				<div className='main'>
 					<DayPilotCalendar
 						//to start the calendar with the good attributes
 						{...this.state.dayPilotSettings}
+						heightSpec={"Parent100Pct"}
 						ref={this.calendarRef}
 					/>
 				</div>

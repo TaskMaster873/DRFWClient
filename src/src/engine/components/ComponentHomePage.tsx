@@ -5,8 +5,9 @@ import Button from "react-bootstrap/Button";
 import Logo from "../../deps/images/logo.png";
 import { API } from "../api/APIManager";
 import {RoutesPath} from "../RoutesPath";
+import {Navigate} from "react-router-dom";
 
-export class ComponentHomePage extends React.Component {
+export class ComponentHomePage extends React.Component<unknown, unknown> {
     private isMounted: boolean = false;
 
     constructor(props) {
@@ -38,7 +39,7 @@ export class ComponentHomePage extends React.Component {
     public render(): JSX.Element {
         if(API.isAuth()) {
             return (
-                <div>User is logged in as {API.getEmployeeName()}</div>
+                <Navigate to={RoutesPath.SCHEDULE}></Navigate>
             );
         } else {
             return (
