@@ -1,6 +1,6 @@
 import React from "react";
 import {API} from "../api/APIManager";
-import {errors} from "../messages/FormMessages";
+import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
@@ -8,8 +8,6 @@ import {Roles} from "../types/Roles";
 import {AvailabilitiesList} from "../components/AvailabilitiesList";
 import {ComponentLoading} from "../components/ComponentLoading";
 import {Employee} from "../types/Employee";
-
-
 
 enum FetchState {
     WAITING = 0,
@@ -115,6 +113,53 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
         }
     }
 
+    readonly #changeAcceptedValue = async (unavailability: any): Promise<void> => {
+        unavailability.isAccepted = !unavailability.isAccepted;
+        const error = await API.changeUnavailabilityAcceptedValue(unavailability);
+
+        if (error) {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+            return;
+        }
+
+        const unavailabilities = this.state.unavailabilities;
+
+        if (!unavailabilities) {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errors.SERVER_ERROR);
+            return;
+        }
+        const oldUnavailability = unavailabilities.find((elem: any) => elem.id === unavailability.id);
+
+        if (!oldUnavailability) {
+            NotificationManager.error(errors.SERVER_ERROR, errors.EMPLOYEE_NOT_FOUND);
+            return;
+        }
+
+        oldUnavailability.isAccepted = unavailability.isAccepted;
+        this.refreshList(oldUnavailability, unavailabilities);
+
+        if (unavailability.isActive) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_ACTIVATED);
+        } else {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
+        }
+    }
+
+    /**
+     * Used to refresh the list of employees
+     * @param unavailability {any} The unavailability to refresh
+     * @param unavailabilities {any[]} The list of unavailabilities
+     * @private
+     * @return {void}
+     */
+    private refreshList(unavailability: any, unavailabilities: any[]) {
+        const index = unavailabilities.findIndex(elem => elem.id == unavailability.id);
+        if (unavailability && index != -1) {
+            unavailabilities[index] = unavailability;
+            this.setState({unavailabilities: unavailabilities});
+        }
+    }
+
     /**
      * Manages the error sending a notification and refreshing the state with error
      * @param error recieved possible error from the API
@@ -141,11 +186,13 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
                 return <AvailabilitiesList
                     employees={this.state.employees}
                     unavailabilities={this.state.unavailabilities}
+                    onChangeAcceptedValue={this.#changeAcceptedValue}
                 />;
             default:
                 return <AvailabilitiesList
                     employees={[]}
                     unavailabilities={[]}
+                    onChangeAcceptedValue={this.#changeAcceptedValue}
                 />;
         }
 

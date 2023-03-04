@@ -52,7 +52,7 @@
   },
   "scripts": {
     "webpack": "webpack",
-    "dev": "concurrently --kill-others \"firebase emulators:start --import=./emulatorSave --export-on-exit\" \"webpack serve\" ",
+    "dev": "concurrently --kill-others \"firebase emulators:start --import=../emulatorSave --export-on-exit\" \"webpack serve\" ",
     "build": "webpack --mode production --progress",
     "emulator": "firebase emulators:start --import=./emulatorSave",
     "export": "firebase emulators:export ./emulatorSave",
