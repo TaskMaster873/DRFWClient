@@ -20,7 +20,7 @@ interface ComponentAvailabilitiesState {
 export class ComponentAvailabilities extends Component<ComponentAvailabilitiesProps, ComponentAvailabilitiesState> {
     private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
     private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
-    
+
     public state: ComponentAvailabilitiesState = {
         daypilotSettings: {
             businessBeginsHour: 0,
@@ -114,8 +114,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     };
 
     /**
-     * 
-     * @param args is the args that the method has by DayPilot 
+     *
+     * @param args is the args that the method has by DayPilot
      */
     readonly #onBeforeCellRender = (args: any): void => {
         let cell = args.cell;
@@ -134,7 +134,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     }
 
     /**
-     * 
+     *
      * @returns all events in the calendar in {DayPilot.EventData[]} or undefined if the calendar is undefined
      */
     public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
@@ -143,7 +143,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
     public render(): JSX.Element {
         return (
-            <div className='wrap'>
+            <div className='flex_hundred'>
                 <div className='left'>
                     <DayPilotNavigator
                         selectMode={"Week"}
@@ -160,6 +160,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                 <div className='main'>
                     <DayPilotCalendar
                         {...this.state.daypilotSettings}
+                        heightSpec={"Parent100Pct"}
+
                         headerDateFormat={"dddd"}
                         viewType={"Week"}
                         businessBeginsHour={0}

@@ -14,7 +14,7 @@ import '../../deps/css/daypilot_custom.css';
 import {ComponentAvailabilitiesPopup} from "../components/ComponentAvailabilitiesPopup";
 import {Timestamp} from "firebase/firestore";
 import {API} from "../api/APIManager";
-import {Container} from "react-bootstrap";
+import {Button, Container} from "react-bootstrap";
 import {NotificationManager} from "../api/NotificationManager";
 import {errors} from "../messages/FormMessages";
 import {RoutesPath} from "../RoutesPath";
@@ -68,8 +68,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     /**
     * get the child componentAvailability
-    * @param 
-    * @param
+    * @param componentAvailability is the child componentAvailability
     * @returns the componentAvailability child of the component
     */
     get componentAvailability() {
@@ -122,16 +121,17 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                     }
                 }
             }
-           
+
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
         return this.computeAllAvailabilities(this.state.currentWeekStart, this.state.currentWeekEnd);
     };
+
     /**
-     * 
+     *
      * @param start the start date selected
-     * @param end the end date selected 
+     * @param end the end date selected
      * @returns {DayPilot.EventData[]}
      */
     readonly #onTimeRangeSelected = (start: Date, end: Date, selectedDate: Date): DayPilot.EventData[] => {
@@ -159,16 +159,18 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                         end={this.toUTC(this.state.currentWeekEnd)}
                         availabilityAdd={this.#createNewAvailabilityRequest}
                     />
-                     <Container className="justify-content-end d-flex mt-3 mb-4 ">
-                        <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Transmettre</button>
-                    </Container>
+
+                    <button type="button" style={{right: 0, position: 'absolute'}} className="btn btn-primary" onClick={() => this.#hideModal(false)}>Transmettre</button>
                 </div>
             );
         }
-
+        /*<Container className="justify-content-end">
+            <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Transmettre</button>
+        </Container>*/
     }
+
     /**
-     * 
+     *
      * @param start is optional and is for the start of a recursiveEvent
      * @param end is optional and is for the start of a recursiveEvent
      */
@@ -259,7 +261,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
     /**
-     * 
+     *
      * @param unavailabilitiesInCalendar is the calendar to transform in Date the DayPilot format of the dates
      * @returns DateOfUnavailabilityList with the information in the @params
      */
@@ -274,7 +276,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
     /**
-     * 
+     *
      * @param active change state of the modal (false = show)
      */
     readonly #hideModal = (active: boolean): void => {
@@ -282,10 +284,10 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     };
 
     /**
-     * 
+     *
      * @param startDate the date to convert
      * @param day the day of the recursive ex: DAYS.SUNDAY
-     * @param numberOfMinutes the minutes of the 
+     * @param numberOfMinutes the minutes of the
      * @returns a Date in good format
      */
     private convertRecursiveExceptionDate(startDate: Date, day: number, numberOfMinutes: number): Date {
@@ -297,8 +299,8 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return date;
     }
     /**
-     * 
-     * @param date 
+     *
+     * @param date
      * @returns a formatted date into utc
      */
     private toUTC(date: Date): DayPilot.Date {

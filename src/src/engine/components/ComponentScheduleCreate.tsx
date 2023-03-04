@@ -1,5 +1,5 @@
 import React from "react";
-import {DayPilot, DayPilotCalendar} from "@daypilot/daypilot-lite-react";
+import {DayPilot, DayPilotCalendar} from "daypilot-pro-react";
 import {EventForCalendar, EventForShiftCreation, EventForShiftEdit} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 import {Employee} from "../types/Employee";
@@ -21,9 +21,9 @@ interface ScheduleCreateState {
 	/** Shift id and serves as a unique DayPilot marker */
 	currentEventId: string;
 	/** start of the calendar */
-	start: DayPilot.Date;
+	start: DayPilot.Date | string;
 	/** end of the calendar */
-	end: DayPilot.Date;
+	end: DayPilot.Date | string;
 	/** for the popup */
 	resource: string;
 	/** Popup taskType */
@@ -60,11 +60,12 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
 					onEventDelete={this.#onEventDelete}
 					startDate={this.props.currentDay}
 					columns={this.getEmployeeColumns()}
-					events={this.props.events}
+					events={this.props.events as any}
 					heightSpec={HeightSpecType.Full}
 					viewType={ViewType.Resources}
 					eventDeleteHandling={EventDeleteHandlingType.Update}
 				/>
+
 				<ComponentPopupSchedule
 					hideModal={this.#hideModal}
 					isShown={this.state.isShowingModal}
@@ -117,7 +118,8 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
 			taskType: EventManipulationType.CREATE,
 		});
 
-		DayPilot.Calendar.clearSelection;
+		// TODO Fix this.
+		//DayPilot.Calendar.clearSelection();
 	};
 
 	/**
@@ -165,7 +167,7 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
 
 	/**
 	 * When you delete an event, this function is called
-	 * @param args 
+	 * @param args
 	 */
 	readonly #onEventDelete = async (args: any): Promise<void> => {
 		let eventToSend: EventForShiftEdit = {
