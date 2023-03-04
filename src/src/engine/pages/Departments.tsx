@@ -96,7 +96,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
     }
 
     //#region Departments
-    public addDepartment = async (department: Department) : Promise<void> => {
+    public addDepartment = async (department: DepartmentModifyDTO) : Promise<void> => {
         let error = await API.createDepartment(department);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);

@@ -4,7 +4,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType} from "../messages/FormMessages";
-import {Department} from "../types/Department";
+import {DepartmentModifyDTO} from "../types/Department";
 import {Employee} from "../types/Employee";
 import FormUtils from "../utils/FormUtils";
 
@@ -17,7 +17,7 @@ interface AddDepartmentState {
 
 interface AddDepartmentProps {
     employees: Employee[];
-    onAddDepartment: (department) => PromiseLike<void> | Promise<void> | void;
+    onAddDepartment: (department: DepartmentModifyDTO) => PromiseLike<void> | Promise<void> | void;
 }
 
 /**
@@ -109,8 +109,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            let department = new Department({name: this.state.name, director: this.state.director});
-            await this.props.onAddDepartment(department);
+            await this.props.onAddDepartment({name: this.state.name, director: this.state.director});
         }
     }
 
