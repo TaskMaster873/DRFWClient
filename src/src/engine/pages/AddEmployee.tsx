@@ -90,7 +90,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     /**
      * Add an employee to the database
      * @param password {string} The password of the employee
-     * @param employee {Employee} The employee to add
+     * @param employee {EmployeeCreateDTO} The employee to add
      * @private
      */
     readonly #addEmployee = async (password: string, employee: EmployeeCreateDTO): Promise<void> => {
