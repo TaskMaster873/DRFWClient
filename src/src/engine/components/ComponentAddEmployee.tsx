@@ -259,7 +259,6 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 role: parseInt(this.state.role),
                 hasChangedDefaultPassword: this.state.hasChangedDefaultPassword
             };
-            console.log(employee);
             this.props.onAddEmployee(this.state.password, employee);
         }
     }
