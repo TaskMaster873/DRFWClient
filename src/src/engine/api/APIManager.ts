@@ -1433,10 +1433,10 @@ class APIManager extends Logger {
         let queryShifts = query(
             collection(this.#db, `shifts`),
             where("department", "==", department.name),
-            where("start", ">", convertedStartDay),
+            where("start", ">=", convertedStartDay),
             where("start", "<", convertedEndDay)
         );
-
+        
         let snaps = await getDocs(queryShifts).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
@@ -1446,7 +1446,7 @@ class APIManager extends Logger {
             for (let doc of snaps.docs) {
                 let shift = doc.data();
                 //Validated end moment
-                if (shift.end < convertedEndDay) {
+                if (shift.end <= convertedEndDay) {
                     //Push shift object
                     shifts.push(new Shift({
                         id: doc.id,
