@@ -10,21 +10,21 @@ export interface DayPilotCalendarSettings {
 	/** show the color for hours that are not business hours */
     cellsMarkBusiness: boolean;
 	/** same as cellMarkBusiness but for the weekend  */
-    businessWeekends: boolean; 
+    businessWeekends: boolean;
 	/** what we see in the header */
-    headerDateFormat: string; 
+    headerDateFormat: string;
 	/** how it show the shifts */
-    viewType: string; 
+    viewType: "Week" | "Day" | "Days" | "WorkWeek" | "Resources" | undefined;
 	/** show the bar of duration  */
-    durationBarVisible: boolean; 
+    durationBarVisible: boolean;
 	/** event daypilot when we click on cells */
-    timeRangeSelectedHandling: string; 
+    timeRangeSelectedHandling: "Disabled" | "CallBack" | "Enabled" | undefined;
 	/** if we can resize events */
-    eventResizeHandling: string;
+    eventResizeHandling: "Disabled" | "Update" | "CallBack" | "Notify" | undefined;
 	/** if wwe can drag event or not */
-    eventMoveHandling: string; 
+    eventMoveHandling: "Disabled" | "Update" | "CallBack" | "Notify" | undefined;
 	/** if we can delete the events */
-    eventDeleteHandling: string; 
+    eventDeleteHandling: "Disabled" | "Update" | "CallBack" | undefined;
 }
 
 
@@ -58,9 +58,9 @@ export enum ViewType {
 
 export enum EventDeleteHandlingType {
 	/** We can delete */
-	Update = "Update", 
+	Update = "Update",
 	/** We cannot delete */
-	Disabled = "Disabled", 
+	Disabled = "Disabled",
 	CallBack = "CallBack",
 	PostBack = "PostBack",
 

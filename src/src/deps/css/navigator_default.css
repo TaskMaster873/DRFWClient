@@ -88,11 +88,10 @@ body .navigator_default_busy {
   cursor: pointer;
 }
 
-.flex_Hundred {
+.flex_hundred {
   display: flex;
   height: 90vh;
 }
-
 
 .wrap {
   display: flex;
@@ -105,10 +104,3 @@ body .navigator_default_busy {
 .main {
   flex-grow: 1;
 }
-
-/*div.calendar_default_main  div:nth-child(2)  {
-  height: 80vh !important;
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color: #ee4f2e;
-  background-color: blue;
-}*/

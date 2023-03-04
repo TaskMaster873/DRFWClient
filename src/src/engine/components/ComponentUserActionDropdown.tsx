@@ -1,5 +1,4 @@
 import React from "react";
-import { LinkContainer } from "react-router-bootstrap";
 
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -10,7 +9,8 @@ import {NotificationManager} from "../api/NotificationManager";
 import {errors, successes} from "../messages/FormMessages";
 import { Nav } from "react-bootstrap";
 import {Navigate} from "react-router-dom";
-import {Routes} from "../api/routes/Routes";
+import {IoSettingsSharp} from "react-icons/io5";
+
 
 interface ComponentUserActionDropdownState {
     redirectTo: string;
@@ -91,7 +91,7 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                     key={'primary'}
                     id={`dropdown-variants-primary`}
                     variant={'primary'}
-                    title={'Paramètres'}
+                    title={<IoSettingsSharp/>}
                 >
                     <Dropdown.Item eventKey="1">
                         <Nav.Link id="logoutLink" className="dropDownMenuText" onClick={this.#logout}>Se déconnecter</Nav.Link>
