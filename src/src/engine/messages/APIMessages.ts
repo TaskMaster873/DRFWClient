@@ -19,5 +19,7 @@ export const errors = {
 export const successes = {
     EMAIL_SENT: "Un courriel a bien été envoyé",
     EMPLOYEE_CREATED: "Un nouvel employé a été ajouté avec succès !",
-    DEPARTMENT_CREATED: "Un nouveau département a été ajouté avec succès !"
+    DEPARTMENT_CREATED: "Un nouveau département a été ajouté avec succès !",
+    AVAILABILITY_CREATED: "Votre demande de disponibilités est envoyée",
+    CREATED: "Succès"
 }
