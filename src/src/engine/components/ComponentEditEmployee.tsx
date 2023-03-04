@@ -50,7 +50,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         this.props = props;
     }
 
-    componentDidUpdate(prevProps: EditEmployeeProps) {
+    public componentDidUpdate(prevProps: EditEmployeeProps): void {
         if (prevProps.editedEmployee !== this.props.editedEmployee) {
             this.setState({
                 department: this.props.editedEmployee?.department,
