@@ -1,5 +1,7 @@
 import {Department} from "../src/engine/types/Department";
 import {Employee} from "../src/engine/types/Employee";
+import {JobTitle} from "../src/engine/types/JobTitle";
+import {Skill} from "../src/engine/types/Skill";
 
 export const testConstants = {
     validEmail: "maxime_labbe@outlook.com",
@@ -92,8 +94,13 @@ const department2 = new Department({
 const departments: Department[] = [department];
 const departments2: Department[] = [department, department2];
 
+let roles = ["Employé"];
+let jobTitles = [new JobTitle({id: "1", name: "Anglophone"})];
+let skills = [new Skill({id: "1", name: "Conducteur de véhicule lourds"} )]
+
+
 const employeeNb: number[] = [1, 2];
 
-export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2, employeesWithIds, department, department2, departments, departments2, employeeNb};
+export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2, employeesWithIds, department, department2, departments, departments2, roles, jobTitles, skills, employeeNb};
 
 

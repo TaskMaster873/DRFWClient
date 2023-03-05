@@ -3,7 +3,7 @@
  */
 
 import "@testing-library/jest-dom";
-import {fireEvent, render} from "@testing-library/react";
+import {fireEvent, render, screen} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
@@ -49,7 +49,7 @@ test("should render form inputs", async () => {
     expect(inputInitialPassword).toHaveAttribute("type", "password");
 });
 
-describe("Empty Fields Login Tests", () => {
+describe("Empty Fields AddEmployee Tests", () => {
     test("Empty employee number should show error", async () => {
         const {
             form,
@@ -262,7 +262,8 @@ describe("Regex Validation AddEmployee Tests", () => {
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
     });
 });
-/* //Will work later, after Context is made and mocked
+//Will work later, after Context is made and mocked
+/*
 test("Valid employee number and password should submit form", async () => {
     const {
         form,
@@ -287,9 +288,7 @@ test("Valid employee number and password should submit form", async () => {
     expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect()
-});
-*/
+});*/
 
 function getFields() {
     const form = document.querySelector("form");
