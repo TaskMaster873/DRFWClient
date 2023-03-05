@@ -5,20 +5,17 @@
 import "@testing-library/jest-dom";
 import {fireEvent, render, screen} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
-import {departments, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
+import {departments, employee, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
+import {ComponentEditEmployee} from "../src/engine/components/ComponentEditEmployee.js";
 jest.mock("../src/engine/api/APIManager");
 let user;
-
 beforeEach(async () => {
     user = userEvent.setup();
     render(<MemoryRouter>
-        <ComponentAddEmployee departments={departments} roles={roles}
-            jobTitles={jobTitles} skills={skills} onAddEmployee={jest.fn()} onAddJobTitle={jest.fn()}
-            onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
-            onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}/>
+        <ComponentEditEmployee departments={departments} jobTitles={jobTitles} editedEmployee={employee} roles={roles} skills={skills} onAddJobTitle={jest.fn()} onAddSkill={jest.fn()}
+                               onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()} onEditEmployee={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}/>
     </MemoryRouter>);
 });
 
@@ -289,22 +286,13 @@ function getFields() {
     const inputName = document.getElementsByName("lastName")[0];
     const inputEmail = document.getElementsByName("email")[0];
     const inputPhoneNumber = document.getElementsByName("phoneNumber")[0];
-    const inputDepartment = document.getElementsByName("department")[0];
     const inputInitialPassword = document.getElementsByName("password")[0];
-    const inputRole = document.getElementsByName("role")[0];
-    const checksJobTitle = document.getElementsByName("jobTitles");
-    const checksSkills = document.getElementsByName("skills");
-
     return {
         form,
         inputEmail,
         inputFirstName,
         inputName,
         inputPhoneNumber,
-        inputDepartment,
         inputInitialPassword,
-        inputRole,
-        checksJobTitle,
-        checksSkills
     };
 }

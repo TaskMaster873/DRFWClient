@@ -51,7 +51,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
             <div className="mt-5">
                 {this.renderSearchBar()}
                 {this.renderList()}
-                {this.renderAddEmployeeButton()}
+                {this.renderNavigationButtons()}
             </div>
         );
     }
@@ -186,16 +186,21 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         );
     }
 
-    private renderAddEmployeeButton(): JSX.Element | undefined {
+    private renderNavigationButtons(): JSX.Element | undefined {
+        let container: JSX.Element = <Button onClick={() => history.back()} className="me-3" variant="secondary">
+            Retour
+        </Button>
         if (API.hasPermission(Roles.ADMIN)) {
             return (
-                <LinkContainer to="/add-employee">
-                    <Button className="mt-3 mb-3">Ajouter</Button>
-                </LinkContainer>
+                <div className="mt-3">
+                    {container}
+                    <LinkContainer to="/add-employee">
+                        <Button>Ajouter</Button>
+                    </LinkContainer>
+                </div>
             );
-        } else {
-            return <></>;
         }
+        return container;
     }
 
     private renderAdminActions(index: number, employee: Employee): JSX.Element | undefined {
