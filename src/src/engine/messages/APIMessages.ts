@@ -15,7 +15,7 @@ export const errors = {
     AUTHENTIFICATION_ERROR: "Une erreur d'authentification s'est produite, veuillez réessayer ultérieurement",
     EMPLOYEE_REMAINING_IN_DEPARTMENT: "Des employés sont toujours présents dans le département",
 
-}
+};
 
 export const successes = {
     EMAIL_SENT: "Un courriel a bien été envoyé",
@@ -23,4 +23,4 @@ export const successes = {
     DEPARTMENT_CREATED: "Un nouveau département a été ajouté avec succès !",
     AVAILABILITY_CREATED: "Votre demande de disponibilités est envoyée",
     CREATED: "Succès"
-}
+};

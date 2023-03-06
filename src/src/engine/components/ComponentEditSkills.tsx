@@ -56,7 +56,8 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
 
     public render(): JSX.Element {
         return <div><ComponentConfirmDeleteSkill closePrompt={this.#onShowConfirmDeleteSkills}
-                                                    skill={this.state.skillToDelete} onDeleteSkill={this.props.onDeleteSkill}/>
+                                                 skill={this.state.skillToDelete}
+                                                 onDeleteSkill={this.props.onDeleteSkill}/>
             <Modal show={this.props.showEdit} onHide={this.hideModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Édition de compétence</Modal.Title>
@@ -188,7 +189,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
 
         if (errorType === FormErrorType.NO_ERROR) {
             formDataObj.id = this.state.editedSkill?.id;
-            if(formDataObj.id) {
+            if (formDataObj.id) {
                 await this.props.onEditSkill(formDataObj);
             }
             this.setState({editedSkill: undefined});

@@ -19,18 +19,116 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         employeeNb: [],
         departments: [],
         redirectTo: null
-    }
+    };
 
-    public async componentDidMount() : Promise<void> {
+    public async componentDidMount(): Promise<void> {
         document.title = "Départements - TaskMaster";
 
         let isLoggedIn: boolean = await this.verifyLogin();
 
-        if(isLoggedIn) {
+        if (isLoggedIn) {
             await this.fetchData();
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
+    }
+
+    /**
+     * Get the employees, the departments and the number of employee in the department from the database and set the state of the component.
+     * Display a notification to the user if the operation was successful or not.
+     * @returns {Promise<void>}
+     */
+    public async fetchData(): Promise<void> {
+        let _employees = API.getEmployees();
+        let departments = await API.getDepartments();
+
+        if (Array.isArray(departments)) {
+            let _employeeNb = API.getEmployeeNbDepartments(departments);
+
+            let employees = await _employees;
+            let employeeNb = await _employeeNb;
+            if (Array.isArray(employees) && Array.isArray(employeeNb)) {
+                this.setState({employees: employees, employeeNb: employeeNb, departments: departments});
+            } else {
+                console.error(errors.GET_EMPLOYEES, employees, employeeNb);
+            }
+        } else {
+            console.error(errors.GET_DEPARTMENTS, departments);
+        }
+    }
+
+    //#region Departments
+    public addDepartment = async (department: DepartmentModifyDTO): Promise<void> => {
+        let error = await API.createDepartment(department);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
+
+            let departments = this.state.departments;
+            let employeeNb = this.state.employeeNb;
+
+            departments.push(department);
+            employeeNb.push(0);
+
+            this.setState({departments: departments, employeeNb: employeeNb});
+            await this.fetchData();
+        } else {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+        }
+    };
+
+    /**
+     * Edit a department in the database and display a notification to the user if the operation was successful or not.
+     * @param departmentId {string} The id of the department to edit
+     * @param department {DepartmentModifyDTO} The department to edit
+     * @param oldDepartmentName The old department name
+     */
+    public editDepartment = async (departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string): Promise<void> => {
+        let error = await API.editDepartment(departmentId, department, oldDepartmentName);
+        if (!error) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
+            let departments = Utils.editElement(this.state.departments, departmentId, department) as Department[];
+            this.setState({departments: departments});
+            await this.fetchData();
+        } else {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+        }
+    };
+
+    public deleteDepartment = async (department: Department): Promise<void> => {
+        let error = await API.deleteDepartment(department);
+        if (!error && department.id) {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
+            let departments = Utils.deleteElement(this.state.departments, department.id) as Department[];
+            this.setState({departments: departments});
+            await this.fetchData();
+        } else if (error) {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+        }
+    };
+
+    /**
+     *
+     * @returns La liste des employés
+     */
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (
+                <Navigate to={this.state.redirectTo}></Navigate>
+            );
+        }
+
+        return (
+            <Container>
+                <ComponentDepartmentList
+                    employees={this.state.employees}
+                    employeeNb={this.state.employeeNb}
+                    departments={this.state.departments}
+                    onAddDepartment={this.addDepartment}
+                    onEditDepartment={this.editDepartment}
+                    onDeleteDepartment={this.deleteDepartment}
+                />
+            </Container>
+        );
     }
 
     /**
@@ -60,6 +158,8 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         return isLoggedIn;
     }
 
+    //#endregion
+
     /**
      * Redirect to a path
      * @param path
@@ -69,104 +169,5 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         this.setState({
             redirectTo: path
         });
-    }
-
-    /**
-     * Get the employees, the departments and the number of employee in the department from the database and set the state of the component.
-     * Display a notification to the user if the operation was successful or not.
-     * @returns {Promise<void>}
-     */
-    public async fetchData() : Promise<void> {
-        let _employees = API.getEmployees();
-        let departments = await API.getDepartments();
-
-        if (Array.isArray(departments)) {
-            let _employeeNb = API.getEmployeeNbDepartments(departments);
-
-            let employees = await _employees;
-            let employeeNb = await _employeeNb;
-            if(Array.isArray(employees) && Array.isArray(employeeNb)) {
-                this.setState({employees: employees, employeeNb: employeeNb, departments: departments});
-            } else {
-                console.error(errors.GET_EMPLOYEES, employees, employeeNb);
-            }
-        } else {
-            console.error(errors.GET_DEPARTMENTS, departments);
-        }
-    }
-
-    //#region Departments
-    public addDepartment = async (department: DepartmentModifyDTO) : Promise<void> => {
-        let error = await API.createDepartment(department);
-        if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
-
-            let departments = this.state.departments;
-            let employeeNb = this.state.employeeNb;
-
-            departments.push(department);
-            employeeNb.push(0);
-
-            this.setState({departments: departments, employeeNb: employeeNb});
-            await this.fetchData();
-        } else {
-            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
-        }
-    }
-
-    /**
-     * Edit a department in the database and display a notification to the user if the operation was successful or not.
-     * @param departmentId {string} The id of the department to edit
-     * @param department {DepartmentModifyDTO} The department to edit
-     * @param oldDepartmentName The old department name
-     */
-    public editDepartment = async (departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string) : Promise<void> => {
-        let error = await API.editDepartment(departmentId, department, oldDepartmentName);
-        if (!error) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
-            let departments = Utils.editElement(this.state.departments, departmentId, department) as Department[];
-            this.setState({departments: departments});
-            await this.fetchData();
-        } else {
-            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
-        }
-    }
-
-    public deleteDepartment = async (department: Department) : Promise<void> => {
-        let error = await API.deleteDepartment(department);
-        if (!error && department.id) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
-            let departments = Utils.deleteElement(this.state.departments, department.id) as Department[];
-            this.setState({departments: departments});
-            await this.fetchData();
-        } else if(error) {
-            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
-        }
-    }
-    //#endregion
-
-    /**
-     *
-     * @returns La liste des employés
-     */
-    public render(): JSX.Element {
-        if(this.state.redirectTo) {
-            return (
-                <Navigate to={this.state.redirectTo}></Navigate>
-            );
-        }
-
-        return (
-            <Container>
-                <ComponentDepartmentList
-                    employees={this.state.employees}
-                    employeeNb={this.state.employeeNb}
-                    departments={this.state.departments}
-                    onAddDepartment={this.addDepartment}
-                    onEditDepartment={this.editDepartment}
-                    onDeleteDepartment={this.deleteDepartment}
-                />
-            </Container>
-        );
     }
 }

@@ -159,6 +159,7 @@ service cloud.firestore {
                 allow read;
                 allow write: if isValidUnavailabilityCreate(unavailabilityId);
                 allow update: if isValidForUpdate(unavailabilityId);
+                allow delete: if isValidUnavailabilityDelete(unavailabilityId)
 
             }
 
@@ -179,6 +180,15 @@ service cloud.firestore {
 
                 return createdValidUnavailability && isAllowed;
             }
+
+            function isValidUnavailabilityDelete(unavailabilityId) {
+                let validUnavailability = existsAfter(/databases/$(database)/documents/unavailabilities/$(unavailabilityId));
+                let employeeId = request.resource.data.employeeId;
+                let employeeDepartment = get(/databases/$(database)/documents/employees/$(employeeId)).data.department;
+                let isAllowed = getCurrentEmployeeRole(request.auth.uid) >= 3 || isManagerAllowedUnavailabilities(employeeDepartment);
+
+                return !validUnavailability && isAllowed;            }
+
              function isTheSameEmployee(employeeId) {
                 let isTheSameEmployee = employeeId == request.auth.uid;
                 return isTheSameEmployee;

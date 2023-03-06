@@ -5,11 +5,11 @@ class InternalFilterUtils {
      * This array contains the keys of the Employee object that we want to ignore
      */
     readonly ignoredElementsEmployee: string[] = [
-        'isActive',
-        'role',
-        'skills',
-        'jobTitles',
-        'department',
+        "isActive",
+        "role",
+        "skills",
+        "jobTitles",
+        "department",
     ];
 
     /**
@@ -23,7 +23,7 @@ class InternalFilterUtils {
      * @private
      * @memberof InternalFilterUtils
      */
-    public filterEmployeeList(list: Employee[], searchTerm: string) : Employee[] {
+    public filterEmployeeList(list: Employee[], searchTerm: string): Employee[] {
         return list.filter((objectItem: Employee) => {
             let startWith = false;
             let keys: string[] = Object.keys(objectItem);
@@ -36,7 +36,7 @@ class InternalFilterUtils {
                  * If the key is in the ignoredElementsEmployee array, we skip it
                  * If the value is not a string or a number, we skip it
                  */
-                if(!(typeof(value) === 'string' || typeof(value) === 'number') || this.ignoredElementsEmployee.includes(key) || (typeof(value) !== 'string' && typeof(value) !== 'number')) {
+                if (!(typeof (value) === "string" || typeof (value) === "number") || this.ignoredElementsEmployee.includes(key) || (typeof (value) !== "string" && typeof (value) !== "number")) {
                     continue;
                 }
 

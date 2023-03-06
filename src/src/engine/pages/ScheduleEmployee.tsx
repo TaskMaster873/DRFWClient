@@ -35,7 +35,7 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         document.title = "Horaire - TaskMaster";
 
         let isLoggedIn: boolean = await this.verifyLogin();
-        if(isLoggedIn) {
+        if (isLoggedIn) {
             let shifts = await this.loadShiftsFromAPI();
             if (typeof shifts === "string") {
                 this.setState({fetchState: enumStateOfFetching.ERROR});
@@ -45,6 +45,23 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
             }
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
+        }
+    }
+
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        }
+
+        let listData: Shift[] = this.state.list;
+        if (this.state.fetchState === enumStateOfFetching.WAITING) {
+            return (
+                <ComponentLoading/>
+            );
+        } else if (this.state.fetchState === enumStateOfFetching.OK) {
+            return (<ComponentEmployeeScheduleView shifts={listData}/>);
+        } else {
+            return (<ComponentEmployeeScheduleView shifts={[]}/>);
         }
     }
 
@@ -89,22 +106,5 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
     // I did this function if we need to do something before the return (if there is some changes)
     private async loadShiftsFromAPI(): Promise<Shift[] | string> {
         return await API.getCurrentEmployeeSchedule();
-    }
-
-    public render(): JSX.Element {
-        if(this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}></Navigate>);
-        }
-
-        let listData: Shift[] = this.state.list;
-        if (this.state.fetchState === enumStateOfFetching.WAITING) {
-            return (
-                <ComponentLoading />
-            );
-        } else if (this.state.fetchState === enumStateOfFetching.OK) {
-            return (<ComponentEmployeeScheduleView shifts={listData}/>);
-        } else {
-            return (<ComponentEmployeeScheduleView shifts={[]}/>);
-        }
     }
 }

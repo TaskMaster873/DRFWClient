@@ -1,6 +1,6 @@
 export enum FormErrorType {
-    NO_ERROR = '0',
-    INVALID_FORM = '1'
+    NO_ERROR = "0",
+    INVALID_FORM = "1"
 }
 
 export const errors = {
@@ -38,7 +38,7 @@ export const errors = {
     SORRY: "Oops!",
     NO_PERMISSION: "Vous n'avez pas les permissions nécessaires pour visiter cette page.",
     GET_AVAILABILITIES: "Une erreur s'est produite lors de la récupération des données des disponibilités.",
-}
+};
 
 export const successes = {
     SUCCESS_GENERIC_MESSAGE: "Succès",
@@ -58,10 +58,12 @@ export const successes = {
     JOB_TITLE_EDITED: "Le corps d'emploi a bien été modifié !",
     SKILL_EDITED: "La compétence a bien été modifié !",
     JOB_TITLE_DELETED: "Le corps d'emploi a bien été supprimé !",
-    SKILL_DELETED: "La compétence a bien été supprimé !"
-}
+    SKILL_DELETED: "La compétence a bien été supprimé !",
+    AVAILABILITY_ACCEPTED: "La demande de disponibilité a bien été acceptée !",
+    AVAILABILITY_REFUSED: "La demande de disponibilité a bien été refusée !",
+};
 
 export const info = {
     PASSWORD_RESET: "Réinitialisation du mot de passe",
     EMAIL_SENT: "Un courriel a été envoyé à votre adresse courriel."
-}
+};

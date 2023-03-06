@@ -21,6 +21,7 @@ export default class Utils {
         }
         return array;
     }
+
     /**
      * This method deletes manually an element in an array
      * @param array the array of elements with an id
