@@ -24,6 +24,10 @@ class InternalNotificationManager {
         this.showNotification(title, message, NotificationType.INFO);
     }
 
+    /**
+     * FOR UNIT TESTS ONLY
+     * @private
+     */
     private hasProcess(): boolean {
         let hasProcess = false;
         try {
