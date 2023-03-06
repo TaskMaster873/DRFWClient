@@ -4,7 +4,6 @@ import {NotificationManager} from "../api/NotificationManager";
 import {errors} from "../messages/FormMessages";
 import {Employee} from "../types/Employee";
 import {unavailabilitiesTableHeads} from "../types/EmployeeAvailabilities";
-import {API} from "../api/APIManager";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 
 
@@ -15,6 +14,24 @@ type Props = {
 };
 
 export class AvailabilitiesList extends React.Component<Props> {
+
+    public render(): JSX.Element {
+        return (
+            <Container className="mt-5">
+                <h3>Liste des demandes de changement de disponibilités</h3>
+                <Table responsive bordered hover className="text-center">
+                    <thead>
+                    <tr key={"firstCol"}>
+                        {unavailabilitiesTableHeads.map((th) => (<th key={th}>{th}</th>))}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.unavailabilitiesList()}
+                    </tbody>
+                </Table>
+            </Container>
+        );
+    }
 
     /**
      * Creates the html elements of the employees name for the html table data
@@ -44,6 +61,7 @@ export class AvailabilitiesList extends React.Component<Props> {
             </>
         );
     }
+
     /**
      * Return the list of availability requests with their firstName, lastName, start and end
      * @returns {JSX.Element[]} The html table data for availabilities
@@ -77,33 +95,15 @@ export class AvailabilitiesList extends React.Component<Props> {
     }
 
     private renderActions(index: number, unavailability: any): JSX.Element | undefined {
-            let component: JSX.Element = <CgUnavailable/>;
-            if (!unavailability.isAccepted) {
-                component = <CgCheckO/>
-            }
-            return (
-                <td key={`action ${index}`}>
-                    <a className="adminActions ms-1 mx-1"
-                       onClick={() => this.props.onChangeAcceptedValue(unavailability)}>{component}</a>
-                </td>
-            );
-    }
-
-    public render(): JSX.Element {
+        let component: JSX.Element = <CgUnavailable/>;
+        if (!unavailability.isAccepted) {
+            component = <CgCheckO/>
+        }
         return (
-            <Container className="mt-5">
-                <h3>Liste des demandes de changement de disponibilités</h3>
-                <Table responsive bordered hover className="text-center">
-                    <thead>
-                        <tr key={"firstCol"}>
-                            {unavailabilitiesTableHeads.map((th) => (<th key={th}>{th}</th>))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.unavailabilitiesList()}
-                    </tbody>
-                </Table>
-            </Container>
+            <td key={`action ${index}`}>
+                <a className="adminActions ms-1 mx-1"
+                   onClick={() => this.props.onChangeAcceptedValue(unavailability)}>{component}</a>
+            </td>
         );
     }
 }

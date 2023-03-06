@@ -6,7 +6,7 @@ import {EventForCalendar, EventForShiftCreation, EventForShiftEdit, Shift} from 
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {Department} from "../types/Department";
 import {SelectDepartment} from "../components/SelectDepartment";
-import {Container} from "react-bootstrap";
+import {Col, Container, Row} from "react-bootstrap";
 import {Employee} from "../types/Employee";
 import {errors} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
@@ -73,6 +73,82 @@ export class CreateSchedule extends React.Component<unknown, State> {
         }
     }
 
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}/>);
+        }
+
+        switch (this.state.fetchState) {
+            case FetchState.WAITING:
+                return <ComponentLoading/>;
+            case FetchState.OK:
+                if (this.state.departments.length > 1) {
+                    return (
+                        <Container fluid={true}>
+                            <Row className={"mx-auto"}>
+                                <Col>
+                                    <SelectDepartment
+                                        departments={this.state.departments}
+                                        changeDepartment={this.#changeDepartment}
+                                    />
+                                </Col>
+                                <Col>
+                                    <SelectDate
+                                        currentDay={this.state.currentDay}
+                                        changeDay={this.#changeDay}
+                                    />
+                                </Col>
+                            </Row>
+
+                            <Row className={"mt-3"}>
+                                <ComponentScheduleCreate
+                                    currentDay={this.state.currentDay}
+                                    events={this.getEventsForCalendarFromShifts(this.state.shifts)}
+                                    employees={this.state.employees}
+                                    addShift={this.#addShift}
+                                    editShift={this.#editShift}
+                                    deleteShift={this.#deleteShift}
+                                />
+                            </Row>
+                        </Container>
+                    );
+                } else {
+                    return (
+                        <Container fluid={true}>
+                            <Row className={"mx-auto"}>
+                                <Col>
+                                    <SelectDate
+                                        currentDay={this.state.currentDay}
+                                        changeDay={this.#changeDay}
+                                    />
+                                </Col>
+                            </Row>
+
+                            <Row className={"mt-3"}>
+                                <ComponentScheduleCreate
+                                    currentDay={this.state.currentDay}
+                                    events={this.getEventsForCalendarFromShifts(this.state.shifts)}
+                                    employees={this.state.employees}
+                                    addShift={this.#addShift}
+                                    editShift={this.#editShift}
+                                    deleteShift={this.#deleteShift}
+                                />
+                            </Row>
+                        </Container>
+                    );
+                }
+            default:
+                return <ComponentScheduleCreate
+                    currentDay={this.state.currentDay}
+                    events={[]}
+                    employees={[]}
+                    addShift={this.#addShift}
+                    editShift={this.#editShift}
+                    deleteShift={this.#deleteShift}
+                />;
+        }
+    }
+
     /**
      * Verify if the user has the permission to access this page
      * @param role
@@ -113,8 +189,8 @@ export class CreateSchedule extends React.Component<unknown, State> {
 
     /**
      * Change employees, shifts to a new current department and refresh state down the function chain (Start of function chain)
-     * @param currentDepartment 
-     * @param departments 
+     * @param currentDepartment
+     * @param departments
      */
     readonly #changeDepartment = async (currentDepartment: Department, departments?: Department[]): Promise<void> => {
         //Get all employees of this department
@@ -153,7 +229,6 @@ export class CreateSchedule extends React.Component<unknown, State> {
             });
         }
     };
-
 
     /**
      * Adds a shift to the DB and refreshes the state (Halfway through the function chain)
@@ -253,65 +328,5 @@ export class CreateSchedule extends React.Component<unknown, State> {
             });
         }
         return events;
-    }
-
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo} />);
-        }
-
-        switch (this.state.fetchState) {
-            case FetchState.WAITING:
-                return <ComponentLoading />;
-            case FetchState.OK:
-                if (this.state.departments.length > 1) {
-                    return (
-                        <Container className="mb-4">
-                            <SelectDepartment
-                                departments={this.state.departments}
-                                changeDepartment={this.#changeDepartment}
-                            />
-                            <SelectDate
-                                currentDay={this.state.currentDay}
-                                changeDay={this.#changeDay}
-                            />
-                            <ComponentScheduleCreate
-                                currentDay={this.state.currentDay}
-                                events={this.getEventsForCalendarFromShifts(this.state.shifts)}
-                                employees={this.state.employees}
-                                addShift={this.#addShift}
-                                editShift={this.#editShift}
-                                deleteShift={this.#deleteShift}
-                            />
-                        </Container>
-                    );
-                } else {
-                    return (
-                        <Container className="mb-4">
-                            <ComponentScheduleCreate
-                                currentDay={this.state.currentDay}
-                                events={this.getEventsForCalendarFromShifts(this.state.shifts)}
-                                employees={this.state.employees}
-                                addShift={this.#addShift}
-                                editShift={this.#editShift}
-                                deleteShift={this.#deleteShift}
-                            />
-                            <SelectDate
-                                currentDay={this.state.currentDay}
-                                changeDay={this.#changeDay}
-                            />
-                        </Container>
-                    );
-                }
-            default:
-                return <ComponentScheduleCreate
-                    currentDay={this.state.currentDay}
-                    events={[]}
-                    employees={[]}
-                    addShift={this.#addShift}
-                    editShift={this.#editShift}
-                    deleteShift={this.#deleteShift}
-                />;
-        }
     }
 }
