@@ -78,6 +78,7 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
             <div className='flex_hundred'>
                 <div className='left'>
                     <DayPilotNavigator
+                        locale= {"fr-fr"}
                         //how many days showed at a time
                         selectMode={"Week"}
                         //month showed at the same time
@@ -103,6 +104,7 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
                         {...this.state.dayPilotSettings}
                         heightSpec={"Parent100Pct"}
                         ref={this.calendarRef}
+                        locale= {"fr-fr"}
                     />
                 </div>
             </div>

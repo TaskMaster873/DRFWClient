@@ -60,6 +60,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
             <div className={"flex_hundred"}>
                 <div className={"left"}>
                     <DayPilotNavigator
+                        locale= {"fr-fr"}
                         selectMode={"Week"}
                         showMonths={1}
                         skipMonths={1}
@@ -74,7 +75,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                 <div className='main'>
                     <DayPilotCalendar
                         heightSpec={"Parent100Pct"}
-
+                        locale= {"fr-fr"}
                         headerDateFormat={"dddd"}
                         viewType={"Week"}
                         businessBeginsHour={6}
