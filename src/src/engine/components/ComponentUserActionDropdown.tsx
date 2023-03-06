@@ -47,17 +47,15 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                     variant={"primary"}
                     title={<IoSettingsSharp/>}
                 >
-                    <Dropdown.Menu>
                         <Dropdown.Item eventKey="1">
-                            <Nav.Link id="logoutLink" className={"dropDownMenuText"} onClick={this.#logout}>Se
-                                déconnecter</Nav.Link>
+                            <Nav id="logoutLink" className={"dropDownMenuText"} onClick={this.#logout}>Se
+                                déconnecter</Nav>
                         </Dropdown.Item>
                         <Dropdown.Divider/>
                         <Dropdown.Item eventKey="2">
-                            <Nav.Link id="changePassword" className={"dropDownMenuText"} onClick={this.#changePassword}>Changer
-                                mon mot de passe</Nav.Link>
+                            <Nav id="changePassword" className={"dropDownMenuText"} onClick={this.#changePassword}>Changer
+                                mon mot de passe</Nav>
                         </Dropdown.Item>
-                    </Dropdown.Menu>
 
                 </DropdownButton>
             );
