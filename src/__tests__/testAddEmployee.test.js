@@ -25,11 +25,14 @@ beforeEach(async () => {
 test("should render form inputs", async () => {
     const {
         form,
-        inputEmail,
         inputFirstName,
         inputName,
         inputPhoneNumber,
         inputInitialPassword,
+        inputDepartment,
+        checksJobTitle,
+        checksSkills,
+        inputEmail,
     } = getFields();
 
     expect(form).not.toBeNull();
@@ -38,6 +41,9 @@ test("should render form inputs", async () => {
     expect(inputName).not.toBeNull();
     expect(inputPhoneNumber).not.toBeNull();
     expect(inputInitialPassword).not.toBeNull();
+    expect(inputDepartment).not.toBeNull();
+    expect(checksJobTitle).not.toBeNull();
+    expect(checksSkills).not.toBeNull();
     expect(inputPhoneNumber).toHaveAttribute("type", "tel");
     expect(inputInitialPassword).toHaveAttribute("type", "password");
 });
@@ -210,7 +216,7 @@ describe("Regex Validation AddEmployee Tests", () => {
             inputFirstName,
             inputName,
             inputPhoneNumber,
-            inputInitialPassword,
+            inputInitialPassword
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
@@ -236,7 +242,7 @@ describe("Regex Validation AddEmployee Tests", () => {
             inputFirstName,
             inputName,
             inputPhoneNumber,
-            inputInitialPassword,
+            inputInitialPassword
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
@@ -249,15 +255,104 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
-        expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
+        expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.invalidPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
     });
 });
 //Will work later, after Context is made and mocked
-/*
-test("Valid employee number and password should submit form", async () => {
+
+describe("Optional fields EditEmployee tests", () => {
+    test("Adding jobTitle should be valid", async () => {
+        const {
+            form,
+            inputEmail,
+            inputFirstName,
+            inputName,
+            inputPhoneNumber,
+            inputInitialPassword,
+            checksJobTitle
+        } = getFields();
+
+        await user.type(inputEmail, testConstants.validEmail);
+        await user.type(inputFirstName, testConstants.validFirstName);
+        await user.type(inputName, testConstants.validName);
+        await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+        await user.type(inputInitialPassword, testConstants.validPassword);
+        await user.click(checksJobTitle[0]);
+
+        fireEvent.submit(form);
+
+        expect(inputEmail.value).toBe(testConstants.validEmail);
+        expect(inputFirstName.value).toBe(testConstants.validFirstName);
+        expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
+        expect(inputInitialPassword.value).toBe(testConstants.validPassword);
+        expect(checksJobTitle.checked).toBeTruthy();
+        expect(form.classList.contains("was-validated")).toBeTruthy();
+        expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    });
+
+    test("Adding skill should be valid", async () => {
+        const {
+            form,
+            inputEmail,
+            inputFirstName,
+            inputName,
+            inputPhoneNumber,
+            inputInitialPassword,
+            checksSkills
+        } = getFields();
+
+        await user.type(inputEmail, testConstants.validEmail);
+        await user.type(inputFirstName, testConstants.validFirstName);
+        await user.type(inputName, testConstants.validName);
+        await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+        await user.type(inputInitialPassword, testConstants.validPassword);
+        await user.click(skills[0]);
+
+        fireEvent.submit(form);
+
+        expect(inputEmail.value).toBe(testConstants.validEmail);
+        expect(inputFirstName.value).toBe(testConstants.validFirstName);
+        expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
+        expect(inputInitialPassword.value).toBe(testConstants.validPassword);
+        expect(checksSkills[0].checked).toBeTruthy();
+        expect(form.classList.contains("was-validated")).toBeTruthy();
+        expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    });
+
+    test("Can change role input valid", async () => {
+        const {
+            form,
+            inputEmail,
+            inputFirstName,
+            inputName,
+            inputPhoneNumber,
+            inputInitialPassword,
+            inputDepartment,
+        } = getFields();
+
+        await user.type(inputEmail, testConstants.validEmail);
+        await user.type(inputFirstName, testConstants.validFirstName);
+        await user.type(inputName, testConstants.validName);
+        await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+        await user.type(inputInitialPassword, testConstants.validPassword);
+        await user.selectOptions(inputDepartment, departments[0].name);
+
+        fireEvent.submit(form);
+
+        expect(inputEmail.value).toBe(testConstants.validEmail);
+        expect(inputFirstName.value).toBe(testConstants.validFirstName);
+        expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
+        expect(inputInitialPassword.value).toBe(testConstants.validPassword);
+        expect(checksSkills[0].checked).toBeTruthy();
+        expect(form.classList.contains("was-validated")).toBeTruthy();
+        expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    });
+});
+
+test("Valid employee infos should submit form", async () => {
     const {
         form,
         inputEmail,
@@ -281,7 +376,7 @@ test("Valid employee number and password should submit form", async () => {
     expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-});*/
+});
 
 function getFields() {
     const form = document.querySelector("form");
@@ -296,15 +391,15 @@ function getFields() {
     const checksSkills = document.getElementsByName("skills");
 
     return {
+        checksJobTitle,
+        checksSkills,
         form,
+        inputDepartment,
         inputEmail,
         inputFirstName,
+        inputInitialPassword,
         inputName,
         inputPhoneNumber,
-        inputDepartment,
-        inputInitialPassword,
-        inputRole,
-        checksJobTitle,
-        checksSkills
+        inputRole
     };
 }
