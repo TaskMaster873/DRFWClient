@@ -382,7 +382,6 @@ class APIManager extends Logger {
         });
 
         if (userCredentials !== null && userCredentials) {
-            console.log("credentials", userCredentials);
 
             if (userCredentials.user !== null && userCredentials.user) {
                 this.#user = userCredentials.user;
@@ -490,9 +489,6 @@ class APIManager extends Logger {
                         } else {
                             this.#employeeInfos = result as EmployeeInfos;
                         }
-
-                        console.log("user", user);
-                        console.log("employeeInfos", this.#employeeInfos);
                     }
                     await this.onEvent();
 
