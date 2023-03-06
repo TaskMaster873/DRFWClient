@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {ChangeEvent, ChangeEventHandler, FormEvent, useState} from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
@@ -7,6 +7,7 @@ import {EventForShiftCreation, EventForShiftEdit} from "../types/Shift";
 import {errors, FormErrorType} from '../messages/FormMessages';
 import {EventManipulationType} from '../types/StatesForDaypilot';
 import {Employee} from '../types/Employee';
+import FormUtils from "../utils/FormUtils";
 
 type Props = {
 	eventAdd: (shiftEvent: EventForShiftCreation) => Promise<void>;
@@ -35,17 +36,7 @@ export function ComponentPopupSchedule(props: Props) {
 	 * @returns {void}
 	 */
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-		const form = event.currentTarget;
-		let isValid = form.checkValidity();
-		let errorType = FormErrorType.NO_ERROR;
-
-		if (!isValid) {
-			errorType = FormErrorType.INVALID_FORM;
-		}
-
-		event.preventDefault();
-		event.stopPropagation();
-
+		let errorType = FormUtils.validateForm(event);
 		setValidated(true);
 		setError(errorType);
 
@@ -99,20 +90,20 @@ export function ComponentPopupSchedule(props: Props) {
 	};
 
 	return (
-		<Modal show={props.isShown} >
+		<Modal show={props.isShown}>
 			<Modal.Header closeButton onClick={() => closeModal()}>
 				<Modal.Title>{props.taskType} un quart de travail</Modal.Title>
 			</Modal.Header>
-			<Form onSubmit={(e) => handleSubmit(e)} validated={validated} data-error={error}>
+			<Form onSubmit={(e: FormEvent<HTMLFormElement>) => handleSubmit(e)} validated={validated} data-error={error}>
 				<Modal.Body>
 					<Form.Group className="mb-6">
 						<Form.Label>Employé assigné</Form.Label>
 						<Form.Select
 							id="assignedEmployee"
-							onChange={(e) => setEmployeeId(e.target.value)}
+							onChange={(e: ChangeEvent<HTMLSelectElement>) => setEmployeeId(e.target.value)}
 							defaultValue={props.resource}
 						>
-							{props.employees.map((employee) => (
+							{props.employees.map((employee: Employee) => (
 								<option 
 									value={employee.id}
 									key={employee.id}
@@ -129,7 +120,7 @@ export function ComponentPopupSchedule(props: Props) {
 							type="datetime-local"
 							defaultValue={props.start}
 							step="1800"
-							onChange={(e) => {setStart(e.target.value);}}
+							onChange={(e: ChangeEvent<HTMLInputElement>) => {setStart(e.target.value);}}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidStartDate">
 							{errors.INVALID_DATETIME}
@@ -142,7 +133,7 @@ export function ComponentPopupSchedule(props: Props) {
 							type="datetime-local"
 							defaultValue={props.end}
 							step="1800"
-							onChange={(e) => setEnd(e.target.value)}
+							onChange={(e: ChangeEvent<HTMLInputElement>) => setEnd(e.target.value)}
 						/>
 						<Form.Control.Feedback type="invalid" id="invalidEndDate">
 							{errors.INVALID_DATETIME}

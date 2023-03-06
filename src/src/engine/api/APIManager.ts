@@ -4,11 +4,7 @@ import {FirebaseApp, initializeApp} from "firebase/app";
 import {Analytics, getAnalytics, isSupported} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {
-    confirmPasswordReset,
-    connectAuthEmulator,
-    verifyPasswordResetCode,
-} from "firebase/auth";
+import {confirmPasswordReset, connectAuthEmulator, verifyPasswordResetCode} from "firebase/auth";
 import {
     addDoc,
     collection,
@@ -31,8 +27,10 @@ import {
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {
-    Employee, EmployeeCreateDTO,
-    EmployeeEditDTO, EmployeeInfos,
+    Employee,
+    EmployeeCreateDTO,
+    EmployeeEditDTO,
+    EmployeeInfos,
     EmployeeJobTitleList,
     EmployeeRoleList,
     EmployeeSkillList
@@ -40,12 +38,7 @@ import {
 import {Department, DepartmentModifyDTO} from "../types/Department";
 import {Shift, ShiftCreateDTO} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
-import {
-    CreatedAccountData,
-    Task,
-    ThreadMessage,
-    ThreadMessageType,
-} from "./types/ThreadMessage";
+import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType,} from "./types/ThreadMessage";
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
@@ -502,7 +495,6 @@ class APIManager extends Logger {
         });
 
         await this.awaitLogin;
-        this.log("Login resolved!");
     }
 
     /**
@@ -565,10 +557,7 @@ class APIManager extends Logger {
                     await enableIndexedDbPersistence(this.#db).catch((err) =>
                         console.log(err.message)
                     );
-                    this.log("IndexedDB persistence enabled");
                 }
-
-                this.log("Firebase emulators loaded");
             }
 
             await this.enablePersistence();
@@ -1803,7 +1792,7 @@ class APIManager extends Logger {
         let errorMessage: string | null = null;
 
         if (unavailability.id) {
-            if (!this.hasPermission) {
+            if (!this.hasPermission(Roles.ADMIN)) {
                 return errors.PERMISSION_DENIED;
             }
             await updateDoc(doc(this.#db, `unavailabilities`, unavailability.id), {isAccepted: unavailability.isAccepted}).catch((error) => {

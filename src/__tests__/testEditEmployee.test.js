@@ -3,14 +3,16 @@
  */
 
 import "@testing-library/jest-dom";
-import {fireEvent, render, screen} from "@testing-library/react";
+import {fireEvent, render} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {departments, employee, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {ComponentEditEmployee} from "../src/engine/components/ComponentEditEmployee.js";
+import {ComponentEditEmployee} from "../src/engine/components/ComponentEditEmployee";
+
 jest.mock("../src/engine/api/APIManager");
 let user;
+
 beforeEach(async () => {
     user = userEvent.setup();
     render(<MemoryRouter>
@@ -26,7 +28,8 @@ test("should render form inputs", async () => {
         inputFirstName,
         inputName,
         inputPhoneNumber,
-        inputRole,
+        selectDepartment,
+        selectRole,
         checksJobTitle,
         checksSkills
     } = getFields();
@@ -36,7 +39,8 @@ test("should render form inputs", async () => {
     expect(inputFirstName).not.toBeNull();
     expect(inputName).not.toBeNull();
     expect(inputPhoneNumber).not.toBeNull();
-    expect(inputRole).not.toBeNull();
+    expect(selectDepartment).not.toBeNull();
+    expect(selectRole).not.toBeNull();
     expect(checksJobTitle).not.toBeNull();
     expect(checksSkills).not.toBeNull();
     expect(inputPhoneNumber).toHaveAttribute("type", "tel");
@@ -57,7 +61,6 @@ describe("Empty Fields AddEmployee Tests", () => {
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
 
         fireEvent.submit(form);
-
 
         expect(inputEmail.value).toBe("");
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
@@ -170,7 +173,6 @@ describe("Regex Validation AddEmployee Tests", () => {
             inputFirstName,
             inputName,
             inputPhoneNumber,
-            inputInitialPassword,
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
@@ -221,7 +223,7 @@ function getFields() {
     const inputName = document.getElementsByName("lastName")[0];
     const inputEmail = document.getElementsByName("email")[0];
     const inputPhoneNumber = document.getElementsByName("phoneNumber")[0];
-    const inputRole = document.getElementsByName("role")[0];
+    const selectRole = document.getElementsByName("role")[0];
     const checksJobTitle = document.getElementsByName("jobTitles");
     const checksSkills = document.getElementsByName("skills");
     return {
@@ -230,7 +232,7 @@ function getFields() {
         inputFirstName,
         inputName,
         inputPhoneNumber,
-        inputRole,
+        selectRole,
         checksJobTitle,
         checksSkills
     };

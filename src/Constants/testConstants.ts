@@ -79,28 +79,29 @@ const employeeWithId2 = new Employee({
     role: 1,
 });
 
-const employees = [employee];
-const employees2 = [employee, employee2];
-const employeesWithIds = [employeeWithId];
+const employees: Employee[] = [employee];
+const employees2: Employee[] = [employee, employee2];
+const employeesWithIds: Employee[] = [employeeWithId];
 
-const department = new Department({
+const department: Department = new Department({
     name: "Informatique", director: "Jasmin"
 });
 
-const department2 = new Department({
+const department2: Department = new Department({
     name: "Informatique", director: "Jasmin"
 });
 
 const departments: Department[] = [department];
 const departments2: Department[] = [department, department2];
 
-let roles = ["Employé"];
-let jobTitles = [new JobTitle({id: "1", name: "Anglophone"})];
-let skills = [new Skill({id: "1", name: "Conducteur de véhicule lourds"} )]
+const roles: string[] = ["Employé", "Administrateur"];
+const jobTitles: JobTitle[] = [new JobTitle({id: "1", name: "Anglophone"})];
+const skills: Skill[] = [new Skill({id: "1", name: "Conducteur de véhicule lourds"} )]
 
 
 const employeeNb: number[] = [1, 2];
 
-export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2, employeesWithIds, department, department2, departments, departments2, roles, jobTitles, skills, employeeNb};
+export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2,
+    employeesWithIds, department, department2, departments, departments2, roles, jobTitles, skills, employeeNb};
 
 

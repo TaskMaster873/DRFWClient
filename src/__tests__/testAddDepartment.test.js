@@ -5,17 +5,17 @@
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
-import {employees} from "../Constants/testConstants";
+import {department, employees2} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddDepartment} from "../src/engine/components/ComponentAddDepartment";
-jest.mock("../src/engine/api/APIManager");
+import {API} from "../src/engine/api/APIManager";
 let user;
-
+const onAddDepartment = jest.fn();
 beforeEach(async () => {
     user = userEvent.setup();
     render(<MemoryRouter>
-        <ComponentAddDepartment employees={employees} onAddDepartment={jest.fn()}/>
+        <ComponentAddDepartment employees={employees2} onAddDepartment={onAddDepartment}/>
     </MemoryRouter>);
 });
 
@@ -32,44 +32,59 @@ test("should render form inputs", async () => {
 });
 
 describe("Empty Fields AddDepartment Tests", () => {
-    test("Empty employee number should show error", async () => {
+    test("Empty name should show error", async () => {
         const {
             form,
             inputName,
             inputDirector
         } = getFields();
 
-
         fireEvent.submit(form);
 
-
         expect(inputName.value).toBe("");
-        expect(inputDirector.value).toBe(`${employees[0].firstName} ${employees[0].lastName}`);
+        expect(inputDirector.value).toBe(`${employees2[0].firstName} ${employees2[0].lastName}`);
 
         expect(form.classList.contains("was-validated")).toBeTruthy();
-
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
     });
 });
 
-/* //Will work later, after Context is made and mocked
-test("Valid employee number and password should submit form", async () => {
+test("Valid name should submit form", async () => {
     const {
             form,
             inputName,
-            inputDirector
         } = getFields();
 
-    await user.type(inputName, testConstants.validDepartment);
+    await user.type(inputName, department.name);
 
     fireEvent.submit(form);
 
-    expect(inputName.value).toBe(testConstants.validDepartment);
+    expect(inputName.value).toBe(department.name);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect()
+    expect(onAddDepartment).toHaveBeenCalled();
 });
-*/
+
+test("Select director should render", async () => {
+    const {
+        form,
+        inputName,
+        inputDirector
+    } = getFields();
+    const index = 1;
+    const employeeFullName = `${employees2[index].firstName} ${employees2[index].lastName}`;
+
+    await user.type(inputName, department.name);
+    await user.selectOptions(inputDirector, employeeFullName);
+
+    fireEvent.submit(form);
+
+    expect(inputName.value).toBe(department.name);
+    expect(inputDirector.value).toBe(employeeFullName);
+    expect(form.classList.contains("was-validated")).toBeTruthy();
+    expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    expect(onAddDepartment).toHaveBeenCalled();
+});
 
 function getFields() {
     const form = document.querySelector("form");

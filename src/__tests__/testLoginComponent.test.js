@@ -8,7 +8,6 @@ import {MemoryRouter} from "react-router-dom";
 import {Login} from "../src/engine/pages/Login";
 import {act} from "react-dom/test-utils";
 
-jest.mock("../src/engine/api/APIManager");
 const {API} = require("../src/engine/api/APIManager");
 
 let user;
@@ -35,7 +34,9 @@ describe("Empty Fields login validation", () => {
 
         await user.type(inputPassword, testConstants.validPassword);
 
-        fireEvent.submit(form);
+        act(() => {
+            fireEvent.submit(form);
+        });
 
         expect(inputEmail.value).toBe("");
         expect(inputPassword.value).toBe(testConstants.validPassword);
@@ -44,13 +45,13 @@ describe("Empty Fields login validation", () => {
     });
 
     test("Empty password should show error", async () => {
-        API.loginWithPassword = async (email, password) => Promise.resolve();
-
         const {inputPassword, form, inputEmail} = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
 
-        fireEvent.submit(form);
+        act(() => {
+            fireEvent.submit(form);
+        })
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputPassword.value).toBe("");
@@ -60,7 +61,7 @@ describe("Empty Fields login validation", () => {
 });
 
 test("Valid email and password should submit form", async () => {
-    API.loginWithPassword = async (email, password) => Promise.resolve();
+    API.loginWithPassword = jest.fn(() => Promise.resolve(null));
 
     const {inputPassword, form, inputEmail} = getFields();
 
@@ -75,6 +76,7 @@ test("Valid email and password should submit form", async () => {
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    expect(API.loginWithPassword).toBeCalled()
 });
 
 function getFields() {

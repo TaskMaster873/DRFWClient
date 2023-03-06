@@ -46,7 +46,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         showEditSkills: false,
         skills: [],
         validated: false,
-        isActive: false,
+        isActive: true,
         hasChangedDefaultPassword: false,
     };
 
@@ -243,7 +243,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         let errorType = FormUtils.validateForm(event);
         this.setState({
             validated: true,
-            error: errorType
+            error: errorType,
         });
 
         if (errorType === FormErrorType.NO_ERROR) {

@@ -3,19 +3,19 @@
  */
 
 import "@testing-library/jest-dom";
-import {fireEvent, render, screen} from "@testing-library/react";
+import {fireEvent, render} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
-import {departments, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
+import {departments2, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
-jest.mock("../src/engine/api/APIManager");
+import {API} from "../src/engine/api/APIManager";
 let user;
 
 beforeEach(async () => {
     user = userEvent.setup();
     render(<MemoryRouter>
-        <ComponentAddEmployee departments={departments} roles={roles}
+        <ComponentAddEmployee departments={departments2} roles={roles}
             jobTitles={jobTitles} skills={skills} onAddEmployee={jest.fn()} onAddJobTitle={jest.fn()}
             onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
             onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}/>
@@ -29,7 +29,7 @@ test("should render form inputs", async () => {
         inputName,
         inputPhoneNumber,
         inputInitialPassword,
-        inputDepartment,
+        selectDepartment,
         checksJobTitle,
         checksSkills,
         inputEmail,
@@ -41,11 +41,12 @@ test("should render form inputs", async () => {
     expect(inputName).not.toBeNull();
     expect(inputPhoneNumber).not.toBeNull();
     expect(inputInitialPassword).not.toBeNull();
-    expect(inputDepartment).not.toBeNull();
+    expect(selectDepartment).not.toBeNull();
     expect(checksJobTitle).not.toBeNull();
     expect(checksSkills).not.toBeNull();
     expect(inputPhoneNumber).toHaveAttribute("type", "tel");
     expect(inputInitialPassword).toHaveAttribute("type", "password");
+    expect(inputEmail).toHaveAttribute("type", "email");
 });
 
 describe("Empty Fields AddEmployee Tests", () => {
@@ -65,7 +66,6 @@ describe("Empty Fields AddEmployee Tests", () => {
         await user.type(inputInitialPassword, testConstants.validPassword);
 
         fireEvent.submit(form);
-
 
         expect(inputEmail.value).toBe("");
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
@@ -255,7 +255,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
-        expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
+        expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.invalidPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
@@ -263,8 +263,36 @@ describe("Regex Validation AddEmployee Tests", () => {
 });
 //Will work later, after Context is made and mocked
 
-describe("Optional fields EditEmployee tests", () => {
+test("Valid employee infos should submit form", async () => {
+    API.createEmployee = jest.fn(() => Promise.resolve(null));
+    const {
+        form,
+        inputEmail,
+        inputFirstName,
+        inputName,
+        inputPhoneNumber,
+        inputInitialPassword,
+    } = getFields();
+
+    await user.type(inputName, testConstants.validName);
+    await user.type(inputEmail, testConstants.validEmail);
+    await user.type(inputFirstName, testConstants.validFirstName);
+    await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
+    await user.type(inputInitialPassword, testConstants.validPassword);
+
+    fireEvent.submit(form);
+
+    expect(inputEmail.value).toBe(testConstants.validEmail);
+    expect(inputFirstName.value).toBe(testConstants.validFirstName);
+    expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
+    expect(inputInitialPassword.value).toBe(testConstants.validPassword);
+    expect(form.classList.contains("was-validated")).toBeTruthy();
+    expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+});
+
+describe("Optional fields AddEmployee tests", () => {
     test("Adding jobTitle should be valid", async () => {
+        API.createEmployee = jest.fn(() => Promise.resolve(null));
         const {
             form,
             inputEmail,
@@ -286,14 +314,15 @@ describe("Optional fields EditEmployee tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
-        expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
+        expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
-        expect(checksJobTitle.checked).toBeTruthy();
+        expect(checksJobTitle[0].checked).toBeTruthy();
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
     });
 
     test("Adding skill should be valid", async () => {
+        API.createEmployee = jest.fn(() => Promise.resolve(null));
         const {
             form,
             inputEmail,
@@ -315,14 +344,16 @@ describe("Optional fields EditEmployee tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
-        expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
+        expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
         expect(checksSkills[0].checked).toBeTruthy();
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+        expect(API.createEmployee).toBeCalled()
     });
 
     test("Can change role input valid", async () => {
+        API.createEmployee = jest.fn(() => Promise.resolve(null));
         const {
             form,
             inputEmail,
@@ -330,7 +361,7 @@ describe("Optional fields EditEmployee tests", () => {
             inputName,
             inputPhoneNumber,
             inputInitialPassword,
-            inputDepartment,
+            selectRole,
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
@@ -338,45 +369,21 @@ describe("Optional fields EditEmployee tests", () => {
         await user.type(inputName, testConstants.validName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
-        await user.selectOptions(inputDepartment, departments[0].name);
+        await user.selectOptions(selectRole, roles[1]);
 
         fireEvent.submit(form);
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
-        expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
+        expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
-        expect(checksSkills[0].checked).toBeTruthy();
         expect(form.classList.contains("was-validated")).toBeTruthy();
+        expect(selectRole.value).toBe(roles[1]);
         expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+        expect(API.createEmployee).toBeCalled()
     });
 });
 
-test("Valid employee infos should submit form", async () => {
-    const {
-        form,
-        inputEmail,
-        inputFirstName,
-        inputName,
-        inputPhoneNumber,
-        inputInitialPassword,
-    } = getFields();
-
-    await user.type(inputEmail, testConstants.validEmail);
-    await user.type(inputFirstName, testConstants.validFirstName);
-    await user.type(inputName, testConstants.validName);
-    await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
-    await user.type(inputInitialPassword, testConstants.validPassword);
-
-    fireEvent.submit(form);
-
-    expect(inputEmail.value).toBe(testConstants.validEmail);
-    expect(inputFirstName.value).toBe(testConstants.validFirstName);
-    expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
-    expect(inputInitialPassword.value).toBe(testConstants.validPassword);
-    expect(form.classList.contains("was-validated")).toBeTruthy();
-    expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-});
 
 function getFields() {
     const form = document.querySelector("form");
@@ -384,9 +391,9 @@ function getFields() {
     const inputName = document.getElementsByName("lastName")[0];
     const inputEmail = document.getElementsByName("email")[0];
     const inputPhoneNumber = document.getElementsByName("phoneNumber")[0];
-    const inputDepartment = document.getElementsByName("department")[0];
     const inputInitialPassword = document.getElementsByName("password")[0];
-    const inputRole = document.getElementsByName("role")[0];
+    const selectDepartment = document.getElementsByName("department")[0];
+    const selectRole = document.getElementsByName("role")[0];
     const checksJobTitle = document.getElementsByName("jobTitles");
     const checksSkills = document.getElementsByName("skills");
 
@@ -394,12 +401,12 @@ function getFields() {
         checksJobTitle,
         checksSkills,
         form,
-        inputDepartment,
+        selectDepartment,
         inputEmail,
         inputFirstName,
         inputInitialPassword,
         inputName,
         inputPhoneNumber,
-        inputRole
+        selectRole
     };
 }

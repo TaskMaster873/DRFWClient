@@ -8,6 +8,7 @@ import {employeeWithId, employeesWithIds, testConstants} from "../Constants/test
 import {EventManipulationType} from "../src/engine/types/StatesForDaypilot";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
+import {API} from "../src/engine/api/APIManager";
 import {act} from "react-dom/test-utils";
 
 let user;
@@ -67,6 +68,7 @@ describe("Test TaskMaster Client component", () => {
                 />
             </MemoryRouter>
         );
+
         const {form, inputAssignedEmployee, inputStart, inputEnd} = getFields();
 
         expect(form).toBeNull();
@@ -96,6 +98,7 @@ describe("Test TaskMaster Client component", () => {
                 />
             </MemoryRouter>
         );
+
         const {form, inputAssignedEmployee, inputStart, inputEnd} = getFields();
 
         expect(form).not.toBeNull();
@@ -105,6 +108,7 @@ describe("Test TaskMaster Client component", () => {
     });
 
     test("test submit sends Create event when set to do so", async () => {
+        API.createShift = jest.fn(() => Promise.resolve(null));
         let eventAddCalls = 0;
         let eventEditCalls = 0;
         const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
@@ -130,12 +134,15 @@ describe("Test TaskMaster Client component", () => {
             </MemoryRouter>
         );
         const {form} = getFields();
+
         fireEvent.submit(form);
+
         expect(eventAddCalls).toBe(1);
         expect(eventEditCalls).toBe(0);
     });
 
     test("test submit sends Edit event when set to do so", async () => {
+        API.editShift = jest.fn(() => Promise.resolve(null));
         let eventAddCalls = 0;
         let eventEditCalls = 0;
         const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");

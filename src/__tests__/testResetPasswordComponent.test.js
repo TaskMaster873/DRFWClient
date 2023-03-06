@@ -6,7 +6,7 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import { ComponentResetPassword } from '../src/engine/components/ComponentResetPassword';
+import {ComponentResetPassword} from '../src/engine/components/ComponentResetPassword';
 
 jest.mock("../src/engine/api/APIManager");
 const {API} = require("../src/engine/api/APIManager");
@@ -57,12 +57,12 @@ describe("Reset password validation", () => {
 });
 
 test("Valid password should submit form", async () => {
-    API.applyResetPassword = async (actionCode, newPassword) => Promise.resolve();
+    API.applyResetPassword = jest.fn(() => Promise.resolve(null));
     const {inputPassword, form} = getFields();
 
     await user.type(inputPassword, testConstants.validPassword);
 
-    await fireEvent.submit(form);
+    fireEvent.submit(form);
 
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
