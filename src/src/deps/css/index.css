@@ -132,17 +132,21 @@ code {
 }
 .dropDownMenuText {
     color: black!important;
+    background-color:  white !important;
 }
 
-.dropdown-item:active {
+.dropdown-item.active , .dropdown-item:active {
     color: white!important;
-    background-color: white!important;
+    background-color: rgb(236, 235, 235)!important;
 }
-.dropdown-variants-primary {
-    color: white!important;
+
+#changePassword {
     background-color: white!important;
 }
 
+#logoutLink {
+    background-color: white!important;
+}
 
 @media only screen and (max-width: 990px) {
     .navbar-nav .nav-link {

@@ -11,7 +11,6 @@ import {Nav} from "react-bootstrap";
 import {Navigate} from "react-router-dom";
 import {IoSettingsSharp} from "react-icons/io5";
 
-
 interface ComponentUserActionDropdownState {
     redirectTo: string;
 }
@@ -48,15 +47,18 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                     variant={"primary"}
                     title={<IoSettingsSharp/>}
                 >
-                    <Dropdown.Item eventKey="1">
-                        <Nav.Link id="logoutLink" className="dropDownMenuText" onClick={this.#logout}>Se
-                            déconnecter</Nav.Link>
-                    </Dropdown.Item>
-                    <Dropdown.Divider/>
-                    <Dropdown.Item eventKey="2">
-                        <Nav.Link id="changePassword" className="dropDownMenuText" onClick={this.#changePassword}>Changer
-                            mon mot de passe</Nav.Link>
-                    </Dropdown.Item>
+                    <Dropdown.Menu>
+                        <Dropdown.Item eventKey="1">
+                            <Nav.Link id="logoutLink" className={"dropDownMenuText"} onClick={this.#logout}>Se
+                                déconnecter</Nav.Link>
+                        </Dropdown.Item>
+                        <Dropdown.Divider/>
+                        <Dropdown.Item eventKey="2">
+                            <Nav.Link id="changePassword" className={"dropDownMenuText"} onClick={this.#changePassword}>Changer
+                                mon mot de passe</Nav.Link>
+                        </Dropdown.Item>
+                    </Dropdown.Menu>
+
                 </DropdownButton>
             );
         }
