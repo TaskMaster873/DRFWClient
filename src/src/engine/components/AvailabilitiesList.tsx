@@ -3,15 +3,15 @@ import {Container, Table} from "react-bootstrap";
 import {NotificationManager} from "../api/NotificationManager";
 import {errors} from "../messages/FormMessages";
 import {Employee} from "../types/Employee";
-import {unavailabilitiesTableHeads} from "../types/EmployeeAvailabilities";
-import {API} from "../api/APIManager";
+import {unavailabilitiesTableHeads, ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 
 
 type Props = {
     employees: Employee[];
-    unavailabilities: any[];
-    onChangeAcceptedValue: (unavailability: any) => PromiseLike<void> | Promise<void> | void;
+    unavailabilities: ViewableAvailabilities[];
+    acceptUnavailability: (unavailability: ViewableAvailabilities) => PromiseLike<void> | Promise<void> | void;
+    refuseUnavailability: (unavailability: ViewableAvailabilities) => PromiseLike<void> | Promise<void> | void;
 };
 
 export class AvailabilitiesList extends React.Component<Props> {
@@ -25,11 +25,11 @@ export class AvailabilitiesList extends React.Component<Props> {
     private employeeNameFromId(employeeId: string, index: number): JSX.Element {
         const currentEmployee = this.props.employees.find((e) => e.id == employeeId);
         if (!currentEmployee) {
-            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errors.GET_EMPLOYEES)
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errors.GET_EMPLOYEES);
             return (
                 <div>
-                    <td key={"firstName " + index}/>
-                    <td key={"lastName " + index}/>
+                    <td key={"firstName " + index} />
+                    <td key={"lastName " + index} />
                 </div>
             );
         }
@@ -52,17 +52,22 @@ export class AvailabilitiesList extends React.Component<Props> {
      */
     private unavailabilitiesList(): JSX.Element[] {
         if (this.props.unavailabilities.length !== 0) {
-            return this.props.unavailabilities.map((unavailability: any, index: number) => (
+            return this.props.unavailabilities.map((unavailability: ViewableAvailabilities, index: number) => (
                 <tr key={"secondCol" + index}>
                     <td key={"no" + index}>{index + 1}</td>
                     {this.employeeNameFromId(unavailability.employeeId, index)}
                     <td key={"start " + index}>
-                        {unavailability.start}
+                        {unavailability.recursiveExceptions.startDate.toString()}
                     </td>
                     <td key={"end " + index}>
-                        {unavailability.end}
+                        {unavailability.recursiveExceptions.endDate.toString()}
                     </td>
-                    {this.renderActions(index, unavailability)}
+                    <td key={`action ${index}`}>
+                        <a className="adminActions ms-1 mx-1"
+                            onClick={() => this.props.acceptUnavailability(unavailability)}><CgCheckO /></a>
+                        <a className="adminActions ms-1 mx-1"
+                            onClick={() => this.props.refuseUnavailability(unavailability)}><CgUnavailable /></a>
+                    </td>
                 </tr>
             ));
         } else {
@@ -74,19 +79,6 @@ export class AvailabilitiesList extends React.Component<Props> {
                 </tr>
             ];
         }
-    }
-
-    private renderActions(index: number, unavailability: any): JSX.Element | undefined {
-            let component: JSX.Element = <CgUnavailable/>;
-            if (!unavailability.isAccepted) {
-                component = <CgCheckO/>
-            }
-            return (
-                <td key={`action ${index}`}>
-                    <a className="adminActions ms-1 mx-1"
-                       onClick={() => this.props.onChangeAcceptedValue(unavailability)}>{component}</a>
-                </td>
-            );
     }
 
     public render(): JSX.Element {

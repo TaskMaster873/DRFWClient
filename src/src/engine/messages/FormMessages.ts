@@ -58,7 +58,9 @@ export const successes = {
     JOB_TITLE_EDITED: "Le corps d'emploi a bien été modifié !",
     SKILL_EDITED: "La compétence a bien été modifié !",
     JOB_TITLE_DELETED: "Le corps d'emploi a bien été supprimé !",
-    SKILL_DELETED: "La compétence a bien été supprimé !"
+    SKILL_DELETED: "La compétence a bien été supprimé !",
+    AVAILABILITY_ACCEPTED: "La demande de disponibilité a bien été acceptée !",
+    AVAILABILITY_REFUSED: "La demande de disponibilité a bien été refusée !",
 }
 
 export const info = {
