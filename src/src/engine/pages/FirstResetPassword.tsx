@@ -17,7 +17,7 @@ export class FirstResetPassword extends React.Component<FirstResetPasswordProps,
     public componentDidMount() {
         document.title = "Protéger votre compte - TaskMaster";
     }
-
+    
     public render(): JSX.Element {
         return (
             <Container>

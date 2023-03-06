@@ -43,6 +43,16 @@ export class CreateSchedule extends React.Component<unknown, State> {
         redirectTo: null
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
+    }
+
     /**
      * Called when the page is loaded
      * @description This function is called when the page is loaded. It will set the title of the page and call the API to get the list of shifts.

@@ -38,6 +38,8 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
         super(props);
     }
 
+
+
     public async componentDidMount() {
         document.title = "Employés " + this.props.params.id + " - TaskMaster";
 
