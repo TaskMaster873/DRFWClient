@@ -6,7 +6,6 @@ import {Employee} from "../types/Employee";
 import {unavailabilitiesTableHeads} from "../types/EmployeeAvailabilities";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 
-
 type Props = {
     employees: Employee[];
     unavailabilities: any[];
@@ -14,7 +13,6 @@ type Props = {
 };
 
 export class AvailabilitiesList extends React.Component<Props> {
-
     public render(): JSX.Element {
         return (
             <Container className="mt-5">
@@ -94,6 +92,14 @@ export class AvailabilitiesList extends React.Component<Props> {
         }
     }
 
+    /**
+     * Render the actions for the unavailability
+     * @param index the current index
+     * @param unavailability the unavailability
+     * @private
+     * @memberof AvailabilitiesList
+     * @returns {JSX.Element | undefined} the html elements for the actions
+     */
     private renderActions(index: number, unavailability: any): JSX.Element | undefined {
         let component: JSX.Element = <CgUnavailable/>;
         if (!unavailability.isAccepted) {

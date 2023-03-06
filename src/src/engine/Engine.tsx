@@ -3,9 +3,10 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
 //#region CSS
 import "../deps/css/index.css";
-import 'react-notifications-component/dist/theme.css';
-import 'animate.css/animate.compat.css'
+import "react-notifications-component/dist/theme.css";
+import "animate.css/animate.compat.css";
 //#endregion
+
 import {Index} from "./pages";
 import {ScheduleEmployee} from "./pages/ScheduleEmployee";
 import {EmployeeWrapper} from "./pages/Employees";
@@ -52,6 +53,9 @@ export class Engine extends React.Component<unknown, EngineState> {
         this.verifyLogin();
     }
 
+    /**
+     * This function is called when the APIManager emits an event.
+     */
     public async verifyLogin(): Promise<void> {
         await API.awaitLogin;
 
@@ -108,12 +112,20 @@ export class Engine extends React.Component<unknown, EngineState> {
         }
     }
 
+    /**
+     * Called when the API login state changes.
+     * @private
+     */
     private onEvent(): void {
         this.setState({
             forceResetPassword: !(API.hasChangedDefaultPassword || !API.isAuth())
         });
     }
 
+    /**
+     * Callback for the first reset password page.
+     * @private
+     */
     readonly #onChangePasswordCallbackParent = () => {
         window.location.reload();
     }

@@ -10,23 +10,27 @@ interface FirstResetPasswordProps {
  * If the user just logged in for the first time, he will be redirected to this page and will be asked to change his password.
  */
 export class FirstResetPassword extends React.Component<FirstResetPasswordProps, unknown> {
-    public componentDidMount() {
-        document.title = "Protéger votre compte - TaskMaster";
-    }
-
     constructor(public props: FirstResetPasswordProps) {
         super(props);
     }
 
-    readonly #onChangePasswordCallback = () : void => {
-        this.props.onChangePasswordCallbackParent();
+    public componentDidMount() {
+        document.title = "Protéger votre compte - TaskMaster";
     }
 
     public render(): JSX.Element {
         return (
             <Container>
-                <ComponentChangePassword onChangePasswordCallback={this.#onChangePasswordCallback} />
+                <ComponentChangePassword onChangePasswordCallback={this.#onChangePasswordCallback}/>
             </Container>
         );
+    }
+
+    /**
+     * This function is called when the user changes his password.
+     * @private
+     */
+    readonly #onChangePasswordCallback = (): void => {
+        this.props.onChangePasswordCallbackParent();
     }
 }

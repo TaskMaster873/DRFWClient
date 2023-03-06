@@ -4,13 +4,6 @@ import {Skill} from "./Skill";
 import {JobTitle} from "./JobTitle";
 
 /**
- * Liste d'employé
- */
-export interface StateEmployeeList {
-    list : Employee[];
-}
-
-/**
  * Contient tous les renseignements des employés de l'application web
  */
 export class Employee {
@@ -82,10 +75,10 @@ export interface EmployeeEditDTO {
     readonly hasChangedDefaultPassword?: boolean;
 }
 
-export let employeeAdminTableHeads : string[] =
+export const employeeAdminTableHeads : string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
 
-export let employeeTableHeads : string[] =
+export const employeeTableHeads : string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
 
 export interface EmployeeProps {
