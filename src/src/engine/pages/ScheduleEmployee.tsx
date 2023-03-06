@@ -31,6 +31,16 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         redirectTo: null
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
+    }
+
     public async componentDidMount(): Promise<void> {
         document.title = "Horaire - TaskMaster";
 
