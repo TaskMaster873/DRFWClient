@@ -7,7 +7,7 @@ import {RoutesPath} from "../RoutesPath";
 import {API} from "../api/APIManager";
 import {NotificationManager} from "../api/NotificationManager";
 import {errors, successes} from "../messages/FormMessages";
-import { Nav } from "react-bootstrap";
+import {Nav} from "react-bootstrap";
 import {Navigate} from "react-router-dom";
 import {IoSettingsSharp} from "react-icons/io5";
 
@@ -19,14 +19,14 @@ interface ComponentUserActionDropdownState {
 export class ComponentUserActionDropdown extends React.Component<unknown, ComponentUserActionDropdownState> {
     public state: ComponentUserActionDropdownState = {
         redirectTo: ''
-    }
+    };
 
     constructor(props) {
         super(props);
     }
 
     public componentDidUpdate(prevProps: Readonly<unknown>, prevState: Readonly<ComponentUserActionDropdownState>, snapshot?: any) {
-        if(this.state.redirectTo) {
+        if (this.state.redirectTo) {
             this.setState({
                 redirectTo: ''
             });
@@ -45,7 +45,7 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
      * @private
      */
     readonly #logout = async (): Promise<void> => {
-        if(API.isAuth()) {
+        if (API.isAuth()) {
             let error = await API.logout();
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.LOGOUT_SUCCESS);
@@ -57,7 +57,7 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                 redirectTo: RoutesPath.INDEX
             });
         }
-    }
+    };
 
     /**
      * This function logs out the user
@@ -71,17 +71,17 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
      * @private
      */
     readonly #changePassword = async (): Promise<void> => {
-        if(API.isAuth()) {
+        if (API.isAuth()) {
             this.setState({
                 redirectTo: RoutesPath.CHANGE_PASSWORD
             });
         }
-    }
+    };
 
     public render(): JSX.Element {
-        if(this.state.redirectTo) {
+        if (this.state.redirectTo) {
             return (
-                <Navigate to={this.state.redirectTo}/>
+                <Navigate to={this.state.redirectTo} />
             );
         } else {
             return (
@@ -91,15 +91,18 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                     key={'primary'}
                     id={`dropdown-variants-primary`}
                     variant={'primary'}
-                    title={<IoSettingsSharp/>}
+                    title={<IoSettingsSharp />}
                 >
-                    <Dropdown.Item eventKey="1">
-                        <Nav.Link id="logoutLink" className="dropDownMenuText" onClick={this.#logout}>Se déconnecter</Nav.Link>
-                    </Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item eventKey="2">
-                        <Nav.Link id="changePassword" className="dropDownMenuText" onClick={this.#changePassword}>Changer mon mot de passe</Nav.Link>
-                    </Dropdown.Item>
+                    <Dropdown.Menu className="">
+                        <Dropdown.Item eventKey="1">
+                            <Nav.Link id="logoutLink" className="dropDownMenuText" onClick={this.#logout}>Se déconnecter</Nav.Link>
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item eventKey="2">
+                            <Nav.Link id="changePassword" className="dropDownMenuText" onClick={this.#changePassword}>Changer mon mot de passe</Nav.Link>
+                        </Dropdown.Item>
+                    </Dropdown.Menu>
+
                 </DropdownButton>
             );
         }
