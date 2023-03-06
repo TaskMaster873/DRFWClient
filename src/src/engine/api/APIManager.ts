@@ -54,7 +54,8 @@ import {
     DAYS,
     EmployeeAvailabilities,
     EmployeeAvailabilitiesForCreate,
-    RecursiveAvailabilitiesList
+    RecursiveAvailabilitiesList,
+    ViewableAvailabilities
 } from "../types/EmployeeAvailabilities";
 import {JobTitle} from "../types/JobTitle";
 import {APIUtils} from "./APIUtils";
@@ -1734,9 +1735,9 @@ class APIManager extends Logger {
      * @param departmentName the name of the department to fetch
      * @returns a string if its an error, a list of Unavailabilities if its not
      */
-    public async getPendingUnavailabilitiesForDepartment(departmentName: string): Promise<string | any[]> {
+    public async getPendingUnavailabilitiesForDepartment(departmentName: string): Promise<string | ViewableAvailabilities[]> {
         let errorMessage: string | null = null;
-        let unavailabilities: any[] = [];
+        let unavailabilities: ViewableAvailabilities[] = [];
         //Validate permissions
         let isManagerPermitted = this.hasPermission(Roles.MANAGER) && departmentName === this.#employeeInfos.department;
         if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
@@ -1759,8 +1760,12 @@ class APIManager extends Logger {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
                 //Push unavailability object
-
-
+                unavailabilities.push({
+                    id: doc.id,
+                    recursiveExceptions: unavailability.unavailabilities,
+                    isAccepted: false,
+                    employeeId: unavailability.employeeId,
+                })
             }
         }
         return errorMessage ?? unavailabilities;
@@ -1768,13 +1773,11 @@ class APIManager extends Logger {
 
     /**
      * This function fetches all pending unavailabilities for one department
-     * @param departmentName the name of the department to fetch
      * @returns a string if its an error, a list of Unavailabilities if its not
-     * @todo implement this function
      */
-    public async getAllPendingUnavailabilities(): Promise<string | any[]> {
+    public async getAllPendingUnavailabilities(): Promise<string | ViewableAvailabilities[]> {
         let errorMessage: string | null = null;
-        let unavailabilities: any[] = [];
+        let unavailabilities: ViewableAvailabilities[] = [];
         //Validate permissions
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
@@ -1795,21 +1798,52 @@ class APIManager extends Logger {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
                 //Push unavailability object
-
-
+                unavailabilities.push({
+                    id: doc.id,
+                    recursiveExceptions: unavailability.unavailabilities,
+                    isAccepted: false,
+                    employeeId: unavailability.employeeId,
+                })
             }
         }
         return errorMessage ?? unavailabilities;
     }
 
-    async changeUnavailabilityAcceptedValue(unavailability: any) {
+    /**
+     * Accepts an unavailability in firestore
+     * @param unavailability the unavailability to accept
+     * @returns a string if there's an error, null if there isn't
+     */
+    public async acceptUnavailability(unavailability: ViewableAvailabilities): Promise<string | null> {
         let errorMessage: string | null = null;
 
         if (unavailability.id) {
-            if (!this.hasPermission) {
+            if (!this.hasPermission(Roles.MANAGER)) {
                 return errors.PERMISSION_DENIED;
             }
             await updateDoc(doc(this.#db, `unavailabilities`, unavailability.id), {isAccepted: unavailability.isAccepted}).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        } else {
+            errorMessage = errors.INVALID_UNAVAILABILITY_ID;
+        }
+
+        return errorMessage;
+    }
+
+    /**
+     * Deletes an unavailability in firestore
+     * @param unavailability the unavailability to delete
+     * @returns a string if there's an error, null if there isn't
+     */
+    public async deleteUnavailability(unavailability: ViewableAvailabilities): Promise<string | null> {
+        let errorMessage: string | null = null;
+
+        if (unavailability.id) {
+            if (!this.hasPermission(Roles.MANAGER)) {
+                return errors.PERMISSION_DENIED;
+            }
+            await deleteDoc(doc(this.#db, `unavailabilities`, unavailability.id)).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
         } else {

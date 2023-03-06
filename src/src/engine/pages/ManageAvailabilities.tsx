@@ -8,6 +8,7 @@ import {Roles} from "../types/Roles";
 import {AvailabilitiesList} from "../components/AvailabilitiesList";
 import {ComponentLoading} from "../components/ComponentLoading";
 import {Employee} from "../types/Employee";
+import {ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 
 enum FetchState {
     WAITING = 0,
@@ -17,7 +18,7 @@ enum FetchState {
 
 type State = {
     employees: Employee[],
-    unavailabilities: any[];
+    unavailabilities: ViewableAvailabilities[];
     fetchState: FetchState;
     redirectTo: string | null;
 };
@@ -87,7 +88,7 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
     private async fetchEmployees(): Promise<void> {
         const employees: string | Employee[] = await API.getEmployees();
         if (this.manageError(employees, errors.GET_EMPLOYEES)) {
-            this.fetchPendingUnavailabilities(employees as Employee[])
+            this.fetchPendingUnavailabilities(employees as Employee[]);
         }
     }
 
@@ -96,7 +97,7 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
      * @param employees the employees to set in state
      */
     private async fetchPendingUnavailabilities(employees: Employee[]): Promise<void> {
-        let unavailabilities: string | any[] = "";
+        let unavailabilities: string | ViewableAvailabilities[] = "";
         if (API.hasPermission(Roles.ADMIN)) {
             unavailabilities = await API.getAllPendingUnavailabilities();
         } else {
@@ -104,61 +105,45 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
             if (currentDepartmentName)
                 unavailabilities = await API.getPendingUnavailabilitiesForDepartment(currentDepartmentName);
         }
-        if (this.manageError(unavailabilities, errors.GET_AVAILABILITIES)){
+        if (this.manageError(unavailabilities, errors.GET_AVAILABILITIES)) {
             this.setState({
                 employees: employees,
-                unavailabilities: unavailabilities as any[],
+                unavailabilities: unavailabilities as ViewableAvailabilities[],
                 fetchState: FetchState.OK
             });
         }
     }
 
-    readonly #changeAcceptedValue = async (unavailability: any): Promise<void> => {
-        unavailability.isAccepted = !unavailability.isAccepted;
-        const error = await API.changeUnavailabilityAcceptedValue(unavailability);
+    /**
+     * Accepts the unavailability and refreshes the page
+     * @param unavailability the unavailability to accept
+     */
+    readonly #acceptUnavailability = async (unavailability: ViewableAvailabilities): Promise<void> => {
+        const error = await API.acceptUnavailability(unavailability);
 
         if (error) {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
-            return;
-        }
-
-        const unavailabilities = this.state.unavailabilities;
-
-        if (!unavailabilities) {
-            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errors.SERVER_ERROR);
-            return;
-        }
-        const oldUnavailability = unavailabilities.find((elem: any) => elem.id === unavailability.id);
-
-        if (!oldUnavailability) {
-            NotificationManager.error(errors.SERVER_ERROR, errors.EMPLOYEE_NOT_FOUND);
-            return;
-        }
-
-        oldUnavailability.isAccepted = unavailability.isAccepted;
-        this.refreshList(oldUnavailability, unavailabilities);
-
-        if (unavailability.isActive) {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_ACTIVATED);
         } else {
-            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.AVAILABILITY_ACCEPTED);
+            await this.fetchPendingUnavailabilities(this.state.employees);
         }
-    }
+    };
 
     /**
-     * Used to refresh the list of employees
-     * @param unavailability {any} The unavailability to refresh
-     * @param unavailabilities {any[]} The list of unavailabilities
-     * @private
-     * @return {void}
+     * Deletes the unavailailability and refreshes the page
+     * @param unavailability the unavailability to delete
      */
-    private refreshList(unavailability: any, unavailabilities: any[]) {
-        const index = unavailabilities.findIndex(elem => elem.id == unavailability.id);
-        if (unavailability && index != -1) {
-            unavailabilities[index] = unavailability;
-            this.setState({unavailabilities: unavailabilities});
+    readonly #refuseUnavailability = async (unavailability: ViewableAvailabilities): Promise<void> => {
+        const error = await API.deleteUnavailability(unavailability);
+
+        if (error) {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
+        } else {
+            NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.AVAILABILITY_REFUSED);
+            await this.fetchPendingUnavailabilities(this.state.employees);
         }
-    }
+
+    };
 
     /**
      * Manages the error sending a notification and refreshing the state with error
@@ -186,13 +171,15 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
                 return <AvailabilitiesList
                     employees={this.state.employees}
                     unavailabilities={this.state.unavailabilities}
-                    onChangeAcceptedValue={this.#changeAcceptedValue}
+                    acceptUnavailability={this.#acceptUnavailability}
+                    refuseUnavailability={this.#refuseUnavailability}
                 />;
             default:
                 return <AvailabilitiesList
                     employees={[]}
                     unavailabilities={[]}
-                    onChangeAcceptedValue={this.#changeAcceptedValue}
+                    acceptUnavailability={this.#acceptUnavailability}
+                    refuseUnavailability={this.#refuseUnavailability}
                 />;
         }
 
