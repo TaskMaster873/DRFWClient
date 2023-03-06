@@ -21,7 +21,7 @@ class InternalNotificationManager {
     }
 
     public info(title: string, message: string): void {
-        this.showNotification(title, message, NotificationType.INFO);
+        this.showNotifiacation(title, message, NotificationType.INFO);
     }
 
     /**
