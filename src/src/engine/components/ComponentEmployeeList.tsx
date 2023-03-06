@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, Col, Form, ListGroup, Row, Table} from "react-bootstrap";
-import {Employee, employeeTableHeads, employeeAdminTableHeads} from "../types/Employee";
+import {Employee, employeeAdminTableHeads, employeeTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {API} from "../api/APIManager";
 import {BiEdit} from "react-icons/bi"

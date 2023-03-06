@@ -67,17 +67,17 @@ export interface EventForShiftEdit {
  */
 export interface EventForCalendar {
     /** unique id in schedule board */
-    readonly id: string; 
-    /** what is written in the calendar */ 
-    text?: string; 
+    readonly id: string;
+    /** what is written in the calendar */
+    text?: string;
     /** time where it start */
     start: DayPilot.date;
     /** end of the event */
-    end: DayPilot.date; 
+    end: DayPilot.date;
     /** the column where it will be */
     resource?: string;
     /** color of de bar */
-    barColor?: string; 
+    barColor?: string;
     /** color of what's remaining */
     backColor?: string;
     /** id of the employee that has the shift */

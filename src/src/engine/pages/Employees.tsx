@@ -32,7 +32,7 @@ interface EmployeeState {
 class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
     public state: EmployeeState = {
         employees: null
-    }
+    };
 
     constructor(props: EmployeeProps) {
         super(props);
@@ -48,8 +48,20 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
             this.setState({
                 employees: []
             });
-        }
-        else this.setState({employees: fetchedData as Employee[]});
+        } else this.setState({employees: fetchedData as Employee[]});
+    }
+
+    public render(): JSX.Element {
+        return (
+            <Container>
+                <ComponentEmployeeList
+                    filteredList={null}
+                    employees={this.state.employees}
+                    department={this.props.params.id}
+                    onEmployeeActivationChange={this.#changeEmployeeActivation}
+                />
+            </Container>
+        );
     }
 
     /**
@@ -104,18 +116,5 @@ class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
             employees[employeeIndex] = employee;
             this.setState({employees: employees});
         }
-    }
-
-    public render(): JSX.Element {
-        return (
-            <Container>
-                <ComponentEmployeeList
-                    filteredList={null}
-                    employees={this.state.employees}
-                    department={this.props.params.id}
-                    onEmployeeActivationChange={this.#changeEmployeeActivation}
-                />
-            </Container>
-        );
     }
 }

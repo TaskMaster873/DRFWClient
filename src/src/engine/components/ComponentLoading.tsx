@@ -1,6 +1,6 @@
-import { BeatLoader } from "react-spinners";
+import {BeatLoader} from "react-spinners";
 
-export function ComponentLoading() : JSX.Element {
+export function ComponentLoading(): JSX.Element {
     return (
         <div className='bigLoading'>
             <BeatLoader
