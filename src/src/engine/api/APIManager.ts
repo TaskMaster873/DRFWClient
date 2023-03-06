@@ -1679,15 +1679,15 @@ class APIManager extends Logger {
 
     /**
      * Get the unavailabilities of an employee
-     * @param idEmployee to get the unavailabilities
+     * @param employeeId to get the unavailabilities
      * @returns the list of unavailabilities
      */
-    public async getOneEmployeeUnavailabilities(idEmployee: string): Promise<EmployeeAvailabilities | string> {
+    public async getOneEmployeeUnavailabilities(employeeId: string): Promise<EmployeeAvailabilities | string> {
         let errorMessage: string | null = null;
         //default value
         let list: EmployeeAvailabilities = {
             recursiveExceptions: [],
-            employeeId: idEmployee ?? ""
+            employeeId: employeeId
         };
         //list that will return
         let listOfRecursive: RecursiveAvailabilitiesList = [];
