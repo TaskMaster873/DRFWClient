@@ -14,6 +14,9 @@ interface State {
     error: FormErrorType;
 }
 
+/**
+ * This component displays the form to select a date.
+ */
 export class SelectDate extends React.Component<Props, State> {
     public state: State = {
         validated: false,
@@ -46,6 +49,12 @@ export class SelectDate extends React.Component<Props, State> {
         );
     }
 
+    /**
+     * Handles the change of the date.
+     * @param event
+     * @private
+     * @return {Promise<void>}
+     */
     readonly #handleChange = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
         const form = event.currentTarget;
         let isValid = form.checkValidity();

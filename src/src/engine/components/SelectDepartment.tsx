@@ -13,6 +13,9 @@ interface State {
     error: FormErrorType;
 }
 
+/**
+ * This component displays the form to select a department.
+ */
 export class SelectDepartment extends React.Component<Props, State> {
     public state: State = {
         validated: false,
@@ -38,6 +41,13 @@ export class SelectDepartment extends React.Component<Props, State> {
         );
     }
 
+    /**
+     * Handles the change of the department.
+     * @param event - The event
+     * @private
+     * @return {Promise<void>} - A promise to nothing
+     * @async
+     */
     readonly #handleChange = async (event: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
         const form = event.currentTarget;
         let isValid = form.checkValidity();

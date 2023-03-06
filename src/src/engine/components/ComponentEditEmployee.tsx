@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
-import {EditEmployeeProps, Employee, EmployeeEditDTO} from "../types/Employee";
+import {EditEmployeeProps, EmployeeEditDTO} from "../types/Employee";
 import {Department} from "../types/Department";
 import {API} from "../api/APIManager";
 import {RegexUtil} from "../utils/RegexValidator";
@@ -110,7 +110,8 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="3">
                         <Form.Label>Département</Form.Label>
-                        <Form.Select required name="department" value={this.state.department} onChange={this.#handleSelect}>
+                        <Form.Select required name="department" value={this.state.department}
+                                     onChange={this.#handleSelect}>
                             {this.props.departments.map((department: Department, index: number) =>
                                 <option key={index} value={department.name}>{department.name}</option>)}
                         </Form.Select>
@@ -123,7 +124,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
                         <Button onClick={() => this.#onShowEditJobTitles()} className="float-end">
-                            <IoSettingsSharp className="mb-05" />
+                            <IoSettingsSharp className="mb-05"/>
                         </Button>
                         {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
                             key={title.name}
@@ -135,13 +136,14 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                         />))}
                         <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)}
                                                 showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
-                                                onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}
+                                                onAddJobTitle={this.props.onAddJobTitle}
+                                                onEditJobTitle={this.props.onEditJobTitle}
                                                 onDeleteJobTitle={this.props.onDeleteJobTitle}></ComponentEditJobTitles>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Compétences</Form.Label>
                         <Button onClick={() => this.#onShowEditSkills()} className="float-end">
-                            <IoSettingsSharp className="mb-05" />
+                            <IoSettingsSharp className="mb-05"/>
                         </Button>
                         {this.props.skills.map((skill: Skill) => (<div key={skill.name}><Form.Check
                             type="checkbox"
@@ -150,7 +152,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                             value={skill.name}
                             defaultChecked={this.props.editedEmployee?.skills.includes(skill.name)}
                         />
-                            </div>))}
+                        </div>))}
                         <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
                                              showEdit={this.state.showEditSkills} skills={this.props.skills}
                                              onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}
@@ -158,12 +160,13 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
-                        <Form.Select required name="role" id="role" value={this.state.role} onChange={this.#handleSelect}>
+                        <Form.Select required name="role" id="role" value={this.state.role}
+                                     onChange={this.#handleSelect}>
                             {this.props.roles.map((role: string, index: number) => {
-                                if(API.hasLowerPermission(index)) {
-                                    return <option key={index} value={index}>{role}</option>
+                                    if (API.hasLowerPermission(index)) {
+                                        return <option key={index} value={index}>{role}</option>
+                                    }
                                 }
-                            }
                             )}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
@@ -215,7 +218,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         document.querySelectorAll('input[type="checkbox"]:checked').forEach((checkbox: any) => {
             let fieldName = checkbox.name;
             if (fieldName) {
-                if (typeof(formDataObj[fieldName]) === "string") {
+                if (typeof (formDataObj[fieldName]) === "string") {
                     formDataObj[fieldName] = [];
                 }
                 formDataObj[fieldName].push(checkbox.value);
