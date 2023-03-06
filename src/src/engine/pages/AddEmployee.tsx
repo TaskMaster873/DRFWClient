@@ -1,7 +1,7 @@
 import React from "react";
 import {ComponentAddEmployee} from "../components/ComponentAddEmployee";
 import {API} from "../api/APIManager";
-import {AddEmployeeState, Employee, EmployeeCreateDTO} from "../types/Employee";
+import {AddEmployeeState, EmployeeCreateDTO} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
@@ -18,12 +18,34 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         titles: [],
         skills: [],
         redirectTo: null
-    }
+    };
 
     public async componentDidMount(): Promise<void> {
         document.title = "Ajouter un Employé - TaskMaster";
 
         await this.fetchData();
+    }
+
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        }
+
+        return (
+            <ComponentAddEmployee
+                departments={this.state.departments}
+                roles={this.state.roles}
+                jobTitles={this.state.titles}
+                skills={this.state.skills}
+                onAddEmployee={this.#addEmployee}
+                onAddJobTitle={this.#addJobTitle}
+                onEditJobTitle={this.#editJobTitle}
+                onAddSkill={this.#addSkill}
+                onEditSkill={this.#editSkill}
+                onDeleteJobTitle={this.#deleteJobTitle}
+                onDeleteSkill={this.#deleteSkill}
+            />
+        );
     }
 
     /**
@@ -45,7 +67,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         ]);
 
         if (Array.isArray(departments) && Array.isArray(roles) && Array.isArray(titles) && Array.isArray(skills)) {
-            this.setState({ departments: departments, roles, titles, skills });
+            this.setState({departments: departments, roles, titles, skills});
         } else {
             NotificationManager.error(errors.GET_DEPARTMENTS, errors.SERVER_ERROR);
         }
@@ -100,7 +122,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         } else {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
-    }
+    };
 
     //#region JobTitles
     /**
@@ -112,13 +134,13 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         const error = await API.createJobTitle(titleName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_CREATED);
-            const titles = [...this.state.titles, new JobTitle({ name: titleName })];
+            const titles = [...this.state.titles, new JobTitle({name: titleName})];
             this.setState({titles: titles});
             await this.fetchData();
         } else {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
-    }
+    };
 
     /**
      * Edit a jobTitle from the database
@@ -137,7 +159,8 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
-    }
+    };
+    //#endregion
 
     /**
      * Delete a jobTitle from the database
@@ -156,8 +179,7 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
-    }
-    //#endregion
+    };
 
     //#region Skills
     /**
@@ -169,13 +191,13 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         const error = await API.createSkill(skillName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_CREATED);
-            const skills = [...this.state.skills, new Skill({ name: skillName })];
+            const skills = [...this.state.skills, new Skill({name: skillName})];
             this.setState({skills: skills});
             await this.fetchData();
         } else {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
-    }
+    };
 
     /**
      * Edit a skill from the database
@@ -194,7 +216,9 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
-    }
+    };
+
+    //#endregion
 
     /**
      * Delete a skill from the database
@@ -213,28 +237,5 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
-    }
-    //#endregion
-
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}></Navigate>);
-        }
-
-        return (
-            <ComponentAddEmployee
-                departments={this.state.departments}
-                roles={this.state.roles}
-                jobTitles={this.state.titles}
-                skills={this.state.skills}
-                onAddEmployee={this.#addEmployee}
-                onAddJobTitle={this.#addJobTitle}
-                onEditJobTitle={this.#editJobTitle}
-                onAddSkill={this.#addSkill}
-                onEditSkill={this.#editSkill}
-                onDeleteJobTitle={this.#deleteJobTitle}
-                onDeleteSkill={this.#deleteSkill}
-            />
-        );
-    }
+    };
 }

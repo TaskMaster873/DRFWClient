@@ -6,8 +6,8 @@ import React from "react";
  * @class ComponentLoadingBarSpinner
  * @extends {React.Component<unknown, unknown>}
  */
-export class ComponentLoadingBarSpinner extends React.Component<unknown, unknown>{
-    public render() : JSX.Element {
+export class ComponentLoadingBarSpinner extends React.Component<unknown, unknown> {
+    public render(): JSX.Element {
         return (
             <div className='loadingBar'>
                 <ScaleLoader

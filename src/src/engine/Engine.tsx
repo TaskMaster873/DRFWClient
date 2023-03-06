@@ -3,10 +3,9 @@ import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 
 //#region CSS
 import "../deps/css/index.css";
-import 'react-notifications-component/dist/theme.css';
-import 'animate.css/animate.compat.css'
+import "react-notifications-component/dist/theme.css";
+import "animate.css/animate.compat.css";
 //#endregion
-
 import {Index} from "./pages";
 import {ScheduleEmployee} from "./pages/ScheduleEmployee";
 import {EmployeeWrapper} from "./pages/Employees";
@@ -26,7 +25,7 @@ import {ForgotPassword} from "./pages/ForgotPassword";
 import {CreateSchedule} from "./pages/CreateSchedule";
 import {RoutesPath} from "./RoutesPath";
 
-import { ReactNotifications } from 'react-notifications-component';
+import {ReactNotifications} from "react-notifications-component";
 import {RouteNotFound} from "./pages/RouteNotFound";
 
 import {FirstResetPassword} from "./pages/FirstResetPassword";
@@ -49,16 +48,13 @@ export class Engine extends React.Component<unknown, EngineState> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private onEvent() : void {
-        this.setState({
-            forceResetPassword: !(API.hasChangedDefaultPassword || !API.isAuth())
-        });
-    }
-
     public componentDidMount(): void {
         this.verifyLogin();
     }
 
+    /**
+     * This function is called when the APIManager emits an event.
+     */
     public async verifyLogin(): Promise<void> {
         await API.awaitLogin;
 
@@ -70,10 +66,6 @@ export class Engine extends React.Component<unknown, EngineState> {
         });
     }
 
-    readonly #onChangePasswordCallbackParent = () => {
-        window.location.reload();
-    }
-
     public render(): JSX.Element {
         if (this.state.showSpinner) {
             return (
@@ -81,12 +73,13 @@ export class Engine extends React.Component<unknown, EngineState> {
                     <ComponentLoading/>
                 </React.StrictMode>
             );
-        } else if(this.state.forceResetPassword) {
+        } else if (this.state.forceResetPassword) {
             return (
                 <Router>
-                    <ReactNotifications />
+                    <ReactNotifications/>
                     <Routes>
-                        <Route path='*' element={<FirstResetPassword onChangePasswordCallbackParent={this.#onChangePasswordCallbackParent}/>}/>
+                        <Route path="*" element={<FirstResetPassword
+                            onChangePasswordCallbackParent={this.#onChangePasswordCallbackParent}/>}/>
                     </Routes>
                 </Router>
             );
@@ -94,13 +87,14 @@ export class Engine extends React.Component<unknown, EngineState> {
             return (
                 <Router>
                     <NavigationBar/>
-                    <ReactNotifications />
+                    <ReactNotifications/>
                     <Routes>
                         <Route path={RoutesPath.INDEX} element={<Index/>}/>
                         <Route path={RoutesPath.SCHEDULE} element={<ScheduleEmployee/>}/>
                         <Route path={RoutesPath.CREATE_SCHEDULE} element={<CreateSchedule/>}/>
                         <Route path={RoutesPath.DEPARTMENTS} element={<Departments/>}/>
-                        <Route path={`${RoutesPath.DEPARTMENTS}${RoutesPath.EMPLOYEE_WITH_PARAM}`} element={<EmployeeWrapper/>}/>
+                        <Route path={`${RoutesPath.DEPARTMENTS}${RoutesPath.EMPLOYEE_WITH_PARAM}`}
+                               element={<EmployeeWrapper/>}/>
                         <Route path={RoutesPath.ABOUT} element={<About/>}/>
                         <Route path={RoutesPath.LOGIN} element={<Login/>}/>
                         <Route path={RoutesPath.ADD_EMPLOYEE} element={<AddEmployee/>}/>
@@ -110,10 +104,28 @@ export class Engine extends React.Component<unknown, EngineState> {
                         <Route path={RoutesPath.RESET_PASSWORD} element={<ResetPassword/>}/>
                         <Route path={RoutesPath.CHANGE_PASSWORD} element={<ChangePassword/>}/>
                         <Route path={RoutesPath.MANAGE_AVAILABILITIES} element={<ManageAvailabilities/>}/>
-                        <Route path='*' element={<RouteNotFound/>}/>
+                        <Route path="*" element={<RouteNotFound/>}/>
                     </Routes>
                 </Router>
             );
         }
     }
+
+    /**
+     * Called when the API login state changes.
+     * @private
+     */
+    private onEvent(): void {
+        this.setState({
+            forceResetPassword: !(API.hasChangedDefaultPassword || !API.isAuth())
+        });
+    }
+
+    /**
+     * Callback for the first reset password page.
+     * @private
+     */
+    readonly #onChangePasswordCallbackParent = () => {
+        window.location.reload();
+    };
 }

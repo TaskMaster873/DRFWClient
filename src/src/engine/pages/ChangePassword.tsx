@@ -9,6 +9,7 @@ export class ChangePassword extends React.Component {
     public componentDidMount() {
         document.title = "Changement de mot de passe - TaskMaster";
     }
+
     /**
      *
      * @returns Le composant pour faire le changement de mot de passe
@@ -16,7 +17,7 @@ export class ChangePassword extends React.Component {
     public render(): JSX.Element {
         return (
             <Container>
-                <ComponentChangePassword />
+                <ComponentChangePassword/>
             </Container>
         );
     }

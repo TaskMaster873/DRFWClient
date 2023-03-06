@@ -1,11 +1,9 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { Link, Navigate } from "react-router-dom";
-import { FormErrorType, errors } from "../messages/FormMessages";
-import { API } from "../api/APIManager";
-import { Routes } from "../api/routes/Routes";
-import { ComponentPropsLogin } from "../types/ComponentPropsType";
+import {Link, Navigate} from "react-router-dom";
+import {errors, FormErrorType} from "../messages/FormMessages";
+import {API} from "../api/APIManager";
 import Logo from "../../deps/images/logo.png";
 import {RoutesPath} from "../RoutesPath";
 import FormUtils from "../utils/FormUtils";
@@ -16,6 +14,10 @@ interface ComponentStateLogin {
     validated: boolean;
     error: FormErrorType;
     isLoggedIn: boolean;
+}
+
+export interface ComponentPropsLogin {
+    onLoginRequest: (email: string, password: string) => Promise<boolean>;
 }
 
 export class ComponentLogin extends React.Component<ComponentPropsLogin, ComponentStateLogin> {
@@ -35,27 +37,27 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
         this.props = props;
     }
 
-    public async componentDidMount() : Promise<void> {
+    public async componentDidMount(): Promise<void> {
         await this.verifyLogin();
     }
 
     public render(): JSX.Element {
-        if(API.isAuth()) {
+        if (API.isAuth()) {
             return (
-                <Navigate to={Routes.ON_LOGIN_SUCCESS_ROUTE}/>
+                <Navigate to={RoutesPath.ON_LOGIN_SUCCESS_ROUTE}/>
             );
         } else {
             return (
-                <div className="auth-form">
-                    <div className="me-4">
+                <div className={"auth-form"}>
+                    <div className={"me-4"}>
                         <img
-                            className="mx-auto d-block mt-5"
+                            className={"mx-auto d-block mt-5"}
                             src={Logo as any}
-                            alt="Logo TaskMaster"
+                            alt={"Logo TaskMaster"}
                             width={50}
                             height={60}
                         />
-                        <h4 className="text-center mt-4 mb-4">Se connecter à TaskMaster</h4>
+                        <h4 className={"text-center mt-4 mb-4"}>Se connecter à TaskMaster</h4>
                     </div>
                     <Form
                         noValidate
@@ -65,7 +67,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                         data-error={this.state.error}
                     >
                         <Form.Group>
-                            <Form.Label htmlFor="emailLogin" className="mt-2">
+                            <Form.Label htmlFor={"emailLogin"} className={"mt-2"}>
                                 Adresse courriel
                             </Form.Label>
                             <Form.Control
@@ -137,11 +139,13 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
         if (errorType === FormErrorType.NO_ERROR) {
             let isLoggedIn: boolean = await this.props.onLoginRequest(this.state.emailLogin, this.state.passwordLogin);
 
-            this.setState({...this.state, ...{
-                isLoggedIn: isLoggedIn,
-            }});
+            this.setState({
+                ...this.state, ...{
+                    isLoggedIn: isLoggedIn,
+                }
+            });
         }
-    }
+    };
 
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
@@ -152,8 +156,10 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
             throw new Error("Name is undefined for element in form.");
         }
 
-        this.setState({...this.state, ...{
-            [name]: value,
-        }});
-    }
+        this.setState({
+            ...this.state, ...{
+                [name]: value,
+            }
+        });
+    };
 }

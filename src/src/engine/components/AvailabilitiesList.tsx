@@ -6,7 +6,6 @@ import {Employee} from "../types/Employee";
 import {unavailabilitiesTableHeads, ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 
-
 type Props = {
     employees: Employee[];
     unavailabilities: ViewableAvailabilities[];
@@ -15,6 +14,23 @@ type Props = {
 };
 
 export class AvailabilitiesList extends React.Component<Props> {
+    public render(): JSX.Element {
+        return (
+            <Container className="mt-5">
+                <h3>Liste des demandes de changement de disponibilités</h3>
+                <Table responsive bordered hover className="text-center">
+                    <thead>
+                    <tr key={"firstCol"}>
+                        {unavailabilitiesTableHeads.map((th) => (<th key={th}>{th}</th>))}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.unavailabilitiesList()}
+                    </tbody>
+                </Table>
+            </Container>
+        );
+    }
 
     /**
      * Creates the html elements of the employees name for the html table data
@@ -28,8 +44,8 @@ export class AvailabilitiesList extends React.Component<Props> {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errors.GET_EMPLOYEES);
             return (
                 <div>
-                    <td key={"firstName " + index} />
-                    <td key={"lastName " + index} />
+                    <td key={"firstName " + index}/>
+                    <td key={"lastName " + index}/>
                 </div>
             );
         }
@@ -44,6 +60,7 @@ export class AvailabilitiesList extends React.Component<Props> {
             </>
         );
     }
+
     /**
      * Return the list of availability requests with their firstName, lastName, start and end
      * @returns {JSX.Element[]} The html table data for availabilities
@@ -64,9 +81,9 @@ export class AvailabilitiesList extends React.Component<Props> {
                     </td>
                     <td key={`action ${index}`}>
                         <a className="adminActions ms-1 mx-1"
-                            onClick={() => this.props.acceptUnavailability(unavailability)}><CgCheckO /></a>
+                           onClick={() => this.props.acceptUnavailability(unavailability)}><CgCheckO/></a>
                         <a className="adminActions ms-1 mx-1"
-                            onClick={() => this.props.refuseUnavailability(unavailability)}><CgUnavailable /></a>
+                           onClick={() => this.props.refuseUnavailability(unavailability)}><CgUnavailable/></a>
                     </td>
                 </tr>
             ));
@@ -79,23 +96,5 @@ export class AvailabilitiesList extends React.Component<Props> {
                 </tr>
             ];
         }
-    }
-
-    public render(): JSX.Element {
-        return (
-            <Container className="mt-5">
-                <h3>Liste des demandes de changement de disponibilités</h3>
-                <Table responsive bordered hover className="text-center">
-                    <thead>
-                        <tr key={"firstCol"}>
-                            {unavailabilitiesTableHeads.map((th) => (<th key={th}>{th}</th>))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.unavailabilitiesList()}
-                    </tbody>
-                </Table>
-            </Container>
-        );
     }
 }

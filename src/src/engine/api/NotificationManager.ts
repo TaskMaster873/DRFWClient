@@ -1,4 +1,4 @@
-import { Store, NOTIFICATION_TYPE } from 'react-notifications-component';
+import {NOTIFICATION_TYPE, Store} from "react-notifications-component";
 
 export enum NotificationType {
     SUCCESS = "success",
@@ -8,11 +8,32 @@ export enum NotificationType {
 }
 
 class InternalNotificationManager {
-    private hasProcess() : boolean {
+    public success(title: string, message: string): void {
+        this.showNotification(title, message, NotificationType.SUCCESS);
+    }
+
+    public warn(title: string, message: string): void {
+        this.showNotification(title, message, NotificationType.WARNING);
+    }
+
+    public error(title: string, message: string): void {
+        this.showNotification(title, message, NotificationType.ERROR);
+    }
+
+    public info(title: string, message: string): void {
+        this.showNotification(title, message, NotificationType.INFO);
+    }
+
+    /**
+     * FOR UNIT TESTS ONLY
+     * @private
+     */
+    private hasProcess(): boolean {
         let hasProcess = false;
         try {
             hasProcess = !!process;
-        } catch(e) {}
+        } catch (e) {
+        }
 
         return hasProcess;
     }
@@ -23,8 +44,8 @@ class InternalNotificationManager {
      * @param message the notification message below title
      * @param type the notification type
      */
-    private showNotification(title: string, message: string, type: NOTIFICATION_TYPE | undefined) : void {
-        if(Store && Store.addNotification && !this.hasProcess()) {
+    private showNotification(title: string, message: string, type: NOTIFICATION_TYPE | undefined): void {
+        if (Store && Store.addNotification && !this.hasProcess()) {
             Store.addNotification({
                 title: title,
                 message: message,
@@ -39,22 +60,6 @@ class InternalNotificationManager {
                 }
             });
         }
-    }
-
-    public success(title: string, message: string) : void {
-        this.showNotification(title, message, NotificationType.SUCCESS);
-    }
-
-    public warn(title: string, message: string) : void {
-        this.showNotification(title, message, NotificationType.WARNING);
-    }
-
-    public error(title: string, message: string) : void {
-        this.showNotification(title, message, NotificationType.ERROR);
-    }
-
-    public info(title: string, message: string) : void {
-        this.showNotification(title, message, NotificationType.INFO);
     }
 }
 
