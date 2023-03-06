@@ -9,8 +9,6 @@ import {departments, employee, jobTitles, roles, skills, testConstants} from "..
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentEditEmployee} from "../src/engine/components/ComponentEditEmployee";
-
-jest.mock("../src/engine/api/APIManager");
 let user;
 
 beforeEach(async () => {

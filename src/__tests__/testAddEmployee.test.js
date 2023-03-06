@@ -9,14 +9,14 @@ import {departments2, jobTitles, roles, skills, testConstants} from "../Constant
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
-import {API} from "../src/engine/api/APIManager";
 let user;
+const onAddEmployee = jest.fn();
 
 beforeEach(async () => {
     user = userEvent.setup();
     render(<MemoryRouter>
         <ComponentAddEmployee departments={departments2} roles={roles}
-            jobTitles={jobTitles} skills={skills} onAddEmployee={jest.fn()} onAddJobTitle={jest.fn()}
+            jobTitles={jobTitles} skills={skills} onAddEmployee={onAddEmployee} onAddJobTitle={jest.fn()}
             onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
             onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}/>
     </MemoryRouter>);
@@ -264,7 +264,6 @@ describe("Regex Validation AddEmployee Tests", () => {
 //Will work later, after Context is made and mocked
 
 test("Valid employee infos should submit form", async () => {
-    API.createEmployee = jest.fn(() => Promise.resolve(null));
     const {
         form,
         inputEmail,
@@ -288,11 +287,11 @@ test("Valid employee infos should submit form", async () => {
     expect(inputInitialPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    expect(onAddEmployee).toHaveBeenCalled()
 });
 
 describe("Optional fields AddEmployee tests", () => {
     test("Adding jobTitle should be valid", async () => {
-        API.createEmployee = jest.fn(() => Promise.resolve(null));
         const {
             form,
             inputEmail,
@@ -319,10 +318,10 @@ describe("Optional fields AddEmployee tests", () => {
         expect(checksJobTitle[0].checked).toBeTruthy();
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+        expect(onAddEmployee).toHaveBeenCalled()
     });
 
     test("Adding skill should be valid", async () => {
-        API.createEmployee = jest.fn(() => Promise.resolve(null));
         const {
             form,
             inputEmail,
@@ -349,11 +348,10 @@ describe("Optional fields AddEmployee tests", () => {
         expect(checksSkills[0].checked).toBeTruthy();
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-        expect(API.createEmployee).toBeCalled()
+        expect(onAddEmployee).toHaveBeenCalled()
     });
 
     test("Can change role input valid", async () => {
-        API.createEmployee = jest.fn(() => Promise.resolve(null));
         const {
             form,
             inputEmail,
@@ -380,7 +378,7 @@ describe("Optional fields AddEmployee tests", () => {
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(selectRole.value).toBe(roles[1]);
         expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-        expect(API.createEmployee).toBeCalled()
+        expect(onAddEmployee).toHaveBeenCalled()
     });
 });
 

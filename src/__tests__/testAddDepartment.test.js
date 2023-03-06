@@ -9,7 +9,6 @@ import {department, employees2} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddDepartment} from "../src/engine/components/ComponentAddDepartment";
-import {API} from "../src/engine/api/APIManager";
 let user;
 const onAddDepartment = jest.fn();
 beforeEach(async () => {

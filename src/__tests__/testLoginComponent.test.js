@@ -5,16 +5,15 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {Login} from "../src/engine/pages/Login";
 import {act} from "react-dom/test-utils";
-
-const {API} = require("../src/engine/api/APIManager");
+import {ComponentLogin} from "../src/engine/components/ComponentLogin";
 
 let user;
+const onLoginRequest = jest.fn();
 beforeEach(async () => {
     user = userEvent.setup();
     act(() => {
-        render(<MemoryRouter><Login/></MemoryRouter>);
+        render(<MemoryRouter><ComponentLogin onLoginRequest={onLoginRequest}/></MemoryRouter>);
     });
 });
 
@@ -34,9 +33,7 @@ describe("Empty Fields login validation", () => {
 
         await user.type(inputPassword, testConstants.validPassword);
 
-        act(() => {
-            fireEvent.submit(form);
-        });
+        fireEvent.submit(form);
 
         expect(inputEmail.value).toBe("");
         expect(inputPassword.value).toBe(testConstants.validPassword);
@@ -49,9 +46,7 @@ describe("Empty Fields login validation", () => {
 
         await user.type(inputEmail, testConstants.validEmail);
 
-        act(() => {
-            fireEvent.submit(form);
-        })
+        fireEvent.submit(form);
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputPassword.value).toBe("");
@@ -61,22 +56,20 @@ describe("Empty Fields login validation", () => {
 });
 
 test("Valid email and password should submit form", async () => {
-    API.loginWithPassword = jest.fn(() => Promise.resolve(null));
-
     const {inputPassword, form, inputEmail} = getFields();
 
     await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputPassword, testConstants.validPassword);
 
-    act(() => {
+    await act(async () => {
         fireEvent.submit(form);
-    });
+    })
 
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect(API.loginWithPassword).toBeCalled()
+    expect(onLoginRequest).toHaveBeenCalled()
 });
 
 function getFields() {

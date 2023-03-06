@@ -10,11 +10,15 @@ import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {API} from "../src/engine/api/APIManager";
 import {act} from "react-dom/test-utils";
+import {ComponentPopupSchedule} from "../src/engine/components/ComponentPopupSchedule";
 
 let user;
 let matchMedia;
+let eventAdd = jest.fn();
+let eventEdit = jest.fn();
+let eventHide = jest.fn();
 
-describe("Test TaskMaster Client component", () => {
+describe("Test Component Popup Schedule component", () => {
     beforeAll(() => {
         matchMedia = new MatchMediaMock();
     });
@@ -48,26 +52,24 @@ describe("Test TaskMaster Client component", () => {
     });
 
     test("test all are not rendered when modal is not shown", async () => {
-        const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
-        render(
-            <MemoryRouter>
-                <ComponentPopupSchedule
-                    eventAdd={() => {
-                    }}
-                    eventEdit={() => {
-                    }}
-                    hideModal={() => {
-                    }}
-                    isShown={false}
-                    id={"..."}
-                    start={"2022-10-10T00:00:00"}
-                    end={"2022-10-10T02:00:00"}
-                    resource={employeeWithId.id}
-                    taskType={EventManipulationType.CREATE}
-                    employees={employeesWithIds}
-                />
-            </MemoryRouter>
-        );
+        act(() => {
+            render(
+                <MemoryRouter>
+                    <ComponentPopupSchedule
+                        eventAdd={eventAdd}
+                        eventEdit={eventEdit}
+                        hideModal={eventHide}
+                        isShown={false}
+                        id={"..."}
+                        start={"2022-10-10T00:00:00"}
+                        end={"2022-10-10T02:00:00"}
+                        resource={employeeWithId.id}
+                        taskType={EventManipulationType.CREATE}
+                        employees={employeesWithIds}
+                    />
+                </MemoryRouter>
+            );
+        });
 
         const {form, inputAssignedEmployee, inputStart, inputEnd} = getFields();
 
@@ -78,16 +80,12 @@ describe("Test TaskMaster Client component", () => {
     });
 
     test("test all are rendered when modal is shown", async () => {
-        const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
         render(
             <MemoryRouter>
                 <ComponentPopupSchedule
-                    eventAdd={() => {
-                    }}
-                    eventEdit={() => {
-                    }}
-                    hideModal={() => {
-                    }}
+                    eventAdd={eventAdd}
+                    eventEdit={eventEdit}
+                    hideModal={eventHide}
                     isShown={true}
                     id={"..."}
                     start={"2022-10-10T00:00:00"}
@@ -99,6 +97,7 @@ describe("Test TaskMaster Client component", () => {
             </MemoryRouter>
         );
 
+
         const {form, inputAssignedEmployee, inputStart, inputEnd} = getFields();
 
         expect(form).not.toBeNull();
@@ -108,71 +107,60 @@ describe("Test TaskMaster Client component", () => {
     });
 
     test("test submit sends Create event when set to do so", async () => {
-        API.createShift = jest.fn(() => Promise.resolve(null));
-        let eventAddCalls = 0;
-        let eventEditCalls = 0;
-        const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
-        render(
-            <MemoryRouter>
-                <ComponentPopupSchedule
-                    eventAdd={() => {
-                        eventAddCalls += 1
-                    }}
-                    eventEdit={() => {
-                        eventEditCalls += 1
-                    }}
-                    hideModal={() => {
-                    }}
-                    isShown={true}
-                    id={""}
-                    start={testConstants.validStartDate}
-                    end={testConstants.validEndDate}
-                    resource={employeeWithId.id}
-                    taskType={EventManipulationType.CREATE}
-                    employees={employeesWithIds}
-                />
-            </MemoryRouter>
-        );
+        act(() => {
+            render(
+                <MemoryRouter>
+                    <ComponentPopupSchedule
+                        eventAdd={eventAdd}
+                        eventEdit={eventEdit}
+                        hideModal={eventHide}
+                        isShown={true}
+                        id={""}
+                        start={testConstants.validStartDate}
+                        end={testConstants.validEndDate}
+                        resource={employeeWithId.id}
+                        taskType={EventManipulationType.CREATE}
+                        employees={employeesWithIds}
+                    />
+                </MemoryRouter>
+            );
+        })
+
         const {form} = getFields();
+        await act(async () => {
+            fireEvent.submit(form);
+        })
 
-        fireEvent.submit(form);
-
-        expect(eventAddCalls).toBe(1);
-        expect(eventEditCalls).toBe(0);
+        expect(eventAdd).toHaveBeenCalled();
+        expect(eventEdit).not.toHaveBeenCalled();
     });
 
     test("test submit sends Edit event when set to do so", async () => {
-        API.editShift = jest.fn(() => Promise.resolve(null));
-        let eventAddCalls = 0;
-        let eventEditCalls = 0;
-        const {ComponentPopupSchedule} = require("../src/engine/components/ComponentPopupSchedule");
-        render(
-            <MemoryRouter>
-                <ComponentPopupSchedule
-                    eventAdd={() => {
-                        eventAddCalls += 1
-                    }}
-                    eventEdit={() => {
-                        eventEditCalls += 1
-                    }}
-                    hideModal={() => {
-                    }}
-                    isShown={true}
-                    id={testConstants.validId}
-                    start={testConstants.validStartDate}
-                    end={testConstants.validEndDate}
-                    resource={employeeWithId.id}
-                    taskType={EventManipulationType.EDIT}
-                    employees={employeesWithIds}
-                />
-            </MemoryRouter>
-        );
+            render(
+                <MemoryRouter>
+                    <ComponentPopupSchedule
+                        eventAdd={eventAdd}
+                        eventEdit={eventEdit}
+                        hideModal={eventHide}
+                        isShown={true}
+                        id={testConstants.validId}
+                        start={testConstants.validStartDate}
+                        end={testConstants.validEndDate}
+                        resource={employeeWithId.id}
+                        taskType={EventManipulationType.EDIT}
+                        employees={employeesWithIds}
+                    />
+                </MemoryRouter>
+            );
+
         const {form} = getFields();
 
-        fireEvent.submit(form);
+        await act(async () => {
+            fireEvent.submit(form);
+        })
 
-        expect(eventEditCalls).toBe(1);
-        expect(eventAddCalls).toBe(0);
+        expect(eventAdd).toHaveBeenCalled();
+        expect(eventEdit).toHaveBeenCalled();
     });
 });
 

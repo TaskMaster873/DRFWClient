@@ -1649,7 +1649,6 @@ class APIManager extends Logger {
             FirebaseAuth.onAuthStateChanged(
                 this.#auth,
                 async (user: FirebaseAuth.User | null) => {
-                    this.log("Auth state changed!");
                     if (user === null || !user) {
                         this.isAuthenticated = false;
                         this.#employeeInfos = {
@@ -1684,7 +1683,6 @@ class APIManager extends Logger {
         });
 
         await this.awaitLogin;
-        this.log("Login resolved!");
     }
 
     /**
@@ -1761,7 +1759,6 @@ class APIManager extends Logger {
             this.#analytics = getAnalytics(this.#app);
         }
 
-        this.log("Firebase loaded");
         await loginAwait;
     }
 
