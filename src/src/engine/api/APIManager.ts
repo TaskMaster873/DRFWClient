@@ -444,7 +444,7 @@ class APIManager extends Logger {
      */
     private async verifyEmailAddress(): Promise<string | null> {
         let errorMessage: string | null = null;
-        if(this.#user) {
+        if (this.#user) {
             await FirebaseAuth.sendEmailVerification(this.#user).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
@@ -1613,9 +1613,9 @@ class APIManager extends Logger {
                         && data.unavailabilities.endDate === list.recursiveExceptions.endDate) {
                         await updateDoc(doc(this.#db, `unavailabilities`, document.id),
                             {unavailabilities: list.recursiveExceptions}).catch((error) => {
-                            errorMessage = APIUtils.getErrorMessageFromCode(error);
+                                errorMessage = APIUtils.getErrorMessageFromCode(error);
 
-                        });
+                            });
                         isAdded = true;
                         break;
                     }
@@ -1637,14 +1637,24 @@ class APIManager extends Logger {
         }
 
         let errorMessage: string | undefined;
-
+        let unavailabilities = {
+            0: list.recursiveExceptions[0],
+            1: list.recursiveExceptions[1],
+            2: list.recursiveExceptions[2],
+            3: list.recursiveExceptions[3],
+            4: list.recursiveExceptions[4],
+            5: list.recursiveExceptions[5],
+            6: list.recursiveExceptions[6],
+            startDate: this.getFirebaseTimestamp(list.recursiveExceptions.startDate),
+            endDate: this.getFirebaseTimestamp(list.recursiveExceptions.endDate),
+        };
         //Create unavailability
-        let isUpdated = await this.unavailabilityUpdate(list)
+        let isUpdated = await this.unavailabilityUpdate(list);
         if (!isUpdated && typeof isUpdated === "boolean") {
             await addDoc(collection(this.#db, `unavailabilities`),
                 {
                     employeeId: this.#user?.uid,
-                    unavailabilities: list.recursiveExceptions,
+                    unavailabilities: unavailabilities,
                     isAccepted: false,
                 },
             ).catch((error) => {
@@ -1709,8 +1719,8 @@ class APIManager extends Logger {
                     if (data.isAccepted) {
                         listOfRecursive.push(
                             {
-                                startDate: new Date((data.start.seconds) * 1000),
-                                endDate: new Date((data.end.seconds) * 1000),
+                                startDate: this.getDayPilotDateString(data.unavailabilities.startDate),
+                                endDate: this.getDayPilotDateString(data.unavailabilities.endDate),
                                 [DAYS.SUNDAY]: data.unavailabilities[DAYS.SUNDAY],
                                 [DAYS.MONDAY]: data.unavailabilities[DAYS.MONDAY],
                                 [DAYS.TUESDAY]: data.unavailabilities[DAYS.TUESDAY],
@@ -1759,13 +1769,24 @@ class APIManager extends Logger {
         if (snaps) {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
+                let tempUnavailabilities = {
+                    [DAYS.SUNDAY]: unavailability.unavailabilities[DAYS.SUNDAY],
+                    [DAYS.MONDAY]: unavailability.unavailabilities[DAYS.MONDAY],
+                    [DAYS.TUESDAY]: unavailability.unavailabilities[DAYS.TUESDAY],
+                    [DAYS.WEDNESDAY]: unavailability.unavailabilities[DAYS.WEDNESDAY],
+                    [DAYS.THURSDAY]: unavailability.unavailabilities[DAYS.THURSDAY],
+                    [DAYS.FRIDAY]: unavailability.unavailabilities[DAYS.FRIDAY],
+                    [DAYS.SATURDAY]: unavailability.unavailabilities[DAYS.SATURDAY],
+                    startDate: this.getDayPilotDateString(unavailability.unavailabilities.startDate),
+                    endDate: this.getDayPilotDateString(unavailability.unavailabilities.endDate),
+                };
                 //Push unavailability object
                 unavailabilities.push({
                     id: doc.id,
-                    recursiveExceptions: unavailability.unavailabilities,
+                    recursiveExceptions: tempUnavailabilities,
                     isAccepted: false,
                     employeeId: unavailability.employeeId,
-                })
+                });
             }
         }
         return errorMessage ?? unavailabilities;
@@ -1797,13 +1818,25 @@ class APIManager extends Logger {
         if (snaps) {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
+                console.log("here", unavailability);
+                let tempUnavailabilities = {
+                    [DAYS.SUNDAY]: unavailability.unavailabilities[DAYS.SUNDAY],
+                    [DAYS.MONDAY]: unavailability.unavailabilities[DAYS.MONDAY],
+                    [DAYS.TUESDAY]: unavailability.unavailabilities[DAYS.TUESDAY],
+                    [DAYS.WEDNESDAY]: unavailability.unavailabilities[DAYS.WEDNESDAY],
+                    [DAYS.THURSDAY]: unavailability.unavailabilities[DAYS.THURSDAY],
+                    [DAYS.FRIDAY]: unavailability.unavailabilities[DAYS.FRIDAY],
+                    [DAYS.SATURDAY]: unavailability.unavailabilities[DAYS.SATURDAY],
+                    startDate: this.getDayPilotDateString(unavailability.unavailabilities.startDate),
+                    endDate: this.getDayPilotDateString(unavailability.unavailabilities.endDate),
+                };
                 //Push unavailability object
                 unavailabilities.push({
                     id: doc.id,
-                    recursiveExceptions: unavailability.unavailabilities,
+                    recursiveExceptions: tempUnavailabilities,
                     isAccepted: false,
                     employeeId: unavailability.employeeId,
-                })
+                });
             }
         }
         return errorMessage ?? unavailabilities;
@@ -1821,7 +1854,7 @@ class APIManager extends Logger {
             if (!this.hasPermission(Roles.MANAGER)) {
                 return errors.PERMISSION_DENIED;
             }
-            await updateDoc(doc(this.#db, `unavailabilities`, unavailability.id), {isAccepted: unavailability.isAccepted}).catch((error) => {
+            await updateDoc(doc(this.#db, `unavailabilities`, unavailability.id), {isAccepted: true}).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
         } else {
