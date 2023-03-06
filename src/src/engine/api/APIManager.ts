@@ -381,7 +381,6 @@ class APIManager extends Logger {
         });
 
         if (userCredentials !== null && userCredentials) {
-            console.log("credentials", userCredentials);
 
             if (userCredentials.user !== null && userCredentials.user) {
                 this.#user = userCredentials.user;
@@ -443,7 +442,7 @@ class APIManager extends Logger {
      */
     private async verifyEmailAddress(): Promise<string | null> {
         let errorMessage: string | null = null;
-        if(this.#user) {
+        if (this.#user) {
             await FirebaseAuth.sendEmailVerification(this.#user).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
@@ -489,9 +488,6 @@ class APIManager extends Logger {
                         } else {
                             this.#employeeInfos = result as EmployeeInfos;
                         }
-
-                        console.log("user", user);
-                        console.log("employeeInfos", this.#employeeInfos);
                     }
                     await this.onEvent();
 
@@ -1612,9 +1608,9 @@ class APIManager extends Logger {
                         && data.unavailabilities.endDate === list.recursiveExceptions.endDate) {
                         await updateDoc(doc(this.#db, `unavailabilities`, document.id),
                             {unavailabilities: list.recursiveExceptions}).catch((error) => {
-                            errorMessage = APIUtils.getErrorMessageFromCode(error);
+                                errorMessage = APIUtils.getErrorMessageFromCode(error);
 
-                        });
+                            });
                         isAdded = true;
                         break;
                     }
@@ -1638,7 +1634,7 @@ class APIManager extends Logger {
         let errorMessage: string | undefined;
 
         //Create unavailability
-        let isUpdated = await this.unavailabilityUpdate(list)
+        let isUpdated = await this.unavailabilityUpdate(list);
         if (!isUpdated && typeof isUpdated === "boolean") {
             await addDoc(collection(this.#db, `unavailabilities`),
                 {
