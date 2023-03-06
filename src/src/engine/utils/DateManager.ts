@@ -1,4 +1,4 @@
-import {DayPilot} from "@daypilot/daypilot-lite-react"; 
+import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {Timestamp} from "firebase/firestore";
 import {DateOfUnavailabilityList, DAYS, EmployeeRecursiveExceptionList} from "../types/EmployeeAvailabilities";
 
@@ -27,26 +27,8 @@ export class InternalDateManager {
         return new Timestamp(Date.parse(daypilotString) / 1000, 0);
     }
 
-    public addDaysToADate(numberOfDays: number, date: Date): Date {
-        let numberOfMs = date.getTime();
-        let msToAdd = 60 * 60 * 1000 * (24 * numberOfDays);
-        return new Date(numberOfMs + msToAdd);
-    }
-
-    public addHoursAndMinutes(numberOfMinutes: number, date: Date): string {
-        let numberOfMs = date.getTime();
-        let msToAdd = 60 * 1000 * numberOfMinutes;
-        //To get the good timezone and to get it good for a DayPilot.Date
-        let newDate = new Date(numberOfMs + msToAdd);
-        return this.changeDateToDayPilotFormat(newDate);
-    }
-
-    public changeDateToDayPilotFormat(date: Date) {
-        return date.toISOString().slice(0, -5);
-    }
-
     /**
-     * 
+     *
      * @param days of the week
      * @param listOfDates of all unavailabilities
      * @returns {EmployeeRecursiveExceptionList} that has the good day ofthe week
@@ -56,15 +38,18 @@ export class InternalDateManager {
 
         for (let unavailabilities of listOfDates) {
             if (unavailabilities.start.getDay() === days) {
-                listToReturn.push({startTime: this.getMinutes(unavailabilities.start), endTime: this.getMinutes(unavailabilities.end)});
+                listToReturn.push({
+                    startTime: this.getMinutes(unavailabilities.start),
+                    endTime: this.getMinutes(unavailabilities.end)
+                });
             }
         }
         return listToReturn;
     }
 
     /**
-     * 
-     * @param date 
+     *
+     * @param date
      * @returns the number of minutes from the start of the day given in param
      */
     public getMinutes(date: Date): number {

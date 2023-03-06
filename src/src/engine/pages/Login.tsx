@@ -39,5 +39,5 @@ export class Login extends React.Component<unknown, unknown> {
         }
 
         return errorMessage === null;
-    }
+    };
 }

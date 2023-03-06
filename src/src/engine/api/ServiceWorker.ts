@@ -1,13 +1,13 @@
-import { Logger } from "../Logger";
-import { AccountCreationData, CreatedAccountData, ThreadMessage, ThreadMessageType } from "./types/ThreadMessage";
-import { FirebaseApp, initializeApp } from "firebase/app";
-import { FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig } from "./config/FirebaseConfig";
+import {Logger} from "../Logger";
+import {AccountCreationData, CreatedAccountData, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
+import {FirebaseApp, initializeApp} from "firebase/app";
+import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig} from "./config/FirebaseConfig";
 import * as FirebaseAuth from "firebase/auth";
-import { connectAuthEmulator } from "firebase/auth";
-import { Employee } from "../types/Employee";
+import {connectAuthEmulator} from "firebase/auth";
+import {Employee} from "../types/Employee";
 
 class TaskMasterServiceWorker extends Logger {
-    public moduleName: string = 'TaskMasterServiceWorker';
+    public moduleName: string = "TaskMasterServiceWorker";
     public logColor: string = `#0ebccb`;
     private emulatorLoaded: boolean = false;
 
@@ -22,7 +22,7 @@ class TaskMasterServiceWorker extends Logger {
         this.init();
     }
 
-    public async init() : Promise<void> {
+    public async init(): Promise<void> {
         this.log(`Initializing TaskMasterServiceWorker.`);
 
         this.listenToMessages();
@@ -32,7 +32,7 @@ class TaskMasterServiceWorker extends Logger {
      * Create the listener for messages from the main thread.
      * @private
      */
-    private listenToMessages() : void {
+    private listenToMessages(): void {
         this.log(`Listening to messages.`);
 
         self.onmessage = this.onMessage.bind(this);
@@ -45,12 +45,12 @@ class TaskMasterServiceWorker extends Logger {
      * @async
      * @returns {Promise<void>}
      */
-    private async onMessage(message: MessageEvent) : Promise<void> {
+    private async onMessage(message: MessageEvent): Promise<void> {
         let data = message.data as ThreadMessage;
 
         this.log(`Received message from main thread.`);
 
-        switch(data.type) {
+        switch (data.type) {
             case ThreadMessageType.INIT: {
                 await this.createFirebaseApp();
                 break;
@@ -73,7 +73,7 @@ class TaskMasterServiceWorker extends Logger {
      * @private
      * @async
      */
-    private async postMessage(message: ThreadMessage) : Promise<void> {
+    private async postMessage(message: ThreadMessage): Promise<void> {
         await self.postMessage(message);
     }
 
@@ -85,7 +85,7 @@ class TaskMasterServiceWorker extends Logger {
      * @private
      * @returns {Promise<void>}
      */
-    private async createNewAccount(taskId: string | null, data: AccountCreationData) : Promise<void> {
+    private async createNewAccount(taskId: string | null, data: AccountCreationData): Promise<void> {
         this.log(`Creating new account for task ${taskId}`);
 
         let employee: Employee = data.employee;
@@ -102,7 +102,7 @@ class TaskMasterServiceWorker extends Logger {
         let responseData: CreatedAccountData = {};
         if (errorMessage) {
             responseData.error = errorMessage;
-        } else if(createdUser) {
+        } else if (createdUser) {
             responseData = {
                 createdUser: {
                     userId: createdUser?.user?.uid
@@ -143,7 +143,7 @@ class TaskMasterServiceWorker extends Logger {
      * @returns {Promise<void>}
      * @async
      */
-    private async createFirebaseApp() : Promise<void> {
+    private async createFirebaseApp(): Promise<void> {
         let start = Date.now();
         this.log(`Creating Firebase app.`);
 

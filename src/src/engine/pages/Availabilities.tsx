@@ -7,10 +7,10 @@ import {
     EmployeeRecursiveException
 } from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
-import {DateManager} from '../utils/DateManager';
+import {DateManager} from "../utils/DateManager";
 import {DayPilot} from "daypilot-pro-react";
 
-import '../../deps/css/daypilot_custom.css';
+import "../../deps/css/daypilot_custom.css";
 import {ComponentAvailabilitiesPopup} from "../components/ComponentAvailabilitiesPopup";
 import {Timestamp} from "firebase/firestore";
 import {API} from "../api/APIManager";
@@ -363,7 +363,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
             if (canRenderWeeklyData) {
                 for (let day in recursive) {
-                    if (day === 'startDate' || day === 'endDate') {
+                    if (day === "startDate" || day === "endDate") {
                         continue;
                     }
 
@@ -422,7 +422,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
             if (canRenderData) {
                 for (let day in recursive) {
-                    if (day === 'startDate' || day === 'endDate') {
+                    if (day === "startDate" || day === "endDate") {
                         continue;
                     }
 

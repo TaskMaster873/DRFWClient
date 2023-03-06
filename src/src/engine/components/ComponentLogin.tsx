@@ -4,8 +4,6 @@ import Button from "react-bootstrap/Button";
 import {Link, Navigate} from "react-router-dom";
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {API} from "../api/APIManager";
-import {Routes} from "../api/routes/Routes";
-import {ComponentPropsLogin} from "../types/ComponentPropsType";
 import Logo from "../../deps/images/logo.png";
 import {RoutesPath} from "../RoutesPath";
 import FormUtils from "../utils/FormUtils";
@@ -16,6 +14,10 @@ interface ComponentStateLogin {
     validated: boolean;
     error: FormErrorType;
     isLoggedIn: boolean;
+}
+
+export interface ComponentPropsLogin {
+    onLoginRequest: (email: string, password: string) => Promise<boolean>;
 }
 
 export class ComponentLogin extends React.Component<ComponentPropsLogin, ComponentStateLogin> {
@@ -38,10 +40,11 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
     public async componentDidMount(): Promise<void> {
         await this.verifyLogin();
     }
+
     public render(): JSX.Element {
         if (API.isAuth()) {
             return (
-                <Navigate to={Routes.ON_LOGIN_SUCCESS_ROUTE}/>
+                <Navigate to={RoutesPath.ON_LOGIN_SUCCESS_ROUTE}/>
             );
         } else {
             return (
@@ -142,7 +145,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                 }
             });
         }
-    }
+    };
 
     readonly #handleChange = (event: React.ChangeEvent<HTMLFormElement>): void => {
         const target = event.target;
@@ -158,5 +161,5 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                 [name]: value,
             }
         });
-    }
+    };
 }

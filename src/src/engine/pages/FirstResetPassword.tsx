@@ -32,5 +32,5 @@ export class FirstResetPassword extends React.Component<FirstResetPasswordProps,
      */
     readonly #onChangePasswordCallback = (): void => {
         this.props.onChangePasswordCallbackParent();
-    }
+    };
 }

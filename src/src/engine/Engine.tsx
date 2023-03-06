@@ -6,7 +6,6 @@ import "../deps/css/index.css";
 import "react-notifications-component/dist/theme.css";
 import "animate.css/animate.compat.css";
 //#endregion
-
 import {Index} from "./pages";
 import {ScheduleEmployee} from "./pages/ScheduleEmployee";
 import {EmployeeWrapper} from "./pages/Employees";
@@ -26,7 +25,7 @@ import {ForgotPassword} from "./pages/ForgotPassword";
 import {CreateSchedule} from "./pages/CreateSchedule";
 import {RoutesPath} from "./RoutesPath";
 
-import {ReactNotifications} from 'react-notifications-component';
+import {ReactNotifications} from "react-notifications-component";
 import {RouteNotFound} from "./pages/RouteNotFound";
 
 import {FirstResetPassword} from "./pages/FirstResetPassword";
@@ -79,7 +78,7 @@ export class Engine extends React.Component<unknown, EngineState> {
                 <Router>
                     <ReactNotifications/>
                     <Routes>
-                        <Route path='*' element={<FirstResetPassword
+                        <Route path="*" element={<FirstResetPassword
                             onChangePasswordCallbackParent={this.#onChangePasswordCallbackParent}/>}/>
                     </Routes>
                 </Router>
@@ -105,7 +104,7 @@ export class Engine extends React.Component<unknown, EngineState> {
                         <Route path={RoutesPath.RESET_PASSWORD} element={<ResetPassword/>}/>
                         <Route path={RoutesPath.CHANGE_PASSWORD} element={<ChangePassword/>}/>
                         <Route path={RoutesPath.MANAGE_AVAILABILITIES} element={<ManageAvailabilities/>}/>
-                        <Route path='*' element={<RouteNotFound/>}/>
+                        <Route path="*" element={<RouteNotFound/>}/>
                     </Routes>
                 </Router>
             );
@@ -128,5 +127,5 @@ export class Engine extends React.Component<unknown, EngineState> {
      */
     readonly #onChangePasswordCallbackParent = () => {
         window.location.reload();
-    }
+    };
 }

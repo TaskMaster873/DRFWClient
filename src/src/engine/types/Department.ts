@@ -25,20 +25,20 @@ export class Department implements IdElement {
         this.id = department.id;
         this.name = department.name;
         this.director = department.director;
-	}
+    }
 }
 
-export let departmentTableHeads : string[] =
+export let departmentTableHeads: string[] =
     ["#", "Nom", "Directeur/Gérant", "Nombre d'employés"];
 
-export let departmentAdminTableHeads : string[] =
+export let departmentAdminTableHeads: string[] =
     ["#", "Nom", "Directeur/Gérant", "Nombre d'employés", "Actions"];
 
 /**
  * Contient tous les renseignements pour créer un nouveau département dans la bd
  */
 export interface DepartmentModifyDTO {
-	readonly name: string;
+    readonly name: string;
     readonly director: string;
 }
 

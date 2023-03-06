@@ -31,19 +31,19 @@ export class Employee {
         this.skills = employee.skills;
         this.role = employee.role;
         this.hasChangedDefaultPassword = employee.hasChangedDefaultPassword;
-	}
+    }
 }
 
 /**
  * Contient tous les renseignements pour créer un iduveau employé dans la bd
  */
 export interface EmployeeCreateDTO {
-	readonly firstName: string;
+    readonly firstName: string;
     readonly lastName: string;
     readonly email: string;
-	readonly phoneNumber: string;
+    readonly phoneNumber: string;
     readonly isActive: boolean;
-	readonly department: string;
+    readonly department: string;
     readonly jobTitles: string[];
     readonly skills: string[];
     readonly role: number;
@@ -75,10 +75,10 @@ export interface EmployeeEditDTO {
     readonly hasChangedDefaultPassword?: boolean;
 }
 
-export const employeeAdminTableHeads : string[] =
+export const employeeAdminTableHeads: string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences", "Actions"];
 
-export const employeeTableHeads : string[] =
+export const employeeTableHeads: string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
 
 export interface EmployeeProps {
@@ -90,7 +90,7 @@ export interface AddEmployeeProps extends SkillActions, JobTitleActions {
     roles: string[];
     jobTitles: JobTitle[];
     skills: Skill[];
-    onAddEmployee: (password : string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
+    onAddEmployee: (password: string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
 }
 
 export interface SkillActions {
