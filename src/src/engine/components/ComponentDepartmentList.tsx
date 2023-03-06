@@ -1,22 +1,21 @@
 import React from "react";
-import { Nav, Table } from "react-bootstrap";
+import {Nav, Table} from "react-bootstrap";
 import {
-    Department, departmentAdminTableHeads,
+    Department,
+    departmentAdminTableHeads,
     DepartmentListProps,
     DepartmentListState,
     departmentTableHeads
 } from "../types/Department";
-import { ComponentAddDepartment } from "./ComponentAddDepartment";
-import { API } from "../api/APIManager";
-import { LinkContainer } from "react-router-bootstrap";
-import { Roles } from "../types/Roles";
+import {ComponentAddDepartment} from "./ComponentAddDepartment";
+import {API} from "../api/APIManager";
+import {LinkContainer} from "react-router-bootstrap";
+import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentEditDepartment} from "./ComponentEditDepartment";
 import {BiEdit, BiTrash} from "react-icons/bi";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
-import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
 import {ComponentConfirmDeleteDepartment} from "./ComponentConfirmDeleteDepartment";
-import {JobTitle} from "../types/JobTitle";
 
 /**
  * Component that display the list of departments
@@ -32,12 +31,12 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
         return (
             <div className="mt-5">
                 <ComponentConfirmDeleteDepartment closePrompt={this.#changeDeletePromptVisibility}
-                                                department={this.state.departmentToDelete}
-                                                onDeleteDepartment={this.props.onDeleteDepartment}/>
+                                                  department={this.state.departmentToDelete}
+                                                  onDeleteDepartment={this.props.onDeleteDepartment}/>
                 <h3>Liste des départements</h3>
                 <Table responsive bordered hover className="text-center">
                     <thead>
-                        {this.renderTableHeads()}
+                    {this.renderTableHeads()}
                     </thead>
                     <tbody>
                     {this.departmentList()}
@@ -45,7 +44,8 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                 </Table>
                 {this.renderAddDepartmentComponent()}
                 <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.props.onEditDepartment}
-                                         departmentToEdit={this.state.editedDepartment} cancelEdit={this.#changeEditPromptVisibility} />
+                                         departmentToEdit={this.state.editedDepartment}
+                                         cancelEdit={this.#changeEditPromptVisibility}/>
             </div>
         );
     }
@@ -64,7 +64,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
             return [
                 <tr key={"noDepartment"}>
                     <td colSpan={5}>
-                        <ComponentLoadingBarSpinner />
+                        <ComponentLoadingBarSpinner/>
                     </td>
                 </tr>
             ];

@@ -11,23 +11,10 @@ interface ComponentAvailabilitiesProps {
     isCellInStartToEndTimeRange: (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date) => boolean;
 }
 
-interface ComponentAvailabilitiesState {
-    daypilotSettings: {
-        businessBeginsHour: number
-    };
-}
-
-export class ComponentAvailabilities extends Component<ComponentAvailabilitiesProps, ComponentAvailabilitiesState> {
+export class ComponentAvailabilities extends Component<ComponentAvailabilitiesProps, unknown> {
+    public props: ComponentAvailabilitiesProps;
     private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
     private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
-
-    public state: ComponentAvailabilitiesState = {
-        daypilotSettings: {
-            businessBeginsHour: 0,
-        }
-    };
-
-    public props: ComponentAvailabilitiesProps;
 
     constructor(props) {
         super(props);
@@ -58,6 +45,51 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.datePicker?.update({
             events: events
         });
+    }
+
+    /**
+     *
+     * @returns all events in the calendar in {DayPilot.EventData[]} or undefined if the calendar is undefined
+     */
+    public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
+        return this.calendar?.events.list;
+    }
+
+    public render(): JSX.Element {
+        return (
+            <div className={"flex_hundred"}>
+                <div className={"left"}>
+                    <DayPilotNavigator
+                        selectMode={"Week"}
+                        showMonths={1}
+                        skipMonths={1}
+                        weekStarts={0}
+                        rowsPerMonth={"Auto"}
+                        startDate={DayPilot.Date.today()}
+                        selectionDay={DayPilot.Date.today()}
+                        onTimeRangeSelected={this.#onTimeRangeSelectedNavigator}
+                        ref={this.datePickerRef}
+                    />
+                </div>
+                <div className='main'>
+                    <DayPilotCalendar
+                        heightSpec={"Parent100Pct"}
+
+                        headerDateFormat={"dddd"}
+                        viewType={"Week"}
+                        businessBeginsHour={6}
+                        businessEndsHour={24}
+                        weekStarts={0}
+                        onTimeRangeSelected={this.#onTimeRangeSelectedCalendar}
+                        eventDeleteHandling={"Update"}
+                        allowEventOverlap={false}
+                        durationBarVisible={true}
+                        onBeforeCellRender={this.#onBeforeCellRender}
+                        ref={this.calendarRef}
+                    />
+                </div>
+            </div>
+        );
     }
 
     /**
@@ -123,60 +155,14 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         let end: DayPilot.Date = cell.end;
         let startDateOfWeek: DayPilot.Date = start.firstDayOfWeek('en-us');
 
-        if(startDateOfWeek) {
+        if (startDateOfWeek) {
             let isDisabled: boolean = this.props.isCellInStartToEndTimeRange(startDateOfWeek, start, end);
 
-            if(isDisabled) {
+            if (isDisabled) {
                 args.cell.properties.disabled = true;
                 args.cell.properties.backColor = "#eeeeee";
             }
         }
-    }
-
-    /**
-     *
-     * @returns all events in the calendar in {DayPilot.EventData[]} or undefined if the calendar is undefined
-     */
-    public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
-        return this.calendar?.events.list;
-    }
-
-    public render(): JSX.Element {
-        return (
-            <div className='flex_hundred'>
-                <div className='left'>
-                    <DayPilotNavigator
-                        selectMode={"Week"}
-                        showMonths={1}
-                        skipMonths={1}
-                        weekStarts={0}
-                        rowsPerMonth={"Auto"}
-                        startDate={DayPilot.Date.today()}
-                        selectionDay={DayPilot.Date.today()}
-                        onTimeRangeSelected={this.#onTimeRangeSelectedNavigator}
-                        ref={this.datePickerRef}
-                    />
-                </div>
-                <div className='main'>
-                    <DayPilotCalendar
-                        {...this.state.daypilotSettings}
-                        heightSpec={"Parent100Pct"}
-
-                        headerDateFormat={"dddd"}
-                        viewType={"Week"}
-                        businessBeginsHour={0}
-                        businessEndsHour={24}
-                        weekStarts={0}
-                        onTimeRangeSelected={this.#onTimeRangeSelectedCalendar}
-                        eventDeleteHandling={"Update"}
-                        allowEventOverlap={false}
-                        durationBarVisible={true}
-                        onBeforeCellRender={this.#onBeforeCellRender}
-                        ref={this.calendarRef}
-                    />
-                </div>
-            </div>
-        );
     }
 }
 

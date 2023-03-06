@@ -53,6 +53,31 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
         }
     }
 
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}/>);
+        }
+        switch (this.state.fetchState) {
+            case FetchState.WAITING:
+                return <ComponentLoading/>;
+            case FetchState.OK:
+                return <AvailabilitiesList
+                    employees={this.state.employees}
+                    unavailabilities={this.state.unavailabilities}
+                    acceptUnavailability={this.#acceptUnavailability}
+                    refuseUnavailability={this.#refuseUnavailability}
+                />;
+            default:
+                return <AvailabilitiesList
+                    employees={[]}
+                    unavailabilities={[]}
+                    acceptUnavailability={this.#acceptUnavailability}
+                    refuseUnavailability={this.#refuseUnavailability}
+                />;
+        }
+
+    }
+
     /**
      * Verify if the user is logged in
      * @private
@@ -158,30 +183,5 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
             return false;
         }
         return true;
-    }
-
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo} />);
-        }
-        switch (this.state.fetchState) {
-            case FetchState.WAITING:
-                return <ComponentLoading />;
-            case FetchState.OK:
-                return <AvailabilitiesList
-                    employees={this.state.employees}
-                    unavailabilities={this.state.unavailabilities}
-                    acceptUnavailability={this.#acceptUnavailability}
-                    refuseUnavailability={this.#refuseUnavailability}
-                />;
-            default:
-                return <AvailabilitiesList
-                    employees={[]}
-                    unavailabilities={[]}
-                    acceptUnavailability={this.#acceptUnavailability}
-                    refuseUnavailability={this.#refuseUnavailability}
-                />;
-        }
-
     }
 }

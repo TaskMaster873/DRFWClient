@@ -20,25 +20,25 @@ interface DeleteSkillProps {
 export class ComponentConfirmDeleteSkill extends React.Component<DeleteSkillProps, unknown> {
     public render(): JSX.Element {
         return (<Modal show={this.props.skill != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Confirmation de suppression</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p>Voulez-vous vraiment supprimer le corps d'emploi {this.props.skill?.name} ?</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => this.#hideModal(true)}>
-                        Oui
-                    </Button>
-                    <Button variant="secondary" onClick={() => this.#hideModal()}>
-                        Non
-                    </Button>
-                </Modal.Footer>
+            <Modal.Header closeButton>
+                <Modal.Title>Confirmation de suppression</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <p>Voulez-vous vraiment supprimer le corps d'emploi {this.props.skill?.name} ?</p>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="primary" onClick={() => this.#hideModal(true)}>
+                    Oui
+                </Button>
+                <Button variant="secondary" onClick={() => this.#hideModal()}>
+                    Non
+                </Button>
+            </Modal.Footer>
         </Modal>);
     }
 
     readonly #hideModal = (confirm: boolean = false) => {
-        if(confirm && this.props.skill?.id) {
+        if (confirm && this.props.skill?.id) {
             this.props.onDeleteSkill(this.props.skill.id);
         }
         this.props.closePrompt();

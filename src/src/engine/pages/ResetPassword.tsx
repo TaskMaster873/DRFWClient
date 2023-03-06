@@ -52,10 +52,10 @@ export function ResetPassword() {
 
     if (emailState === ResetPasswordState.WAITING) {
         // Chargement pendant que verifyActionCode valide avec le serveur que le code est bon.
-        return <ComponentLoading />;
+        return <ComponentLoading/>;
     } else if (emailState === ResetPasswordState.OK) {
         // Toutes les données sont correctes, l'utilisateur peut réinitialiser son mot de passe
-        return <ComponentResetPassword actionCode={actionCode} email={email} />;
+        return <ComponentResetPassword actionCode={actionCode} email={email}/>;
     } else {
         return <></>;
     }
