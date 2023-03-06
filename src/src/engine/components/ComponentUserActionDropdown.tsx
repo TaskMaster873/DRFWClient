@@ -93,7 +93,7 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                     variant={'primary'}
                     title={<IoSettingsSharp />}
                 >
-                    <Dropdown.Menu className="super-colors">
+                    <Dropdown.Menu className="">
                         <Dropdown.Item eventKey="1">
                             <Nav.Link id="logoutLink" className="dropDownMenuText" onClick={this.#logout}>Se déconnecter</Nav.Link>
                         </Dropdown.Item>

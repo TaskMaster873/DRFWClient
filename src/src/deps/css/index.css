@@ -148,10 +148,6 @@ code {
     background-color: white!important;
 }
 
-.super-colors {
-    background-color: white!important;
-}
-
 @media only screen and (max-width: 990px) {
     .navbar-nav .nav-link {
         width: 100%;
