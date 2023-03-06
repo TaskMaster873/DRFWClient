@@ -26,7 +26,7 @@ test("should render form inputs", async () => {
     const {
         form,
         inputFirstName,
-        inputName,
+        inputLastName,
         inputPhoneNumber,
         inputInitialPassword,
         selectDepartment,
@@ -38,7 +38,7 @@ test("should render form inputs", async () => {
     expect(form).not.toBeNull();
     expect(inputEmail).not.toBeNull();
     expect(inputFirstName).not.toBeNull();
-    expect(inputName).not.toBeNull();
+    expect(inputLastName).not.toBeNull();
     expect(inputPhoneNumber).not.toBeNull();
     expect(inputInitialPassword).not.toBeNull();
     expect(selectDepartment).not.toBeNull();
@@ -50,18 +50,18 @@ test("should render form inputs", async () => {
 });
 
 describe("Empty Fields AddEmployee Tests", () => {
-    test("Empty employee number should show error", async () => {
+    test("Empty email should show error", async () => {
         const {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
@@ -69,6 +69,7 @@ describe("Empty Fields AddEmployee Tests", () => {
 
         expect(inputEmail.value).toBe("");
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
+        expect(inputLastName.value).toBe(testConstants.validLastName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
 
@@ -82,13 +83,13 @@ describe("Empty Fields AddEmployee Tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
@@ -96,19 +97,19 @@ describe("Empty Fields AddEmployee Tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe("");
-        expect(inputName.value).toBe(testConstants.validName);
+        expect(inputLastName.value).toBe(testConstants.validLastName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
     });
 
-    test("Empty name should show error", async () => {
+    test("Empty last name should show error", async () => {
         const {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
@@ -122,7 +123,7 @@ describe("Empty Fields AddEmployee Tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
-        expect(inputName.value).toBe("");
+        expect(inputLastName.value).toBe("");
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
@@ -134,21 +135,21 @@ describe("Empty Fields AddEmployee Tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
         fireEvent.submit(form);
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
-        expect(inputName.value).toBe(testConstants.validName);
+        expect(inputLastName.value).toBe(testConstants.validLastName);
         expect(inputPhoneNumber.value).toBe("");
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
@@ -160,21 +161,21 @@ describe("Empty Fields AddEmployee Tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
 
         fireEvent.submit(form);
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
-        expect(inputName.value).toBe(testConstants.validName);
+        expect(inputLastName.value).toBe(testConstants.validLastName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe("");
         expect(form.classList.contains("was-validated")).toBeTruthy();
@@ -188,14 +189,14 @@ describe("Regex Validation AddEmployee Tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
         } = getFields();
 
         await user.type(inputEmail, testConstants.invalidEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
@@ -203,6 +204,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.invalidEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
+        expect(inputLastName.value).toBe(testConstants.validLastName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
@@ -214,14 +216,14 @@ describe("Regex Validation AddEmployee Tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.invalidPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
 
@@ -229,6 +231,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
+        expect(inputLastName.value).toBe(testConstants.validLastName);
         expect(inputPhoneNumber.value).toBe(testConstants.invalidPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
@@ -240,14 +243,14 @@ describe("Regex Validation AddEmployee Tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword
         } = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.invalidPassword);
 
@@ -255,6 +258,7 @@ describe("Regex Validation AddEmployee Tests", () => {
 
         expect(inputEmail.value).toBe(testConstants.validEmail);
         expect(inputFirstName.value).toBe(testConstants.validFirstName);
+        expect(inputLastName.value).toBe(testConstants.validLastName);
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.invalidPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
@@ -268,14 +272,14 @@ test("Valid employee infos should submit form", async () => {
         form,
         inputEmail,
         inputFirstName,
-        inputName,
+        inputLastName,
         inputPhoneNumber,
         inputInitialPassword,
     } = getFields();
 
-    await user.type(inputName, testConstants.validName);
     await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputFirstName, testConstants.validFirstName);
+    await user.type(inputLastName, testConstants.validLastName);
     await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
     await user.type(inputInitialPassword, testConstants.validPassword);
 
@@ -296,7 +300,7 @@ describe("Optional fields AddEmployee tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
             checksJobTitle
@@ -304,7 +308,7 @@ describe("Optional fields AddEmployee tests", () => {
 
         await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
         await user.click(checksJobTitle[0]);
@@ -326,7 +330,7 @@ describe("Optional fields AddEmployee tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
             checksSkills
@@ -334,10 +338,10 @@ describe("Optional fields AddEmployee tests", () => {
 
         await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
-        await user.click(skills[0]);
+        await user.click(checksSkills[0]);
 
         fireEvent.submit(form);
 
@@ -356,7 +360,7 @@ describe("Optional fields AddEmployee tests", () => {
             form,
             inputEmail,
             inputFirstName,
-            inputName,
+            inputLastName,
             inputPhoneNumber,
             inputInitialPassword,
             selectRole,
@@ -364,7 +368,7 @@ describe("Optional fields AddEmployee tests", () => {
 
         await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
-        await user.type(inputName, testConstants.validName);
+        await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
         await user.selectOptions(selectRole, roles[1]);
@@ -386,7 +390,7 @@ describe("Optional fields AddEmployee tests", () => {
 function getFields() {
     const form = document.querySelector("form");
     const inputFirstName = document.getElementsByName("firstName")[0];
-    const inputName = document.getElementsByName("lastName")[0];
+    const inputLastName = document.getElementsByName("lastName")[0];
     const inputEmail = document.getElementsByName("email")[0];
     const inputPhoneNumber = document.getElementsByName("phoneNumber")[0];
     const inputInitialPassword = document.getElementsByName("password")[0];
@@ -403,7 +407,7 @@ function getFields() {
         inputEmail,
         inputFirstName,
         inputInitialPassword,
-        inputName,
+        inputLastName,
         inputPhoneNumber,
         selectRole
     };

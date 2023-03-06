@@ -61,7 +61,7 @@ test("Valid email and password should submit form", async () => {
     await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputPassword, testConstants.validPassword);
 
-    await act(async () => {
+    await act(async() => {
         fireEvent.submit(form);
     })
 
