@@ -32,8 +32,8 @@ const employee = new Employee({
     department: "Construction",
     jobTitles: ["Manager"],
     skills: ["Gestion de personnel"],
-    isActive: false,
-    hasChangedDefaultPassword: false,
+    isActive: true,
+    hasChangedDefaultPassword: true,
     role: 1,
 });
 
@@ -46,7 +46,7 @@ const employee2 = new Employee({
     department: "Informatique",
     jobTitles: [],
     skills: [],
-    isActive: false,
+    isActive: true,
     hasChangedDefaultPassword: false,
     role: 2,
 });
@@ -54,7 +54,7 @@ const employee2 = new Employee({
 const employeeWithId = new Employee({
     id: "1234",
     firstName: "David",
-    lastName: "Gol",
+    lastName: "Golan",
     email: "test@test.test",
     phoneNumber: "977-333-2954",
     department: "Marketing",
@@ -71,7 +71,7 @@ const employeeWithId2 = new Employee({
     lastName: "Trenta",
     email: "jtrenta@hotmail.com",
     phoneNumber: "976-433-1062",
-    department: "Marketing",
+    department: "Construction",
     jobTitles: ["Manager"],
     skills: ["Gestion de personnel"],
     isActive: false,
@@ -84,11 +84,11 @@ const employees2: Employee[] = [employee, employee2];
 const employeesWithIds: Employee[] = [employeeWithId];
 
 const department: Department = new Department({
-    name: "Informatique", director: "Jasmin"
+    name: "Informatique", director: "George Belleau"
 });
 
 const department2: Department = new Department({
-    name: "Informatique", director: "Jasmin"
+    name: "Construction", director: "Maxime Bédard"
 });
 
 const jobTitle = new JobTitle({id: "1", name: "Manager"});
@@ -99,10 +99,9 @@ const skill2 = new Skill({id: "2", name: "Gestion de personnel"})
 const departments: Department[] = [department];
 const departments2: Department[] = [department, department2];
 
-const roles: string[] = ["Employé", "Administrateur"];
+const roles: string[] = ["Invité", "Employé", "Gestionnaire", "Administrateur"];
 const jobTitles: JobTitle[] = [jobTitle, jobTitle2];
 const skills: Skill[] = [skill, skill2];
-
 const employeeNb: number[] = [1, 2];
 
 export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2,

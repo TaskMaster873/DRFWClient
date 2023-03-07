@@ -3,13 +3,15 @@
  */
 
 import "@testing-library/jest-dom";
-import {fireEvent, render} from "@testing-library/react";
+import {fireEvent, render, screen} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {departments2, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
+import {API} from "../src/engine/api/APIManager";
 let user;
+API.hasLowerPermission = jest.fn(() => true);
 const onAddEmployee = jest.fn();
 
 beforeEach(async () => {
@@ -284,6 +286,7 @@ test("Valid employee infos should submit form", async () => {
     await user.type(inputInitialPassword, testConstants.validPassword);
 
     fireEvent.submit(form);
+    screen.debug();
 
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputFirstName.value).toBe(testConstants.validFirstName);
@@ -365,13 +368,14 @@ describe("Optional fields AddEmployee tests", () => {
             inputInitialPassword,
             selectRole,
         } = getFields();
+        const selectedRole = 1;
 
         await user.type(inputEmail, testConstants.validEmail);
         await user.type(inputFirstName, testConstants.validFirstName);
         await user.type(inputLastName, testConstants.validLastName);
         await user.type(inputPhoneNumber, testConstants.validPhoneNumber);
         await user.type(inputInitialPassword, testConstants.validPassword);
-        await user.selectOptions(selectRole, roles[1]);
+        await user.selectOptions(selectRole, roles[selectedRole]);
 
         fireEvent.submit(form);
 
@@ -380,7 +384,7 @@ describe("Optional fields AddEmployee tests", () => {
         expect(inputPhoneNumber.value).toBe(testConstants.validPhoneNumber);
         expect(inputInitialPassword.value).toBe(testConstants.validPassword);
         expect(form.classList.contains("was-validated")).toBeTruthy();
-        expect(selectRole.value).toBe(roles[1]);
+        expect(selectRole.value).toBe(selectedRole.toString());
         expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
         expect(onAddEmployee).toHaveBeenCalled()
     });

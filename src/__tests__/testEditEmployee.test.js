@@ -3,19 +3,23 @@
  */
 
 import "@testing-library/jest-dom";
-import {fireEvent, render} from "@testing-library/react";
+import {fireEvent, render, screen} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
-import {departments, employee, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
+import {departments2, employee, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentEditEmployee} from "../src/engine/components/ComponentEditEmployee";
+import {API} from "../src/engine/api/APIManager";
 let user;
+API.hasLowerPermission = jest.fn(() => true);
+let onEditEmployee = jest.fn();
 
 beforeEach(async () => {
     user = userEvent.setup();
     render(<MemoryRouter>
-        <ComponentEditEmployee departments={departments} jobTitles={jobTitles} editedEmployee={employee} roles={roles} skills={skills} onAddJobTitle={jest.fn()} onAddSkill={jest.fn()}
-                               onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()} onEditEmployee={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}/>
+        <ComponentEditEmployee departments={departments2} jobTitles={jobTitles} editedEmployee={employee} roles={roles} skills={skills} employeeId={employee.id}
+                               onEditEmployee={onEditEmployee} onAddJobTitle={jest.fn()} onAddSkill={jest.fn()} onDeleteJobTitle={jest.fn()}
+                               onDeleteSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}/>
     </MemoryRouter>);
 });
 
@@ -57,7 +61,7 @@ test("should have default values on initialization", async () => {
     expect(inputLastName.value).toBe(employee.lastName);
     expect(inputPhoneNumber.value).toBe(employee.phoneNumber);
     expect(selectDepartment.value).toBe(employee.department);
-    expect(selectRole.value).toBe(employee.role);
+    expect(selectRole.value).toBe(employee.role.toString());
     expect(checksJobTitle[0].value).toBe(jobTitles[0].name);
     expect(checksSkills[0].value).toBe(skills[0].name);
     expect(checksJobTitle[0].checked).toBeTruthy();
