@@ -56,7 +56,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
      * Display a notification to the user if the operation was successful or not.
      * @returns {Promise<void>}
      */
-    public async fetchData(): Promise<void> {
+    private async fetchData(): Promise<void> {
         let _employees = API.getEmployees();
         let departments = await API.getDepartments();
 
@@ -76,7 +76,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
     }
 
     //#region Departments
-    public addDepartment = async (department: DepartmentModifyDTO): Promise<void> => {
+    private addDepartment = async (department: DepartmentModifyDTO): Promise<void> => {
         let error = await API.createDepartment(department);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_CREATED);
@@ -100,7 +100,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
      * @param department {DepartmentModifyDTO} The department to edit
      * @param oldDepartmentName The old department name
      */
-    public editDepartment = async (departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string): Promise<void> => {
+    private editDepartment = async (departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string): Promise<void> => {
         let error = await API.editDepartment(departmentId, department, oldDepartmentName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
@@ -112,7 +112,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     };
 
-    public deleteDepartment = async (department: Department): Promise<void> => {
+    private deleteDepartment = async (department: Department): Promise<void> => {
         let error = await API.deleteDepartment(department);
         if (!error && department.id) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.DEPARTMENT_EDITED);
@@ -135,7 +135,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             );
         }
         return (
-            <Container>
+            <Container data-bs-theme={"dark"}>
                 <ComponentDepartmentList
                     employees={this.state.employees}
                     employeeNb={this.state.employeeNb}

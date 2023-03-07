@@ -54,7 +54,7 @@ export class ComponentChangePassword extends React.Component<ChangePasswordProps
                     <div className="me-4">
                         <img
                             className="mx-auto d-block mt-5"
-                            src={Logo as any}
+                            src={Logo}
                             alt="Logo TaskMaster"
                             width={50}
                             height={60}
