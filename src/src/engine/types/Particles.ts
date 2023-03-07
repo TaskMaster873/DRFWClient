@@ -382,6 +382,28 @@ export const ParticlesOptLogin: any = {
     fpsLimit: 120,
     detectRetina: true,
     autoPlay: true,
+    interactivity: {
+        events: {
+            onClick: {
+                enable: true,
+                mode: "push",
+            },
+            onHover: {
+                enable: true,
+                mode: "repulse",
+            },
+            resize: true,
+        },
+        modes: {
+            push: {
+                quantity: 4,
+            },
+            repulse: {
+                distance: 100,
+                duration: 0.4,
+            },
+        },
+    },
     particles: {
         "bounce": {
             "horizontal": {
