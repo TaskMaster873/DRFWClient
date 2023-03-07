@@ -149,7 +149,7 @@ export function ComponentPopupSchedule(props: Props) {
                             id="end"
                             type="datetime-local"
                             defaultValue={props.end}
-                            isInvalid={areDatesValid()}
+                            isInvalid={!areDatesValid()}
                             step="1800"
                             onChange={(e) => setEnd(e.target.value)}
                         />
