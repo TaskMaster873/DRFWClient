@@ -44,8 +44,8 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                     as={ButtonGroup}
                     key={"primary"}
                     id={`dropdown-variants-primary`}
-                    variant={"primary"}
-                    title={<IoSettingsSharp/>}
+                    variant={"dark"}
+                    title={<IoSettingsSharp size ={25} />}
                 >
                         <Dropdown.Item eventKey="1">
                             <Nav id="logoutLink" className={"dropDownMenuText"} onClick={this.#logout}>Se
@@ -56,7 +56,6 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                             <Nav id="changePassword" className={"dropDownMenuText"} onClick={this.#changePassword}>Changer
                                 mon mot de passe</Nav>
                         </Dropdown.Item>
-
                 </DropdownButton>
             );
         }
