@@ -28,12 +28,8 @@ export function ComponentAvailabilitiesPopup(props: Props) {
      */
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         const form = event.currentTarget;
-        let isValid = form.checkValidity();
+        let isValid = form.checkValidity() && areDatesValid();
         let errorType = FormErrorType.NO_ERROR;
-
-        if ((start ?? props.start) > (end ?? props.end)) {
-            isValid = false;
-        }
 
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
@@ -48,6 +44,10 @@ export function ComponentAvailabilitiesPopup(props: Props) {
             props.availabilityAdd(start ?? props.start, end ?? props.end);
             closeModal();
         }
+    };
+
+    const areDatesValid = (): boolean => {
+        return (start ?? props.start) < (end ?? props.end);
     };
 
 
@@ -68,7 +68,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
             <Modal.Header closeButton onClick={() => closeModal()}>
                 <Modal.Title>Les dates de début et de fin</Modal.Title>
             </Modal.Header>
-            <Form onSubmit={(e) => handleSubmit(e)} validated={validated && (start ?? props.start) < (end ?? props.end)} data-error={error}>
+            <Form onSubmit={(e) => handleSubmit(e)} validated={validated && areDatesValid()} data-error={error}>
                 <Modal.Body>
                     <Form.Group className="mb-3">
                         <Form.Label>Date de début</Form.Label>
@@ -76,7 +76,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
                             id="start"
                             type="date"
                             step="7"
-                            isInvalid={(start ?? props.start) > (end ?? props.end)}
+                            isInvalid={!areDatesValid()}
                             defaultValue={props.start.toString("yyyy-MM-dd")}
                             onChange={(e) => {
                                 setStart(new DayPilot.Date(e.target.value));
@@ -92,7 +92,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
                             id="end"
                             type="date"
                             step="7"
-                            isInvalid={(start ?? props.start) > (end ?? props.end)}
+                            isInvalid={!areDatesValid()}
                             defaultValue={props.end.toString("yyyy-MM-dd")}
                             onChange={(e) => setEnd(new DayPilot.Date(e.target.value))}
                         />

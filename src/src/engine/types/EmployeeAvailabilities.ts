@@ -14,7 +14,7 @@ export enum DAYS {
 }
 
 /**
- * The startDate when the availability is effective (Sunday) and the endDate is when the availibility end (Sunday)
+ * The startTime is when the employee starts being unavailable and the endTime is when the employee ends being unavailable
  */
 export interface EmployeeAvailabilityException {
     startTime: DayPilot.Date;
@@ -86,6 +86,9 @@ export type DateOfUnavailabilityList = DateOfUnavailability[];
 
 export const unavailabilitiesTableHeads: string[] = ["#", "Prénom", "Nom", "Début", "Fin", "Actions"];
 
+/**
+ * Availabilities stored in DB.
+ */
 export interface ViewableAvailabilities {
     id: string;
     recursiveExceptions: RecursiveAvailabilities;
