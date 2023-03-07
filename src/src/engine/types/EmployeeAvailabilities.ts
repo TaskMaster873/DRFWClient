@@ -64,7 +64,7 @@ export interface EventsForUnavailability {
 export type EventsForUnavailabilityList = EventsForUnavailability[];
 
 /**
- * It is all the informations used for
+ * Used for the creation of availabilities
  */
 export interface EmployeeAvailabilitiesForCreate {
     recursiveExceptions: RecursiveAvailabilities;
@@ -72,7 +72,7 @@ export interface EmployeeAvailabilitiesForCreate {
 }
 
 /**
- * It is used for date convert
+ * The start and end date of unavailability
  */
 export interface DateOfUnavailability {
     start: Date,

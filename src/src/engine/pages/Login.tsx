@@ -22,7 +22,7 @@ export class Login extends React.Component<unknown, unknown> {
     }
 
     /**
-     * This function is called when the user wants to login.
+     * This function is called when the user wants to sign in.
      * @param email - The email of the user
      * @param password - The password of the user
      * @private
