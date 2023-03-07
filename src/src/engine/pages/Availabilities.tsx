@@ -12,7 +12,6 @@ import {DayPilot} from "daypilot-pro-react";
 
 import "../../deps/css/daypilot_custom.css";
 import {ComponentAvailabilitiesPopup} from "../components/ComponentAvailabilitiesPopup";
-import {Timestamp} from "firebase/firestore";
 import {API} from "../api/APIManager";
 import {NotificationManager} from "../api/NotificationManager";
 import {errors} from "../messages/FormMessages";

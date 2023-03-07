@@ -5,6 +5,7 @@ import {API} from "../api/APIManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
+import {AvailabilitiesState} from "./Availabilities";
 
 export interface ChangePasswordState {
     redirectTo: string | null;
@@ -14,6 +15,10 @@ export interface ChangePasswordState {
  * La page pour changer le mot de passe
  */
 export class ChangePassword extends React.Component<unknown, ChangePasswordState> {
+    public state: ChangePasswordState = {
+        redirectTo: null
+    }
+
     public componentDidMount() {
         document.title = "Changement de mot de passe - TaskMaster";
     }

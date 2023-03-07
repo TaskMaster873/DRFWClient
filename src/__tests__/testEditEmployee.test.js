@@ -10,15 +10,19 @@ import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentEditEmployee} from "../src/engine/components/ComponentEditEmployee";
 import {API} from "../src/engine/api/APIManager";
+
 let user;
 API.hasLowerPermission = jest.fn(() => true);
 let onEditEmployee = jest.fn();
 let testScope = {};
 beforeEach(async () => {
     user = userEvent.setup();
-    const { rerender }  = render(<MemoryRouter>
-        <ComponentEditEmployee departments={departments2} jobTitles={jobTitles} editedEmployee={employee2} roles={roles} skills={skills} employeeId={employee2.id} onEditEmployee={onEditEmployee} onAddJobTitle={jest.fn()}
-            onAddSkill={jest.fn()} onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
+    const {rerender} = render(<MemoryRouter>
+        <ComponentEditEmployee departments={departments2} jobTitles={jobTitles} editedEmployee={employee2} roles={roles}
+                               skills={skills} employeeId={employee2.id} onEditEmployee={onEditEmployee}
+                               onAddJobTitle={jest.fn()}
+                               onAddSkill={jest.fn()} onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}
+                               onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
         />
     </MemoryRouter>);
     testScope.rerender = rerender;
@@ -75,7 +79,6 @@ test("should have default values on initialization", async () => {
             onEditSkill={jest.fn()}
         />
     </MemoryRouter>);
-
     expect(inputFirstName.value).toBe(employee.firstName);
     expect(inputLastName.value).toBe(employee.lastName);
     expect(inputPhoneNumber.value).toBe(employee.phoneNumber);
@@ -83,8 +86,8 @@ test("should have default values on initialization", async () => {
     expect(selectRole.value).toBe(employee.role.toString());
     expect(checksJobTitle[0].value).toBe(jobTitles[0].name);
     expect(checksSkills[0].value).toBe(skills[0].name);
-    //expect(checksJobTitle[0].checked).toBeTruthy();
-    //expect(checksSkills[0].checked).toBeTruthy();
+    expect(checksJobTitle[0].checked).toBeTruthy();
+    expect(checksSkills[0].checked).toBeTruthy();
 });
 
 describe("Empty Fields EditEmployee Tests", () => {
