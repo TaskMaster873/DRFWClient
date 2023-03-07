@@ -33,6 +33,15 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         redirectTo: null
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
+    }
 
     public async componentDidMount(): Promise<void> {
         document.title = "Modifier un Employé - TaskMaster";

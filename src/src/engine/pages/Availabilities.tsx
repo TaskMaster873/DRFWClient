@@ -61,6 +61,16 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         redirectTo: null
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
+    }
+
     //It is to have acces more easily to the datepicker and calendar getters and their public methods
     private componentAvailabilitiesRef: React.RefObject<ComponentAvailabilities> = React.createRef();
 
