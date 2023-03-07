@@ -44,7 +44,7 @@ export class NavigationBar extends React.Component<unknown, State> {
 
     public render(): JSX.Element {
         return (
-            <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{fontSize: 15}}>
+            <Navbar collapseOnSelect expand="lg" variant="dark" className={"navbar-element"}>
                 <Container fluid={true}>
                     <LinkContainer to="/">
                         <Navbar.Brand>

@@ -128,7 +128,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
 
         return (
-            <Container>
+            <Container data-bs-theme={"dark"}>
                 <ComponentDepartmentList
                     employees={this.state.employees}
                     employeeNb={this.state.employeeNb}

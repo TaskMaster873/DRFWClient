@@ -24,7 +24,7 @@ code {
 }
 
 .departmentName {
-    color: #0a58ca;
+    color: rgba(231,228,235,1)!important;
 }
 
 :root {
@@ -148,8 +148,74 @@ code {
     background-color: white!important;
 }
 
+.navbar-element {
+    font-size: 15px;
+    z-index: 1000;
+
+    background-color: #1d1920!important;
+    border: 1px solid #353038!important;
+}
+
+.z-1 {
+    z-index: 1;
+}
+
+th, tr, table {
+    color: #eee!important;
+    border-color: #eee;
+}
+
 @media only screen and (max-width: 990px) {
     .navbar-nav .nav-link {
         width: 100%;
     }
+}
+
+.particles {
+    z-index: 0;
+}
+
+.btn.btn-primary{
+    background: rgba(231,228,235,0.22);
+    border-color: rgba(231,228,235,1);
+}
+
+.btn-primary {
+    background: rgba(231,228,235,0.22)!important;
+    border-color: rgba(231,228,235,1)!important;
+}
+
+.btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+    background: rgba(231,228,235,1)!important;
+    border-color: rgba(231,228,235,0.22)!important;
+}
+
+/**
+    * ANIMATION HOME PAGE
+ */
+
+body {
+    background: radial-gradient(circle at 52.1% -29.6%, rgb(29, 25, 32) 0%, rgb(53, 48, 56) 100.2%);
+    color: #fff;
+    overflow: hidden;
+    font-family: 'Open Sans', sans-serif;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+}
+
+h1 {
+    color: #fff; /*#rgba(108,42,206,0.8);*/
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 800;
+    font-size: 4em;
+    letter-spacing: -2px;
+    text-align: center;
+    text-shadow: 1px 2px 1px rgba(0, 0, 0, .6);
+}
+
+.text-home-page-description {
+    width: 40em;
 }
