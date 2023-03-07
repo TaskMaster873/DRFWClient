@@ -5,7 +5,6 @@ import {API} from "../api/APIManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
-import {AvailabilitiesState} from "./Availabilities";
 
 export interface ChangePasswordState {
     redirectTo: string | null;
@@ -43,23 +42,14 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
 
         const hasPerms = API.hasPermission(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             isLoggedIn = true;
         }
 
         return isLoggedIn;
-    }
-
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
     }
 
     /**

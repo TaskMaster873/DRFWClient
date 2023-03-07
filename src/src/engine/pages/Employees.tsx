@@ -4,8 +4,10 @@ import {ComponentEmployeeList} from "../components/ComponentEmployeeList";
 import {Employee} from "../types/Employee";
 import {API} from "../api/APIManager";
 import {errors, successes} from "../messages/FormMessages";
-import {Params, useParams} from "react-router-dom";
+import {Navigate, Params, useParams} from "react-router-dom";
 import {NotificationManager} from "../api/NotificationManager";
+import {Roles} from "../types/Roles";
+import {RoutesPath} from "../RoutesPath";
 
 export function EmployeeWrapper(): JSX.Element {
     const parameters: Readonly<Params<string>> = useParams();
@@ -15,6 +17,8 @@ export function EmployeeWrapper(): JSX.Element {
 }
 interface EmployeeState {
     employees: Employee[] | null;
+    redirectTo: string | null;
+
 }
 
 interface EmployeesProps {
@@ -34,12 +38,18 @@ interface EmployeesProps {
  */
 class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
     public state: EmployeeState = {
-        employees: null
+        employees: null,
+        redirectTo: null
     };
 
-
-    constructor(props: EmployeesProps) {
+    constructor(props) {
         super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
     }
 
     public async componentDidMount() {
@@ -56,6 +66,11 @@ class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
     }
 
     public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (
+                <Navigate to={this.state.redirectTo}></Navigate>
+            );
+        }
         return (
             <Container>
                 <ComponentEmployeeList
@@ -106,6 +121,26 @@ class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.EMPLOYEE_DEACTIVATED);
         }
     };
+
+    /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
+        await API.awaitLogin;
+
+        let hasPerms = API.hasPermission(Roles.EMPLOYEE);
+        if (!API.isAuth() || !hasPerms) {
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
+        } else {
+            isLoggedIn = true;
+        }
+
+        return isLoggedIn;
+    }
 
     /**
      * Used to refresh the list of employees

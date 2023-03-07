@@ -23,7 +23,6 @@ import {successes} from "../messages/APIMessages";
 enum FetchState {
     WAITING = 0,
     ERROR = 1,
-    OK = 2,
 }
 
 export interface AvailabilitiesState {
@@ -75,7 +74,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     /**
      * get the child componentAvailability
-     * @param componentAvailability is the child componentAvailability
      * @returns the componentAvailability child of the component
      */
     get componentAvailability() {
@@ -83,8 +81,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
     public async componentDidMount() {
-        document.title = "Disponibilitées - TaskMaster";
-
+        document.title = "Disponibilités - TaskMaster";
     }
 
     public render(): JSX.Element {
@@ -123,6 +120,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     /**
      * Check if the date given higher than the startDate
+     * @param date
      * @param startDate is the start date and date is the date to check if it is higher than startDate
      * @returns a boolean of date >= startDate
      */
@@ -132,6 +130,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     /**
      * Check if the date given lower than the endDate
+     * @param date
      * @param endDate is the start date and date is the date to check if it is higher than endDate
      * @returns a boolean of date <= endDate
      */
@@ -172,7 +171,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
      * @param end the end date selected
      * @returns {DayPilot.EventData[]}
      */
-    readonly #onTimeRangeSelected = (start: Date, end: Date, selectedDate: Date): DayPilot.EventData[] => {
+    readonly #onTimeRangeSelected = (start: Date, end: Date): DayPilot.EventData[] => {
         return this.computeAllAvailabilities(start, end);
     };
 
@@ -232,23 +231,14 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
         const hasPerms = API.hasPermission(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             isLoggedIn = true;
         }
 
         return isLoggedIn;
-    }
-
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
     }
 
     /**
@@ -382,7 +372,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
      * @description This function will compute all the availabilities for the current week and the selected day.
      * @param start The start of the selected day
      * @param end The end of the selected day
-     * @param selectedDate The selected date
      * @private
      * @returns {DayPilot.EventData[]} The list of all the availabilities for the current week and the selected day.
      * @memberof Availabilities

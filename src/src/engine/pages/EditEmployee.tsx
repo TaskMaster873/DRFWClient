@@ -24,7 +24,7 @@ interface EmployeeEditProps {
 
 /**
  * The page to edit an employee
- * @param props {EmployeeProps} The props of the page
+ * @param props {EmployeeEditProps} The props of the page
  */
 export class EditEmployeeInternal extends React.Component<EmployeeEditProps, AddEmployeeState> {
     public state: AddEmployeeState = {
@@ -113,39 +113,21 @@ export class EditEmployeeInternal extends React.Component<EmployeeEditProps, Add
     }
 
     /**
-     * Verify if the user has the permission to access this page
-     * @param role
-     * @private
-     */
-    private verifyPermissions(role: Roles): boolean {
-        return API.hasPermission(role);
-    }
-
-    /**
      * Verify if the user is logged in
      * @private
      */
     private async verifyLogin(): Promise<boolean> {
         await API.awaitLogin;
 
-        const hasPerms = this.verifyPermissions(Roles.ADMIN);
+        const hasPerms = API.hasPermission(Roles.ADMIN);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
     }
 
     /**

@@ -94,23 +94,14 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
 
         let hasPerms = this.verifyPermissions(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             isLoggedIn = true;
         }
 
         return isLoggedIn;
-    }
-
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
     }
 
     // I did this function if we need to do something before the return (if there is some changes)

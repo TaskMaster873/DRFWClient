@@ -1,7 +1,7 @@
 import React from "react";
 import {ComponentDepartmentList} from "../components/ComponentDepartmentList";
 import {API} from "../api/APIManager";
-import {Department, DepartmentModifyDTO, DepartmentsState} from "../types/Department";
+import {Department, DepartmentModifyDTO} from "../types/Department";
 import {errors, successes} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
 import {Roles} from "../types/Roles";
@@ -9,6 +9,14 @@ import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import {Container} from "react-bootstrap";
 import Utils from "../utils/Utils";
+import {Employee} from "../types/Employee";
+
+export interface DepartmentsState {
+    employees: Employee[];
+    employeeNb: number[];
+    departments: Department[];
+    redirectTo: string | null;
+}
 
 /**
  * Ceci est la page pour les departments
@@ -126,7 +134,6 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
                 <Navigate to={this.state.redirectTo}></Navigate>
             );
         }
-
         return (
             <Container>
                 <ComponentDepartmentList
@@ -142,15 +149,6 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
     }
 
     /**
-     * Verify if the user has the permission to access this page
-     * @param role
-     * @private
-     */
-    private verifyPermissions(role: Roles): boolean {
-        return API.hasPermission(role);
-    }
-
-    /**
      * Verify if the user is logged in
      * @private
      */
@@ -158,9 +156,11 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        let hasPerms = this.verifyPermissions(Roles.EMPLOYEE);
+        let hasPerms = API.hasPermission(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             isLoggedIn = true;
         }
@@ -170,14 +170,4 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
 
     //#endregion
 
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
-    }
 }
