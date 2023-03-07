@@ -15,6 +15,7 @@ import {Navigate} from "react-router-dom";
 import {Roles} from "../types/Roles";
 import {DateManager} from "../utils/DateManager";
 import {SelectDate} from "../components/SelectDate";
+import {ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 
 enum FetchState {
     WAITING = 0,
@@ -27,6 +28,7 @@ interface State {
     currentDay: DayPilot.Date;
     departments: Department[];
     employees: Employee[];
+    unavailabilities: ViewableAvailabilities[];
     shifts: Shift[];
     fetchState: FetchState;
     redirectTo: string | null;
@@ -38,10 +40,21 @@ export class CreateSchedule extends React.Component<unknown, State> {
         currentDay: DayPilot.Date.today(),
         departments: [],
         employees: [],
+        unavailabilities: [],
         shifts: [],
         fetchState: FetchState.WAITING,
         redirectTo: null
     };
+
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
+    }
 
     /**
      * Called when the page is loaded
@@ -61,7 +74,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
             if (this.manageError(fetchedDepartments, errors.GET_DEPARTMENTS)) {
                 fetchedDepartments = fetchedDepartments as Department[];
                 //If current user is a manager, limit access to other departments
-                if (!this.verifyPermissions(Roles.ADMIN)) {
+                if (!API.hasPermission(Roles.ADMIN)) {
                     fetchedDepartments = fetchedDepartments.filter(d =>
                         d.name === API.getCurrentEmployeeInfos()?.department
                     );
@@ -75,12 +88,11 @@ export class CreateSchedule extends React.Component<unknown, State> {
 
     public render(): JSX.Element {
         if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}/>);
+            return (<Navigate to={this.state.redirectTo} />);
         }
-
         switch (this.state.fetchState) {
             case FetchState.WAITING:
-                return <ComponentLoading/>;
+                return <ComponentLoading />;
             case FetchState.OK:
                 if (this.state.departments.length > 1) {
                     return (
@@ -105,6 +117,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
                                     currentDay={this.state.currentDay}
                                     events={this.getEventsForCalendarFromShifts(this.state.shifts)}
                                     employees={this.state.employees}
+                                    unavailabilities={this.state.unavailabilities}
                                     addShift={this.#addShift}
                                     editShift={this.#editShift}
                                     deleteShift={this.#deleteShift}
@@ -129,6 +142,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
                                     currentDay={this.state.currentDay}
                                     events={this.getEventsForCalendarFromShifts(this.state.shifts)}
                                     employees={this.state.employees}
+                                    unavailabilities={this.state.unavailabilities}
                                     addShift={this.#addShift}
                                     editShift={this.#editShift}
                                     deleteShift={this.#deleteShift}
@@ -142,20 +156,12 @@ export class CreateSchedule extends React.Component<unknown, State> {
                     currentDay={this.state.currentDay}
                     events={[]}
                     employees={[]}
+                    unavailabilities={[]}
                     addShift={this.#addShift}
                     editShift={this.#editShift}
                     deleteShift={this.#deleteShift}
                 />;
         }
-    }
-
-    /**
-     * Verify if the user has the permission to access this page
-     * @param role
-     * @private
-     */
-    private verifyPermissions(role: Roles): boolean {
-        return API.hasPermission(role);
     }
 
     /**
@@ -166,7 +172,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
         let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        const hasPerms = this.verifyPermissions(Roles.MANAGER);
+        const hasPerms = API.hasPermission(Roles.MANAGER);
         if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
         } else {
@@ -189,14 +195,22 @@ export class CreateSchedule extends React.Component<unknown, State> {
 
     /**
      * Change employees, shifts to a new current department and refresh state down the function chain (Start of function chain)
-     * @param currentDepartment
-     * @param departments
+     * @param currentDepartment current department to view
+     * @param departments OPTIONAL. all departments available
      */
     readonly #changeDepartment = async (currentDepartment: Department, departments?: Department[]): Promise<void> => {
-        //Get all employees of this department
         const fetchedEmployees = await API.getEmployees(currentDepartment.name);
-        if (this.manageError(fetchedEmployees, errors.CREATE_SHIFT)) {
-            await this.getShifts(this.state.currentDay, currentDepartment, departments, fetchedEmployees as Employee[]);
+        const fetchedUnavailabilities = await API.getUnavailabilitiesForDepartment(currentDepartment.name, true);
+        if (this.manageError(fetchedEmployees, errors.GET_EMPLOYEES)) {
+            if (this.manageError(fetchedUnavailabilities, errors.GET_AVAILABILITIES)) {
+                await this.getShifts(
+                    this.state.currentDay, 
+                    currentDepartment, 
+                    departments, 
+                    fetchedEmployees as Employee[], 
+                    fetchedUnavailabilities as ViewableAvailabilities[]
+                );
+            }
         }
     };
 
@@ -211,19 +225,21 @@ export class CreateSchedule extends React.Component<unknown, State> {
         currentDay?: DayPilot.Date,
         currentDepartment?: Department,
         departments?: Department[],
-        employees?: Employee[]
+        employees?: Employee[],
+        unavailabilities?: ViewableAvailabilities[]
     ): Promise<void> => {
         //Get all daily shifts of this department
         const fetchedShifts = await API.getDailyScheduleForDepartment(
             currentDay || this.state.currentDay,
             currentDepartment || this.state.currentDepartment
         );
-        if (this.manageError(fetchedShifts, errors.CREATE_SHIFT)) {
+        if (this.manageError(fetchedShifts, errors.GET_SHIFTS)) {
             this.setState({
                 currentDepartment: currentDepartment || this.state.currentDepartment,
                 currentDay: currentDay || this.state.currentDay,
                 departments: departments || this.state.departments,
                 employees: employees || this.state.employees,
+                unavailabilities: unavailabilities || this.state.unavailabilities,
                 shifts: fetchedShifts as Shift[],
                 fetchState: FetchState.OK,
             });

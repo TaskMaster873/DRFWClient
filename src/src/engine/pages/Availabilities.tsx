@@ -61,6 +61,16 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         redirectTo: null
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
+    }
+
     //It is to have acces more easily to the datepicker and calendar getters and their public methods
     private componentAvailabilitiesRef: React.RefObject<ComponentAvailabilities> = React.createRef();
 
@@ -137,9 +147,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     readonly #getStartData = async (): Promise<DayPilot.EventData[]> => {
         const isLoggedIn: boolean = await this.verifyLogin();
         if (isLoggedIn) {
-
-            //If current user is a manager, limit access to other departments
-            if (!this.verifyPermissions(Roles.EMPLOYEE)) {
+            if (API.hasPermission(Roles.EMPLOYEE)) {
                 let recursiveException = await API.getCurrentEmployeeUnavailabilities();
                 if (this.manageError(recursiveException, errors.GET_AVAILABILITIES)) {
                     if (typeof recursiveException === "string") {
@@ -174,30 +182,17 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
      * @param start is optional and is for the start of a recursiveEvent
      * @param end is optional and is for the start of a recursiveEvent
      */
-    readonly #createNewAvailabilityRequest = async (start?: Timestamp, end?: Timestamp): Promise<void> => {
-        let starts;
-        let ends;
+    readonly #createNewAvailabilityRequest = async (start: DayPilot.Date, end: DayPilot.Date): Promise<void> => {
         let unavailabilitiesInCalendar = this.componentAvailability?.getListFromTheCalendar();
         let datesList: DateOfUnavailabilityList = [];
         if (unavailabilitiesInCalendar) {
             datesList = this.transformListIntoDateList(unavailabilitiesInCalendar);
         }
-
-        //format start
-        if (start) {
-            starts = DateManager.getDayPilotDateString(start);
-        }
-
-        //format end
-        if (end) {
-            ends = DateManager.getDayPilotDateString(end);
-        }
-
         //add a recursive
         let listCreate: EmployeeAvailabilitiesForCreate = {
             recursiveExceptions: {
-                startDate: starts ?? undefined,
-                endDate: ends ?? undefined,
+                startDate: start,
+                endDate: end,
                 [DAYS.SUNDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.SUNDAY, datesList),
                 [DAYS.MONDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.MONDAY, datesList),
                 [DAYS.TUESDAY]: DateManager.getCertainDayOfWeekUnavailabilities(DAYS.TUESDAY, datesList),
@@ -229,15 +224,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
     /**
-     * Verify if the user has the permission to access this page
-     * @param role
-     * @private
-     */
-    private verifyPermissions(role: Roles): boolean {
-        return API.hasPermission(role);
-    }
-
-    /**
      * Verify if the user is logged in
      * @private
      */
@@ -245,7 +231,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        const hasPerms = this.verifyPermissions(Roles.EMPLOYEE);
+        const hasPerms = API.hasPermission(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
             this.redirectTo(RoutesPath.INDEX);
         } else {

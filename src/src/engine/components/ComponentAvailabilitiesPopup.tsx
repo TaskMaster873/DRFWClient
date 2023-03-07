@@ -4,16 +4,14 @@ import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {errors, FormErrorType} from '../messages/FormMessages';
-import {Timestamp} from "firebase/firestore";
-import {DateManager} from '../utils/DateManager';
 
 type Props = {
-    availabilityAdd: (start?: Timestamp, end?: Timestamp) => Promise<void>;
-    //eventEdit: (shiftEvent: EventForShiftEdit) => Promise<void>;
-    hideModal: (hide: boolean) => void;
-    isShown: boolean;
-    start: DayPilot.Date;
-    end: DayPilot.Date;
+	availabilityAdd: (start: DayPilot.Date, end: DayPilot.Date) => Promise<void>;
+	//eventEdit: (shiftEvent: EventForShiftEdit) => Promise<void>;
+	hideModal: (hide: boolean) => void;
+	isShown: boolean;
+	start: DayPilot.Date;
+	end: DayPilot.Date;
 };
 
 export function ComponentAvailabilitiesPopup(props: Props) {
@@ -41,12 +39,12 @@ export function ComponentAvailabilitiesPopup(props: Props) {
         setValidated(true);
         setError(errorType);
 
-        if (errorType === FormErrorType.NO_ERROR) {
-            setDisabled(true);
-            props.availabilityAdd(DateManager.getFirebaseTimestamp(start ?? props.start), DateManager.getFirebaseTimestamp(end ?? props.end));
-            closeModal();
-        }
-    };
+		if (errorType === FormErrorType.NO_ERROR) {
+			setDisabled(true);
+			props.availabilityAdd(start ?? props.start, end ?? props.end);
+			closeModal();
+		}
+	};
 
 
     /**

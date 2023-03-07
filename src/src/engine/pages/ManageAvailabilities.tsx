@@ -32,6 +32,16 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
         redirectTo: null,
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
+    }
+
     /**
      * Called when the page is loaded
      * @description This function is called when the page is loaded. It will set the title of the
@@ -124,11 +134,11 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
     private async fetchPendingUnavailabilities(employees: Employee[]): Promise<void> {
         let unavailabilities: string | ViewableAvailabilities[] = "";
         if (API.hasPermission(Roles.ADMIN)) {
-            unavailabilities = await API.getAllPendingUnavailabilities();
+            unavailabilities = await API.getAllUnavailabilities(false);
         } else {
             let currentDepartmentName = API.getCurrentEmployeeInfos().department;
             if (currentDepartmentName)
-                unavailabilities = await API.getPendingUnavailabilitiesForDepartment(currentDepartmentName);
+                unavailabilities = await API.getUnavailabilitiesForDepartment(currentDepartmentName, false);
         }
         if (this.manageError(unavailabilities, errors.GET_AVAILABILITIES)) {
             this.setState({
