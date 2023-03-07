@@ -70,7 +70,7 @@ export class SelectDate extends React.Component<Props, State> {
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
-            this.props.changeDay(`${event.currentTarget.value}T00:00:00`);
+            this.props.changeDay(new DayPilot.Date(event.currentTarget.value));
         }
     };
 }

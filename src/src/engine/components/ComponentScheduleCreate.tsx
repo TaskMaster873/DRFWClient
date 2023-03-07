@@ -4,11 +4,13 @@ import {EventForCalendar, EventForShiftCreation, EventForShiftEdit} from "../typ
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 import {Employee} from "../types/Employee";
 import {ColumnsType, EventDeleteHandlingType, EventManipulationType, ViewType} from "../types/StatesForDaypilot";
+import {ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 
 interface ScheduleCreateProps {
     currentDay: DayPilot.Date;
     events: EventForCalendar[];
     employees: Employee[];
+    unavailabilities: ViewableAvailabilities[];
     addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
     editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
     deleteShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
@@ -57,7 +59,7 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
                 <DayPilotCalendar
                     heightSpec={"Parent100Pct"}
                     headerDateFormat={"dddd"}
-					locale= {"fr-fr"}
+                    locale={"fr-fr"}
                     viewType={ViewType.Resources}
                     businessBeginsHour={6}
                     businessEndsHour={24}
@@ -68,12 +70,13 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
                     allowEventOverlap={false}
                     durationBarVisible={true}
 
+                    onBeforeCellRender={this.#onBeforeCellRender}
                     onTimeRangeSelected={this.#onTimeRangeSelected}
                     onEventClick={this.#onEventClick}
                     onEventMoved={this.#onEventMoved}
                     onEventResized={this.#onEventResized}
                     onEventDelete={this.#onEventDelete}
-                    startDate={this.props.currentDay}
+                    startDate={this.props.currentDay.toString()}
                     columns={this.getEmployeeColumns()}
                     events={this.props.events as any}
                     ref={this.calendarRef}
@@ -114,7 +117,34 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
         return listToReturn;
     }
 
-    // TODO type this arg
+
+    /**
+     * Called before rendering each cell, used to set unavailability ranges
+     * @param args the cell's data and properties
+     */
+    readonly #onBeforeCellRender = (args: any): void => {
+        for (let unavailability of this.props.unavailabilities) {
+            //Is unavailability affecting correct column
+            if (unavailability.employeeId === args.cell.resource) {
+                //Is unavailability valid
+                if (unavailability.recursiveExceptions.endDate >= this.props.currentDay &&
+                    unavailability.recursiveExceptions.startDate <= this.props.currentDay
+                ) {
+                    //For each unavailability time range
+                    for (let timerange of unavailability.recursiveExceptions[this.props.currentDay.getDayOfWeek()]) {
+                        //Convert minutes to milliseconds and compare with cell millisends since start of day
+                        if (timerange.startTime * 60000 <= args.cell.start.getTimePart() &&
+                            timerange.endTime * 60000 >= args.cell.end.getTimePart()
+                        ) {
+                            args.cell.properties.disabled = true;
+                            args.cell.properties.backColor = "#eeeeee";
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     /**
      * Called when the user selects a time range in the calendar
      * @param args
