@@ -36,8 +36,9 @@ export function ComponentPopupSchedule(props: Props) {
      */
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         const form = event.currentTarget;
-        let isValid = form.checkValidity();
+        let isValid = form.checkValidity() && areDatesValid();
         let errorType = FormErrorType.NO_ERROR;
+
 
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
@@ -58,6 +59,10 @@ export function ComponentPopupSchedule(props: Props) {
             }
             closeModal();
         }
+    };
+
+    const areDatesValid = (): boolean => {
+        return (start ?? props.start) < (end ?? props.end);
     };
 
     /**
@@ -103,7 +108,7 @@ export function ComponentPopupSchedule(props: Props) {
             <Modal.Header closeButton onClick={() => closeModal()}>
                 <Modal.Title>{props.taskType} un quart de travail</Modal.Title>
             </Modal.Header>
-            <Form onSubmit={(e) => handleSubmit(e)} validated={validated} data-error={error}>
+            <Form onSubmit={(e) => handleSubmit(e)} validated={validated && areDatesValid()} data-error={error}>
                 <Modal.Body>
                     <Form.Group className="mb-6">
                         <Form.Label>Employé assigné</Form.Label>
@@ -128,6 +133,7 @@ export function ComponentPopupSchedule(props: Props) {
                             id="start"
                             type="datetime-local"
                             defaultValue={props.start}
+                            isInvalid={!areDatesValid()}
                             step="1800"
                             onChange={(e) => {
                                 setStart(e.target.value);
@@ -143,6 +149,7 @@ export function ComponentPopupSchedule(props: Props) {
                             id="end"
                             type="datetime-local"
                             defaultValue={props.end}
+                            isInvalid={!areDatesValid()}
                             step="1800"
                             onChange={(e) => setEnd(e.target.value)}
                         />
