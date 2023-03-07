@@ -134,11 +134,11 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
     private async fetchPendingUnavailabilities(employees: Employee[]): Promise<void> {
         let unavailabilities: string | ViewableAvailabilities[] = "";
         if (API.hasPermission(Roles.ADMIN)) {
-            unavailabilities = await API.getAllPendingUnavailabilities();
+            unavailabilities = await API.getAllUnavailabilities(false);
         } else {
             let currentDepartmentName = API.getCurrentEmployeeInfos().department;
             if (currentDepartmentName)
-                unavailabilities = await API.getPendingUnavailabilitiesForDepartment(currentDepartmentName);
+                unavailabilities = await API.getUnavailabilitiesForDepartment(currentDepartmentName, false);
         }
         if (this.manageError(unavailabilities, errors.GET_AVAILABILITIES)) {
             this.setState({
