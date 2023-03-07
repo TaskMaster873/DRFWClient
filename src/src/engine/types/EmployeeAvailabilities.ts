@@ -106,5 +106,6 @@ export interface ViewableAvailabilities {
     id: string;
     recursiveExceptions: RecursiveAvailabilities;
     isAccepted: boolean;
+    department: string;
     employeeId: string;
 }
