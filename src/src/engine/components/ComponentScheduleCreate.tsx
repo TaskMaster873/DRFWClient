@@ -57,7 +57,7 @@ export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps
                 <DayPilotCalendar
                     heightSpec={"Parent100Pct"}
                     headerDateFormat={"dddd"}
-
+					locale= {"fr-fr"}
                     viewType={ViewType.Resources}
                     businessBeginsHour={6}
                     businessEndsHour={24}

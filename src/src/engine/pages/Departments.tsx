@@ -21,6 +21,16 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         redirectTo: null
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
+    private async onEvent() : Promise<void> {
+        await this.verifyLogin();
+    }
+
     public async componentDidMount(): Promise<void> {
         document.title = "Départements - TaskMaster";
 
