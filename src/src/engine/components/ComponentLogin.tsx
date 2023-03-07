@@ -7,6 +7,10 @@ import {API} from "../api/APIManager";
 import Logo from "../../deps/images/logo.png";
 import {RoutesPath} from "../RoutesPath";
 import FormUtils from "../utils/FormUtils";
+import { loadFull } from "tsparticles";
+import Particles from "react-particles";
+import type { Engine } from "tsparticles-engine";
+import {ParticlesOptLogin} from "../types/Particles";
 
 interface ComponentStateLogin {
     emailLogin: string;
@@ -41,6 +45,10 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
         await this.verifyLogin();
     }
 
+    readonly #customInit = async (engine: Engine) => {
+        await loadFull(engine);
+    };
+
     public render(): JSX.Element {
         if (API.isAuth()) {
             return (
@@ -49,10 +57,12 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
         } else {
             return (
                 <div className={"auth-form"}>
-                    <div className={"me-4"}>
+                    <Particles options={ParticlesOptLogin} init={this.#customInit} />
+
+                    <div className={"me-4 z-1"}>
                         <img
                             className={"mx-auto d-block mt-5"}
-                            src={Logo as any}
+                            src={Logo}
                             alt={"Logo TaskMaster"}
                             width={50}
                             height={60}
@@ -65,6 +75,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                         onSubmit={this.#handleSubmit}
                         onChange={this.#handleChange}
                         data-error={this.state.error}
+                        className={"z-1"}
                     >
                         <Form.Group>
                             <Form.Label htmlFor={"emailLogin"} className={"mt-2"}>
