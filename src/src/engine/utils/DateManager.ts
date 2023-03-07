@@ -1,6 +1,6 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {Timestamp} from "firebase/firestore";
-import {DateOfUnavailabilityList, DAYS, EmployeeRecursiveExceptionList} from "../types/EmployeeAvailabilities";
+import {DateOfUnavailabilityList, DAYS, EmployeeAvailabilityExceptionList} from "../types/EmployeeAvailabilities";
 
 export class InternalDateManager {
     public convertTimestampToDayPilotDate(time: string): string {
@@ -33,8 +33,8 @@ export class InternalDateManager {
      * @param listOfDates of all unavailabilities
      * @returns {EmployeeRecursiveExceptionList} that has the good day ofthe week
      */
-    public getCertainDayOfWeekUnavailabilities(days: DAYS, listOfDates: DateOfUnavailabilityList): EmployeeRecursiveExceptionList {
-        let listToReturn: EmployeeRecursiveExceptionList = [];
+    public getCertainDayOfWeekUnavailabilities(days: DAYS, listOfDates: DateOfUnavailabilityList): EmployeeAvailabilityExceptionList {
+        let listToReturn: EmployeeAvailabilityExceptionList = [];
 
         for (let unavailabilities of listOfDates) {
             if (unavailabilities.start.getDay() === days) {

@@ -4,7 +4,7 @@ import {
     DAYS,
     EmployeeAvailabilities,
     EmployeeAvailabilitiesForCreate,
-    EmployeeRecursiveException
+    EmployeeAvailabilityException
 } from "../types/EmployeeAvailabilities";
 import {ComponentAvailabilities} from "../components/ComponentAvailabilities";
 import {DateManager} from "../utils/DateManager";
@@ -66,7 +66,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
+    private async onEvent(): Promise<void> {
         await this.verifyLogin();
     }
 
@@ -89,13 +89,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     public render(): JSX.Element {
         if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}/>);
+            return (<Navigate to={this.state.redirectTo} />);
         } else {
             return (
                 <div>
                     <button type="button"
-                            className="btn btn-primary submit-abilities-button"
-                            onClick={() => this.#hideModal(false)}>Transmettre
+                        className="btn btn-primary submit-abilities-button"
+                        onClick={() => this.#hideModal(false)}>Transmettre
                     </button>
 
                     <ComponentAvailabilities
@@ -105,7 +105,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                         startDate={new DayPilot.Date(this.state.currentWeekStart)}
                         selectionDay={new DayPilot.Date(this.state.selectedDate)}
                         employeeAvailabilities={this.state.timesUnavailable}
-                        ref={this.componentAvailabilitiesRef}/>
+                        ref={this.componentAvailabilitiesRef} />
                     <ComponentAvailabilitiesPopup
                         hideModal={this.#hideModal}
                         isShown={this.state.popupInactive}
@@ -308,7 +308,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
      * @param hours The hours of the selected day
      * @private
      */
-    private transformObjToEventForUnavailability(start: Date, day: number, hours: EmployeeRecursiveException): DayPilot.EventData {
+    private transformObjToEventForUnavailability(start: Date, day: number, hours: EmployeeAvailabilityException): DayPilot.EventData {
         let startTime = this.convertRecursiveExceptionDate(start, day, hours.startTime);
         let endTime = this.convertRecursiveExceptionDate(start, day, hours.endTime);
 
