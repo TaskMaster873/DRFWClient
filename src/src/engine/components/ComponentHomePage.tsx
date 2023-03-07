@@ -28,6 +28,7 @@ export class ComponentHomePage extends React.PureComponent<unknown, unknown> {
         this.isMounted = false;
     }
 
+
     readonly #customInit = async (engine: Engine) => {
         await loadFull(engine);
     };
@@ -45,7 +46,7 @@ export class ComponentHomePage extends React.PureComponent<unknown, unknown> {
                         <div className="mt-6 mb-4 mt-4 z-1">
                             <h1><img
                                 className="me-3"
-                                src={Logo as any}
+                                src={Logo}
                                 alt="Logo TaskMaster"
                                 width={150}
                                 height={190}

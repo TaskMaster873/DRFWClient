@@ -50,7 +50,7 @@ export class NavigationBar extends React.Component<unknown, State> {
                         <Navbar.Brand>
                             <img
                                 className="me-3"
-                                src={Logo as any}
+                                src={Logo}
                                 alt="Logo TaskMaster"
                                 width={50}
                                 height={60}

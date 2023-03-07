@@ -62,7 +62,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
                     <div className={"me-4 z-1"}>
                         <img
                             className={"mx-auto d-block mt-5"}
-                            src={Logo as any}
+                            src={Logo}
                             alt={"Logo TaskMaster"}
                             width={50}
                             height={60}
