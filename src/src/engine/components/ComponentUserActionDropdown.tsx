@@ -45,7 +45,7 @@ export class ComponentUserActionDropdown extends React.Component<unknown, Compon
                     key={"primary"}
                     id={`dropdown-variants-primary`}
                     variant={"primary"}
-                    title={<IoSettingsSharp/>}
+                    title={<IoSettingsSharp size ={25} />}
                 >
                         <Dropdown.Item eventKey="1">
                             <Nav id="logoutLink" className={"dropDownMenuText"} onClick={this.#logout}>Se
