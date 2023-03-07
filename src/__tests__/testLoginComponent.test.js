@@ -61,9 +61,7 @@ test("Valid email and password should submit form", async () => {
     await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputPassword, testConstants.validPassword);
 
-    act(() => {
-        fireEvent.submit(form);
-    })
+    fireEvent.submit(form);
 
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputPassword.value).toBe(testConstants.validPassword);

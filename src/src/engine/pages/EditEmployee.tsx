@@ -1,7 +1,6 @@
 import React from "react";
 import {API} from "../api/APIManager";
-import {AddEmployeeState, EmployeeEditDTO, EmployeeProps,} from "../types/Employee";
-
+import {AddEmployeeState, EmployeeEditDTO} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
 import {Navigate, Params, useParams} from "react-router-dom";
@@ -19,11 +18,15 @@ export function EditEmployeeWrapper(): JSX.Element {
     );
 }
 
+interface EmployeeEditProps {
+    params: Readonly<Params>;
+}
+
 /**
  * The page to edit an employee
  * @param props {EmployeeProps} The props of the page
  */
-export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmployeeState> {
+export class EditEmployeeInternal extends React.Component<EmployeeEditProps, AddEmployeeState> {
     public state: AddEmployeeState = {
         departments: [],
         roles: [],
@@ -33,7 +36,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         redirectTo: null
     };
 
-    constructor(props) {
+    constructor(props: EmployeeEditProps) {
         super(props);
 
         API.subscribeToEvent(this.onEvent.bind(this));

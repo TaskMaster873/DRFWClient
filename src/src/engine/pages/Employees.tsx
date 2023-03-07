@@ -1,7 +1,7 @@
 import React from "react";
 import {Container} from "react-bootstrap";
 import {ComponentEmployeeList} from "../components/ComponentEmployeeList";
-import {Employee, EmployeeProps} from "../types/Employee";
+import {Employee} from "../types/Employee";
 import {API} from "../api/APIManager";
 import {errors, successes} from "../messages/FormMessages";
 import {Params, useParams} from "react-router-dom";
@@ -13,14 +13,17 @@ export function EmployeeWrapper(): JSX.Element {
         <EmployeesInternal  {...{params: parameters}}/>
     );
 }
-
 interface EmployeeState {
     employees: Employee[] | null;
 }
 
+interface EmployeesProps {
+    params: Readonly<Params>;
+}
+
 /**
  * This is the page for the employees
- * @param props {EmployeeProps} The props for the page
+ * @param props {EmployeesProps} The props for the page
  * @constructor
  * @return {JSX.Element} The page
  * @category Pages
@@ -29,12 +32,13 @@ interface EmployeeState {
  * @see EmployeeProps
  * @see Employee
  */
-class EmployeesInternal extends React.Component<EmployeeProps, EmployeeState> {
+class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
     public state: EmployeeState = {
         employees: null
     };
 
-    constructor(props: EmployeeProps) {
+
+    constructor(props: EmployeesProps) {
         super(props);
     }
 

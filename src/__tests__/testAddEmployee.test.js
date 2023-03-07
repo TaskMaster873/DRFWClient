@@ -3,7 +3,7 @@
  */
 
 import "@testing-library/jest-dom";
-import {fireEvent, render, screen} from "@testing-library/react";
+import {fireEvent, render} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {departments2, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
@@ -286,7 +286,6 @@ test("Valid employee infos should submit form", async () => {
     await user.type(inputInitialPassword, testConstants.validPassword);
 
     fireEvent.submit(form);
-    screen.debug();
 
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputFirstName.value).toBe(testConstants.validFirstName);
