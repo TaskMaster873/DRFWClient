@@ -39,6 +39,8 @@ export function ComponentPopupSchedule(props: Props) {
         let isValid = form.checkValidity();
         let errorType = FormErrorType.NO_ERROR;
 
+        if ((start ?? props.start) > (end ?? props.end)) isValid = false;
+
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
         }
@@ -103,7 +105,7 @@ export function ComponentPopupSchedule(props: Props) {
             <Modal.Header closeButton onClick={() => closeModal()}>
                 <Modal.Title>{props.taskType} un quart de travail</Modal.Title>
             </Modal.Header>
-            <Form onSubmit={(e) => handleSubmit(e)} validated={validated} data-error={error}>
+            <Form onSubmit={(e) => handleSubmit(e)} validated={validated && (start ?? props.start) < (end ?? props.end)} data-error={error}>
                 <Modal.Body>
                     <Form.Group className="mb-6">
                         <Form.Label>Employé assigné</Form.Label>
@@ -128,6 +130,7 @@ export function ComponentPopupSchedule(props: Props) {
                             id="start"
                             type="datetime-local"
                             defaultValue={props.start}
+                            isInvalid={(start ?? props.start) > (end ?? props.end)}
                             step="1800"
                             onChange={(e) => {
                                 setStart(e.target.value);
@@ -143,6 +146,7 @@ export function ComponentPopupSchedule(props: Props) {
                             id="end"
                             type="datetime-local"
                             defaultValue={props.end}
+                            isInvalid={(start ?? props.start) > (end ?? props.end)}
                             step="1800"
                             onChange={(e) => setEnd(e.target.value)}
                         />

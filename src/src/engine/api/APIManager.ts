@@ -1464,10 +1464,41 @@ class APIManager extends Logger {
         if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(unavailability.department)) {
             return errors.PERMISSION_DENIED;
         }
+
+        //Get previously accepted unavailabilities
+        let queryUnavailability = query(
+            collection(this.#db, `unavailabilities`),
+            where("employeeId", "==", unavailability.employeeId),
+            where("isAccepted", "==", true)
+        );
+        let snaps = await getDocs(queryUnavailability).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+        unavailability.recursiveExceptions.startDate = this.getFirebaseTimestamp(unavailability.recursiveExceptions.startDate);
+        unavailability.recursiveExceptions.endDate = this.getFirebaseTimestamp(unavailability.recursiveExceptions.endDate);
+        //Delete previously accepted unavailabilities
+        if (snaps) {
+            for (let document of snaps.docs) {
+                let data = document.data();
+                if (!data.unavailabilities.startDate._compareTo(unavailability.recursiveExceptions.startDate) &&
+                    !data.unavailabilities.endDate._compareTo(unavailability.recursiveExceptions.endDate)
+                ) {
+                    errorMessage = await this.deleteUnavailability({
+                        id: document.id,
+                        recursiveExceptions: data.unavailabilities,
+                        isAccepted: data.isAccepted,
+                        department: data.department,
+                        employeeId: data.employeeId,
+                    });
+                    if (typeof errorMessage === "string") return errorMessage;
+                    break;
+                }
+            }
+        }
+        //Accept new unavailabilities
         await updateDoc(doc(this.#db, `unavailabilities`, unavailability.id), {isAccepted: true}).catch((error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
-
 
         return errorMessage;
     }
@@ -1847,7 +1878,6 @@ class APIManager extends Logger {
                     await updateDoc(doc(this.#db, `unavailabilities`, document.id),
                         {unavailabilities: list.recursiveExceptions}).catch((error) => {
                             errorMessage = APIUtils.getErrorMessageFromCode(error);
-
                         });
                     isAdded = true;
                     break;

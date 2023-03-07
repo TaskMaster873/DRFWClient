@@ -6,12 +6,12 @@ import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {errors, FormErrorType} from '../messages/FormMessages';
 
 type Props = {
-	availabilityAdd: (start: DayPilot.Date, end: DayPilot.Date) => Promise<void>;
-	//eventEdit: (shiftEvent: EventForShiftEdit) => Promise<void>;
-	hideModal: (hide: boolean) => void;
-	isShown: boolean;
-	start: DayPilot.Date;
-	end: DayPilot.Date;
+    availabilityAdd: (start: DayPilot.Date, end: DayPilot.Date) => Promise<void>;
+    //eventEdit: (shiftEvent: EventForShiftEdit) => Promise<void>;
+    hideModal: (hide: boolean) => void;
+    isShown: boolean;
+    start: DayPilot.Date;
+    end: DayPilot.Date;
 };
 
 export function ComponentAvailabilitiesPopup(props: Props) {
@@ -31,6 +31,10 @@ export function ComponentAvailabilitiesPopup(props: Props) {
         let isValid = form.checkValidity();
         let errorType = FormErrorType.NO_ERROR;
 
+        if ((start ?? props.start) > (end ?? props.end)) {
+            isValid = false;
+        }
+
         if (!isValid) {
             errorType = FormErrorType.INVALID_FORM;
         }
@@ -39,12 +43,12 @@ export function ComponentAvailabilitiesPopup(props: Props) {
         setValidated(true);
         setError(errorType);
 
-		if (errorType === FormErrorType.NO_ERROR) {
-			setDisabled(true);
-			props.availabilityAdd(start ?? props.start, end ?? props.end);
-			closeModal();
-		}
-	};
+        if (errorType === FormErrorType.NO_ERROR) {
+            setDisabled(true);
+            props.availabilityAdd(start ?? props.start, end ?? props.end);
+            closeModal();
+        }
+    };
 
 
     /**
@@ -62,18 +66,20 @@ export function ComponentAvailabilitiesPopup(props: Props) {
     return (
         <Modal show={!props.isShown}>
             <Modal.Header closeButton onClick={() => closeModal()}>
-                <Modal.Title>Les dates de commencement et de fin</Modal.Title>
+                <Modal.Title>Les dates de début et de fin</Modal.Title>
             </Modal.Header>
-            <Form onSubmit={(e) => handleSubmit(e)} validated={validated} data-error={error}>
+            <Form onSubmit={(e) => handleSubmit(e)} validated={validated && (start ?? props.start) < (end ?? props.end)} data-error={error}>
                 <Modal.Body>
                     <Form.Group className="mb-3">
                         <Form.Label>Date de début</Form.Label>
                         <Form.Control
                             id="start"
-                            type="datetime-local"
-                            defaultValue={props.start}
+                            type="date"
+                            step="7"
+                            isInvalid={(start ?? props.start) > (end ?? props.end)}
+                            defaultValue={props.start.toString("yyyy-MM-dd")}
                             onChange={(e) => {
-                                setStart(e.target.value);
+                                setStart(new DayPilot.Date(e.target.value));
                             }}
                         />
                         <Form.Control.Feedback type="invalid" id="invalidStartDate">
@@ -84,9 +90,11 @@ export function ComponentAvailabilitiesPopup(props: Props) {
                         <Form.Label>Date de fin</Form.Label>
                         <Form.Control
                             id="end"
-                            type="datetime-local"
-                            defaultValue={props.end}
-                            onChange={(e) => setEnd(e.target.value)}
+                            type="date"
+                            step="7"
+                            isInvalid={(start ?? props.start) > (end ?? props.end)}
+                            defaultValue={props.end.toString("yyyy-MM-dd")}
+                            onChange={(e) => setEnd(new DayPilot.Date(e.target.value))}
                         />
                         <Form.Control.Feedback type="invalid" id="invalidEndDate">
                             {errors.INVALID_DATE}
