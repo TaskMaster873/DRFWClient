@@ -22,7 +22,7 @@ export function ForgotPassword() {
      */
     return (
         <Container>
-            <Particles options={ParticlesOpts} init={customInit} />
+            <Particles options={ParticlesOpts} init={customInit}/>
             <ComponentForgotPassword/>
         </Container>
     );

@@ -11,21 +11,22 @@ import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
 import {JobTitle} from "../src/engine/types/JobTitle";
 import {Skill} from "../src/engine/types/Skill";
+
 jest.mock("../src/engine/api/APIManager");
 let user;
 
 let departments = [{name: "Informatique", director: "Maxime"}];
 let roles = ["Employé"];
 let jobTitles = [new JobTitle({id: "1", name: "Anglophone"})];
-let skills = [new Skill({id: "1", name: "Conducteur de véhicule lourds"} )]
+let skills = [new Skill({id: "1", name: "Conducteur de véhicule lourds"})]
 
 beforeEach(async () => {
     user = userEvent.setup();
     render(<MemoryRouter>
         <ComponentAddEmployee departments={departments} roles={roles}
-            jobTitles={jobTitles} skills={skills} onAddEmployee={jest.fn()} onAddJobTitle={jest.fn()}
-            onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
-            onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}/>
+                              jobTitles={jobTitles} skills={skills} onAddEmployee={jest.fn()} onAddJobTitle={jest.fn()}
+                              onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
+                              onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}/>
     </MemoryRouter>);
 });
 
@@ -262,6 +263,7 @@ describe("Regex Validation AddEmployee Tests", () => {
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
     });
 });
+
 /* //Will work later, after Context is made and mocked
 test("Valid employee number and password should submit form", async () => {
     const {

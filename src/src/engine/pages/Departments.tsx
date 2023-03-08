@@ -27,10 +27,6 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
-        await this.verifyLogin();
-    }
-
     public async componentDidMount(): Promise<void> {
         document.title = "Départements - TaskMaster";
 
@@ -41,6 +37,35 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
+    }
+
+    /**
+     *
+     * @returns La liste des employés
+     */
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (
+                <Navigate to={this.state.redirectTo}></Navigate>
+            );
+        }
+
+        return (
+            <Container data-bs-theme={"dark"}>
+                <ComponentDepartmentList
+                    employees={this.state.employees}
+                    employeeNb={this.state.employeeNb}
+                    departments={this.state.departments}
+                    onAddDepartment={this.addDepartment}
+                    onEditDepartment={this.editDepartment}
+                    onDeleteDepartment={this.deleteDepartment}
+                />
+            </Container>
+        );
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**
@@ -115,31 +140,6 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     };
-
-    /**
-     *
-     * @returns La liste des employés
-     */
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (
-                <Navigate to={this.state.redirectTo}></Navigate>
-            );
-        }
-
-        return (
-            <Container data-bs-theme={"dark"}>
-                <ComponentDepartmentList
-                    employees={this.state.employees}
-                    employeeNb={this.state.employeeNb}
-                    departments={this.state.departments}
-                    onAddDepartment={this.addDepartment}
-                    onEditDepartment={this.editDepartment}
-                    onDeleteDepartment={this.deleteDepartment}
-                />
-            </Container>
-        );
-    }
 
     /**
      * Verify if the user has the permission to access this page
