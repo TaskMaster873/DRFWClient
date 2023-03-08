@@ -318,7 +318,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return {
             start: this.toUTC(startTime),
             end: this.toUTC(endTime),
-            text: "Unavailable" + (startTime.getHours().toString() + startTime.getMinutes().toString()) + " " + (endTime.getHours().toString() + endTime.getMinutes().toString()),
+            text: "Unavailable" + (startTime.getDate().toString().slice(11,16)) + " à " + (endTime.getDate().toString().slice(11,16)),
             id: "unavailable",
             
         };
