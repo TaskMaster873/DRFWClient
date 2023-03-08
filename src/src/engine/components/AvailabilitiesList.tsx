@@ -5,6 +5,7 @@ import {errors} from "../messages/FormMessages";
 import {Employee} from "../types/Employee";
 import {unavailabilitiesTableHeads, ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
+import {IconContext} from "react-icons/lib";
 
 type Props = {
     employees: Employee[];
@@ -80,10 +81,16 @@ export class AvailabilitiesList extends React.Component<Props> {
                         {unavailability.recursiveExceptions.endDate.toString()}
                     </td>
                     <td key={`action ${index}`}>
-                        <a className="adminActions ms-1 mx-1"
-                           onClick={() => this.props.acceptUnavailability(unavailability)}><CgCheckO/></a>
-                        <a className="adminActions ms-1 mx-1"
-                           onClick={() => this.props.refuseUnavailability(unavailability)}><CgUnavailable/></a>
+                        <a className="adminActions ms-1 mx-1" onClick={() => this.props.acceptUnavailability(unavailability)}>
+                            <IconContext.Provider value={{ color: 'white' }}>
+                                <CgCheckO/>
+                            </IconContext.Provider>
+                        </a>
+                        <a className="adminActions ms-1 mx-1" onClick={() => this.props.refuseUnavailability(unavailability)}>
+                            <IconContext.Provider value={{ color: 'white' }}>
+                                <CgUnavailable/>
+                            </IconContext.Provider>
+                        </a>
                     </td>
                 </tr>
             ));
