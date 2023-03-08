@@ -59,19 +59,14 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         fetchState: FetchState.WAITING,
         redirectTo: null
     };
+    //It is to have acces more easily to the datepicker and calendar getters and their public methods
+    private componentAvailabilitiesRef: React.RefObject<ComponentAvailabilities> = React.createRef();
 
     constructor(props) {
         super(props);
 
         API.subscribeToEvent(this.onEvent.bind(this));
     }
-
-    private async onEvent(): Promise<void> {
-        await this.verifyLogin();
-    }
-
-    //It is to have acces more easily to the datepicker and calendar getters and their public methods
-    private componentAvailabilitiesRef: React.RefObject<ComponentAvailabilities> = React.createRef();
 
     /**
      * get the child componentAvailability
@@ -89,13 +84,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     public render(): JSX.Element {
         if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo} />);
+            return (<Navigate to={this.state.redirectTo}/>);
         } else {
             return (
                 <div>
                     <button type="button"
-                        className="btn btn-primary submit-abilities-button"
-                        onClick={() => this.#hideModal(false)}>Transmettre
+                            className="btn btn-primary submit-abilities-button"
+                            onClick={() => this.#hideModal(false)}>Transmettre
                     </button>
 
                     <ComponentAvailabilities
@@ -105,7 +100,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                         startDate={new DayPilot.Date(this.state.currentWeekStart)}
                         selectionDay={new DayPilot.Date(this.state.selectedDate)}
                         employeeAvailabilities={this.state.timesUnavailable}
-                        ref={this.componentAvailabilitiesRef} />
+                        ref={this.componentAvailabilitiesRef}/>
                     <ComponentAvailabilitiesPopup
                         hideModal={this.#hideModal}
                         isShown={this.state.popupInactive}
@@ -116,9 +111,10 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                 </div>
             );
         }
-        /*<Container className="justify-content-end">
-            <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Transmettre</button>
-        </Container>*/
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**

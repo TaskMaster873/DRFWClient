@@ -82,7 +82,7 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
                     </Button>
                 </Modal.Footer>
             </Form>
-        </Modal>
+        </Modal>;
     }
 
     /**
@@ -122,5 +122,5 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
         if (errorType === FormErrorType.NO_ERROR && this.props.departmentToEdit?.id) {
             await this.props.onEditDepartment(this.props.departmentToEdit?.id, formDataObj, this.props.departmentToEdit?.name);
         }
-    }
+    };
 }

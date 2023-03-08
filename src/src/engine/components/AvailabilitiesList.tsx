@@ -16,7 +16,7 @@ type Props = {
 export class AvailabilitiesList extends React.Component<Props> {
     public render(): JSX.Element {
         return (
-            <Container className="mt-5">
+            <Container data-bs-theme={"dark"} className="mt-5">
                 <h3>Liste des demandes de changement de disponibilités</h3>
                 <Table responsive bordered hover className="text-center">
                     <thead>

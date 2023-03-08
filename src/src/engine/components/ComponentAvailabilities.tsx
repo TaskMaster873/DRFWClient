@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
 
@@ -71,7 +71,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         ref={this.datePickerRef}
                     />
                 </div>
-                <div className='main'>
+                <div className="main">
                     <DayPilotCalendar
                         heightSpec={"Parent100Pct"}
                         locale={"fr-fr"}
@@ -215,7 +215,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         let cell = args.cell;
         let start: DayPilot.Date = cell.start;
         let end: DayPilot.Date = cell.end;
-        let startDateOfWeek: DayPilot.Date = start.firstDayOfWeek('en-us');
+        let startDateOfWeek: DayPilot.Date = start.firstDayOfWeek("en-us");
 
         if (startDateOfWeek) {
             let isDisabled: boolean = this.props.isCellInStartToEndTimeRange(startDateOfWeek, start, end);

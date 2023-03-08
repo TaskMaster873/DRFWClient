@@ -1,106 +1,123 @@
 .calendar_default_cell_inner {
-  background-color: white;
+    background-color: white;
 }
 
 .calendar_default_cell {
-  background-color: white !important;
+    background-color: white !important;
 }
 
 .calendar_default_cell_business {
-  background-color: white;
+    background-color: white;
 }
 
 .calendar_default_cell.calendar_default_cell_business {
-  background-color: white !important;
+    background-color: white !important;
 }
 
 .navigator_default_main {
-  border-left: 1px solid #c0c0c0;
-  border-right: 1px solid #c0c0c0;
-  border-bottom: 1px solid #c0c0c0;
-  background-color: white;
-  color: #000000;
-  box-sizing: content-box;
+    border-left: 1px solid #c0c0c0;
+    border-right: 1px solid #c0c0c0;
+    border-bottom: 1px solid #c0c0c0;
+    background-color: white;
+    color: #000000;
+    box-sizing: content-box;
 }
+
 .navigator_default_main *,
 .navigator_default_main *:before,
 .navigator_default_main *:after {
-  box-sizing: content-box;
+    box-sizing: content-box;
 }
+
 .navigator_default_month {
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  font-size: 12px;
+    font-size: 12px;
 }
+
 .navigator_default_day {
-  color: black;
+    color: black;
 }
+
 .navigator_default_weekend {
-  background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
+
 .navigator_default_dayheader {
-  color: black;
+    color: black;
 }
+
 .navigator_default_line {
-  border-bottom: 1px solid #c0c0c0;
+    border-bottom: 1px solid #c0c0c0;
 }
+
 .navigator_default_dayother {
-  color: gray;
+    color: gray;
 }
+
 .navigator_default_todaybox {
-  border: 1px solid red;
+    border: 1px solid red;
 }
+
 .navigator_default_title,
 .navigator_default_titleleft,
 .navigator_default_titleright {
-  border-top: 1px solid #c0c0c0;
-  border-bottom: 1px solid #c0c0c0;
-  color: #333;
-  background: #f3f3f3;
+    border-top: 1px solid #c0c0c0;
+    border-bottom: 1px solid #c0c0c0;
+    color: #333;
+    background: #f3f3f3;
 }
+
 body .navigator_default_busy {
-  background-color: #ee4f2e;
-  border-radius: 15px;
-  color: white;
+    background-color: #ee4f2e;
+    border-radius: 15px;
+    color: white;
 }
+
 .navigator_default_cell {
-  text-align: center;
+    text-align: center;
 }
+
 .navigator_default_select .navigator_default_cell_box {
-  background-color: #ffe794;
-  opacity: 0.5;
+    background-color: #ffe794;
+    opacity: 0.5;
 }
+
 .navigator_default_title {
-  text-align: center;
+    text-align: center;
 }
+
 .navigator_default_titleleft,
 .navigator_default_titleright {
-  text-align: center;
+    text-align: center;
 }
+
 .navigator_default_dayheader {
-  text-align: center;
+    text-align: center;
 }
+
 .navigator_default_weeknumber {
-  text-align: center;
-  color: #999;
+    text-align: center;
+    color: #999;
 }
+
 .navigator_default_cell_text {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .flex_hundred {
-  display: flex;
-  height: 90vh;
+    display: flex;
+    height: 90vh;
 }
 
 .wrap {
-  display: flex;
+    display: flex;
 }
 
 .left {
-  margin-right: 10px;
+    margin-right: 10px;
 }
 
 .main {
-  flex-grow: 1;
+    flex-grow: 1;
 }
