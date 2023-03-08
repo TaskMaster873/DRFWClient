@@ -376,7 +376,7 @@ export const ParticlesOpts: any = {
             "speed": 1
         }
     },
-}
+};
 
 export const ParticlesOptLogin: any = {
     fpsLimit: 120,

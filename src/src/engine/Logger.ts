@@ -21,10 +21,6 @@ export class Logger {
     private red: string = "#ff4500";
     private lightRed: string = lightenColor(this.red, 15);
 
-    private getStartPrefix(): string {
-        return "";
-    }
-
     constructor(moduleName?: string, logColor?: string, hideLogs?: boolean) {
         if (moduleName !== null && moduleName) {
             this.moduleName = moduleName;
@@ -57,5 +53,9 @@ export class Logger {
 
     public info(...args: any[]): void {
         console.log(`%c${this.getStartPrefix()}[${this.moduleName} INFO]: %c` + args.join(" "), `color: ${this.green}`, `color: #${this.lightGreen}`);
+    }
+
+    private getStartPrefix(): string {
+        return "";
     }
 }

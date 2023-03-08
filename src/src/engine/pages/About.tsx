@@ -13,14 +13,14 @@ export class About extends React.Component {
         document.title = "À propos - TaskMaster";
     }
 
+    public render(): JSX.Element {
+        return <div>
+            <Particles options={ParticlesOpts} init={this.#customInit}/>
+            <ComponentAbout/>;
+        </div>;
+    }
+
     readonly #customInit = async (engine: Engine) => {
         await loadFull(engine);
     };
-
-    public render(): JSX.Element {
-        return <div>
-            <Particles options={ParticlesOpts} init={this.#customInit} />
-            <ComponentAbout/>;
-        </div>
-    }
 }

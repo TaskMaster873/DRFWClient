@@ -43,5 +43,5 @@ export class ComponentConfirmDeleteJobTitle extends React.Component<DeleteJobTit
             this.props.onDeleteJobTitle(this.props.jobTitle.id);
         }
         this.props.closePrompt();
-    }
+    };
 }

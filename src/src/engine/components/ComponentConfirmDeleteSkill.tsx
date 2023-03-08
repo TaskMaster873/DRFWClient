@@ -42,5 +42,5 @@ export class ComponentConfirmDeleteSkill extends React.Component<DeleteSkillProp
             this.props.onDeleteSkill(this.props.skill.id);
         }
         this.props.closePrompt();
-    }
+    };
 }

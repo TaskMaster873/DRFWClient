@@ -164,7 +164,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                                      onChange={this.#handleSelect}>
                             {this.props.roles.map((role: string, index: number) => {
                                     if (API.hasLowerPermission(index)) {
-                                        return <option key={index} value={index}>{role}</option>
+                                        return <option key={index} value={index}>{role}</option>;
                                     }
                                 }
                             )}
@@ -190,12 +190,12 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
     }
 
     readonly #onShowEditJobTitles = (value: boolean = true): void => {
-        this.setState({showEditJobTitles: value})
-    }
+        this.setState({showEditJobTitles: value});
+    };
 
     readonly #onShowEditSkills = (value: boolean = true): void => {
-        this.setState({showEditSkills: value})
-    }
+        this.setState({showEditSkills: value});
+    };
 
     /**
      * Handle the form submission. Validate the form and attempt to edit the employee.
@@ -215,7 +215,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         };
 
         // Iterate over all checked checkbox elements and create an array that contains each of them
-        document.querySelectorAll('input[type="checkbox"]:checked').forEach((checkbox: any) => {
+        document.querySelectorAll("input[type=\"checkbox\"]:checked").forEach((checkbox: any) => {
             let fieldName = checkbox.name;
             if (fieldName) {
                 if (typeof (formDataObj[fieldName]) === "string") {
@@ -237,10 +237,10 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 jobTitles: formDataObj.jobTitles ?? [],
                 skills: formDataObj.skills ?? [],
                 role: parseInt(formDataObj.role)
-            }
+            };
             this.props.onEditEmployee(this.props.employeeId, employee);
         }
-    }
+    };
 
     /**
      * Handle the change of a form element. Update the state with the new value.
@@ -269,7 +269,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 [name]: value,
             }
         });
-    }
+    };
 
     readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
         const target = event.target;
@@ -278,5 +278,5 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
                 [target.name]: target.value
             }
         });
-    }
+    };
 }

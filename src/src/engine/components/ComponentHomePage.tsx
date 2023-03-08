@@ -7,13 +7,14 @@ import {API} from "../api/APIManager";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
 import Row from "react-bootstrap/Row";
-import { loadFull } from "tsparticles";
+import {loadFull} from "tsparticles";
 import Particles from "react-particles";
-import type { Engine } from "tsparticles-engine";
+import type {Engine} from "tsparticles-engine";
 import {ParticlesOpts} from "../types/Particles";
 
 export class ComponentHomePage extends React.PureComponent<unknown, unknown> {
     private isMounted: boolean = false;
+
     constructor(props) {
         super(props);
 
@@ -28,10 +29,6 @@ export class ComponentHomePage extends React.PureComponent<unknown, unknown> {
         this.isMounted = false;
     }
 
-    readonly #customInit = async (engine: Engine) => {
-        await loadFull(engine);
-    };
-
     public render(): JSX.Element {
         if (API.isAuth() && API.hasChangedDefaultPassword) {
             return (
@@ -41,7 +38,7 @@ export class ComponentHomePage extends React.PureComponent<unknown, unknown> {
             return (
                 <Container>
                     <Row className={"justify-content-md-center"}>
-                        <Particles options={ParticlesOpts} init={this.#customInit} />
+                        <Particles options={ParticlesOpts} init={this.#customInit}/>
                         <div className="mt-6 mb-4 mt-4 z-1">
                             <h1><img
                                 className="me-3"
@@ -77,6 +74,10 @@ export class ComponentHomePage extends React.PureComponent<unknown, unknown> {
             );
         }
     }
+
+    readonly #customInit = async (engine: Engine) => {
+        await loadFull(engine);
+    };
 
     /**
      * This method is called when the API emits an event.

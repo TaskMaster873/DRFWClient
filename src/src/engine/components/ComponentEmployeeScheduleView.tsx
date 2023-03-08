@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
-import {Shift, ShiftForCalendar} from '../types/Shift';
-import {DayPilotCalendarSettings} from '../types/StatesForDaypilot';
+import {Shift, ShiftForCalendar} from "../types/Shift";
+import {DayPilotCalendarSettings} from "../types/StatesForDaypilot";
 
-import {DateManager} from '../utils/DateManager';
+import {DateManager} from "../utils/DateManager";
 import EventData = DayPilot.EventData;
 
 interface ComponentEmployeeScheduleViewProps {
@@ -77,10 +77,10 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
 
     public render(): JSX.Element {
         return (
-            <div className='flex_hundred'>
-                <div className='left'>
+            <div className="flex_hundred">
+                <div className="left">
                     <DayPilotNavigator
-                        locale= {"fr-fr"}
+                        locale={"fr-fr"}
                         //how many days showed at a time
                         selectMode={"Week"}
                         //month showed at the same time
@@ -100,13 +100,13 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
                     />
                 </div>
 
-                <div className='main'>
+                <div className="main">
                     <DayPilotCalendar
                         //to start the calendar with the good attributes
                         {...this.state.dayPilotSettings}
                         heightSpec={"Parent100Pct"}
                         ref={this.calendarRef}
-                        locale= {"fr-fr"}
+                        locale={"fr-fr"}
                     />
                 </div>
             </div>
