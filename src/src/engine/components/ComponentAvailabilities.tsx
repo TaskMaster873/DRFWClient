@@ -15,7 +15,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     public props: ComponentAvailabilitiesProps;
     private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
     private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
-
     constructor(props) {
         super(props);
 
@@ -86,6 +85,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         allowEventOverlap={false}
                         durationBarVisible={true}
                         onBeforeCellRender={this.#onBeforeCellRender}
+                        onEventMoved={this.#onEventMoved}
+                        onEventResized={this.#onEventResized}
                         ref={this.calendarRef}
                     />
                 </div>
@@ -135,8 +136,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         const eventToAdd: DayPilot.EventData = {
             start: args.start,
             end: args.end,
-            id: "",
-            text: ""
+            id: args.start.toString() + args.end.toString(),
+            text: this.transformToDayPilotText(args.start, args.end),
         };
 
         event.push(eventToAdd);
@@ -145,6 +146,66 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.calendar?.update({events: event});
         this.calendar?.clearSelection();
     };
+
+    /**
+     * 
+     * @param start date of the event
+     * @param end date of the event
+     * @returns A string containing the hours of the things
+     */
+    private transformToDayPilotText(start: DayPilot.Date, end: DayPilot.Date): string {
+        return start.toString().slice(11,16) + " à " + end.toString().slice(11,16);
+    }
+
+    readonly #onEventResized= (args: DayPilot.CalendarEventResizedArgs): void => {
+        let events = this.calendar?.events?.list;
+        if (!events) {
+            events = [];
+        }
+
+        const eventToAdd: DayPilot.EventData = {
+            start: args.newStart,
+            end: args.newEnd,
+            id: args.newStart.toString() + args.newEnd.toString(),
+            text: this.transformToDayPilotText(args.newStart, args.newEnd),
+        };
+
+            for (let index = 0; index < events.length; index++) {
+                if(events[index].id == args.e.id()) {
+                    events[index] = eventToAdd;
+                } 
+             }
+
+        this.datePicker?.update({events: events});
+        this.calendar?.update({events: events});
+        this.calendar?.clearSelection();
+    }
+
+    readonly #onEventMoved= (args: DayPilot.CalendarEventMovedArgs): void => {
+        let events = this.calendar?.events?.list;
+        if (!events) {
+            events = [];
+        }
+        
+
+        const eventToAdd: DayPilot.EventData = {
+            start: args.newStart,
+            end: args.newEnd,
+            id: args.newStart.toString() + args.newEnd.toString(),
+            text: this.transformToDayPilotText(args.newStart, args.newEnd),
+        };
+
+            for (let index = 0; index < events.length; index++) {
+                if(events[index].id == args.e.id()) {
+                    events[index] = eventToAdd;
+                } 
+             }
+
+        this.datePicker?.update({events: events});
+        this.calendar?.update({events: events});
+        this.calendar?.clearSelection();
+
+    }
 
     /**
      *

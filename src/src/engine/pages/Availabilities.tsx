@@ -198,8 +198,11 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         };
 
         let error = await API.pushAvailabilitiesToManager(listCreate);
-        if (error) {
+        if (!error) {
             NotificationManager.success(successes.AVAILABILITY_CREATED, successes.CREATED);
+        }
+        else {
+            NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errors.AVAILABILITY_ERROR);
         }
     };
 
@@ -301,7 +304,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return {
             start: this.toUTC(startTime),
             end: this.toUTC(endTime),
-            text: "Unavailable",
+            text: "Unavailable" + (startTime.getDate().toString().slice(11,16)) + " à " + (endTime.getDate().toString().slice(11,16)),
             id: "unavailable",
         };
     }
