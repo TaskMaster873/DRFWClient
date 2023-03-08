@@ -212,11 +212,11 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
             }
             return (
                 <td key={`action ${index}`}>
-                    <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
                         <IconContext.Provider value={{ color: 'white' }}>
-                            <BiEdit/>
+                            <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
+                                <BiEdit/>
+                            </LinkContainer>
                         </IconContext.Provider>
-                    </LinkContainer>
                     <a className="adminActions ms-1 mx-1"
                        onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>
                 </td>

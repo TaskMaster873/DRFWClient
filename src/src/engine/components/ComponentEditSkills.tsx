@@ -12,6 +12,7 @@ import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteSkill} from "./ComponentConfirmDeleteSkill";
 import {SkillActions} from "../types/Employee";
+import { IconContext } from "react-icons/lib";
 
 interface EditSkillsState {
     skillToDelete?: Skill;
@@ -112,7 +113,11 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group as={Col} md="2">
-                                <Button type="submit"><BiPlus className="adminActions mb-1"/></Button>
+                                <Button type="submit">
+                                    <IconContext.Provider value={{ color: 'white' }}>
+                                        <BiPlus className="adminActions mb-1"/>
+                                    </IconContext.Provider>
+                                </Button>
                             </Form.Group>
                         </Row>
                     </Form>
@@ -146,14 +151,20 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         if (this.state.editedSkill == skill) {
             return <div>
                 <button className="transparentButton me-2" type="submit">
-                    <BiCheck className="adminActions"/>
+                    <IconContext.Provider value={{ color: 'white' }}>
+                        <BiCheck className="adminActions"/>
+                    </IconContext.Provider>
                 </button>
-                <CgUnavailable onClick={() => this.editSkill()} className="adminActions ms-1"/>
+                <IconContext.Provider value={{ color: 'white' }}>
+                    <CgUnavailable onClick={() => this.editSkill()} className="adminActions ms-1"/>
+                </IconContext.Provider>
             </div>;
         } else {
             return <div>
-                <BiPencil onClick={() => this.editSkill(skill)} className="adminActions me-2"/>
-                <BiTrash onClick={() => this.showDeletePrompt(skill)} className="adminActions ms-2"/>
+                <IconContext.Provider value={{ color: 'white' }}>
+                    <BiPencil onClick={() => this.editSkill(skill)} className="adminActions me-2"/>
+                    <BiTrash onClick={() => this.showDeletePrompt(skill)} className="adminActions ms-2"/>
+                </IconContext.Provider>
             </div>;
         }
     }

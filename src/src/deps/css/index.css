@@ -266,7 +266,7 @@ h1 {
     background: #353038;
 }
 
-.modal-body {
+.modal-body, .modal-footer {
     background: #353038;
     color: #fff;
 }
