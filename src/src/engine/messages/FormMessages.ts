@@ -21,6 +21,7 @@ export const errors = {
     INVALID_LOGIN: "Le numéro d'employé ou le mot de passe spécifié est invalide",
     INVALID_DATETIME: "La date doit être un multiple d'une demi-heure.",
     INVALID_DATE: "La date est invalide",
+    AVAILABILITY_ERROR: "Il y a eu une erreur de création de disponibilité",
     DEPARTMENT_ALREADY_EXISTS: "Le département existe déjà",
     MESSAGE_SCHEDULE_UNAVALIBLE: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
     SERVER_ERROR: "Une erreur s'est produite, veuillez réessayer plus tard",

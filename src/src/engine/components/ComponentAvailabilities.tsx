@@ -60,7 +60,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
             <div className={"flex_hundred"}>
                 <div className={"left"}>
                     <DayPilotNavigator
-                        locale= {"fr-fr"}
+                        locale={"fr-fr"}
                         selectMode={"Week"}
                         showMonths={1}
                         skipMonths={1}
@@ -75,7 +75,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                 <div className='main'>
                     <DayPilotCalendar
                         heightSpec={"Parent100Pct"}
-                        locale= {"fr-fr"}
+                        locale={"fr-fr"}
                         headerDateFormat={"dddd"}
                         viewType={"Week"}
                         businessBeginsHour={6}
@@ -86,6 +86,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         allowEventOverlap={false}
                         durationBarVisible={true}
                         onBeforeCellRender={this.#onBeforeCellRender}
+                        onEventResized={this.#onEventResized}
                         ref={this.calendarRef}
                     />
                 </div>
@@ -135,8 +136,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         const eventToAdd: DayPilot.EventData = {
             start: args.start,
             end: args.end,
-            id: '',
-            text: ''
+            id: args.start.toString() + args.end.toString(),
+            text: this.transformToDayPilotText(args.start, args.end),
         };
 
         event.push(eventToAdd);
@@ -145,6 +146,45 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.calendar?.update({events: event});
         this.calendar?.clearSelection();
     };
+
+    /**
+     * 
+     * @param start date of the event
+     * @param end date of the event
+     * @returns A string containing the hours of the things
+     */
+    private transformToDayPilotText(start: DayPilot.Date, end: DayPilot.Date): string {
+        return start.toString().slice(11,16) + " à " + end.toString().slice(11,16);
+    }
+
+    readonly #onEventResized= (args: DayPilot.CalendarEventResizedArgs): void => {
+        let events = this.calendar?.events?.list;
+        if (!events) {
+            events = [];
+        }
+        
+
+        const eventToAdd: DayPilot.EventData = {
+            start: args.newStart,
+            end: args.newEnd,
+            id: args.newStart.toString() + args.newEnd.toString(),
+            text: this.transformToDayPilotText(args.newStart, args.newEnd),
+        };
+
+            for (let index = 0; index < events.length; index++) {
+                if(events[index].id == args.e.id()) {
+                    events[index] = eventToAdd;
+                }
+                 
+             }
+      
+
+        this.datePicker?.update({events: events});
+        this.calendar?.update({events: events});
+        this.calendar?.clearSelection();
+
+    }
+
 
     /**
      *
@@ -164,7 +204,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                 args.cell.properties.backColor = "#eeeeee";
             }
         }
-    }
+    };
 }
 
 
