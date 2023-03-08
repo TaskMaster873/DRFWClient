@@ -4,6 +4,7 @@ import {Shift, ShiftForCalendar} from '../types/Shift';
 import {DayPilotCalendarSettings} from '../types/StatesForDaypilot';
 
 import {DateManager} from '../utils/DateManager';
+import EventData = DayPilot.EventData;
 
 interface ComponentEmployeeScheduleViewProps {
     shifts: Shift[];
@@ -31,8 +32,8 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
             eventDeleteHandling: "Disabled",
         }
     };
-    private calendarRef: React.RefObject<any> = React.createRef();
-    private datePickerRef: React.RefObject<any> = React.createRef();
+    private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
+    private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
 
     constructor(props: ComponentEmployeeScheduleViewProps) {
         super(props);
@@ -43,15 +44,15 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
     /**
      * @returns Return the calendar component
      */
-    get calendar(): any {
-        return this.calendarRef.current.control;
+    get calendar(): DayPilot.Calendar | undefined {
+        return this.calendarRef?.current?.control;
     }
 
     /**
      * @returns Return the date picker component
      */
-    get datePicker(): any {
-        return this.datePickerRef.current.control;
+    get datePicker(): DayPilot.Navigator | undefined {
+        return this.datePickerRef?.current?.control;
     }
 
     public componentDidMount(): void {
@@ -69,8 +70,9 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
             });
         }
 
-        this.calendar.update({events, startDate});
-        this.datePicker.update({events, startDate});
+        let dayPilotEvents: EventData[] = events as EventData[];
+        this.calendar?.update({events: dayPilotEvents, startDate});
+        this.datePicker?.update({events: dayPilotEvents, startDate});
     }
 
     public render(): JSX.Element {
@@ -116,7 +118,7 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
      * @param args
      */
     readonly #onTimeRangeSelected = (args: any): void => {
-        this.calendar.update({
+        this.calendar?.update({
             startDate: args.day
         });
     };

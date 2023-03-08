@@ -1,5 +1,9 @@
 import React from "react";
 import {ComponentAbout} from "../components/ComponentAbout";
+import {ParticlesOpts} from "../types/Particles";
+import Particles from "react-particles";
+import {Engine} from "tsparticles-engine";
+import {loadFull} from "tsparticles";
 
 /**
  * Ceci est la page : à propos de nous
@@ -9,7 +13,14 @@ export class About extends React.Component {
         document.title = "À propos - TaskMaster";
     }
 
+    readonly #customInit = async (engine: Engine) => {
+        await loadFull(engine);
+    };
+
     public render(): JSX.Element {
-        return <ComponentAbout/>;
+        return <div>
+            <Particles options={ParticlesOpts} init={this.#customInit} />
+            <ComponentAbout/>;
+        </div>
     }
 }

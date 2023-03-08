@@ -384,10 +384,6 @@ export const ParticlesOptLogin: any = {
     autoPlay: true,
     interactivity: {
         events: {
-            onClick: {
-                enable: true,
-                mode: "push",
-            },
             onHover: {
                 enable: true,
                 mode: "repulse",

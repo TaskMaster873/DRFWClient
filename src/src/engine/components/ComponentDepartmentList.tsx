@@ -21,7 +21,6 @@ import {ComponentConfirmDeleteDepartment} from "./ComponentConfirmDeleteDepartme
  * Component that display the list of departments
  */
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
-
     public state: DepartmentListState = {
         editedDepartment: undefined,
         departmentToDelete: undefined
