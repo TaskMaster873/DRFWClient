@@ -206,7 +206,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
 
     private renderAdminActions(index: number, employee: Employee): JSX.Element | undefined {
         if (employee.id && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
-            let component: JSX.Element = <CgUnavailable/>;
+            let component: JSX.Element = <IconContext.Provider value={{ color: 'white' }}><CgUnavailable/></IconContext.Provider>;
             if (!employee.isActive) {
                 component = <IconContext.Provider value={{ color: 'white' }}><CgCheckO/></IconContext.Provider>;
             }

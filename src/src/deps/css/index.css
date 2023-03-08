@@ -23,10 +23,6 @@ code {
     padding-left: 0;
 }
 
-.departmentName {
-    color: rgba(231, 228, 235, 1) !important;
-}
-
 :root {
     --side_bar_width: 300px;
 }
@@ -240,7 +236,11 @@ body {
 
 a {
     color: #fff;
-    text-decoration: none;
+}
+
+.departmentName {
+    color: #fff;
+    text-decoration: underline;
 }
 
 h1 {
