@@ -145,10 +145,6 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
     };
     //#endregion
 
-    /**
-     *
-     * @returns The list of departments
-     */
     public render(): JSX.Element {
         if (this.state.redirectTo) {
             return (
@@ -168,8 +164,4 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             </Container>
         );
     }
-
-    
-
-
 }
