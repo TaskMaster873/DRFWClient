@@ -86,6 +86,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         allowEventOverlap={false}
                         durationBarVisible={true}
                         onBeforeCellRender={this.#onBeforeCellRender}
+                        onEventMoved={this.#onEventMoved}
                         onEventResized={this.#onEventResized}
                         ref={this.calendarRef}
                     />
@@ -158,6 +159,33 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     }
 
     readonly #onEventResized= (args: DayPilot.CalendarEventResizedArgs): void => {
+        let events = this.calendar?.events?.list;
+        if (!events) {
+            events = [];
+        }
+        
+
+        const eventToAdd: DayPilot.EventData = {
+            start: args.newStart,
+            end: args.newEnd,
+            id: args.newStart.toString() + args.newEnd.toString(),
+            text: this.transformToDayPilotText(args.newStart, args.newEnd),
+        };
+
+            for (let index = 0; index < events.length; index++) {
+                if(events[index].id == args.e.id()) {
+                    events[index] = eventToAdd;
+                }
+                 
+             }
+
+        this.datePicker?.update({events: events});
+        this.calendar?.update({events: events});
+        this.calendar?.clearSelection();
+
+    }
+
+    readonly #onEventMoved= (args: DayPilot.CalendarEventMovedArgs): void => {
         let events = this.calendar?.events?.list;
         if (!events) {
             events = [];
