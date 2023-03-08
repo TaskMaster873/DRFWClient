@@ -74,39 +74,21 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
     }
 
     /**
-     * Verify if the user has the permission to access this page
-     * @param role
-     * @private
-     */
-    private verifyPermissions(role: Roles): boolean {
-        return API.hasPermission(role);
-    }
-
-    /**
      * Verify if the user is logged in
      * @private
      */
     private async verifyLogin(): Promise<boolean> {
         await API.awaitLogin;
 
-        let hasPerms = this.verifyPermissions(Roles.ADMIN);
+        let hasPerms = API.hasPermission(Roles.ADMIN);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
     }
 
     /**

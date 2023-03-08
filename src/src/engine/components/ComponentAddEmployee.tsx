@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {Container} from "react-bootstrap";
-import {AddEmployeeProps, Employee, EmployeeCreateDTO} from "../types/Employee";
+import {Employee, EmployeeCreateDTO, JobTitleActions, SkillActions} from "../types/Employee";
 import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
 import {ComponentEditSkills} from "./ComponentEditSkills";
@@ -14,6 +14,15 @@ import {Skill} from "../types/Skill";
 import FormUtils from "../utils/FormUtils";
 import {JobTitle} from "../types/JobTitle";
 import {IoSettingsSharp} from "react-icons/io5";
+import {Department} from "../types/Department";
+
+export interface AddEmployeeProps extends SkillActions, JobTitleActions {
+    departments: Department[];
+    roles: string[];
+    jobTitles: JobTitle[];
+    skills: Skill[];
+    onAddEmployee: (password: string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
+}
 
 interface ComponentAddEmployeeState extends Employee {
     showEditJobTitles: boolean;
@@ -46,7 +55,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         showEditSkills: false,
         skills: [],
         validated: false,
-        isActive: false,
+        isActive: true,
         hasChangedDefaultPassword: false,
     };
 
@@ -255,7 +264,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         let errorType = FormUtils.validateForm(event);
         this.setState({
             validated: true,
-            error: errorType
+            error: errorType,
         });
 
         if (errorType === FormErrorType.NO_ERROR) {

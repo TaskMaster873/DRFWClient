@@ -81,17 +81,7 @@ export const employeeAdminTableHeads: string[] =
 export const employeeTableHeads: string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
 
-export interface EmployeeProps {
-    params: Readonly<Params>;
-}
 
-export interface AddEmployeeProps extends SkillActions, JobTitleActions {
-    departments: Department[];
-    roles: string[];
-    jobTitles: JobTitle[];
-    skills: Skill[];
-    onAddEmployee: (password: string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
-}
 
 export interface SkillActions {
     onAddSkill: (skill: string) => PromiseLike<void> | Promise<void> | void;

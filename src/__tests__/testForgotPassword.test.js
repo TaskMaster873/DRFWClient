@@ -57,7 +57,7 @@ test("Valid email should submit form", async () => {
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect(API.sendResetPassword).toBeCalled();
+    expect(API.sendResetPassword).toHaveBeenCalled();
 });
 
 function getFields() {

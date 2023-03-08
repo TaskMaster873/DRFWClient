@@ -7,8 +7,6 @@ import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ChangePassword} from "../src/engine/pages/ChangePassword.tsx";
 
-jest.mock("../src/engine/api/APIManager");
-
 let user;
 beforeEach(async () => {
     user = userEvent.setup();
@@ -36,7 +34,7 @@ describe("Empty Fields change password validation", () => {
 });
 
 test("Valid old and new password should submit form", async () => {
-    const {inputOldPassword, form, inputNewPassword} = getFields();
+    const {form, inputNewPassword} = getFields();
 
     await user.type(inputNewPassword, testConstants.validNewPassword);
 

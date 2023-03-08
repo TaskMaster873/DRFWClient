@@ -98,23 +98,14 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
 
         const hasPerms = API.hasPermission(Roles.MANAGER);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             isLoggedIn = true;
         }
 
         return isLoggedIn;
-    }
-
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
     }
 
     /**

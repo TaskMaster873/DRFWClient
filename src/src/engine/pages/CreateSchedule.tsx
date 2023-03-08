@@ -174,23 +174,14 @@ export class CreateSchedule extends React.Component<unknown, State> {
 
         const hasPerms = API.hasPermission(Roles.MANAGER);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             isLoggedIn = true;
         }
 
         return isLoggedIn;
-    }
-
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
     }
 
     /**
@@ -220,6 +211,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
      * @param currentDepartment OPTIONAL. The department to fetch the shifts from
      * @param departments OPTIONAL. The departments to set in state
      * @param employees OPTIONAL. The employees to set in state
+     * @param unavailabilities The unavailabilities that the user can see
      */
     private getShifts = async (
         currentDay?: DayPilot.Date,

@@ -57,12 +57,12 @@ describe("Reset password validation", () => {
 });
 
 test("Valid password should submit form", async () => {
-    API.applyResetPassword = async (actionCode, newPassword) => Promise.resolve();
+    API.applyResetPassword = jest.fn(() => Promise.resolve(null));
     const {inputPassword, form} = getFields();
 
     await user.type(inputPassword, testConstants.validPassword);
 
-    await fireEvent.submit(form);
+    fireEvent.submit(form);
 
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();

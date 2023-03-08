@@ -1,12 +1,7 @@
 import {Employee} from "./Employee";
 import {IdElement} from "./Global";
 
-export interface DepartmentsState {
-    employees: Employee[];
-    employeeNb: number[];
-    departments: Department[];
-    redirectTo: string | null;
-}
+
 
 export interface DepartmentListState {
     editedDepartment?: Department;

@@ -8,6 +8,7 @@ import Particles from "react-particles";
 import {API} from "../api/APIManager";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
+import {Roles} from "../types/Roles";
 
 interface ChangePasswordState {
     redirectTo: string | null;
@@ -30,6 +31,7 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
     public componentDidMount() {
         document.title = "Changement de mot de passe - TaskMaster";
     }
+
 
     /**
      *

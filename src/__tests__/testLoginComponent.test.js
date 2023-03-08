@@ -5,17 +5,15 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {Login} from "../src/engine/pages/Login";
 import {act} from "react-dom/test-utils";
-
-jest.mock("../src/engine/api/APIManager");
-const {API} = require("../src/engine/api/APIManager");
+import {ComponentLogin} from "../src/engine/components/ComponentLogin";
 
 let user;
+const onLoginRequest = jest.fn();
 beforeEach(async () => {
     user = userEvent.setup();
     act(() => {
-        render(<MemoryRouter><Login/></MemoryRouter>);
+        render(<MemoryRouter><ComponentLogin onLoginRequest={onLoginRequest}/></MemoryRouter>);
     });
 });
 
@@ -44,8 +42,6 @@ describe("Empty Fields login validation", () => {
     });
 
     test("Empty password should show error", async () => {
-        API.loginWithPassword = async (email, password) => Promise.resolve();
-
         const {inputPassword, form, inputEmail} = getFields();
 
         await user.type(inputEmail, testConstants.validEmail);
@@ -60,21 +56,18 @@ describe("Empty Fields login validation", () => {
 });
 
 test("Valid email and password should submit form", async () => {
-    API.loginWithPassword = async (email, password) => Promise.resolve();
-
     const {inputPassword, form, inputEmail} = getFields();
 
     await user.type(inputEmail, testConstants.validEmail);
     await user.type(inputPassword, testConstants.validPassword);
 
-    act(() => {
-        fireEvent.submit(form);
-    });
+    fireEvent.submit(form);
 
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(inputPassword.value).toBe(testConstants.validPassword);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
+    expect(onLoginRequest).toHaveBeenCalled()
 });
 
 function getFields() {
