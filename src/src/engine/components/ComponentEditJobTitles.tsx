@@ -117,7 +117,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                     </Form>
                 </Modal.Body>
             </Modal>
-        </div>
+        </div>;
     }
 
     /**
@@ -126,7 +126,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
     readonly hideModal = (): void => {
         this.#editJobTitle();
         this.props.cancelEdit();
-    }
+    };
 
     /**
      * When the delete button is clicked show the deletion confirmation window
@@ -135,7 +135,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      */
     readonly #onShowConfirmDeleteJobTitle = (value?: JobTitle): void => {
         this.setState({jobTitleToDelete: value});
-    }
+    };
 
     /**
      * Render edit and delete actions of the jobTitle
@@ -153,7 +153,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             return <div>
                 <BiPencil onClick={() => this.#editJobTitle(title)} className="adminActions me-2"/>
                 <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
-            </div>
+            </div>;
         }
     }
 
@@ -164,7 +164,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      */
     readonly #editJobTitle = (title?: JobTitle): void => {
         this.setState({editedJobTitle: title});
-    }
+    };
 
     /**
      * Shows the deletion confirmation modal
@@ -173,7 +173,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      */
     readonly #showDeletePrompt = (title: JobTitle): void => {
         this.setState({jobTitleToDelete: title});
-    }
+    };
 
     /**
      * Function that is called when the add form is submitted.
@@ -194,7 +194,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             }
             this.#editJobTitle();
         }
-    }
+    };
 
     /**
      * Function that is called when the add form is submitted.
@@ -211,7 +211,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         if (errorType === FormErrorType.NO_ERROR) {
             await this.props.onAddJobTitle(this.state.name);
         }
-    }
+    };
 
     /**
      * Function that is called when the form is changed. This update the state of the component.
@@ -232,5 +232,5 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                 [name]: value,
             }
         });
-    }
+    };
 }

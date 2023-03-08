@@ -1,9 +1,10 @@
-import React from 'react';
+import React from "react";
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
-import {Shift, ShiftForCalendar} from '../types/Shift';
-import {DayPilotCalendarSettings} from '../types/StatesForDaypilot';
+import {Shift, ShiftForCalendar} from "../types/Shift";
+import {DayPilotCalendarSettings} from "../types/StatesForDaypilot";
 
-import {DateManager} from '../utils/DateManager';
+import {DateManager} from "../utils/DateManager";
+import EventData = DayPilot.EventData;
 
 interface ComponentEmployeeScheduleViewProps {
     shifts: Shift[];
@@ -31,8 +32,8 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
             eventDeleteHandling: "Disabled",
         }
     };
-    private calendarRef: React.RefObject<any> = React.createRef();
-    private datePickerRef: React.RefObject<any> = React.createRef();
+    private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
+    private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
 
     constructor(props: ComponentEmployeeScheduleViewProps) {
         super(props);
@@ -43,15 +44,15 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
     /**
      * @returns Return the calendar component
      */
-    get calendar(): any {
-        return this.calendarRef.current.control;
+    get calendar(): DayPilot.Calendar | undefined {
+        return this.calendarRef?.current?.control;
     }
 
     /**
      * @returns Return the date picker component
      */
-    get datePicker(): any {
-        return this.datePickerRef.current.control;
+    get datePicker(): DayPilot.Navigator | undefined {
+        return this.datePickerRef?.current?.control;
     }
 
     public componentDidMount(): void {
@@ -69,16 +70,17 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
             });
         }
 
-        this.calendar.update({events, startDate});
-        this.datePicker.update({events, startDate});
+        let dayPilotEvents: EventData[] = events as EventData[];
+        this.calendar?.update({events: dayPilotEvents, startDate});
+        this.datePicker?.update({events: dayPilotEvents, startDate});
     }
 
     public render(): JSX.Element {
         return (
-            <div className='flex_hundred'>
-                <div className='left'>
+            <div className="flex_hundred">
+                <div className="left">
                     <DayPilotNavigator
-                        locale= {"fr-fr"}
+                        locale={"fr-fr"}
                         //how many days showed at a time
                         selectMode={"Week"}
                         //month showed at the same time
@@ -98,13 +100,13 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
                     />
                 </div>
 
-                <div className='main'>
+                <div className="main">
                     <DayPilotCalendar
                         //to start the calendar with the good attributes
                         {...this.state.dayPilotSettings}
                         heightSpec={"Parent100Pct"}
                         ref={this.calendarRef}
-                        locale= {"fr-fr"}
+                        locale={"fr-fr"}
                     />
                 </div>
             </div>
@@ -116,7 +118,7 @@ export class ComponentEmployeeScheduleView extends React.Component<ComponentEmpl
      * @param args
      */
     readonly #onTimeRangeSelected = (args: any): void => {
-        this.calendar.update({
+        this.calendar?.update({
             startDate: args.day
         });
     };

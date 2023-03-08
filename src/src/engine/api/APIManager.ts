@@ -38,7 +38,7 @@ import {
 import {Department, DepartmentModifyDTO} from "../types/Department";
 import {Shift, ShiftCreateDTO} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
-import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType, } from "./types/ThreadMessage";
+import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType,} from "./types/ThreadMessage";
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
@@ -1874,8 +1874,8 @@ class APIManager extends Logger {
                     && !data.unavailabilities.endDate._compareTo(list.recursiveExceptions.endDate)) {
                     await updateDoc(doc(this.#db, `unavailabilities`, document.id),
                         {unavailabilities: list.recursiveExceptions}).catch((error) => {
-                            errorMessage = APIUtils.getErrorMessageFromCode(error);
-                        });
+                        errorMessage = APIUtils.getErrorMessageFromCode(error);
+                    });
                     isAdded = true;
                     break;
                 }

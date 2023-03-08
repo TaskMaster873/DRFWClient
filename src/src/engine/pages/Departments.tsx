@@ -35,10 +35,6 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
-        await this.verifyLogin();
-    }
-
     public async componentDidMount(): Promise<void> {
         document.title = "Départements - TaskMaster";
 
@@ -49,6 +45,12 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
+    }
+
+    
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**
@@ -123,10 +125,11 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     };
+    //#endregion
 
     /**
      *
-     * @returns La liste des employés
+     * @returns The list of departments
      */
     public render(): JSX.Element {
         if (this.state.redirectTo) {
@@ -168,6 +171,5 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         return isLoggedIn;
     }
 
-    //#endregion
 
 }

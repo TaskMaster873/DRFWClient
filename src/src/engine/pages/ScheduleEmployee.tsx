@@ -37,10 +37,6 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
-        await this.verifyLogin();
-    }
-
     public async componentDidMount(): Promise<void> {
         document.title = "Horaire - TaskMaster";
 
@@ -66,13 +62,17 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         let listData: Shift[] = this.state.list;
         if (this.state.fetchState === enumStateOfFetching.WAITING) {
             return (
-                <ComponentLoading />
+                <ComponentLoading/>
             );
         } else if (this.state.fetchState === enumStateOfFetching.OK) {
-            return (<ComponentEmployeeScheduleView shifts={listData} />);
+            return (<ComponentEmployeeScheduleView shifts={listData}/>);
         } else {
-            return (<ComponentEmployeeScheduleView shifts={[]} />);
+            return (<ComponentEmployeeScheduleView shifts={[]}/>);
         }
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**

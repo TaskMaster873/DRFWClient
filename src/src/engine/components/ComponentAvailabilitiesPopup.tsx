@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal';
+import React, {useState} from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import Modal from "react-bootstrap/Modal";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
-import {errors, FormErrorType} from '../messages/FormMessages';
+import {errors, FormErrorType} from "../messages/FormMessages";
 
 type Props = {
     availabilityAdd: (start: DayPilot.Date, end: DayPilot.Date) => Promise<void>;

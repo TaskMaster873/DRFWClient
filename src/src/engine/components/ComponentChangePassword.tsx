@@ -139,7 +139,7 @@ export class ComponentChangePassword extends React.Component<ChangePasswordProps
                 NotificationManager.error(error, errors.ERROR_FORM);
             }
         }
-    }
+    };
 
     /**
      * This function is called when the user changes a field in the form.
@@ -160,5 +160,5 @@ export class ComponentChangePassword extends React.Component<ChangePasswordProps
                 [name]: value,
             }
         });
-    }
+    };
 }

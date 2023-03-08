@@ -21,11 +21,10 @@ import {ComponentConfirmDeleteDepartment} from "./ComponentConfirmDeleteDepartme
  * Component that display the list of departments
  */
 export class ComponentDepartmentList extends React.Component<DepartmentListProps, unknown> {
-
     public state: DepartmentListState = {
         editedDepartment: undefined,
         departmentToDelete: undefined
-    }
+    };
 
     public render(): JSX.Element {
         return (
@@ -109,7 +108,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                 <tr key={"firstCol"}>
                     {departmentTableHeads.map((th) => (<th key={th}>{th}</th>))}
                 </tr>
-            )
+            );
         }
     }
 
@@ -135,7 +134,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
      */
     readonly #changeEditPromptVisibility = (department?: Department): void => {
         this.setState({editedDepartment: department});
-    }
+    };
 
     /**
      * Shows the deletion confirmation modal
@@ -144,7 +143,7 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
      */
     readonly #changeDeletePromptVisibility = (department?: Department): void => {
         this.setState({departmentToDelete: department});
-    }
+    };
 
     /**
      * Render the component to add a department if the user is an admin

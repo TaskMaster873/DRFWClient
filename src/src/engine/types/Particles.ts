@@ -376,7 +376,7 @@ export const ParticlesOpts: any = {
             "speed": 1
         }
     },
-}
+};
 
 export const ParticlesOptLogin: any = {
     fpsLimit: 120,
@@ -384,10 +384,6 @@ export const ParticlesOptLogin: any = {
     autoPlay: true,
     interactivity: {
         events: {
-            onClick: {
-                enable: true,
-                mode: "push",
-            },
             onHover: {
                 enable: true,
                 mode: "repulse",

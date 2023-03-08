@@ -52,10 +52,6 @@ export class CreateSchedule extends React.Component<unknown, State> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
-        await this.verifyLogin();
-    }
-
     /**
      * Called when the page is loaded
      * @description This function is called when the page is loaded. It will set the title of the page and call the API to get the list of shifts.
@@ -88,11 +84,11 @@ export class CreateSchedule extends React.Component<unknown, State> {
 
     public render(): JSX.Element {
         if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo} />);
+            return (<Navigate to={this.state.redirectTo}/>);
         }
         switch (this.state.fetchState) {
             case FetchState.WAITING:
-                return <ComponentLoading />;
+                return <ComponentLoading/>;
             case FetchState.OK:
                 if (this.state.departments.length > 1) {
                     return (
@@ -164,6 +160,10 @@ export class CreateSchedule extends React.Component<unknown, State> {
         }
     }
 
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
+    }
+
     /**
      * Verify if the user is logged in
      * @private
@@ -195,10 +195,10 @@ export class CreateSchedule extends React.Component<unknown, State> {
         if (this.manageError(fetchedEmployees, errors.GET_EMPLOYEES)) {
             if (this.manageError(fetchedUnavailabilities, errors.GET_AVAILABILITIES)) {
                 await this.getShifts(
-                    this.state.currentDay, 
-                    currentDepartment, 
-                    departments, 
-                    fetchedEmployees as Employee[], 
+                    this.state.currentDay,
+                    currentDepartment,
+                    departments,
+                    fetchedEmployees as Employee[],
                     fetchedUnavailabilities as ViewableAvailabilities[]
                 );
             }

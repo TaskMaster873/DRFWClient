@@ -4,11 +4,10 @@
 import "@testing-library/jest-dom";
 import MatchMediaMock from "jest-matchmedia-mock";
 import {fireEvent, render} from "@testing-library/react";
-import {employeeWithId, employeesWithIds, testConstants} from "../Constants/testConstants";
+import {employeesWithIds, employeeWithId, testConstants} from "../Constants/testConstants";
 import {EventManipulationType} from "../src/engine/types/StatesForDaypilot";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {API} from "../src/engine/api/APIManager";
 import {act} from "react-dom/test-utils";
 import {ComponentPopupSchedule} from "../src/engine/components/ComponentPopupSchedule";
 

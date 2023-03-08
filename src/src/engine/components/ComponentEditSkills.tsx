@@ -117,7 +117,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                     </Form>
                 </Modal.Body>
             </Modal>
-        </div>
+        </div>;
     }
 
     /**
@@ -125,7 +125,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
      */
     readonly hideModal = (): void => {
         this.props.cancelEdit();
-    }
+    };
 
     /**
      * When the delete button is clicked show the deletion confirmation window
@@ -134,7 +134,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
      */
     readonly #onShowConfirmDeleteSkills = (value?: Skill): void => {
         this.setState({skillToDelete: value});
-    }
+    };
 
     /**
      * Render edit and delete actions
@@ -148,12 +148,12 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                     <BiCheck className="adminActions"/>
                 </button>
                 <CgUnavailable onClick={() => this.editSkill()} className="adminActions ms-1"/>
-            </div>
+            </div>;
         } else {
             return <div>
                 <BiPencil onClick={() => this.editSkill(skill)} className="adminActions me-2"/>
                 <BiTrash onClick={() => this.showDeletePrompt(skill)} className="adminActions ms-2"/>
-            </div>
+            </div>;
         }
     }
 
@@ -194,7 +194,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
             }
             this.setState({editedSkill: undefined});
         }
-    }
+    };
 
     /**
      * Function that is called when the add form is submitted.
@@ -211,7 +211,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         if (errorType === FormErrorType.NO_ERROR) {
             await this.props.onAddSkill(this.state.name);
         }
-    }
+    };
 
     /**
      * Function that is called when the form is changed. This update the state of the component.
@@ -232,5 +232,5 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                 [name]: value,
             }
         });
-    }
+    };
 }

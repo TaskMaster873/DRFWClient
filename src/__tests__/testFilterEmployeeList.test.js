@@ -1,6 +1,6 @@
-import { FilterUtils } from '../src/engine/utils/FilterUtils';
-import { employees2 } from "../Constants/testConstants";
-import { Employee } from "../src/engine/types/Employee";
+import {FilterUtils} from '../src/engine/utils/FilterUtils';
+import {employees2} from "../Constants/testConstants";
+import {Employee} from "../src/engine/types/Employee";
 
 describe('Test FilterUtil Class', () => {
     test('Test if filterEmployeeList can filter an empty list', () => {

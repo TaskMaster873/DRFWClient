@@ -38,10 +38,6 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
-        await this.verifyLogin();
-    }
-
     /**
      * Called when the page is loaded
      * @description This function is called when the page is loaded. It will set the title of the
@@ -86,6 +82,10 @@ export class ManageAvailabilities extends React.Component<unknown, State> {
                 />;
         }
 
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**
