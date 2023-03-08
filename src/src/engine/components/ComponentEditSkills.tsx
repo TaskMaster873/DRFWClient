@@ -125,6 +125,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
      * The function that hides the modal when the exit button is clicked
      */
     readonly hideModal = (): void => {
+        this.editSkill();
         this.props.cancelEdit();
     };
 

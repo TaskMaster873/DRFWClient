@@ -47,33 +47,28 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     }
 
-    /**
-     *
-     * @returns La liste des employés
-     */
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (
-                <Navigate to={this.state.redirectTo}></Navigate>
-            );
-        }
-
-        return (
-            <Container data-bs-theme={"dark"}>
-                <ComponentDepartmentList
-                    employees={this.state.employees}
-                    employeeNb={this.state.employeeNb}
-                    departments={this.state.departments}
-                    onAddDepartment={this.addDepartment}
-                    onEditDepartment={this.editDepartment}
-                    onDeleteDepartment={this.deleteDepartment}
-                />
-            </Container>
-        );
-    }
-
     private async onEvent(): Promise<void> {
         await this.verifyLogin();
+    }
+
+    /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
+        await API.awaitLogin;
+
+        let hasPerms = API.hasPermission(Roles.EMPLOYEE);
+        if (!API.isAuth() || !hasPerms) {
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
+        } else {
+            isLoggedIn = true;
+        }
+
+        return isLoggedIn;
     }
 
     /**
@@ -148,27 +143,25 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     };
-
-    /**
-     * Verify if the user is logged in
-     * @private
-     */
-    private async verifyLogin(): Promise<boolean> {
-        let isLoggedIn: boolean = false;
-        await API.awaitLogin;
-
-        let hasPerms = API.hasPermission(Roles.EMPLOYEE);
-        if (!API.isAuth() || !hasPerms) {
-            this.setState({
-                redirectTo: RoutesPath.INDEX
-            });
-        } else {
-            isLoggedIn = true;
-        }
-
-        return isLoggedIn;
-    }
-
     //#endregion
 
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (
+                <Navigate to={this.state.redirectTo}></Navigate>
+            );
+        }
+        return (
+            <Container data-bs-theme={"dark"}>
+                <ComponentDepartmentList
+                    employees={this.state.employees}
+                    employeeNb={this.state.employeeNb}
+                    departments={this.state.departments}
+                    onAddDepartment={this.addDepartment}
+                    onEditDepartment={this.editDepartment}
+                    onDeleteDepartment={this.deleteDepartment}
+                />
+            </Container>
+        );
+    }
 }
