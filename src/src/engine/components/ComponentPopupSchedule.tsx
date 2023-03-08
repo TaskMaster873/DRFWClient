@@ -7,6 +7,7 @@ import {EventForShiftCreation, EventForShiftEdit} from "../types/Shift";
 import {errors, FormErrorType} from "../messages/FormMessages";
 import {EventManipulationType} from "../types/StatesForDaypilot";
 import {Employee} from "../types/Employee";
+import {CloseButton} from "react-bootstrap";
 
 type Props = {
     eventAdd: (shiftEvent: EventForShiftCreation) => Promise<void>;
@@ -105,8 +106,9 @@ export function ComponentPopupSchedule(props: Props) {
 
     return (
         <Modal show={props.isShown}>
-            <Modal.Header closeButton onClick={() => closeModal()}>
+            <Modal.Header>
                 <Modal.Title>{props.taskType} un quart de travail</Modal.Title>
+                <CloseButton variant="white" onClick={() => closeModal()} />
             </Modal.Header>
             <Form onSubmit={(e) => handleSubmit(e)} validated={validated && areDatesValid()} data-error={error}>
                 <Modal.Body>
