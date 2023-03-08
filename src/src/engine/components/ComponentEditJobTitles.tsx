@@ -12,6 +12,7 @@ import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
 import {JobTitleActions} from "../types/Employee";
+import { IconContext } from "react-icons/lib";
 
 interface EditJobTitlesState {
     jobTitleToDelete?: JobTitle;
@@ -112,7 +113,11 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group as={Col} md="2">
-                                <Button type="submit"><BiPlus className="adminActions mb-1"/></Button>
+                                <Button type="submit">
+                                    <IconContext.Provider value={{ color: 'white' }}>
+                                        <BiPlus className="adminActions mb-1"/>
+                                    </IconContext.Provider>
+                                </Button>
                             </Form.Group>
                         </Row>
                     </Form>
@@ -147,13 +152,20 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         if (this.state.editedJobTitle == title) {
             return <div>
                 <button className="transparentButton me-2" type="submit">
-                    <BiCheck className="adminActions"/>
+                    <IconContext.Provider value={{ color: 'white' }}>
+                        <BiCheck className="adminActions"/>
+                    </IconContext.Provider>
                 </button>
-                <CgUnavailable onClick={() => this.editJobTitle()} className="adminActions ms-1"/></div>
+                <IconContext.Provider value={{ color: 'white' }}>
+                    <CgUnavailable onClick={() => this.editJobTitle} className="adminActions ms-1"/>
+                </IconContext.Provider>
+            </div>;
         } else {
             return <div>
-                <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
-                <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
+                <IconContext.Provider value={{ color: 'white' }}>
+                    <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
+                    <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
+                </IconContext.Provider>
             </div>;
         }
     }
