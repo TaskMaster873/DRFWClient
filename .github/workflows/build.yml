@@ -12,123 +12,123 @@ jobs:
     #needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: '0'
-    - uses: actions/setup-node@v3
-      with:
-        node-version: lts/*
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.9.15
-      with:
-        versionSpec: 5.x
-    - id: determine_version
-      name: Determine Version
-      uses: gittools/actions/gitversion/execute@v0.9.15
-      with:
-        additionalArguments: /overrideconfig mode=Mainline
-    - name: Install Dependencies
-      run: npm i
-      shell: bash
-    - name: Cache node modules
-      id: cache-npm
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-node-modules
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-    - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-      name: List the state of node modules
-      continue-on-error: true
-      run: npm list
-    - name: List Dependencies
-      run: npm list --all > dependencies.txt
-      shell: bash
-    - name: Collect Dependencies
-      uses: actions/upload-artifact@v3.1.2
-      with:
-        name: Dependencies
-        path: dependencies.txt
-    - name: List Dependency Updates
-      run: npm outdated > dependencyUpdates.txt
-      shell: bash
-    - name: Collect Dependency Updates
-      uses: actions/upload-artifact@v3.1.2
-      with:
-        name: Dependencies Updates
-        path: dependencyUpdates.txt
-    - name: Test
-      run: npm test
-      shell: bash
-    - name: Build
-      run: npm run build
-      shell: bash
-    - name: Install Octopus Deploy CLI
-      uses: OctopusDeploy/install-octopus-cli-action@v1.2.0
-      with:
-        version: latest
-    - name: Package
-      run: |-
-        SOURCEPATH=.
-        OUTPUTPATH=.
-        # If there is a build directory, assume that is what we want to package
-        if [[ -d "build" ]]; then
-          SOURCEPATH=build
-        fi
-        octo pack \
-         --basePath ${SOURCEPATH} \
-         --outFolder ${OUTPUTPATH} \
-         --id TaskMaster \
-         --version ${{ steps.determine_version.outputs.semVer }} \
-         --format zip \
-         --overwrite \
-         --include '**/*.html' \
-         --include '**/*.sh' \
-         --include '**/*.ico' \
-         --include '**/*.htm' \
-         --include '**/*.css' \
-         --include '**/*.js' \
-         --include '**/*.min' \
-         --include '**/*.map' \
-         --include '**/*.sql' \
-         --include '**/*.png' \
-         --include '**/*.jpg' \
-         --include '**/*.jpeg' \
-         --include '**/*.gif' \
-         --include '**/*.json' \
-         --include '**/*.env' \
-         --include '**/*.txt' \
-         --include '**/*.Procfile' \
-         --include '**/*.md'
-      shell: bash
-    - name: Push packages to Octopus Deploy
-      uses: OctopusDeploy/push-package-action@v2
-      env:
-        OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-        OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
-      with:
-        packages: TaskMaster.${{ steps.determine_version.outputs.semVer }}.zip
-        overwrite_mode: OverwriteExisting
-    - name: Generate Octopus Deploy build information
-      uses: OctopusDeploy/push-build-information-action@v1
-      env:
-        OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-        OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
-      with:
-        version: ${{ steps.determine_version.outputs.semVer }}
-        packages: TaskMaster
-        overwrite_mode: OverwriteExisting
-    - name: Create Octopus Release
-      uses: OctopusDeploy/create-release-action@v1
-      with:
-        api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
-        project: TaskMaster
-        server: ${{ secrets.OCTOPUSSERVERURL }}
-        deploy_to: Development
-        packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.15
+        with:
+          versionSpec: 5.x
+      - id: determine_version
+        name: Determine Version
+        uses: gittools/actions/gitversion/execute@v0.9.15
+        with:
+          additionalArguments: /overrideconfig mode=Mainline
+      - name: Install Dependencies
+        run: npm i
+        shell: bash
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+      - name: List Dependencies
+        run: npm list --all > dependencies.txt
+        shell: bash
+      - name: Collect Dependencies
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: Dependencies
+          path: dependencies.txt
+      - name: List Dependency Updates
+        run: npm outdated > dependencyUpdates.txt
+        shell: bash
+      - name: Collect Dependency Updates
+        uses: actions/upload-artifact@v3.1.2
+        with:
+          name: Dependencies Updates
+          path: dependencyUpdates.txt
+      - name: Test
+        run: npm test
+        shell: bash
+      - name: Build
+        run: npm run build
+        shell: bash
+      - name: Install Octopus Deploy CLI
+        uses: OctopusDeploy/install-octopus-cli-action@v1.2.0
+        with:
+          version: latest
+      - name: Package
+        run: |-
+          SOURCEPATH=.
+          OUTPUTPATH=.
+          # If there is a build directory, assume that is what we want to package
+          if [[ -d "build" ]]; then
+            SOURCEPATH=build
+          fi
+          octo pack \
+           --basePath ${SOURCEPATH} \
+           --outFolder ${OUTPUTPATH} \
+           --id TaskMaster \
+           --version ${{ steps.determine_version.outputs.semVer }} \
+           --format zip \
+           --overwrite \
+           --include '**/*.html' \
+           --include '**/*.sh' \
+           --include '**/*.ico' \
+           --include '**/*.htm' \
+           --include '**/*.css' \
+           --include '**/*.js' \
+           --include '**/*.min' \
+           --include '**/*.map' \
+           --include '**/*.sql' \
+           --include '**/*.png' \
+           --include '**/*.jpg' \
+           --include '**/*.jpeg' \
+           --include '**/*.gif' \
+           --include '**/*.json' \
+           --include '**/*.env' \
+           --include '**/*.txt' \
+           --include '**/*.Procfile' \
+           --include '**/*.md'
+        shell: bash
+      - name: Push packages to Octopus Deploy
+        uses: OctopusDeploy/push-package-action@v2
+        env:
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
+        with:
+          packages: TaskMaster.${{ steps.determine_version.outputs.semVer }}.zip
+          overwrite_mode: OverwriteExisting
+      - name: Generate Octopus Deploy build information
+        uses: OctopusDeploy/push-build-information-action@v1
+        env:
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          OCTOPUS_HOST: ${{ secrets.OCTOPUSSERVERURL }}
+        with:
+          version: ${{ steps.determine_version.outputs.semVer }}
+          packages: TaskMaster
+          overwrite_mode: OverwriteExisting
+      - name: Create Octopus Release
+        uses: OctopusDeploy/create-release-action@v1
+        with:
+          api_key: ${{ secrets.OCTOPUSSERVERAPIKEY }}
+          project: TaskMaster
+          server: ${{ secrets.OCTOPUSSERVERURL }}
+          deploy_to: Development
+          packages: TaskMaster:${{ steps.determine_version.outputs.semVer }}

@@ -39,10 +39,6 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
-        await this.verifyLogin();
-    }
-
     public async componentDidMount(): Promise<void> {
         document.title = "Modifier un Employé - TaskMaster";
 
@@ -71,6 +67,10 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 onDeleteSkill={this.#deleteSkill}
             />
         );
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**

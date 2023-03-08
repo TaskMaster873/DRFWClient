@@ -186,9 +186,9 @@ function checkFieldValues(ths, trs, tds, list) {
  */
 function expectedListItems(array) {
     let listItems = ``;
-    if(array.size === 0) return listItems;
+    if (array.size === 0) return listItems;
     for (const elem of array) {
-        listItems +=`<div class="list-group-item">${elem}</div>`
+        listItems += `<div class="list-group-item">${elem}</div>`
     }
     return listItems;
 }

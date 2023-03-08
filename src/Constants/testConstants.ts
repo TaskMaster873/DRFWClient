@@ -94,6 +94,19 @@ const departments2: Department[] = [department, department2];
 
 const employeeNb: number[] = [1, 2];
 
-export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2, employeesWithIds, department, department2, departments, departments2, employeeNb};
+export {
+    employee,
+    employee2,
+    employeeWithId,
+    employeeWithId2,
+    employees,
+    employees2,
+    employeesWithIds,
+    department,
+    department2,
+    departments,
+    departments2,
+    employeeNb
+};
 
 

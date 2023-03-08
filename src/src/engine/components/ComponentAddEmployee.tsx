@@ -195,7 +195,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                         <Form.Select required name="role" value={this.state.role} onChange={this.#handleSelect}>
                             {this.props.roles.map((role: string, index: number) => {
                                 if (API.hasLowerPermission(index)) {
-                                    return <option key={index} value={index}>{role}</option>
+                                    return <option key={index} value={index}>{role}</option>;
                                 }
                             })}
                         </Form.Select>
@@ -227,8 +227,8 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
      * @returns {void}
      */
     readonly #onShowEditJobTitles = (value: boolean = true): void => {
-        this.setState({showEditJobTitles: value})
-    }
+        this.setState({showEditJobTitles: value});
+    };
 
     /**
      * Triggered when a skill is selected.
@@ -236,8 +236,8 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
      * @private
      */
     readonly #onShowEditSkills = (value: boolean = true): void => {
-        this.setState({showEditSkills: value})
-    }
+        this.setState({showEditSkills: value});
+    };
 
     /**
      * TODO
@@ -273,7 +273,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
             };
             this.props.onAddEmployee(this.state.password, employee);
         }
-    }
+    };
 
     /**
      * Handle the change of a form element. Update the state with the new value.
@@ -311,7 +311,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         if (!name) {
             throw new Error("Name is undefined for element in form.");
         }
-    }
+    };
 
     readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
         const target = event.target;
@@ -320,5 +320,5 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                 [target.name]: target.value
             }
         });
-    }
+    };
 }

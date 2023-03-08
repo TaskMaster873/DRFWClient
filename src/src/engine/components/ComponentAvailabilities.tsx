@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
 
@@ -60,7 +60,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
             <div className={"flex_hundred"}>
                 <div className={"left"}>
                     <DayPilotNavigator
-                        locale= {"fr-fr"}
+                        locale={"fr-fr"}
                         selectMode={"Week"}
                         showMonths={1}
                         skipMonths={1}
@@ -72,10 +72,10 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                         ref={this.datePickerRef}
                     />
                 </div>
-                <div className='main'>
+                <div className="main">
                     <DayPilotCalendar
                         heightSpec={"Parent100Pct"}
-                        locale= {"fr-fr"}
+                        locale={"fr-fr"}
                         headerDateFormat={"dddd"}
                         viewType={"Week"}
                         businessBeginsHour={6}
@@ -135,8 +135,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         const eventToAdd: DayPilot.EventData = {
             start: args.start,
             end: args.end,
-            id: '',
-            text: ''
+            id: "",
+            text: ""
         };
 
         event.push(eventToAdd);
@@ -154,7 +154,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         let cell = args.cell;
         let start: DayPilot.Date = cell.start;
         let end: DayPilot.Date = cell.end;
-        let startDateOfWeek: DayPilot.Date = start.firstDayOfWeek('en-us');
+        let startDateOfWeek: DayPilot.Date = start.firstDayOfWeek("en-us");
 
         if (startDateOfWeek) {
             let isDisabled: boolean = this.props.isCellInStartToEndTimeRange(startDateOfWeek, start, end);
@@ -164,7 +164,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                 args.cell.properties.backColor = "#eeeeee";
             }
         }
-    }
+    };
 }
 
 
