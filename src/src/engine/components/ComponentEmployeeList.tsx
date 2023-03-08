@@ -9,7 +9,7 @@ import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 import {FilterUtils} from "../utils/FilterUtils";
-import { IconContext } from "react-icons/lib";
+import {IconContext} from "react-icons/lib";
 
 export interface EmployeeListProps {
     employees: Employee[] | null;
@@ -184,7 +184,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
     private renderNavigationButtons(): JSX.Element | undefined {
         let container: JSX.Element = <Button onClick={() => history.back()} className="me-3" variant="secondary">
             Retour
-        </Button>
+        </Button>;
         if (API.hasPermission(Roles.ADMIN)) {
             return (
                 <div className="mt-3">
@@ -200,17 +200,18 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
 
     private renderAdminActions(index: number, employee: Employee): JSX.Element | undefined {
         if (employee.id && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
-            let component: JSX.Element = <IconContext.Provider value={{ color: 'white' }}><CgUnavailable/></IconContext.Provider>;
+            let component: JSX.Element = <IconContext.Provider
+                value={{color: "white"}}><CgUnavailable/></IconContext.Provider>;
             if (!employee.isActive) {
-                component = <IconContext.Provider value={{ color: 'white' }}><CgCheckO/></IconContext.Provider>;
+                component = <IconContext.Provider value={{color: "white"}}><CgCheckO/></IconContext.Provider>;
             }
             return (
                 <td key={`action ${index}`}>
-                        <IconContext.Provider value={{ color: 'white' }}>
-                            <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
-                                <BiEdit/>
-                            </LinkContainer>
-                        </IconContext.Provider>
+                    <IconContext.Provider value={{color: "white"}}>
+                        <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
+                            <BiEdit/>
+                        </LinkContainer>
+                    </IconContext.Provider>
                     <a className="adminActions ms-1 mx-1"
                        onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>
                 </td>

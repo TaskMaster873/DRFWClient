@@ -81,13 +81,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     public render(): JSX.Element {
         if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo} />);
+            return (<Navigate to={this.state.redirectTo}/>);
         } else {
             return (
                 <div>
                     <button type="button"
-                        className="btn btn-primary submit-abilities-button"
-                        onClick={() => this.#hideModal(false)}>Transmettre
+                            className="btn btn-primary submit-abilities-button"
+                            onClick={() => this.#hideModal(false)}>Transmettre
                     </button>
 
                     <ComponentAvailabilities
@@ -97,7 +97,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                         startDate={new DayPilot.Date(this.state.currentWeekStart)}
                         selectionDay={new DayPilot.Date(this.state.selectedDate)}
                         employeeAvailabilities={this.state.timesUnavailable}
-                        ref={this.componentAvailabilitiesRef} />
+                        ref={this.componentAvailabilitiesRef}/>
                     <ComponentAvailabilitiesPopup
                         hideModal={this.#hideModal}
                         isShown={this.state.popupInactive}
@@ -200,8 +200,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         let error = await API.pushAvailabilitiesToManager(listCreate);
         if (!error) {
             NotificationManager.success(successes.AVAILABILITY_CREATED, successes.CREATED);
-        }
-        else {
+        } else {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, errors.AVAILABILITY_ERROR);
         }
     };
@@ -310,7 +309,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
     }
 
     /**
-     * 
+     *
      * @param start date of the event
      * @param end date of the event
      * @returns A string containing the hours of the things

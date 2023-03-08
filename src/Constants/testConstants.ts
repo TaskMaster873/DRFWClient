@@ -92,9 +92,9 @@ const department2: Department = new Department({
 });
 
 const jobTitle = new JobTitle({id: "1", name: "Manager"});
-const jobTitle2 = new JobTitle({id: "2", name: "Conducteur"})
-const skill = new Skill({id: "1", name: "Conducteur de véhicule lourds"})
-const skill2 = new Skill({id: "2", name: "Gestion de personnel"})
+const jobTitle2 = new JobTitle({id: "2", name: "Conducteur"});
+const skill = new Skill({id: "1", name: "Conducteur de véhicule lourds"});
+const skill2 = new Skill({id: "2", name: "Gestion de personnel"});
 
 const departments: Department[] = [department];
 const departments2: Department[] = [department, department2];
@@ -104,5 +104,7 @@ const jobTitles: JobTitle[] = [jobTitle, jobTitle2];
 const skills: Skill[] = [skill, skill2];
 const employeeNb: number[] = [1, 2];
 
-export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2,
-    employeesWithIds, department, department2, departments, departments2, roles, jobTitles, skills, employeeNb};
+export {
+    employee, employee2, employeeWithId, employeeWithId2, employees, employees2,
+    employeesWithIds, department, department2, departments, departments2, roles, jobTitles, skills, employeeNb
+};

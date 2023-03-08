@@ -2,7 +2,6 @@ import {Employee} from "./Employee";
 import {IdElement} from "./Global";
 
 
-
 export interface DepartmentListState {
     editedDepartment?: Department;
     departmentToDelete?: Department;

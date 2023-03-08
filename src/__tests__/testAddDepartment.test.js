@@ -9,6 +9,7 @@ import {department, employees2} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddDepartment} from "../src/engine/components/ComponentAddDepartment";
+
 let user;
 const onAddDepartment = jest.fn();
 beforeEach(async () => {
@@ -50,9 +51,9 @@ describe("Empty Fields AddDepartment Tests", () => {
 
 test("Valid name should submit form", async () => {
     const {
-            form,
-            inputName,
-        } = getFields();
+        form,
+        inputName,
+    } = getFields();
 
     await user.type(inputName, department.name);
 

@@ -135,22 +135,22 @@ describe("Test Component Popup Schedule component", () => {
     });
 
     test("test submit sends Edit event when set to do so", async () => {
-            render(
-                <MemoryRouter>
-                    <ComponentPopupSchedule
-                        eventAdd={eventAdd}
-                        eventEdit={eventEdit}
-                        hideModal={eventHide}
-                        isShown={true}
-                        id={testConstants.validId}
-                        start={testConstants.validStartDate}
-                        end={testConstants.validEndDate}
-                        resource={employeeWithId.id}
-                        taskType={EventManipulationType.EDIT}
-                        employees={employeesWithIds}
-                    />
-                </MemoryRouter>
-            );
+        render(
+            <MemoryRouter>
+                <ComponentPopupSchedule
+                    eventAdd={eventAdd}
+                    eventEdit={eventEdit}
+                    hideModal={eventHide}
+                    isShown={true}
+                    id={testConstants.validId}
+                    start={testConstants.validStartDate}
+                    end={testConstants.validEndDate}
+                    resource={employeeWithId.id}
+                    taskType={EventManipulationType.EDIT}
+                    employees={employeesWithIds}
+                />
+            </MemoryRouter>
+        );
 
         const {form} = getFields();
 

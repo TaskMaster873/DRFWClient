@@ -81,13 +81,15 @@ export class AvailabilitiesList extends React.Component<Props> {
                         {unavailability.recursiveExceptions.endDate.toString()}
                     </td>
                     <td key={`action ${index}`}>
-                        <a className="adminActions ms-1 mx-1" onClick={() => this.props.acceptUnavailability(unavailability)}>
-                            <IconContext.Provider value={{ color: 'white' }}>
+                        <a className="adminActions ms-1 mx-1"
+                           onClick={() => this.props.acceptUnavailability(unavailability)}>
+                            <IconContext.Provider value={{color: "white"}}>
                                 <CgCheckO/>
                             </IconContext.Provider>
                         </a>
-                        <a className="adminActions ms-1 mx-1" onClick={() => this.props.refuseUnavailability(unavailability)}>
-                            <IconContext.Provider value={{ color: 'white' }}>
+                        <a className="adminActions ms-1 mx-1"
+                           onClick={() => this.props.refuseUnavailability(unavailability)}>
+                            <IconContext.Provider value={{color: "white"}}>
                                 <CgUnavailable/>
                             </IconContext.Provider>
                         </a>

@@ -5,7 +5,7 @@
 import "@testing-library/jest-dom";
 import {fireEvent, render} from "@testing-library/react";
 import {FormErrorType} from "../src/engine/messages/FormMessages";
-import {departments2, employee, employee2, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
+import {departments2, employee, jobTitles, roles, skills, testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentEditEmployee} from "../src/engine/components/ComponentEditEmployee";

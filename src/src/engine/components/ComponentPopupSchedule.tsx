@@ -108,7 +108,7 @@ export function ComponentPopupSchedule(props: Props) {
         <Modal show={props.isShown}>
             <Modal.Header>
                 <Modal.Title>{props.taskType} un quart de travail</Modal.Title>
-                <CloseButton variant="white" onClick={() => closeModal()} />
+                <CloseButton variant="white" onClick={() => closeModal()}/>
             </Modal.Header>
             <Form onSubmit={(e) => handleSubmit(e)} validated={validated && areDatesValid()} data-error={error}>
                 <Modal.Body>
