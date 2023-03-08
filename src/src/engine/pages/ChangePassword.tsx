@@ -80,7 +80,7 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         // @ts-ignore
         const hasPerms = API.hasPermission(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.redirectTo(RoutesPath.ON_LOGIN_SUCCESS_ROUTE);
         } else {
             isLoggedIn = true;
         }
