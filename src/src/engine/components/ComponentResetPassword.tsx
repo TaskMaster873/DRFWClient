@@ -53,7 +53,7 @@ export function ComponentResetPassword(props: Props) {
 
     return (
         <Container>
-            <Particles options={ParticlesOpts} init={customInit} />
+            <Particles options={ParticlesOpts} init={customInit}/>
             <div className="auth-form">
                 <div className="me-4">
                     <img
