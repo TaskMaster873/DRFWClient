@@ -20,6 +20,12 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
         redirectTo: null
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
     public async componentDidMount(): Promise<void> {
         document.title = "Ajouter un Employé - TaskMaster";
 
@@ -46,6 +52,14 @@ export class AddEmployee extends React.Component<unknown, AddEmployeeState> {
                 onDeleteSkill={this.#deleteSkill}
             />
         );
+    }
+
+    /**
+     * On logout or on login, verify if the user is logged in
+     * @private
+     */
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**
