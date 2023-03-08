@@ -3,7 +3,7 @@ import {Button, Col, Form, ListGroup, Row, Table} from "react-bootstrap";
 import {Employee, employeeAdminTableHeads, employeeTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {API} from "../api/APIManager";
-import {BiEdit} from "react-icons/bi"
+import {BiEdit} from "react-icons/bi";
 import {Roles} from "../types/Roles";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {RoutesPath} from "../RoutesPath";
@@ -34,7 +34,7 @@ export interface EmployeeListState {
 export class ComponentEmployeeList extends React.Component<EmployeeListProps, EmployeeListState> {
     public state: EmployeeListState = {
         filteredList: null,
-    }
+    };
 
     constructor(props: EmployeeListProps) {
         super(props);
@@ -119,7 +119,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                         <ComponentLoadingBarSpinner/>
                     </td>
                 </tr>
-            ]
+            ];
         } else if (list.length !== 0) {
             return list.map((employee, index) => (
                 <tr key={"secondCol" + index}>
@@ -207,7 +207,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         if (employee.id && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
             let component: JSX.Element = <CgUnavailable/>;
             if (!employee.isActive) {
-                component = <CgCheckO/>
+                component = <CgCheckO/>;
             }
             return (
                 <td key={`action ${index}`}>
@@ -236,7 +236,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                 <tr key={"firstCol"}>
                     {employeeTableHeads.map((th) => (<th key={th}>{th}</th>))}
                 </tr>
-            )
+            );
         }
     }
 }

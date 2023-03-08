@@ -7,9 +7,9 @@ import {API} from "../api/APIManager";
 import Logo from "../../deps/images/logo.png";
 import {RoutesPath} from "../RoutesPath";
 import FormUtils from "../utils/FormUtils";
-import { loadFull } from "tsparticles";
+import {loadFull} from "tsparticles";
 import Particles from "react-particles";
-import type { Engine } from "tsparticles-engine";
+import type {Engine} from "tsparticles-engine";
 import {ParticlesOptLogin} from "../types/Particles";
 
 interface ComponentStateLogin {
@@ -45,10 +45,6 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
         await this.verifyLogin();
     }
 
-    readonly #customInit = async (engine: Engine) => {
-        await loadFull(engine);
-    };
-
     public render(): JSX.Element {
         if (API.isAuth()) {
             return (
@@ -57,7 +53,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
         } else {
             return (
                 <div className={"auth-form"}>
-                    <Particles options={ParticlesOptLogin} init={this.#customInit} />
+                    <Particles options={ParticlesOptLogin} init={this.#customInit}/>
 
                     <div className={"me-4 z-1"}>
                         <img
@@ -128,6 +124,10 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
             );
         }
     }
+
+    readonly #customInit = async (engine: Engine) => {
+        await loadFull(engine);
+    };
 
     private async verifyLogin(): Promise<void> {
         await API.awaitLogin;

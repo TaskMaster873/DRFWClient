@@ -206,7 +206,7 @@ export class ComponentEditEmployee extends React.Component<EditEmployeeProps, Co
         };
 
         // Iterate over all checked checkbox elements and create an array that contains each of them
-        document.querySelectorAll('input[type="checkbox"]:checked').forEach((checkbox: any) => {
+        document.querySelectorAll("input[type=\"checkbox\"]:checked").forEach((checkbox: any) => {
             let fieldName = checkbox.name;
             if (fieldName) {
                 if (typeof (formDataObj[fieldName]) === "string") {

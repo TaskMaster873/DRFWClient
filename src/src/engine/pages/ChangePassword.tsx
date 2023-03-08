@@ -1,12 +1,16 @@
 import React from "react";
 import {Container} from "react-bootstrap";
 import {ComponentChangePassword} from "../components/ComponentChangePassword";
+import {Engine} from "tsparticles-engine";
+import {loadFull} from "tsparticles";
+import {ParticlesOpts} from "../types/Particles";
+import Particles from "react-particles";
 import {API} from "../api/APIManager";
-import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
+import {Roles} from "../types/Roles";
 
-export interface ChangePasswordState {
+interface ChangePasswordState {
     redirectTo: string | null;
 }
 
@@ -16,11 +20,7 @@ export interface ChangePasswordState {
 export class ChangePassword extends React.Component<unknown, ChangePasswordState> {
     public state: ChangePasswordState = {
         redirectTo: null
-    }
-
-    public componentDidMount() {
-        document.title = "Changement de mot de passe - TaskMaster";
-    }
+    };
 
     constructor(props) {
         super(props);
@@ -28,7 +28,32 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
+    public componentDidMount() {
+        document.title = "Changement de mot de passe - TaskMaster";
+    }
+
+
+    /**
+     *
+     * @returns Le composant pour faire le changement de mot de passe
+     */
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}/>);
+        }
+        return (
+            <Container>
+                <Particles options={ParticlesOpts} init={this.#customInit}/>
+                <ComponentChangePassword/>
+            </Container>
+        );
+    }
+
+    readonly #customInit = async (engine: Engine) => {
+        await loadFull(engine);
+    };
+
+    private async onEvent(): Promise<void> {
         await this.verifyLogin();
     }
 
@@ -40,11 +65,10 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
+        // @ts-ignore
         const hasPerms = API.hasPermission(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
-            this.setState({
-                redirectTo: RoutesPath.INDEX
-            });
+            this.redirectTo(RoutesPath.INDEX);
         } else {
             isLoggedIn = true;
         }
@@ -53,18 +77,13 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
     }
 
     /**
-     *
-     * @returns Le composant pour faire le changement de mot de passe
+     * Redirect to a path
+     * @param path
+     * @private
      */
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}/>);
-        } else {
-            return (
-                <Container>
-                    <ComponentChangePassword/>
-                </Container>
-            );
-        }
+    private redirectTo(path: string): void {
+        this.setState({
+            redirectTo: path
+        });
     }
 }

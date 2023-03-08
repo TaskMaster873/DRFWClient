@@ -104,5 +104,20 @@ const jobTitles: JobTitle[] = [jobTitle, jobTitle2];
 const skills: Skill[] = [skill, skill2];
 const employeeNb: number[] = [1, 2];
 
-export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2,
-    employeesWithIds, department, department2, departments, departments2, roles, jobTitles, skills, employeeNb};
+export {
+    employee, 
+    employee2, 
+    employeeWithId, 
+    employeeWithId2, 
+    employees, 
+    employees2,
+    employeesWithIds, 
+    department, 
+    department2, 
+    departments, 
+    departments2, 
+    roles, 
+    jobTitles, 
+    skills, 
+    employeeNb
+};

@@ -21,7 +21,7 @@ export class FirstResetPassword extends React.Component<FirstResetPasswordProps,
     public render(): JSX.Element {
         return (
             <Container>
-                <ComponentChangePassword onChangePasswordCallback={this.#onChangePasswordCallback} />
+                <ComponentChangePassword onChangePasswordCallback={this.#onChangePasswordCallback}/>
             </Container>
         );
     }

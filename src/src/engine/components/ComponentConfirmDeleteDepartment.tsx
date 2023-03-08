@@ -43,5 +43,5 @@ export class ComponentConfirmDeleteDepartment extends React.Component<DeleteDepa
             this.props.onDeleteDepartment(this.props.department);
         }
         this.props.closePrompt();
-    }
+    };
 }

@@ -18,7 +18,7 @@ beforeEach(async () => {
     user = userEvent.setup();
     //Mock navigate
     jest.spyOn(router, 'useNavigate').mockImplementation(() => navigate)
-    
+
     render(<MemoryRouter><ComponentResetPassword actionCode="" email={testConstants.validEmail}/></MemoryRouter>);
 });
 

@@ -267,7 +267,6 @@ describe("Regex Validation AddEmployee Tests", () => {
         expect(form.dataset.error).toBe(FormErrorType.INVALID_FORM);
     });
 });
-//Will work later, after Context is made and mocked
 
 test("Valid employee infos should submit form", async () => {
     const {

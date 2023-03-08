@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import {render} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import { NavigationBar } from "../src/engine/components/NavigationBar";
+import {NavigationBar} from "../src/engine/components/NavigationBar";
 
 jest.mock("../src/engine/api/APIManager");
 const {API} = require("../src/engine/api/APIManager");

@@ -155,7 +155,6 @@ function checkFieldValues(ths, trs, tds, tdLinks, list) {
 }
 
 
-
 function getFields() {
     const table = document.querySelector("table");
     const ths = document.querySelectorAll("th");
