@@ -177,7 +177,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
                 }
                  
              }
-      
 
         this.datePicker?.update({events: events});
         this.calendar?.update({events: events});
