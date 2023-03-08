@@ -16,6 +16,7 @@ import {ComponentEditDepartment} from "./ComponentEditDepartment";
 import {BiEdit, BiTrash} from "react-icons/bi";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 import {ComponentConfirmDeleteDepartment} from "./ComponentConfirmDeleteDepartment";
+import { IconContext } from "react-icons/lib";
 
 /**
  * Component that display the list of departments
@@ -35,13 +36,14 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
                 <h3>Liste des départements</h3>
                 <Table responsive bordered hover className="text-center">
                     <thead>
-                    {this.renderTableHeads()}
+                        {this.renderTableHeads()}
                     </thead>
                     <tbody>
-                    {this.departmentList()}
+                        {this.departmentList()}
                     </tbody>
                 </Table>
                 {this.renderAddDepartmentComponent()}
+
                 <ComponentEditDepartment employees={this.props.employees} onEditDepartment={this.props.onEditDepartment}
                                          departmentToEdit={this.state.editedDepartment}
                                          cancelEdit={this.#changeEditPromptVisibility}/>
@@ -117,10 +119,18 @@ export class ComponentDepartmentList extends React.Component<DepartmentListProps
             return (
                 <td key={`action ${index}`}>
                     <a onClick={() => this.#changeEditPromptVisibility(department)} className="adminActions mx-1">
-                        <BiEdit/>
+                        <IconContext.Provider
+                            value={{ color: 'white' }}
+                        >
+                            <BiEdit/>
+                        </IconContext.Provider>
                     </a>
                     <a onClick={() => this.#changeDeletePromptVisibility(department)} className="adminActions mx-1">
-                        <BiTrash/>
+                        <IconContext.Provider
+                            value={{ color: 'white' }}
+                        >
+                            <BiTrash/>
+                        </IconContext.Provider>
                     </a>
                 </td>
             );
