@@ -171,6 +171,7 @@ code {
 th, tr, table {
     color: #eee!important;
     border-color: #eee;
+    background: #1d1920;
 }
 
 .dropdown-variants-primary {
