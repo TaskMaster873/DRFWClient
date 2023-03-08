@@ -116,9 +116,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                 </div>
             );
         }
-        /*<Container className="justify-content-end">
-            <button type="button" className="btn btn-primary" onClick={() => this.#hideModal(false)}>Transmettre</button>
-        </Container>*/
     }
 
     /**

@@ -258,3 +258,12 @@ h1 {
 .text-home-page-description {
     width: 40em;
 }
+
+.modal-header {
+    background-color: #1d1920;
+    color: #fff;
+}
+
+.modal-content form {
+    background: #353038;
+}
