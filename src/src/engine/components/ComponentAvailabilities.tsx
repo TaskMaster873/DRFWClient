@@ -15,6 +15,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     public props: ComponentAvailabilitiesProps;
     private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
     private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
+
     constructor(props) {
         super(props);
 
@@ -148,7 +149,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     };
 
     /**
-     * 
+     *
      * @param start date of the event
      * @param end date of the event
      * @returns A string containing the hours of the things

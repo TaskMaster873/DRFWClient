@@ -12,7 +12,7 @@ import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteSkill} from "./ComponentConfirmDeleteSkill";
 import {SkillActions} from "../types/Employee";
-import { IconContext } from "react-icons/lib";
+import {IconContext} from "react-icons/lib";
 
 interface EditSkillsState {
     skillToDelete?: Skill;
@@ -59,10 +59,10 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         return <div><ComponentConfirmDeleteSkill closePrompt={this.#onShowConfirmDeleteSkills}
                                                  skill={this.state.skillToDelete}
                                                  onDeleteSkill={this.props.onDeleteSkill}/>
-            <Modal variant='dark' show={this.props.showEdit} onHide={this.hideModal}>
+            <Modal variant="dark" show={this.props.showEdit} onHide={this.hideModal}>
                 <Modal.Header>
                     <Modal.Title>Édition de compétence</Modal.Title>
-                    <CloseButton variant="white" onClick={() => this.hideModal()} />
+                    <CloseButton variant="white" onClick={() => this.hideModal()}/>
                 </Modal.Header>
                 <Modal.Body>
                     <Form
@@ -114,7 +114,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                             </Form.Group>
                             <Form.Group as={Col} md="2">
                                 <Button type="submit">
-                                    <IconContext.Provider value={{ color: 'white' }}>
+                                    <IconContext.Provider value={{color: "white"}}>
                                         <BiPlus className="adminActions mb-1"/>
                                     </IconContext.Provider>
                                 </Button>
@@ -152,17 +152,17 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         if (this.state.editedSkill == skill) {
             return <div>
                 <button className="transparentButton me-2" type="submit">
-                    <IconContext.Provider value={{ color: 'white' }}>
+                    <IconContext.Provider value={{color: "white"}}>
                         <BiCheck className="adminActions"/>
                     </IconContext.Provider>
                 </button>
-                <IconContext.Provider value={{ color: 'white' }}>
+                <IconContext.Provider value={{color: "white"}}>
                     <CgUnavailable onClick={() => this.editSkill()} className="adminActions ms-1"/>
                 </IconContext.Provider>
             </div>;
         } else {
             return <div>
-                <IconContext.Provider value={{ color: 'white' }}>
+                <IconContext.Provider value={{color: "white"}}>
                     <BiPencil onClick={() => this.editSkill(skill)} className="adminActions me-2"/>
                     <BiTrash onClick={() => this.showDeletePrompt(skill)} className="adminActions ms-2"/>
                 </IconContext.Provider>

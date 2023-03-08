@@ -6,8 +6,9 @@ import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {act} from "react-dom/test-utils";
-jest.mock("tsparticles");
 import {ComponentLogin} from "../src/engine/components/ComponentLogin";
+
+jest.mock("tsparticles");
 
 let user;
 const onLoginRequest = jest.fn();

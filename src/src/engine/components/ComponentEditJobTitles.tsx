@@ -12,7 +12,7 @@ import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
 import {JobTitleActions} from "../types/Employee";
-import { IconContext } from "react-icons/lib";
+import {IconContext} from "react-icons/lib";
 
 interface EditJobTitlesState {
     jobTitleToDelete?: JobTitle;
@@ -62,7 +62,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
                 <Modal.Header>
                     <Modal.Title>Édition de corps d'emploi</Modal.Title>
-                    <CloseButton variant="white" onClick={() => this.hideModal()} />
+                    <CloseButton variant="white" onClick={() => this.hideModal()}/>
                 </Modal.Header>
                 <Modal.Body>
                     <Form
@@ -114,7 +114,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                             </Form.Group>
                             <Form.Group as={Col} md="2">
                                 <Button type="submit">
-                                    <IconContext.Provider value={{ color: 'white' }}>
+                                    <IconContext.Provider value={{color: "white"}}>
                                         <BiPlus className="adminActions mb-1"/>
                                     </IconContext.Provider>
                                 </Button>
@@ -152,17 +152,17 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         if (this.state.editedJobTitle == title) {
             return <div>
                 <button className="transparentButton me-2" type="submit">
-                    <IconContext.Provider value={{ color: 'white' }}>
+                    <IconContext.Provider value={{color: "white"}}>
                         <BiCheck className="adminActions"/>
                     </IconContext.Provider>
                 </button>
-                <IconContext.Provider value={{ color: 'white' }}>
+                <IconContext.Provider value={{color: "white"}}>
                     <CgUnavailable onClick={() => this.editJobTitle} className="adminActions ms-1"/>
                 </IconContext.Provider>
             </div>;
         } else {
             return <div>
-                <IconContext.Provider value={{ color: 'white' }}>
+                <IconContext.Provider value={{color: "white"}}>
                     <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
                     <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
                 </IconContext.Provider>
@@ -175,7 +175,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * @param title The JobTitle to edit
      * @private
      */
-    private editJobTitle (title?: JobTitle): void {
+    private editJobTitle(title?: JobTitle): void {
         this.setState({editedJobTitle: title});
     }
 

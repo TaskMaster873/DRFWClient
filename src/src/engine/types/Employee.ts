@@ -1,5 +1,4 @@
 import {Department} from "./Department";
-import {Params} from "react-router-dom";
 import {Skill} from "./Skill";
 import {JobTitle} from "./JobTitle";
 
@@ -80,7 +79,6 @@ export const employeeAdminTableHeads: string[] =
 
 export const employeeTableHeads: string[] =
     ["#", "Prénom", "Nom", "Adresse courriel", "Téléphone", "Département", "Actif", "Poste(s)", "Compétences"];
-
 
 
 export interface SkillActions {

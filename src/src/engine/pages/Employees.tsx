@@ -49,10 +49,6 @@ class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent(): Promise<void> {
-        await this.verifyLogin();
-    }
-
     public async componentDidMount(): Promise<void> {
         document.title = "Employés " + this.props.params.id + " - TaskMaster";
 
@@ -62,23 +58,6 @@ class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
             await this.fetchData();
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
-        }
-    }
-
-    /**
-     * Get the employees from the database and set the state of the component.
-     * Display a notification to the user if the operation was successful or not.
-     * @returns {Promise<void>}
-     */
-    private async fetchData(): Promise<void> {
-        const fetchedData: Employee[] | string = await API.getEmployees(this.props.params.id);
-        if (typeof fetchedData === "string") {
-            NotificationManager.error(errors.GET_EMPLOYEES, fetchedData);
-            this.setState({
-                employees: []
-            });
-        } else {
-            this.setState({employees: fetchedData as Employee[]});
         }
     }
 
@@ -98,6 +77,27 @@ class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
                 />
             </Container>
         );
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
+    }
+
+    /**
+     * Get the employees from the database and set the state of the component.
+     * Display a notification to the user if the operation was successful or not.
+     * @returns {Promise<void>}
+     */
+    private async fetchData(): Promise<void> {
+        const fetchedData: Employee[] | string = await API.getEmployees(this.props.params.id);
+        if (typeof fetchedData === "string") {
+            NotificationManager.error(errors.GET_EMPLOYEES, fetchedData);
+            this.setState({
+                employees: []
+            });
+        } else {
+            this.setState({employees: fetchedData as Employee[]});
+        }
     }
 
     /**

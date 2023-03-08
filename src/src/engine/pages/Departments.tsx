@@ -47,6 +47,26 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     }
 
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (
+                <Navigate to={this.state.redirectTo}></Navigate>
+            );
+        }
+        return (
+            <Container data-bs-theme={"dark"}>
+                <ComponentDepartmentList
+                    employees={this.state.employees}
+                    employeeNb={this.state.employeeNb}
+                    departments={this.state.departments}
+                    onAddDepartment={this.addDepartment}
+                    onEditDepartment={this.editDepartment}
+                    onDeleteDepartment={this.deleteDepartment}
+                />
+            </Container>
+        );
+    }
+
     private async onEvent(): Promise<void> {
         await this.verifyLogin();
     }
@@ -132,6 +152,8 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     };
 
+    //#endregion
+
     private deleteDepartment = async (department: Department): Promise<void> => {
         let error = await API.deleteDepartment(department);
         if (!error && department.id) {
@@ -143,25 +165,4 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
     };
-    //#endregion
-
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (
-                <Navigate to={this.state.redirectTo}></Navigate>
-            );
-        }
-        return (
-            <Container data-bs-theme={"dark"}>
-                <ComponentDepartmentList
-                    employees={this.state.employees}
-                    employeeNb={this.state.employeeNb}
-                    departments={this.state.departments}
-                    onAddDepartment={this.addDepartment}
-                    onEditDepartment={this.editDepartment}
-                    onDeleteDepartment={this.deleteDepartment}
-                />
-            </Container>
-        );
-    }
 }

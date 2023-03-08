@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
 import {ComponentAddEmployee} from "../src/engine/components/ComponentAddEmployee";
 import {API} from "../src/engine/api/APIManager";
+
 let user;
 API.hasLowerPermission = jest.fn(() => true);
 const onAddEmployee = jest.fn();
@@ -18,9 +19,10 @@ beforeEach(async () => {
     user = userEvent.setup();
     render(<MemoryRouter>
         <ComponentAddEmployee departments={departments2} roles={roles}
-            jobTitles={jobTitles} skills={skills} onAddEmployee={onAddEmployee} onAddJobTitle={jest.fn()}
-            onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
-            onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}/>
+                              jobTitles={jobTitles} skills={skills} onAddEmployee={onAddEmployee}
+                              onAddJobTitle={jest.fn()}
+                              onAddSkill={jest.fn()} onEditJobTitle={jest.fn()} onEditSkill={jest.fn()}
+                              onDeleteJobTitle={jest.fn()} onDeleteSkill={jest.fn()}/>
     </MemoryRouter>);
 });
 

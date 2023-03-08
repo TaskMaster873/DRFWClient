@@ -8,9 +8,9 @@ import Particles from "react-particles";
 import {API} from "../api/APIManager";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
-import { NotificationManager } from "../api/NotificationManager";
-import { errors } from "../messages/FormMessages";
-import { Roles } from "../types/Roles";
+import {NotificationManager} from "../api/NotificationManager";
+import {errors} from "../messages/FormMessages";
+import {Roles} from "../types/Roles";
 
 interface ChangePasswordState {
     redirectTo: string | null;
@@ -24,6 +24,11 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         redirectTo: null
     };
 
+    constructor(props: unknown) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
 
     public async componentDidMount() {
         document.title = "Changement de mot de passe - TaskMaster";
@@ -33,12 +38,6 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         if (!isLoggedIn) {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
-    }
-
-    constructor(props: unknown) {
-        super(props);
-
-        API.subscribeToEvent(this.onEvent.bind(this));
     }
 
     /**
@@ -81,7 +80,7 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         // @ts-ignore
         const hasPerms = API.hasPermission(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.redirectTo(RoutesPath.ON_LOGIN_SUCCESS_ROUTE);
         } else {
             isLoggedIn = true;
         }
