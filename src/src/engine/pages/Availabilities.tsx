@@ -81,13 +81,13 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
 
     public render(): JSX.Element {
         if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}/>);
+            return (<Navigate to={this.state.redirectTo} />);
         } else {
             return (
                 <div>
                     <button type="button"
-                            className="btn btn-primary submit-abilities-button"
-                            onClick={() => this.#hideModal(false)}>Transmettre
+                        className="btn btn-primary submit-abilities-button"
+                        onClick={() => this.#hideModal(false)}>Transmettre
                     </button>
 
                     <ComponentAvailabilities
@@ -97,7 +97,7 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
                         startDate={new DayPilot.Date(this.state.currentWeekStart)}
                         selectionDay={new DayPilot.Date(this.state.selectedDate)}
                         employeeAvailabilities={this.state.timesUnavailable}
-                        ref={this.componentAvailabilitiesRef}/>
+                        ref={this.componentAvailabilitiesRef} />
                     <ComponentAvailabilitiesPopup
                         hideModal={this.#hideModal}
                         isShown={this.state.popupInactive}
@@ -304,9 +304,19 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
         return {
             start: this.toUTC(startTime),
             end: this.toUTC(endTime),
-            text: "Unavailable" + (startTime.getDate().toString().slice(11,16)) + " à " + (endTime.getDate().toString().slice(11,16)),
-            id: "unavailable",
+            text: this.transformToDayPilotText(this.toUTC(startTime), this.toUTC(endTime)),
+            id: "",
         };
+    }
+
+    /**
+     * 
+     * @param start date of the event
+     * @param end date of the event
+     * @returns A string containing the hours of the things
+     */
+    private transformToDayPilotText(start: DayPilot.Date, end: DayPilot.Date): string {
+        return start.toString().slice(11, 16) + " à " + end.toString().slice(11, 16);
     }
 
     /**

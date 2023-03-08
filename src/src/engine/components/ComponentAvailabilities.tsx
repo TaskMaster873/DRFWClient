@@ -136,7 +136,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         const eventToAdd: DayPilot.EventData = {
             start: args.start,
             end: args.end,
-            id: args.start.toString() + args.end.toString(),
+            id: "",
             text: this.transformToDayPilotText(args.start, args.end),
         };
 
@@ -154,58 +154,28 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
      * @returns A string containing the hours of the things
      */
     private transformToDayPilotText(start: DayPilot.Date, end: DayPilot.Date): string {
-        return start.toString().slice(11,16) + " à " + end.toString().slice(11,16);
+        return start.toString().slice(11, 16) + " à " + end.toString().slice(11, 16);
     }
 
-    readonly #onEventResized= (args: DayPilot.CalendarEventResizedArgs): void => {
-        let events = this.calendar?.events?.list;
-        if (!events) {
-            events = [];
-        }
+    /**
+     * Updates the event with its new time
+     * @param args the event data
+     */
+    readonly #onEventResized = (args: DayPilot.CalendarEventResizedArgs): void => {
+        args.e.text(this.transformToDayPilotText(args.newStart, args.newEnd));
+        this.datePicker?.update();
+        this.calendar?.update();
+    };
 
-        const eventToAdd: DayPilot.EventData = {
-            start: args.newStart,
-            end: args.newEnd,
-            id: args.newStart.toString() + args.newEnd.toString(),
-            text: this.transformToDayPilotText(args.newStart, args.newEnd),
-        };
-
-            for (let index = 0; index < events.length; index++) {
-                if(events[index].id == args.e.id()) {
-                    events[index] = eventToAdd;
-                } 
-             }
-
-        this.datePicker?.update({events: events});
-        this.calendar?.update({events: events});
-        this.calendar?.clearSelection();
-    }
-
-    readonly #onEventMoved= (args: DayPilot.CalendarEventMovedArgs): void => {
-        let events = this.calendar?.events?.list;
-        if (!events) {
-            events = [];
-        }
-        
-
-        const eventToAdd: DayPilot.EventData = {
-            start: args.newStart,
-            end: args.newEnd,
-            id: args.newStart.toString() + args.newEnd.toString(),
-            text: this.transformToDayPilotText(args.newStart, args.newEnd),
-        };
-
-            for (let index = 0; index < events.length; index++) {
-                if(events[index].id == args.e.id()) {
-                    events[index] = eventToAdd;
-                } 
-             }
-
-        this.datePicker?.update({events: events});
-        this.calendar?.update({events: events});
-        this.calendar?.clearSelection();
-
-    }
+    /**
+     * Updates the event with its new time
+     * @param args the events data
+     */
+    readonly #onEventMoved = (args: DayPilot.CalendarEventMovedArgs): void => {
+        args.e.text(this.transformToDayPilotText(args.newStart, args.newEnd));
+        this.datePicker?.update();
+        this.calendar?.update();
+    };
 
     /**
      *
