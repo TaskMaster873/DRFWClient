@@ -28,7 +28,6 @@ export class ComponentHomePage extends React.PureComponent<unknown, unknown> {
         this.isMounted = false;
     }
 
-
     readonly #customInit = async (engine: Engine) => {
         await loadFull(engine);
     };
