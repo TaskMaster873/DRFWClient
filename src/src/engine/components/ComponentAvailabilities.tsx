@@ -15,7 +15,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
     public props: ComponentAvailabilitiesProps;
     private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
     private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
-
     constructor(props) {
         super(props);
 
@@ -163,7 +162,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         if (!events) {
             events = [];
         }
-        
 
         const eventToAdd: DayPilot.EventData = {
             start: args.newStart,
@@ -175,14 +173,12 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
             for (let index = 0; index < events.length; index++) {
                 if(events[index].id == args.e.id()) {
                     events[index] = eventToAdd;
-                }
-                 
+                } 
              }
 
         this.datePicker?.update({events: events});
         this.calendar?.update({events: events});
         this.calendar?.clearSelection();
-
     }
 
     readonly #onEventMoved= (args: DayPilot.CalendarEventMovedArgs): void => {
@@ -202,8 +198,7 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
             for (let index = 0; index < events.length; index++) {
                 if(events[index].id == args.e.id()) {
                     events[index] = eventToAdd;
-                }
-                 
+                } 
              }
 
         this.datePicker?.update({events: events});
@@ -211,7 +206,6 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.calendar?.clearSelection();
 
     }
-
 
     /**
      *

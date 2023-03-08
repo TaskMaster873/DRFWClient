@@ -320,7 +320,6 @@ export class Availabilities extends React.Component<unknown, AvailabilitiesState
             end: this.toUTC(endTime),
             text: "Unavailable" + (startTime.getDate().toString().slice(11,16)) + " à " + (endTime.getDate().toString().slice(11,16)),
             id: "unavailable",
-            
         };
     }
 
