@@ -5,7 +5,6 @@ import {errors} from "../messages/FormMessages";
 import {Employee} from "../types/Employee";
 import {unavailabilitiesTableHeads, ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
-import {BiTrash} from "react-icons/bi";
 import {IconContext} from "react-icons/lib";
 
 type Props = {
