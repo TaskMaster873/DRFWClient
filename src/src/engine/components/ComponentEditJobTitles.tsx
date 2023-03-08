@@ -124,7 +124,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * The function that hides the modal when the exit button is clicked
      */
     readonly hideModal = (): void => {
-        this.#editJobTitle();
+        this.editJobTitle();
         this.props.cancelEdit();
     };
 
@@ -148,10 +148,10 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                 <button className="transparentButton me-2" type="submit">
                     <BiCheck className="adminActions"/>
                 </button>
-                <CgUnavailable onClick={() => this.#editJobTitle()} className="adminActions ms-1"/></div>
+                <CgUnavailable onClick={() => this.editJobTitle()} className="adminActions ms-1"/></div>
         } else {
             return <div>
-                <BiPencil onClick={() => this.#editJobTitle(title)} className="adminActions me-2"/>
+                <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
                 <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
             </div>;
         }
@@ -162,9 +162,9 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * @param title The JobTitle to edit
      * @private
      */
-    readonly #editJobTitle = (title?: JobTitle): void => {
+    private editJobTitle (title?: JobTitle): void {
         this.setState({editedJobTitle: title});
-    };
+    }
 
     /**
      * Shows the deletion confirmation modal
@@ -192,7 +192,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             if (formDataObj.id) {
                 await this.props.onEditJobTitle(formDataObj);
             }
-            this.#editJobTitle();
+            this.editJobTitle();
         }
     };
 
