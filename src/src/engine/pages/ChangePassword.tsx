@@ -5,6 +5,8 @@ import {API} from "../api/APIManager";
 import {Roles} from "../types/Roles";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
+import {NotificationManager} from "../api/NotificationManager";
+import {errors} from "../messages/FormMessages";
 
 export interface ChangePasswordState {
     redirectTo: string | null;
@@ -18,8 +20,14 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         redirectTo: null
     }
 
-    public componentDidMount() {
+    public async componentDidMount(): Promise<void> {
         document.title = "Changement de mot de passe - TaskMaster";
+
+        let isLoggedIn: boolean = await this.verifyLogin();
+
+        if (!isLoggedIn) {
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
+        }
     }
 
     constructor(props) {

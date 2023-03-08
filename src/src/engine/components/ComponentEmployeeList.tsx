@@ -123,20 +123,14 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         } else if (list.length !== 0) {
             return list.map((employee, index) => (
                 <tr key={"secondCol" + index}>
-                    <td key={"id" + index}>{index + 1}</td>
-                    <td key={"firstName" + index}>
-                        {employee.firstName}
-                    </td>
-
-                    <td key={"name " + index}>{employee.lastName}</td>
-                    <td key={"email " + index}>{employee.email}</td>
-                    <td key={"phoneNumber " + index}>
-                        {employee.phoneNumber}
-                    </td>
-
-                    <td key={"departmentId " + index}>{employee.department}</td>
-                    <td key={"actif " + index}>{employee.isActive ? "Oui" : "Non"}</td>
-                    <td key={"jobTitles " + index}>
+                    <td key={`id ${index}`}>{index + 1}</td>
+                    <td key={`firstName ${index}`}>{employee.firstName}</td>
+                    <td key={`name ${index}`}>{employee.lastName}</td>
+                    <td key={`email ${index}`}><a href={`mailto:${employee.email}`}>{employee.email}</a></td>
+                    <td key={`phoneNumber ${index}`}>{employee.phoneNumber}</td>
+                    <td key={`departmentId ${index}`}>{employee.department}</td>
+                    <td key={`actif ${index}`}>{employee.isActive ? `Oui` : `Non`}</td>
+                    <td key={`jobTitles ${index}`}>
                         <ListGroup variant="flush">
                             {employee.jobTitles.map((title: string) => (
                                 <ListGroup.Item key={title}>{title}</ListGroup.Item>
@@ -144,7 +138,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                         </ListGroup>
                     </td>
 
-                    <td key={"skills " + index}>
+                    <td key={`skills ${index}`}>
                         <ListGroup variant="flush">
                             {employee.skills.map((skill: string) => (
                                 <ListGroup.Item key={skill}>{skill}</ListGroup.Item>

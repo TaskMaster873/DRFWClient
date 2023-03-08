@@ -15,6 +15,7 @@ export function EmployeeWrapper(): JSX.Element {
         <EmployeesInternal  {...{params: parameters}}/>
     );
 }
+
 interface EmployeeState {
     employees: Employee[] | null;
     redirectTo: string | null;
@@ -48,21 +49,32 @@ class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    private async onEvent() : Promise<void> {
+    private async onEvent(): Promise<void> {
         await this.verifyLogin();
     }
 
-    public async componentDidMount() {
+    public async componentDidMount(): Promise<void> {
         document.title = "Employés " + this.props.params.id + " - TaskMaster";
 
+        let isLoggedIn: boolean = await this.verifyLogin();
+
+        if (isLoggedIn) {
+            await this.fetchData();
+        } else {
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
+        }
+    }
+
+    private async fetchData(): Promise<void> {
         const fetchedData: Employee[] | string = await API.getEmployees(this.props.params.id);
         if (typeof fetchedData === "string") {
             NotificationManager.error(errors.GET_EMPLOYEES, fetchedData);
-
             this.setState({
                 employees: []
             });
-        } else this.setState({employees: fetchedData as Employee[]});
+        } else {
+            this.setState({employees: fetchedData as Employee[]});
+        }
     }
 
     public render(): JSX.Element {
@@ -149,7 +161,7 @@ class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
      * @private
      * @return {void}
      */
-    private refreshList(employee: Employee, employees: Employee[]) {
+    private refreshList(employee: Employee, employees: Employee[]): void {
         const employeeIndex = employees.findIndex(elem => elem.id == employee.id);
         if (employee && employeeIndex != -1) {
             employees[employeeIndex] = employee;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, {MouseEventHandler} from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -124,6 +124,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * The function that hides the modal when the exit button is clicked
      */
     readonly hideModal = (): void => {
+        this.#editJobTitle();
         this.props.cancelEdit();
     }
 
@@ -147,7 +148,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                 <button className="transparentButton me-2" type="submit">
                     <BiCheck className="adminActions"/>
                 </button>
-                <CgUnavailable onClick={() => this.#editJobTitle} className="adminActions ms-1"/></div>
+                <CgUnavailable onClick={() => this.#editJobTitle()} className="adminActions ms-1"/></div>
         } else {
             return <div>
                 <BiPencil onClick={() => this.#editJobTitle(title)} className="adminActions me-2"/>
@@ -163,6 +164,9 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      */
     readonly #editJobTitle = (title?: JobTitle): void => {
         this.setState({editedJobTitle: title});
+        if(!title) {
+            
+        }
     }
 
     /**
