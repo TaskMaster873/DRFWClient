@@ -6,6 +6,7 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
+jest.mock("tsparticles");
 import {ComponentResetPassword} from '../src/engine/components/ComponentResetPassword';
 
 jest.mock("../src/engine/api/APIManager");

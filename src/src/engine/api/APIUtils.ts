@@ -17,32 +17,29 @@ export class InternalAPIUtils extends Logger {
      * @returns {string} The human-readable error message.
      */
     public getErrorMessageFromCode(error: Error | string): string {
-        let errorMessage: string;
+        let errorMessage: string = errors.DEFAULT;
         let message: string;
 
         if (typeof error === "string") {
             message = error;
         } else {
             message = error.message;
+            switch (message) {
+                case "Firebase: Error (auth/invalid-email).":
+                    errorMessage = errors.INVALID_LOGIN;
+                    break;
+                case "Firebase: Error (auth/user-not-found).":
+                    errorMessage = errors.INVALID_LOGIN;
+                    break;
+                case "Firebase: Error (auth/wrong-password).":
+                    errorMessage = errors.INVALID_LOGIN;
+                    break;
+                case "Firebase: Error (permission-denied).":
+                    errorMessage = errors.PERMISSION_DENIED;
+                    break;
+            }
         }
 
-        switch (message) {
-            case "auth/invalid-email":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "auth/user-not-found":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "auth/wrong-password":
-                errorMessage = errors.INVALID_LOGIN;
-                break;
-            case "permission-denied":
-                errorMessage = errors.PERMISSION_DENIED;
-                break;
-            default:
-                errorMessage = errors.DEFAULT;
-                break;
-        }
         this.error(
             `Erreur: ${errorMessage} Code: ${error} Message: ${message}`
         );
