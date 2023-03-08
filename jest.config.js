@@ -33,6 +33,7 @@ const config = {
     maxWorkers: '85%',
 
     setupFilesAfterEnv: ['<rootDir>/jest-setup.js'],
+    setupFiles: ['jest-canvas-mock'],
     testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     moduleNameMapper: {
         '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|svg|webp)$': '<rootDir>/src/__mocks__/fileMock.js',
