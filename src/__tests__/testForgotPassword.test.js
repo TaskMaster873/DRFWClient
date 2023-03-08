@@ -5,6 +5,7 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
+jest.mock("tsparticles");
 import {ForgotPassword} from "../src/engine/pages/ForgotPassword";
 import {API} from "../src/engine/api/APIManager";
 

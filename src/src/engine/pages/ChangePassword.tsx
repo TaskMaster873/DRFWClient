@@ -8,7 +8,9 @@ import Particles from "react-particles";
 import {API} from "../api/APIManager";
 import {RoutesPath} from "../RoutesPath";
 import {Navigate} from "react-router-dom";
-import {Roles} from "../types/Roles";
+import { NotificationManager } from "../api/NotificationManager";
+import { errors } from "../messages/FormMessages";
+import { Roles } from "../types/Roles";
 
 interface ChangePasswordState {
     redirectTo: string | null;
@@ -22,16 +24,22 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         redirectTo: null
     };
 
-    constructor(props) {
+
+    public async componentDidMount() {
+        document.title = "Changement de mot de passe - TaskMaster";
+
+        let isLoggedIn: boolean = await this.verifyLogin();
+
+        if (!isLoggedIn) {
+            NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
+        }
+    }
+
+    constructor(props: unknown) {
         super(props);
 
         API.subscribeToEvent(this.onEvent.bind(this));
     }
-
-    public componentDidMount() {
-        document.title = "Changement de mot de passe - TaskMaster";
-    }
-
 
     /**
      *
@@ -49,6 +57,11 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         );
     }
 
+    /**
+     * Initialization of particlesJS on the page
+     * @param engine
+     * @private
+     */
     readonly #customInit = async (engine: Engine) => {
         await loadFull(engine);
     };

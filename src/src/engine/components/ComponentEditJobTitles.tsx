@@ -130,6 +130,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * The function that hides the modal when the exit button is clicked
      */
     readonly hideModal = (): void => {
+        this.editJobTitle();
         this.props.cancelEdit();
     };
 
@@ -155,15 +156,14 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                         <BiCheck className="adminActions"/>
                     </IconContext.Provider>
                 </button>
-
                 <IconContext.Provider value={{ color: 'white' }}>
-                    <CgUnavailable onClick={() => this.#editJobTitle} className="adminActions ms-1"/>
+                    <CgUnavailable onClick={() => this.editJobTitle} className="adminActions ms-1"/>
                 </IconContext.Provider>
             </div>;
         } else {
             return <div>
                 <IconContext.Provider value={{ color: 'white' }}>
-                    <BiPencil onClick={() => this.#editJobTitle(title)} className="adminActions me-2"/>
+                    <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
                     <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
                 </IconContext.Provider>
             </div>;
@@ -175,9 +175,9 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * @param title The JobTitle to edit
      * @private
      */
-    readonly #editJobTitle = (title?: JobTitle): void => {
+    private editJobTitle (title?: JobTitle): void {
         this.setState({editedJobTitle: title});
-    };
+    }
 
     /**
      * Shows the deletion confirmation modal
@@ -205,7 +205,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             if (formDataObj.id) {
                 await this.props.onEditJobTitle(formDataObj);
             }
-            this.setState({editedJobTitle: undefined});
+            this.editJobTitle();
         }
     };
 
@@ -237,7 +237,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         const name = target.name;
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({

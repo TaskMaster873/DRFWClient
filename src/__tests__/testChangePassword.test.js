@@ -5,12 +5,13 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {ChangePassword} from "../src/engine/pages/ChangePassword.tsx";
-
+jest.mock("tsparticles");
+import {ComponentChangePassword} from "../src/engine/components/ComponentChangePassword";
 let user;
+
 beforeEach(async () => {
     user = userEvent.setup();
-    render(<MemoryRouter><ChangePassword/></MemoryRouter>);
+    render(<MemoryRouter><ComponentChangePassword/></MemoryRouter>);
 });
 
 test("should render form inputs", async () => {

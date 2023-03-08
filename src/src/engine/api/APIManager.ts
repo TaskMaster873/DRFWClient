@@ -222,7 +222,7 @@ class APIManager extends Logger {
             this.#auth,
             email,
             password
-        ).catch((error) => {
+        ).catch((error: Error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
