@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import {errors, FormErrorType} from "../messages/FormMessages";
-import {Modal} from "react-bootstrap";
+import {CloseButton, Modal} from "react-bootstrap";
 import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
 import {Skill} from "../types/Skill";
 import {CgUnavailable} from "react-icons/cg";
@@ -58,9 +58,10 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         return <div><ComponentConfirmDeleteSkill closePrompt={this.#onShowConfirmDeleteSkills}
                                                  skill={this.state.skillToDelete}
                                                  onDeleteSkill={this.props.onDeleteSkill}/>
-            <Modal show={this.props.showEdit} onHide={this.hideModal}>
-                <Modal.Header closeButton>
+            <Modal variant='dark' show={this.props.showEdit} onHide={this.hideModal}>
+                <Modal.Header>
                     <Modal.Title>Édition de compétence</Modal.Title>
+                    <CloseButton variant="white" onClick={() => this.hideModal()} />
                 </Modal.Header>
                 <Modal.Body>
                     <Form

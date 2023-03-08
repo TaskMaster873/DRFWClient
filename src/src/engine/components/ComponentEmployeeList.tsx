@@ -9,6 +9,7 @@ import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 import {FilterUtils} from "../utils/FilterUtils";
+import { IconContext } from "react-icons/lib";
 
 export interface EmployeeListProps {
     employees: Employee[] | null;
@@ -201,12 +202,14 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         if (employee.id && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
             let component: JSX.Element = <CgUnavailable/>;
             if (!employee.isActive) {
-                component = <CgCheckO/>;
+                component = <IconContext.Provider value={{ color: 'white' }}><CgCheckO/></IconContext.Provider>;
             }
             return (
                 <td key={`action ${index}`}>
                     <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
-                        <BiEdit/>
+                        <IconContext.Provider value={{ color: 'white' }}>
+                            <BiEdit/>
+                        </IconContext.Provider>
                     </LinkContainer>
                     <a className="adminActions ms-1 mx-1"
                        onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>

@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import {errors, FormErrorType} from "../messages/FormMessages";
-import {Modal} from "react-bootstrap";
+import {CloseButton, Modal} from "react-bootstrap";
 import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
 import {JobTitle} from "../types/JobTitle";
 import {CgUnavailable} from "react-icons/cg";
@@ -59,8 +59,9 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                                                     jobTitle={this.state.jobTitleToDelete}
                                                     onDeleteJobTitle={this.props.onDeleteJobTitle}/>
             <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
-                <Modal.Header closeButton>
+                <Modal.Header>
                     <Modal.Title>Édition de corps d'emploi</Modal.Title>
+                    <CloseButton variant="white" onClick={() => this.hideModal()} />
                 </Modal.Header>
                 <Modal.Body>
                     <Form

@@ -35,7 +35,7 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         }
     }
 
-    constructor(props) {
+    constructor(props: unknown) {
         super(props);
 
         API.subscribeToEvent(this.onEvent.bind(this));

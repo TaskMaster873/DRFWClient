@@ -54,6 +54,26 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
     }
 
     /**
+     * Verify if the user is logged in
+     * @private
+     */
+    private async verifyLogin(): Promise<boolean> {
+        let isLoggedIn: boolean = false;
+        await API.awaitLogin;
+
+        let hasPerms = API.hasPermission(Roles.EMPLOYEE);
+        if (!API.isAuth() || !hasPerms) {
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
+        } else {
+            isLoggedIn = true;
+        }
+
+        return isLoggedIn;
+    }
+
+    /**
      * Get the employees, the departments and the number of employee in the department from the database and set the state of the component.
      * Display a notification to the user if the operation was successful or not.
      * @returns {Promise<void>}
@@ -151,25 +171,7 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         );
     }
 
-    /**
-     * Verify if the user is logged in
-     * @private
-     */
-    private async verifyLogin(): Promise<boolean> {
-        let isLoggedIn: boolean = false;
-        await API.awaitLogin;
-
-        let hasPerms = API.hasPermission(Roles.EMPLOYEE);
-        if (!API.isAuth() || !hasPerms) {
-            this.setState({
-                redirectTo: RoutesPath.INDEX
-            });
-        } else {
-            isLoggedIn = true;
-        }
-
-        return isLoggedIn;
-    }
+    
 
 
 }
