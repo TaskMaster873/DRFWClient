@@ -47,8 +47,6 @@ export class Departments extends React.Component<unknown, DepartmentsState> {
         }
     }
 
-    
-
     private async onEvent(): Promise<void> {
         await this.verifyLogin();
     }

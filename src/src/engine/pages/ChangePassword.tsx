@@ -57,6 +57,11 @@ export class ChangePassword extends React.Component<unknown, ChangePasswordState
         );
     }
 
+    /**
+     * Initialization of particlesJS on the page
+     * @param engine
+     * @private
+     */
     readonly #customInit = async (engine: Engine) => {
         await loadFull(engine);
     };

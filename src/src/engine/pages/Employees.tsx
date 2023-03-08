@@ -65,6 +65,11 @@ class EmployeesInternal extends React.Component<EmployeesProps, EmployeeState> {
         }
     }
 
+    /**
+     * Get the employees from the database and set the state of the component.
+     * Display a notification to the user if the operation was successful or not.
+     * @returns {Promise<void>}
+     */
     private async fetchData(): Promise<void> {
         const fetchedData: Employee[] | string = await API.getEmployees(this.props.params.id);
         if (typeof fetchedData === "string") {
