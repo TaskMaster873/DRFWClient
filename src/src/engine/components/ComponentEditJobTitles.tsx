@@ -1,4 +1,4 @@
-import React, {MouseEventHandler} from "react";
+import React from "react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
@@ -164,9 +164,6 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      */
     readonly #editJobTitle = (title?: JobTitle): void => {
         this.setState({editedJobTitle: title});
-        if(!title) {
-            
-        }
     }
 
     /**
@@ -195,7 +192,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             if (formDataObj.id) {
                 await this.props.onEditJobTitle(formDataObj);
             }
-            this.setState({editedJobTitle: undefined});
+            this.#editJobTitle();
         }
     }
 
@@ -227,7 +224,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         const name = target.name;
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({
