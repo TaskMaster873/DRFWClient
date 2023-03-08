@@ -7,7 +7,7 @@ export class RouteNotFound extends React.Component<unknown, unknown> {
         super(props);
     }
 
-    public render() : JSX.Element {
+    public render(): JSX.Element {
         return (
             <div className="d-flex flex-column justify-content-center align-items-center vh-90">
                 <div className="text-center">

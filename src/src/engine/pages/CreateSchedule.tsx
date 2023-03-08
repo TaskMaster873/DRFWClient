@@ -6,7 +6,7 @@ import {EventForCalendar, EventForShiftCreation, EventForShiftEdit, Shift} from 
 import {DayPilot} from "@daypilot/daypilot-lite-react";
 import {Department} from "../types/Department";
 import {SelectDepartment} from "../components/SelectDepartment";
-import {Container} from "react-bootstrap";
+import {Col, Container, Row} from "react-bootstrap";
 import {Employee} from "../types/Employee";
 import {errors} from "../messages/FormMessages";
 import {NotificationManager} from "../api/NotificationManager";
@@ -15,6 +15,7 @@ import {Navigate} from "react-router-dom";
 import {Roles} from "../types/Roles";
 import {DateManager} from "../utils/DateManager";
 import {SelectDate} from "../components/SelectDate";
+import {ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 
 enum FetchState {
     WAITING = 0,
@@ -22,26 +23,34 @@ enum FetchState {
     OK = 2,
 }
 
-interface State {
+interface CreateScheduleState {
     currentDepartment: Department;
     currentDay: DayPilot.Date;
     departments: Department[];
     employees: Employee[];
+    unavailabilities: ViewableAvailabilities[];
     shifts: Shift[];
     fetchState: FetchState;
     redirectTo: string | null;
 }
 
-export class CreateSchedule extends React.Component<unknown, State> {
-    public state: State = {
+export class CreateSchedule extends React.Component<unknown, CreateScheduleState> {
+    public state: CreateScheduleState = {
         currentDepartment: {name: "", director: ""},
         currentDay: DayPilot.Date.today(),
         departments: [],
         employees: [],
+        unavailabilities: [],
         shifts: [],
         fetchState: FetchState.WAITING,
         redirectTo: null
     };
+
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
 
     /**
      * Called when the page is loaded
@@ -61,7 +70,7 @@ export class CreateSchedule extends React.Component<unknown, State> {
             if (this.manageError(fetchedDepartments, errors.GET_DEPARTMENTS)) {
                 fetchedDepartments = fetchedDepartments as Department[];
                 //If current user is a manager, limit access to other departments
-                if (!this.verifyPermissions(Roles.ADMIN)) {
+                if (!API.hasPermission(Roles.ADMIN)) {
                     fetchedDepartments = fetchedDepartments.filter(d =>
                         d.name === API.getCurrentEmployeeInfos()?.department
                     );
@@ -73,13 +82,86 @@ export class CreateSchedule extends React.Component<unknown, State> {
         }
     }
 
-    /**
-     * Verify if the user has the permission to access this page
-     * @param role
-     * @private
-     */
-    private verifyPermissions(role: Roles): boolean {
-        return API.hasPermission(role);
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}/>);
+        }
+        switch (this.state.fetchState) {
+            case FetchState.WAITING:
+                return <ComponentLoading/>;
+            case FetchState.OK:
+                if (this.state.departments.length > 1) {
+                    return (
+                        <Container fluid={true}>
+                            <Row className={"mx-auto"}>
+                                <Col>
+                                    <SelectDepartment
+                                        departments={this.state.departments}
+                                        changeDepartment={this.#changeDepartment}
+                                    />
+                                </Col>
+                                <Col>
+                                    <SelectDate
+                                        currentDay={this.state.currentDay}
+                                        changeDay={this.#changeDay}
+                                    />
+                                </Col>
+                            </Row>
+
+                            <Row className={"mt-3"}>
+                                <ComponentScheduleCreate
+                                    currentDay={this.state.currentDay}
+                                    events={this.getEventsForCalendarFromShifts(this.state.shifts)}
+                                    employees={this.state.employees}
+                                    unavailabilities={this.state.unavailabilities}
+                                    addShift={this.#addShift}
+                                    editShift={this.#editShift}
+                                    deleteShift={this.#deleteShift}
+                                />
+                            </Row>
+                        </Container>
+                    );
+                } else {
+                    return (
+                        <Container fluid={true}>
+                            <Row className={"mx-auto"}>
+                                <Col>
+                                    <SelectDate
+                                        currentDay={this.state.currentDay}
+                                        changeDay={this.#changeDay}
+                                    />
+                                </Col>
+                            </Row>
+
+                            <Row className={"mt-3"}>
+                                <ComponentScheduleCreate
+                                    currentDay={this.state.currentDay}
+                                    events={this.getEventsForCalendarFromShifts(this.state.shifts)}
+                                    employees={this.state.employees}
+                                    unavailabilities={this.state.unavailabilities}
+                                    addShift={this.#addShift}
+                                    editShift={this.#editShift}
+                                    deleteShift={this.#deleteShift}
+                                />
+                            </Row>
+                        </Container>
+                    );
+                }
+            default:
+                return <ComponentScheduleCreate
+                    currentDay={this.state.currentDay}
+                    events={[]}
+                    employees={[]}
+                    unavailabilities={[]}
+                    addShift={this.#addShift}
+                    editShift={this.#editShift}
+                    deleteShift={this.#deleteShift}
+                />;
+        }
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**
@@ -90,9 +172,11 @@ export class CreateSchedule extends React.Component<unknown, State> {
         let isLoggedIn: boolean = false;
         await API.awaitLogin;
 
-        const hasPerms = this.verifyPermissions(Roles.MANAGER);
+        const hasPerms = API.hasPermission(Roles.MANAGER);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             isLoggedIn = true;
         }
@@ -101,26 +185,23 @@ export class CreateSchedule extends React.Component<unknown, State> {
     }
 
     /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
-    }
-
-    /**
      * Change employees, shifts to a new current department and refresh state down the function chain (Start of function chain)
-     * @param currentDepartment 
-     * @param departments 
+     * @param currentDepartment current department to view
+     * @param departments OPTIONAL. all departments available
      */
     readonly #changeDepartment = async (currentDepartment: Department, departments?: Department[]): Promise<void> => {
-        //Get all employees of this department
         const fetchedEmployees = await API.getEmployees(currentDepartment.name);
-        if (this.manageError(fetchedEmployees, errors.CREATE_SHIFT)) {
-            await this.getShifts(this.state.currentDay, currentDepartment, departments, fetchedEmployees as Employee[]);
+        const fetchedUnavailabilities = await API.getUnavailabilitiesForDepartment(currentDepartment.name, true);
+        if (this.manageError(fetchedEmployees, errors.GET_EMPLOYEES)) {
+            if (this.manageError(fetchedUnavailabilities, errors.GET_AVAILABILITIES)) {
+                await this.getShifts(
+                    this.state.currentDay,
+                    currentDepartment,
+                    departments,
+                    fetchedEmployees as Employee[],
+                    fetchedUnavailabilities as ViewableAvailabilities[]
+                );
+            }
         }
     };
 
@@ -130,30 +211,32 @@ export class CreateSchedule extends React.Component<unknown, State> {
      * @param currentDepartment OPTIONAL. The department to fetch the shifts from
      * @param departments OPTIONAL. The departments to set in state
      * @param employees OPTIONAL. The employees to set in state
+     * @param unavailabilities The unavailabilities that the user can see
      */
     private getShifts = async (
         currentDay?: DayPilot.Date,
         currentDepartment?: Department,
         departments?: Department[],
-        employees?: Employee[]
+        employees?: Employee[],
+        unavailabilities?: ViewableAvailabilities[]
     ): Promise<void> => {
         //Get all daily shifts of this department
         const fetchedShifts = await API.getDailyScheduleForDepartment(
             currentDay || this.state.currentDay,
             currentDepartment || this.state.currentDepartment
         );
-        if (this.manageError(fetchedShifts, errors.CREATE_SHIFT)) {
+        if (this.manageError(fetchedShifts, errors.GET_SHIFTS)) {
             this.setState({
                 currentDepartment: currentDepartment || this.state.currentDepartment,
                 currentDay: currentDay || this.state.currentDay,
                 departments: departments || this.state.departments,
                 employees: employees || this.state.employees,
+                unavailabilities: unavailabilities || this.state.unavailabilities,
                 shifts: fetchedShifts as Shift[],
                 fetchState: FetchState.OK,
             });
         }
     };
-
 
     /**
      * Adds a shift to the DB and refreshes the state (Halfway through the function chain)
@@ -253,65 +336,5 @@ export class CreateSchedule extends React.Component<unknown, State> {
             });
         }
         return events;
-    }
-
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo} />);
-        }
-
-        switch (this.state.fetchState) {
-            case FetchState.WAITING:
-                return <ComponentLoading />;
-            case FetchState.OK:
-                if (this.state.departments.length > 1) {
-                    return (
-                        <Container className="mb-4">
-                            <SelectDepartment
-                                departments={this.state.departments}
-                                changeDepartment={this.#changeDepartment}
-                            />
-                            <SelectDate
-                                currentDay={this.state.currentDay}
-                                changeDay={this.#changeDay}
-                            />
-                            <ComponentScheduleCreate
-                                currentDay={this.state.currentDay}
-                                events={this.getEventsForCalendarFromShifts(this.state.shifts)}
-                                employees={this.state.employees}
-                                addShift={this.#addShift}
-                                editShift={this.#editShift}
-                                deleteShift={this.#deleteShift}
-                            />
-                        </Container>
-                    );
-                } else {
-                    return (
-                        <Container className="mb-4">
-                            <ComponentScheduleCreate
-                                currentDay={this.state.currentDay}
-                                events={this.getEventsForCalendarFromShifts(this.state.shifts)}
-                                employees={this.state.employees}
-                                addShift={this.#addShift}
-                                editShift={this.#editShift}
-                                deleteShift={this.#deleteShift}
-                            />
-                            <SelectDate
-                                currentDay={this.state.currentDay}
-                                changeDay={this.#changeDay}
-                            />
-                        </Container>
-                    );
-                }
-            default:
-                return <ComponentScheduleCreate
-                    currentDay={this.state.currentDay}
-                    events={[]}
-                    employees={[]}
-                    addShift={this.#addShift}
-                    editShift={this.#editShift}
-                    deleteShift={this.#deleteShift}
-                />;
-        }
     }
 }

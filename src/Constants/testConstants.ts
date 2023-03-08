@@ -1,10 +1,12 @@
 import {Department} from "../src/engine/types/Department";
 import {Employee} from "../src/engine/types/Employee";
+import {JobTitle} from "../src/engine/types/JobTitle";
+import {Skill} from "../src/engine/types/Skill";
 
 export const testConstants = {
     validEmail: "maxime_labbe@outlook.com",
     validFirstName: "Alfred",
-    validName: "Montmagny",
+    validLastName: "Montmagny",
     validPhoneNumber: "418-666-6666",
     validPassword: "HWDIj23iew!",
     invalidEmail: "a@a",
@@ -30,8 +32,8 @@ const employee = new Employee({
     department: "Construction",
     jobTitles: ["Manager"],
     skills: ["Gestion de personnel"],
-    isActive: false,
-    hasChangedDefaultPassword: false,
+    isActive: true,
+    hasChangedDefaultPassword: true,
     role: 1,
 });
 
@@ -44,7 +46,7 @@ const employee2 = new Employee({
     department: "Informatique",
     jobTitles: [],
     skills: [],
-    isActive: false,
+    isActive: true,
     hasChangedDefaultPassword: false,
     role: 2,
 });
@@ -52,7 +54,7 @@ const employee2 = new Employee({
 const employeeWithId = new Employee({
     id: "1234",
     firstName: "David",
-    lastName: "Gol",
+    lastName: "Golan",
     email: "test@test.test",
     phoneNumber: "977-333-2954",
     department: "Marketing",
@@ -69,7 +71,7 @@ const employeeWithId2 = new Employee({
     lastName: "Trenta",
     email: "jtrenta@hotmail.com",
     phoneNumber: "976-433-1062",
-    department: "Marketing",
+    department: "Construction",
     jobTitles: ["Manager"],
     skills: ["Gestion de personnel"],
     isActive: false,
@@ -77,23 +79,32 @@ const employeeWithId2 = new Employee({
     role: 1,
 });
 
-const employees = [employee];
-const employees2 = [employee, employee2];
-const employeesWithIds = [employeeWithId];
+const employees: Employee[] = [employee];
+const employees2: Employee[] = [employee, employee2];
+const employeesWithIds: Employee[] = [employeeWithId];
 
-const department = new Department({
-    name: "Informatique", director: "Jasmin"
+const department: Department = new Department({
+    name: "Informatique", director: "George Belleau"
 });
 
-const department2 = new Department({
-    name: "Informatique", director: "Jasmin"
+const department2: Department = new Department({
+    name: "Construction", director: "Maxime Bédard"
 });
+
+const jobTitle = new JobTitle({id: "1", name: "Manager"});
+const jobTitle2 = new JobTitle({id: "2", name: "Conducteur"});
+const skill = new Skill({id: "1", name: "Conducteur de véhicule lourds"});
+const skill2 = new Skill({id: "2", name: "Gestion de personnel"});
 
 const departments: Department[] = [department];
 const departments2: Department[] = [department, department2];
 
+const roles: string[] = ["Invité", "Employé", "Gestionnaire", "Administrateur"];
+const jobTitles: JobTitle[] = [jobTitle, jobTitle2];
+const skills: Skill[] = [skill, skill2];
 const employeeNb: number[] = [1, 2];
 
-export {employee, employee2, employeeWithId, employeeWithId2, employees, employees2, employeesWithIds, department, department2, departments, departments2, employeeNb};
-
-
+export {
+    employee, employee2, employeeWithId, employeeWithId2, employees, employees2,
+    employeesWithIds, department, department2, departments, departments2, roles, jobTitles, skills, employeeNb
+};

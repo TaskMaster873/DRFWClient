@@ -111,7 +111,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
         if (errorType === FormErrorType.NO_ERROR) {
             await this.props.onAddDepartment({name: this.state.name, director: this.state.director});
         }
-    }
+    };
 
     /**
      * Function that is called when the form is changed. This update the state of the component.
@@ -132,7 +132,7 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
                 [name]: value,
             }
         });
-    }
+    };
 
     /**
      * Function that is called when the select is changed. This update the state of the component.
@@ -147,5 +147,5 @@ export class ComponentAddDepartment extends React.Component<AddDepartmentProps, 
                 [target.name]: target.value
             }
         });
-    }
+    };
 }

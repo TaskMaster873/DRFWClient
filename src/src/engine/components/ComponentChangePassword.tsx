@@ -2,7 +2,7 @@ import React from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {errors, FormErrorType, successes} from "../messages/FormMessages";
-import { API } from "../api/APIManager";
+import {API} from "../api/APIManager";
 
 import Logo from "../../deps/images/logo.png";
 import {RegexUtil} from "../utils/RegexValidator";
@@ -44,9 +44,9 @@ export class ComponentChangePassword extends React.Component<ChangePasswordProps
     }
 
     public render(): JSX.Element {
-        if(this.state.redirectTo) {
+        if (this.state.redirectTo) {
             return (
-                <Navigate to={this.state.redirectTo} />
+                <Navigate to={this.state.redirectTo}/>
             );
         } else {
             return (
@@ -54,7 +54,7 @@ export class ComponentChangePassword extends React.Component<ChangePasswordProps
                     <div className="me-4">
                         <img
                             className="mx-auto d-block mt-5"
-                            src={Logo as any}
+                            src={Logo}
                             alt="Logo TaskMaster"
                             width={50}
                             height={60}
@@ -127,19 +127,19 @@ export class ComponentChangePassword extends React.Component<ChangePasswordProps
             if (!error) {
                 NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.CHANGE_PASSWORD);
 
-                if(API.hasChangedDefaultPassword) {
+                if (API.hasChangedDefaultPassword) {
                     // Redirect to the home page
                     this.setState({
                         redirectTo: RoutesPath.INDEX
                     });
-                } else if(this.props.onChangePasswordCallback) {
+                } else if (this.props.onChangePasswordCallback) {
                     this.props.onChangePasswordCallback();
                 }
             } else {
                 NotificationManager.error(error, errors.ERROR_FORM);
             }
         }
-    }
+    };
 
     /**
      * This function is called when the user changes a field in the form.
@@ -155,8 +155,10 @@ export class ComponentChangePassword extends React.Component<ChangePasswordProps
             throw new Error("Name is undefined for element in form.");
         }
 
-        this.setState({...this.state, ...{
-            [name]: value,
-        }});
-    }
+        this.setState({
+            ...this.state, ...{
+                [name]: value,
+            }
+        });
+    };
 }

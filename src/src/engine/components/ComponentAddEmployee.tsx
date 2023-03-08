@@ -3,9 +3,9 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { errors, FormErrorType } from "../messages/FormMessages";
-import { Container } from "react-bootstrap";
-import {AddEmployeeProps, Employee, EmployeeCreateDTO} from "../types/Employee";
+import {errors, FormErrorType} from "../messages/FormMessages";
+import {Container} from "react-bootstrap";
+import {Employee, EmployeeCreateDTO, JobTitleActions, SkillActions} from "../types/Employee";
 import {RegexUtil} from "../utils/RegexValidator";
 import {API} from "../api/APIManager";
 import {ComponentEditSkills} from "./ComponentEditSkills";
@@ -14,6 +14,15 @@ import {Skill} from "../types/Skill";
 import FormUtils from "../utils/FormUtils";
 import {JobTitle} from "../types/JobTitle";
 import {IoSettingsSharp} from "react-icons/io5";
+import {Department} from "../types/Department";
+
+export interface AddEmployeeProps extends SkillActions, JobTitleActions {
+    departments: Department[];
+    roles: string[];
+    jobTitles: JobTitle[];
+    skills: Skill[];
+    onAddEmployee: (password: string, employee: EmployeeCreateDTO) => PromiseLike<void> | Promise<void> | void;
+}
 
 interface ComponentAddEmployeeState extends Employee {
     showEditJobTitles: boolean;
@@ -46,7 +55,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         showEditSkills: false,
         skills: [],
         validated: false,
-        isActive: false,
+        isActive: true,
         hasChangedDefaultPassword: false,
     };
 
@@ -58,7 +67,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         this.props = props;
     }
 
-    public componentDidUpdate(prevProps: AddEmployeeProps) : void {
+    public componentDidUpdate(prevProps: AddEmployeeProps): void {
         if (prevProps.departments !== this.props.departments && this.props.departments.length > 0) {
             this.setState({
                 department: this.props.departments[0].name
@@ -158,7 +167,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                     <Form.Group as={Col} md="4">
                         <Form.Label>Corps d'emploi</Form.Label>
                         <Button onClick={() => this.#onShowEditJobTitles()} className="float-end">
-                            <IoSettingsSharp className="mb-05" />
+                            <IoSettingsSharp className="mb-05"/>
                         </Button>
                         {this.props.jobTitles.map((title: JobTitle) => (<Form.Check
                             key={title.name}
@@ -168,14 +177,15 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             value={title.name}
                         />))}
                         <ComponentEditJobTitles cancelEdit={() => this.#onShowEditJobTitles(false)}
-                            showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
-                            onAddJobTitle={this.props.onAddJobTitle} onEditJobTitle={this.props.onEditJobTitle}
-                            onDeleteJobTitle={this.props.onDeleteJobTitle}></ComponentEditJobTitles>
+                                                showEdit={this.state.showEditJobTitles} jobTitles={this.props.jobTitles}
+                                                onAddJobTitle={this.props.onAddJobTitle}
+                                                onEditJobTitle={this.props.onEditJobTitle}
+                                                onDeleteJobTitle={this.props.onDeleteJobTitle}></ComponentEditJobTitles>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Compétences</Form.Label>
                         <Button onClick={() => this.#onShowEditSkills()} className="float-end">
-                            <IoSettingsSharp className="mb-05" />
+                            <IoSettingsSharp className="mb-05"/>
                         </Button>
                         {this.props.skills.map((skill: Skill) => (<Form.Check
                             key={skill.name}
@@ -185,16 +195,16 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
                             value={skill.name}
                         />))}
                         <ComponentEditSkills cancelEdit={() => this.#onShowEditSkills(false)}
-                            showEdit={this.state.showEditSkills} skills={this.props.skills}
-                            onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}
-                            onDeleteSkill={this.props.onDeleteSkill}></ComponentEditSkills>
+                                             showEdit={this.state.showEditSkills} skills={this.props.skills}
+                                             onAddSkill={this.props.onAddSkill} onEditSkill={this.props.onEditSkill}
+                                             onDeleteSkill={this.props.onDeleteSkill}></ComponentEditSkills>
                     </Form.Group>
                     <Form.Group as={Col} md="4">
                         <Form.Label>Rôle de l'employé</Form.Label>
                         <Form.Select required name="role" value={this.state.role} onChange={this.#handleSelect}>
                             {this.props.roles.map((role: string, index: number) => {
-                                if(API.hasLowerPermission(index)) {
-                                    return <option key={index} value={index}>{role}</option>
+                                if (API.hasLowerPermission(index)) {
+                                    return <option key={index} value={index}>{role}</option>;
                                 }
                             })}
                         </Form.Select>
@@ -219,13 +229,24 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         </Container>);
     }
 
+    /**
+     * Show a job title edit modal.
+     * @param value The value of the selected option.
+     * @private
+     * @returns {void}
+     */
     readonly #onShowEditJobTitles = (value: boolean = true): void => {
-        this.setState({showEditJobTitles: value})
-    }
+        this.setState({showEditJobTitles: value});
+    };
 
+    /**
+     * Triggered when a skill is selected.
+     * @param value
+     * @private
+     */
     readonly #onShowEditSkills = (value: boolean = true): void => {
-        this.setState({showEditSkills: value})
-    }
+        this.setState({showEditSkills: value});
+    };
 
     /**
      * TODO
@@ -243,7 +264,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         let errorType = FormUtils.validateForm(event);
         this.setState({
             validated: true,
-            error: errorType
+            error: errorType,
         });
 
         if (errorType === FormErrorType.NO_ERROR) {
@@ -261,7 +282,7 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
             };
             this.props.onAddEmployee(this.state.password, employee);
         }
-    }
+    };
 
     /**
      * Handle the change of a form element. Update the state with the new value.
@@ -277,30 +298,36 @@ export class ComponentAddEmployee extends React.Component<AddEmployeeProps, Comp
         let value = target.value;
         if (target.type === "checkbox") {
             let array: string[] = this.state[name];
-            if(target.checked) {
+            if (target.checked) {
                 array.push(value);
             } else {
                 let index = array.findIndex((elem: string) => elem === value);
                 array.splice(index, 1);
             }
-            this.setState({...this.state, ...{
+            this.setState({
+                ...this.state, ...{
                     [name]: array,
-                }});
+                }
+            });
         } else {
-            this.setState({...this.state, ...{
+            this.setState({
+                ...this.state, ...{
                     [name]: value,
-            }});
+                }
+            });
         }
 
         if (!name) {
             throw new Error("Name is undefined for element in form.");
         }
-    }
+    };
 
-    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>) : void => {
+    readonly #handleSelect = (event: ChangeEvent<HTMLSelectElement>): void => {
         const target = event.target;
-        this.setState({...this.state, ...{
-            [target.name]: target.value
-        }});
-    }
+        this.setState({
+            ...this.state, ...{
+                [target.name]: target.value
+            }
+        });
+    };
 }

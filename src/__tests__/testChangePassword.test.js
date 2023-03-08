@@ -5,14 +5,14 @@ import {FormErrorType} from "../src/engine/messages/FormMessages";
 import {testConstants} from "../Constants/testConstants";
 import userEvent from "@testing-library/user-event";
 import {MemoryRouter} from "react-router-dom";
-import {ChangePassword} from "../src/engine/pages/ChangePassword.tsx";
+import {ComponentChangePassword} from "../src/engine/components/ComponentChangePassword";
 
-jest.mock("../src/engine/api/APIManager");
-
+jest.mock("tsparticles");
 let user;
+
 beforeEach(async () => {
     user = userEvent.setup();
-    render(<MemoryRouter><ChangePassword/></MemoryRouter>);
+    render(<MemoryRouter><ComponentChangePassword/></MemoryRouter>);
 });
 
 test("should render form inputs", async () => {
@@ -36,7 +36,7 @@ describe("Empty Fields change password validation", () => {
 });
 
 test("Valid old and new password should submit form", async () => {
-    const {inputOldPassword, form, inputNewPassword} = getFields();
+    const {form, inputNewPassword} = getFields();
 
     await user.type(inputNewPassword, testConstants.validNewPassword);
 

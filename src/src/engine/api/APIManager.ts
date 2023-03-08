@@ -4,11 +4,7 @@ import {FirebaseApp, initializeApp} from "firebase/app";
 import {Analytics, getAnalytics, isSupported} from "firebase/analytics";
 
 import * as FirebaseAuth from "firebase/auth";
-import {
-    confirmPasswordReset,
-    connectAuthEmulator,
-    verifyPasswordResetCode,
-} from "firebase/auth";
+import {confirmPasswordReset, connectAuthEmulator, verifyPasswordResetCode} from "firebase/auth";
 import {
     addDoc,
     collection,
@@ -31,8 +27,10 @@ import {
 import {FirebasePerformance, getPerformance} from "firebase/performance";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig, FIRESTORE_EMULATOR_PORT} from "./config/FirebaseConfig";
 import {
-    Employee, EmployeeCreateDTO,
-    EmployeeEditDTO, EmployeeInfos,
+    Employee,
+    EmployeeCreateDTO,
+    EmployeeEditDTO,
+    EmployeeInfos,
     EmployeeJobTitleList,
     EmployeeRoleList,
     EmployeeSkillList
@@ -40,12 +38,7 @@ import {
 import {Department, DepartmentModifyDTO} from "../types/Department";
 import {Shift, ShiftCreateDTO} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
-import {
-    CreatedAccountData,
-    Task,
-    ThreadMessage,
-    ThreadMessageType,
-} from "./types/ThreadMessage";
+import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType,} from "./types/ThreadMessage";
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
@@ -54,7 +47,8 @@ import {
     DAYS,
     EmployeeAvailabilities,
     EmployeeAvailabilitiesForCreate,
-    RecursiveAvailabilitiesList
+    RecursiveAvailabilitiesList,
+    ViewableAvailabilities
 } from "../types/EmployeeAvailabilities";
 import {JobTitle} from "../types/JobTitle";
 import {APIUtils} from "./APIUtils";
@@ -95,7 +89,7 @@ class APIManager extends Logger {
     //region Attributes
     public moduleName: string = "APIManager";
     public logColor: string = "#8a894a";
-
+    public awaitLogin: Promise<void> | undefined;
     /**
      * Firebase related properties.
      */
@@ -107,20 +101,16 @@ class APIManager extends Logger {
     #user: FirebaseAuth.User | null = null;
     #employeeInfos: EmployeeInfos = {
         role: 0,
-        department: '',
+        department: "",
         hasChangedDefaultPassword: false
     };
-
     /**
      * Global variables of APIManager.
      * @private
      */
     #worker: Worker | null = null;
-
     private emulatorLoaded: boolean = false;
     private isAuthenticated: boolean = false;
-
-    public awaitLogin: Promise<void> | undefined;
     private subscribers: Array<SubscriberCallback> = [];
 
     private tasks: Map<string, Task> = new Map<string, Task>();
@@ -201,150 +191,6 @@ class APIManager extends Logger {
     //#endregion
 
     /**
-     * Create a new service worker and listen for messages.
-     * @private
-     * @async
-     * @method registerServiceWorker
-     * @returns {Promise<void>}
-     * @memberof APIManager
-     */
-    private async registerServiceWorker(): Promise<void> {
-        try {
-            const worker = new Worker(
-                new URL("./ServiceWorker.ts", import.meta.url)
-            );
-
-            let initMessage: ThreadMessage = {
-                type: ThreadMessageType.INIT,
-                taskId: null,
-            };
-
-            worker.postMessage(initMessage);
-
-            this.#worker = worker;
-            this.listenWorkerEvents();
-        } catch (e: any) {
-            this.error(e.message);
-        }
-    }
-
-    /**
-     * This function is used to process the messages received from the web worker.
-     * @param message
-     * @private
-     * @async
-     * @method onWorkerMessage
-     * @returns {Promise<void>}
-     */
-    private async onWorkerMessage(message: MessageEvent): Promise<void> {
-        let data = message.data as ThreadMessage;
-
-        switch (data.type) {
-            case ThreadMessageType.TASK_RESPONSE: {
-                await this.onTaskResponse(data.taskId, data.data);
-                break;
-            }
-
-            default: {
-                this.warn(`[MAIN] Unknown message type ${data.type}.`);
-            }
-        }
-    }
-
-    /**
-     * Used to generate unique task IDs for the web worker.
-     * @private
-     * @method generateTaskId
-     * @returns {string}
-     */
-    private generateTaskId(): string {
-        return Math.random().toString(36).substring(2);
-    }
-
-    /**
-     * This function is used to send a message to the web worker to create a new user.
-     * @param {Employee} employee The employee data of the new user.
-     * @param {string} password The password of the new user.
-     * @private
-     * @async
-     * @method requestUserCreationFromWorker
-     * @returns {Promise<CreatedAccountData>}
-     * @memberof APIManager
-     */
-    private requestUserCreationFromWorker(
-        employee: Employee,
-        password: string
-    ): Promise<CreatedAccountData> {
-        return new Promise((resolve) => {
-            let taskId = this.generateTaskId();
-            let createAccountMessage: ThreadMessage = {
-                type: ThreadMessageType.CREATE_NEW_ACCOUNT,
-                taskId: taskId,
-                data: {
-                    employee: employee,
-                    password: password,
-                },
-            };
-
-            let task: Task = {
-                callback: resolve,
-            };
-
-            this.tasks.set(taskId, task);
-            this.#worker?.postMessage(createAccountMessage);
-        });
-    }
-
-    /**
-     * This function is used to process the response from the web worker.
-     * @param {string | null} taskId
-     * @param {CreatedAccountData} data
-     * @private
-     * @async
-     * @method onTaskResponse
-     * @returns {Promise<void>}
-     */
-    private async onTaskResponse(
-        taskId: string | null,
-        data: CreatedAccountData
-    ): Promise<void> {
-        this.log(`Got response from worker for task ${taskId}`);
-
-        let task = this.tasks.get(taskId || "");
-        if (task) {
-            task.callback(data);
-
-            this.tasks.delete(taskId || "");
-        } else {
-            this.error(`Task ${taskId} not found.`);
-        }
-    }
-
-    /**
-     * Listen for messages from the web worker.
-     * @private
-     * @method listenWorkerEvents
-     * @memberof APIManager
-     */
-    private listenWorkerEvents(): void {
-        if (this.#worker !== null && this.#worker) {
-            this.#worker.onmessage = this.onWorkerMessage.bind(this);
-        }
-    }
-
-    /**
-     * This method call all the subscribers to the login/logout event.
-     * @private
-     * @async
-     * @method onEvent
-     */
-    private async onEvent(): Promise<void> {
-        for (let subscriber of this.subscribers) {
-            await subscriber();
-        }
-    }
-
-    /**
      * This method is used to subscribe to the login/logout event.
      * @param subscriber
      * @memberof APIManager
@@ -376,12 +222,11 @@ class APIManager extends Logger {
             this.#auth,
             email,
             password
-        ).catch((error) => {
+        ).catch((error: Error) => {
             errorMessage = APIUtils.getErrorMessageFromCode(error);
         });
 
         if (userCredentials !== null && userCredentials) {
-            console.log("credentials", userCredentials);
 
             if (userCredentials.user !== null && userCredentials.user) {
                 this.#user = userCredentials.user;
@@ -430,169 +275,6 @@ class APIManager extends Logger {
         }
 
         return errorMessage;
-    }
-
-    /**
-     * This method is used to trigger an email verification.
-     * @param user The user to verify.
-     * @private
-     * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
-     * @memberof APIManager
-     * @method verifyEmailAddress
-     * @async
-     */
-    private async verifyEmailAddress(): Promise<string | null> {
-        let errorMessage: string | null = null;
-        if(this.#user) {
-            await FirebaseAuth.sendEmailVerification(this.#user).catch((error) => {
-                errorMessage = APIUtils.getErrorMessageFromCode(error);
-            });
-        }
-        return errorMessage;
-    }
-
-    /**
-     * This method is used to create all the listeners needed for the API and firebase.
-     * @private
-     * @memberof APIManager
-     * @method listenEvents
-     * @async
-     * @returns {Promise<void>} Nothing.
-     */
-    private async listenEvents(): Promise<void> {
-        let resolved = false;
-
-        this.awaitLogin = new Promise(async (resolve) => {
-            FirebaseAuth.onAuthStateChanged(
-                this.#auth,
-                async (user: FirebaseAuth.User | null) => {
-                    this.log("Auth state changed!");
-                    if (user === null || !user) {
-                        this.isAuthenticated = false;
-                        this.#employeeInfos = {
-                            role: 0,
-                            department: '',
-                            hasChangedDefaultPassword: false
-                        };
-
-                    } else {
-                        this.isAuthenticated = true;
-                        this.#user = user;
-                        let result = await this.getEmployeeInfos(user.uid);
-                        if (typeof result === "string") {
-                            NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
-                            this.#employeeInfos = {
-                                role: 0,
-                                department: '',
-                                hasChangedDefaultPassword: false
-                            };
-                        } else {
-                            this.#employeeInfos = result as EmployeeInfos;
-                        }
-
-                        console.log("user", user);
-                        console.log("employeeInfos", this.#employeeInfos);
-                    }
-                    await this.onEvent();
-
-                    if (!resolved) {
-                        resolved = true;
-                        resolve();
-                    }
-                }
-            );
-        });
-
-        await this.awaitLogin;
-        this.log("Login resolved!");
-    }
-
-    /**
-     * This method is used to enable the browser session persistence.
-     * @private
-     * @memberof APIManager
-     * @method enablePersistence
-     * @async
-     * @returns {Promise<void>} Nothing.
-     */
-    private async enablePersistence(): Promise<void> {
-        await FirebaseAuth.setPersistence(
-            this.#auth,
-            FirebaseAuth.browserSessionPersistence
-        ).catch((error) => {
-            // Handle Errors here.
-            const errorCode = error;
-            const errorMessage = error.message;
-
-            this.error(`Error code: ${errorCode} - ${errorMessage}`);
-        });
-    }
-
-    /**
-     * This method is used to load the firebase sdk. It also initializes everything related to the emulator when needed.
-     * @private
-     * @memberof APIManager
-     * @method loadFirebase
-     * @async
-     * @returns {Promise<void>} Nothing.
-     */
-    private async loadFirebase(): Promise<void> {
-        this.#app = initializeApp(firebaseConfig);
-
-        this.#auth = FirebaseAuth.getAuth(this.#app);
-        let loginAwait = this.listenEvents();
-
-        this.#performance = getPerformance(this.#app);
-        this.#db = getFirestore(this.#app);
-
-        if ("indexedDB" in window) {
-            if (
-                "location" in window &&
-                location &&
-                location.hostname === "localhost" &&
-                !this.emulatorLoaded
-            ) {
-                this.emulatorLoaded = true;
-                connectAuthEmulator(
-                    this.#auth,
-                    "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT
-                );
-                connectFirestoreEmulator(
-                    this.#db,
-                    "localhost",
-                    FIRESTORE_EMULATOR_PORT
-                );
-
-                if (!(this.#db as any)._firestoreClient) {
-                    await enableIndexedDbPersistence(this.#db).catch((err) =>
-                        console.log(err.message)
-                    );
-                    this.log("IndexedDB persistence enabled");
-                }
-
-                this.log("Firebase emulators loaded");
-            }
-
-            await this.enablePersistence();
-        }
-
-        let isAnalyticsSupported = await isSupported();
-        if (isAnalyticsSupported) {
-            this.#analytics = getAnalytics(this.#app);
-        }
-
-        this.log("Firebase loaded");
-        await loginAwait;
-    }
-
-    /**
-     * This method is used to verify that an element is not null or undefined.
-     * @param element The element to verify.
-     * @private
-     * @returns {boolean} True if the element is not null or undefined, false otherwise.
-     */
-    private elementExist(element: any): boolean {
-        return element !== undefined && element !== null;
     }
 
     /**
@@ -1407,26 +1089,6 @@ class APIManager extends Logger {
     }
 
     /**
-     * Convert firebase timestamp to daypilot string
-     * @param date the firebase timestamp to convert
-     * @returns string daypilot Ex: (February 2, 2022 at 3:15 AM) = 2022-02-16T03:15:00
-     */
-    private getDayPilotDateString(date: Timestamp): string {
-        //Take UTC timestamp, remove timezone offset, convert to ISO format
-        let myDate = new Date((date.seconds - new Date().getTimezoneOffset() * 60) * 1000).toISOString();
-        return myDate.slice(0, -5);
-    }
-
-    /**
-     * Converti une date de daypilot en timestamp firebase
-     * @param daypilotString string daypilot Ex: (2 février 2022 à 3h15 AM) = 2022-02-16T03:15:00
-     * @returns Timestamp firebase
-     */
-    private getFirebaseTimestamp(daypilotString: string): Timestamp {
-        return new Timestamp(Date.parse(daypilotString) / 1000, 0);
-    }
-
-    /**
      * This method is used to get the schedule of a department for a day. If the request was not successful, it will return an error message.
      * @method getDailyScheduleForDepartment
      * @async
@@ -1560,11 +1222,6 @@ class APIManager extends Logger {
         if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(shift.department)) {
             return errors.PERMISSION_DENIED;
         }
-        //Check if user has permission
-        if (!this.hasPermission(Roles.ADMIN)) {
-            //Manager or less
-            return errors.PERMISSION_DENIED;
-        }
 
         let errorMessage: string | undefined;
 
@@ -1577,51 +1234,8 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
-    public isManagerPermitted(department: string) {
+    public isManagerPermitted(department: string): boolean {
         return this.hasPermission(Roles.MANAGER) && department === this.#employeeInfos?.department;
-    }
-
-    /**
-     * Check if the unavailability already exist with the same dates in the DB and if it is yes, it update with the new data and return true
-     * @method checkUnavailabilityShouldUpdate
-     * @async
-     * @public
-     * @memberof APIManager
-     * @returns {Promise<string | boolean>} boolean if the request was successful or it doesn't need to update,
-     * and the error message if it has an error in Firebase.
-     * @param list
-     */
-    private async unavailabilityUpdate(list: EmployeeAvailabilitiesForCreate): Promise<string | boolean> {
-        let errorMessage: string | undefined;
-        let isAdded = false;
-        let queryUnavailability = query(
-            collection(this.#db, `unavailabilities`),
-            where("employeeId", "==", this.#user?.uid)
-        );
-
-        let snaps = await getDocs(queryUnavailability).catch((error) => {
-            errorMessage = APIUtils.getErrorMessageFromCode(error);
-        });
-
-        if (snaps) {
-            //check if a document with the same dates and that is not accepted already exists
-            for (let document of snaps.docs) {
-                let data = document.data();
-                if (!data.isAccepted) {
-                    if (data.unavailabilities.startDate === list.recursiveExceptions.startDate
-                        && data.unavailabilities.endDate === list.recursiveExceptions.endDate) {
-                        await updateDoc(doc(this.#db, `unavailabilities`, document.id),
-                            {unavailabilities: list.recursiveExceptions}).catch((error) => {
-                            errorMessage = APIUtils.getErrorMessageFromCode(error);
-
-                        });
-                        isAdded = true;
-                        break;
-                    }
-                }
-            }
-        }
-        return errorMessage ?? isAdded;
     }
 
     /**
@@ -1630,21 +1244,32 @@ class APIManager extends Logger {
      * @returns {void}
      */
     public async pushAvailabilitiesToManager(list: EmployeeAvailabilitiesForCreate): Promise<void | string> {
-        if (!this.hasPermission(Roles.EMPLOYEE)) {
+        if (!this.hasPermission(Roles.EMPLOYEE) && list.employeeId == this.#user?.uid) {
             //Is not an Employee
             return errors.PERMISSION_DENIED;
         }
 
         let errorMessage: string | undefined;
-
+        let unavailabilities = {
+            [DAYS.SUNDAY]: list.recursiveExceptions[DAYS.SUNDAY],
+            [DAYS.MONDAY]: list.recursiveExceptions[DAYS.MONDAY],
+            [DAYS.TUESDAY]: list.recursiveExceptions[DAYS.TUESDAY],
+            [DAYS.WEDNESDAY]: list.recursiveExceptions[DAYS.WEDNESDAY],
+            [DAYS.THURSDAY]: list.recursiveExceptions[DAYS.THURSDAY],
+            [DAYS.FRIDAY]: list.recursiveExceptions[DAYS.FRIDAY],
+            [DAYS.SATURDAY]: list.recursiveExceptions[DAYS.SATURDAY],
+            startDate: this.getFirebaseTimestamp(list.recursiveExceptions.startDate),
+            endDate: this.getFirebaseTimestamp(list.recursiveExceptions.endDate),
+        };
         //Create unavailability
-        let isUpdated = await this.unavailabilityUpdate(list)
+        let isUpdated = await this.unavailabilityUpdate(list);
         if (!isUpdated && typeof isUpdated === "boolean") {
             await addDoc(collection(this.#db, `unavailabilities`),
                 {
                     employeeId: this.#user?.uid,
-                    unavailabilities: list.recursiveExceptions,
+                    unavailabilities: unavailabilities,
                     isAccepted: false,
+                    department: this.#employeeInfos.department,
                 },
             ).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
@@ -1678,22 +1303,23 @@ class APIManager extends Logger {
 
     /**
      * Get the unavailabilities of an employee
-     * @param idEmployee to get the unavailabilities
+     * @param employeeId to get the unavailabilities
      * @returns the list of unavailabilities
      */
-    public async getOneEmployeeUnavailabilities(idEmployee: string): Promise<EmployeeAvailabilities | string> {
+    public async getOneEmployeeUnavailabilities(employeeId: string): Promise<EmployeeAvailabilities | string> {
         let errorMessage: string | null = null;
         //default value
         let list: EmployeeAvailabilities = {
             recursiveExceptions: [],
-            employeeId: idEmployee ?? ""
+            employeeId: employeeId
         };
         //list that will return
         let listOfRecursive: RecursiveAvailabilitiesList = [];
         if (this.isAuthenticated) {
             let queryUnavailability = query(
                 collection(this.#db, `unavailabilities`),
-                where("employeeId", "==", list.employeeId)
+                where("employeeId", "==", list.employeeId),
+                where("isAccepted", "==", true)
             );
 
             let snaps = await getDocs(queryUnavailability).catch((error) => {
@@ -1701,26 +1327,20 @@ class APIManager extends Logger {
             });
 
             if (snaps) {
-                //push all the recursiveExceptions  in the list
+                //push all the recursiveExceptions in the list
                 for (let document of snaps.docs) {
                     let data = document.data();
-                    //need to be accepted to be showed
-                    if (data.isAccepted) {
-                        listOfRecursive.push(
-                            {
-                                startDate: new Date((data.start.seconds) * 1000),
-                                endDate: new Date((data.end.seconds) * 1000),
-                                [DAYS.SUNDAY]: data.unavailabilities[DAYS.SUNDAY],
-                                [DAYS.MONDAY]: data.unavailabilities[DAYS.MONDAY],
-                                [DAYS.TUESDAY]: data.unavailabilities[DAYS.TUESDAY],
-                                [DAYS.WEDNESDAY]: data.unavailabilities[DAYS.WEDNESDAY],
-                                [DAYS.THURSDAY]: data.unavailabilities[DAYS.THURSDAY],
-                                [DAYS.FRIDAY]: data.unavailabilities[DAYS.FRIDAY],
-                                [DAYS.SATURDAY]: data.unavailabilities[DAYS.SATURDAY]
-                            }
-                        );
-                    }
-
+                    listOfRecursive.push({
+                        startDate: this.getDayPilotDateString(data.unavailabilities.startDate),
+                        endDate: this.getDayPilotDateString(data.unavailabilities.endDate),
+                        [DAYS.SUNDAY]: data.unavailabilities[DAYS.SUNDAY],
+                        [DAYS.MONDAY]: data.unavailabilities[DAYS.MONDAY],
+                        [DAYS.TUESDAY]: data.unavailabilities[DAYS.TUESDAY],
+                        [DAYS.WEDNESDAY]: data.unavailabilities[DAYS.WEDNESDAY],
+                        [DAYS.THURSDAY]: data.unavailabilities[DAYS.THURSDAY],
+                        [DAYS.FRIDAY]: data.unavailabilities[DAYS.FRIDAY],
+                        [DAYS.SATURDAY]: data.unavailabilities[DAYS.SATURDAY]
+                    });
                 }
                 list.recursiveExceptions = listOfRecursive;
             }
@@ -1730,16 +1350,16 @@ class APIManager extends Logger {
     }
 
     /**
-     * This function fetches all pending unavailabilities for one department
+     * This function fetches all unavailabilities for one department
      * @param departmentName the name of the department to fetch
+     * @param isAccepted the accepted status of the unavailabilities
      * @returns a string if its an error, a list of Unavailabilities if its not
      */
-    public async getPendingUnavailabilitiesForDepartment(departmentName: string): Promise<string | any[]> {
+    public async getUnavailabilitiesForDepartment(departmentName: string, isAccepted: boolean): Promise<string | ViewableAvailabilities[]> {
         let errorMessage: string | null = null;
-        let unavailabilities: any[] = [];
+        let unavailabilities: ViewableAvailabilities[] = [];
         //Validate permissions
-        let isManagerPermitted = this.hasPermission(Roles.MANAGER) && departmentName === this.#employeeInfos.department;
-        if (!this.hasPermission(Roles.ADMIN) && !isManagerPermitted) {
+        if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(departmentName)) {
             return errors.PERMISSION_DENIED;
         }
 
@@ -1747,7 +1367,7 @@ class APIManager extends Logger {
         let queryShifts = query(
             collection(this.#db, `unavailabilities`),
             where("department", "==", departmentName),
-            where("isAccepted", "==", false)
+            where("isAccepted", "==", isAccepted)
         );
 
         let snaps = await getDocs(queryShifts).catch((error) => {
@@ -1758,23 +1378,38 @@ class APIManager extends Logger {
         if (snaps) {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
+                let tempUnavailabilities = {
+                    [DAYS.SUNDAY]: unavailability.unavailabilities[DAYS.SUNDAY],
+                    [DAYS.MONDAY]: unavailability.unavailabilities[DAYS.MONDAY],
+                    [DAYS.TUESDAY]: unavailability.unavailabilities[DAYS.TUESDAY],
+                    [DAYS.WEDNESDAY]: unavailability.unavailabilities[DAYS.WEDNESDAY],
+                    [DAYS.THURSDAY]: unavailability.unavailabilities[DAYS.THURSDAY],
+                    [DAYS.FRIDAY]: unavailability.unavailabilities[DAYS.FRIDAY],
+                    [DAYS.SATURDAY]: unavailability.unavailabilities[DAYS.SATURDAY],
+                    startDate: this.getDayPilotDateString(unavailability.unavailabilities.startDate),
+                    endDate: this.getDayPilotDateString(unavailability.unavailabilities.endDate),
+                };
                 //Push unavailability object
-
-
+                unavailabilities.push({
+                    id: doc.id,
+                    recursiveExceptions: tempUnavailabilities,
+                    isAccepted: unavailability.isAccepted,
+                    department: unavailability.department,
+                    employeeId: unavailability.employeeId,
+                });
             }
         }
         return errorMessage ?? unavailabilities;
     }
 
     /**
-     * This function fetches all pending unavailabilities for one department
-     * @param departmentName the name of the department to fetch
+     * This function fetches all unavailabilities
+     * @param isAccepted the accepted status of the unavailabilities
      * @returns a string if its an error, a list of Unavailabilities if its not
-     * @todo implement this function
      */
-    public async getAllPendingUnavailabilities(): Promise<string | any[]> {
+    public async getAllUnavailabilities(isAccepted: boolean): Promise<string | ViewableAvailabilities[]> {
         let errorMessage: string | null = null;
-        let unavailabilities: any[] = [];
+        let unavailabilities: ViewableAvailabilities[] = [];
         //Validate permissions
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
@@ -1783,7 +1418,7 @@ class APIManager extends Logger {
         //Query unavailabilities
         let queryShifts = query(
             collection(this.#db, `unavailabilities`),
-            where("isAccepted", "==", false)
+            where("isAccepted", "==", isAccepted)
         );
 
         let snaps = await getDocs(queryShifts).catch((error) => {
@@ -1794,29 +1429,459 @@ class APIManager extends Logger {
         if (snaps) {
             for (let doc of snaps.docs) {
                 let unavailability = doc.data();
+                let tempUnavailabilities = {
+                    [DAYS.SUNDAY]: unavailability.unavailabilities[DAYS.SUNDAY],
+                    [DAYS.MONDAY]: unavailability.unavailabilities[DAYS.MONDAY],
+                    [DAYS.TUESDAY]: unavailability.unavailabilities[DAYS.TUESDAY],
+                    [DAYS.WEDNESDAY]: unavailability.unavailabilities[DAYS.WEDNESDAY],
+                    [DAYS.THURSDAY]: unavailability.unavailabilities[DAYS.THURSDAY],
+                    [DAYS.FRIDAY]: unavailability.unavailabilities[DAYS.FRIDAY],
+                    [DAYS.SATURDAY]: unavailability.unavailabilities[DAYS.SATURDAY],
+                    startDate: this.getDayPilotDateString(unavailability.unavailabilities.startDate),
+                    endDate: this.getDayPilotDateString(unavailability.unavailabilities.endDate),
+                };
                 //Push unavailability object
-
-
+                unavailabilities.push({
+                    id: doc.id,
+                    recursiveExceptions: tempUnavailabilities,
+                    isAccepted: unavailability.isAccepted,
+                    department: unavailability.department,
+                    employeeId: unavailability.employeeId,
+                });
             }
         }
         return errorMessage ?? unavailabilities;
     }
 
-    async changeUnavailabilityAcceptedValue(unavailability: any) {
+    /**
+     * Accepts an unavailability in firestore
+     * @param unavailability the unavailability to accept
+     * @returns a string if there's an error, null if there isn't
+     */
+    public async acceptUnavailability(unavailability: ViewableAvailabilities): Promise<string | null> {
         let errorMessage: string | null = null;
 
-        if (unavailability.id) {
-            if (!this.hasPermission) {
-                return errors.PERMISSION_DENIED;
-            }
-            await updateDoc(doc(this.#db, `unavailabilities`, unavailability.id), {isAccepted: unavailability.isAccepted}).catch((error) => {
-                errorMessage = APIUtils.getErrorMessageFromCode(error);
-            });
-        } else {
-            errorMessage = errors.INVALID_UNAVAILABILITY_ID;
+        if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(unavailability.department)) {
+            return errors.PERMISSION_DENIED;
         }
 
+        //Get previously accepted unavailabilities
+        let queryUnavailability = query(
+            collection(this.#db, `unavailabilities`),
+            where("employeeId", "==", unavailability.employeeId),
+            where("isAccepted", "==", true)
+        );
+        let snaps = await getDocs(queryUnavailability).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+        unavailability.recursiveExceptions.startDate = this.getFirebaseTimestamp(unavailability.recursiveExceptions.startDate);
+        unavailability.recursiveExceptions.endDate = this.getFirebaseTimestamp(unavailability.recursiveExceptions.endDate);
+        //Delete previously accepted unavailabilities
+        if (snaps) {
+            for (let document of snaps.docs) {
+                let data = document.data();
+                if (!data.unavailabilities.startDate._compareTo(unavailability.recursiveExceptions.startDate) &&
+                    !data.unavailabilities.endDate._compareTo(unavailability.recursiveExceptions.endDate)
+                ) {
+                    errorMessage = await this.deleteUnavailability({
+                        id: document.id,
+                        recursiveExceptions: data.unavailabilities,
+                        isAccepted: data.isAccepted,
+                        department: data.department,
+                        employeeId: data.employeeId,
+                    });
+                    if (typeof errorMessage === "string") return errorMessage;
+                    break;
+                }
+            }
+        }
+        //Accept new unavailabilities
+        await updateDoc(doc(this.#db, `unavailabilities`, unavailability.id), {isAccepted: true}).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+
         return errorMessage;
+    }
+
+    /**
+     * Deletes an unavailability in firestore
+     * @param unavailability the unavailability to delete
+     * @returns a string if there's an error, null if there isn't
+     */
+    public async deleteUnavailability(unavailability: ViewableAvailabilities): Promise<string | null> {
+        let errorMessage: string | null = null;
+
+        if (!this.hasPermission(Roles.ADMIN) && !this.isManagerPermitted(unavailability.department)) {
+            return errors.PERMISSION_DENIED;
+        }
+        await deleteDoc(doc(this.#db, `unavailabilities`, unavailability.id)).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+
+        return errorMessage;
+    }
+
+    /**
+     * Create a new service worker and listen for messages.
+     * @private
+     * @async
+     * @method registerServiceWorker
+     * @returns {Promise<void>}
+     * @memberof APIManager
+     */
+    private async registerServiceWorker(): Promise<void> {
+        try {
+            const worker = new Worker(
+                new URL("./ServiceWorker.ts", import.meta.url)
+            );
+
+            let initMessage: ThreadMessage = {
+                type: ThreadMessageType.INIT,
+                taskId: null,
+            };
+
+            worker.postMessage(initMessage);
+
+            this.#worker = worker;
+            this.listenWorkerEvents();
+        } catch (e: any) {
+            this.error(e.message);
+        }
+    }
+
+    /**
+     * This function is used to process the messages received from the web worker.
+     * @param message
+     * @private
+     * @async
+     * @method onWorkerMessage
+     * @returns {Promise<void>}
+     */
+    private async onWorkerMessage(message: MessageEvent): Promise<void> {
+        let data = message.data as ThreadMessage;
+
+        switch (data.type) {
+            case ThreadMessageType.TASK_RESPONSE: {
+                await this.onTaskResponse(data.taskId, data.data);
+                break;
+            }
+
+            default: {
+                this.warn(`[MAIN] Unknown message type ${data.type}.`);
+            }
+        }
+    }
+
+    /**
+     * Used to generate unique task IDs for the web worker.
+     * @private
+     * @method generateTaskId
+     * @returns {string}
+     */
+    private generateTaskId(): string {
+        return Math.random().toString(36).substring(2);
+    }
+
+    /**
+     * This function is used to send a message to the web worker to create a new user.
+     * @param {Employee} employee The employee data of the new user.
+     * @param {string} password The password of the new user.
+     * @private
+     * @async
+     * @method requestUserCreationFromWorker
+     * @returns {Promise<CreatedAccountData>}
+     * @memberof APIManager
+     */
+    private requestUserCreationFromWorker(
+        employee: Employee,
+        password: string
+    ): Promise<CreatedAccountData> {
+        return new Promise((resolve) => {
+            let taskId = this.generateTaskId();
+            let createAccountMessage: ThreadMessage = {
+                type: ThreadMessageType.CREATE_NEW_ACCOUNT,
+                taskId: taskId,
+                data: {
+                    employee: employee,
+                    password: password,
+                },
+            };
+
+            let task: Task = {
+                callback: resolve,
+            };
+
+            this.tasks.set(taskId, task);
+            this.#worker?.postMessage(createAccountMessage);
+        });
+    }
+
+    /**
+     * This function is used to process the response from the web worker.
+     * @param {string | null} taskId
+     * @param {CreatedAccountData} data
+     * @private
+     * @async
+     * @method onTaskResponse
+     * @returns {Promise<void>}
+     */
+    private async onTaskResponse(
+        taskId: string | null,
+        data: CreatedAccountData
+    ): Promise<void> {
+        this.log(`Got response from worker for task ${taskId}`);
+
+        let task = this.tasks.get(taskId || "");
+        if (task) {
+            task.callback(data);
+
+            this.tasks.delete(taskId || "");
+        } else {
+            this.error(`Task ${taskId} not found.`);
+        }
+    }
+
+    /**
+     * Listen for messages from the web worker.
+     * @private
+     * @method listenWorkerEvents
+     * @memberof APIManager
+     */
+    private listenWorkerEvents(): void {
+        if (this.#worker !== null && this.#worker) {
+            this.#worker.onmessage = this.onWorkerMessage.bind(this);
+        }
+    }
+
+    /**
+     * This method call all the subscribers to the login/logout event.
+     * @private
+     * @async
+     * @method onEvent
+     */
+    private async onEvent(): Promise<void> {
+        for (let subscriber of this.subscribers) {
+            await subscriber();
+        }
+    }
+
+    /**
+     * This method is used to trigger an email verification.
+     * @param user The user to verify.
+     * @private
+     * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
+     * @memberof APIManager
+     * @method verifyEmailAddress
+     * @async
+     */
+    private async verifyEmailAddress(): Promise<string | null> {
+        let errorMessage: string | null = null;
+        if (this.#user) {
+            await FirebaseAuth.sendEmailVerification(this.#user).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+        }
+        return errorMessage;
+    }
+
+    /**
+     * This method is used to create all the listeners needed for the API and firebase.
+     * @private
+     * @memberof APIManager
+     * @method listenEvents
+     * @async
+     * @returns {Promise<void>} Nothing.
+     */
+    private async listenEvents(): Promise<void> {
+        let resolved = false;
+
+        this.awaitLogin = new Promise(async (resolve) => {
+            FirebaseAuth.onAuthStateChanged(
+                this.#auth,
+                async (user: FirebaseAuth.User | null) => {
+                    if (user === null || !user) {
+                        this.isAuthenticated = false;
+                        this.#employeeInfos = {
+                            role: 0,
+                            department: "",
+                            hasChangedDefaultPassword: false
+                        };
+
+                    } else {
+                        this.isAuthenticated = true;
+                        this.#user = user;
+                        let result = await this.getEmployeeInfos(user.uid);
+                        if (typeof result === "string") {
+                            NotificationManager.error(errors.AUTHENTIFICATION_ERROR, result);
+                            this.#employeeInfos = {
+                                role: 0,
+                                department: "",
+                                hasChangedDefaultPassword: false
+                            };
+                        } else {
+                            this.#employeeInfos = result as EmployeeInfos;
+                        }
+                    }
+                    await this.onEvent();
+
+                    if (!resolved) {
+                        resolved = true;
+                        resolve();
+                    }
+                }
+            );
+        });
+
+        await this.awaitLogin;
+    }
+
+    /**
+     * This method is used to enable the browser session persistence.
+     * @private
+     * @memberof APIManager
+     * @method enablePersistence
+     * @async
+     * @returns {Promise<void>} Nothing.
+     */
+    private async enablePersistence(): Promise<void> {
+        await FirebaseAuth.setPersistence(
+            this.#auth,
+            FirebaseAuth.browserSessionPersistence
+        ).catch((error) => {
+            // Handle Errors here.
+            const errorCode = error;
+            const errorMessage = error.message;
+
+            this.error(`Error code: ${errorCode} - ${errorMessage}`);
+        });
+    }
+
+    /**
+     * This method is used to load the firebase sdk. It also initializes everything related to the emulator when needed.
+     * @private
+     * @memberof APIManager
+     * @method loadFirebase
+     * @async
+     * @returns {Promise<void>} Nothing.
+     */
+    private async loadFirebase(): Promise<void> {
+        this.#app = initializeApp(firebaseConfig);
+
+        this.#auth = FirebaseAuth.getAuth(this.#app);
+        let loginAwait = this.listenEvents();
+
+        this.#performance = getPerformance(this.#app);
+        this.#db = getFirestore(this.#app);
+
+        if ("indexedDB" in window) {
+            if (
+                "location" in window &&
+                location &&
+                location.hostname === "localhost" &&
+                !this.emulatorLoaded
+            ) {
+                this.emulatorLoaded = true;
+                connectAuthEmulator(
+                    this.#auth,
+                    "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT
+                );
+                connectFirestoreEmulator(
+                    this.#db,
+                    "localhost",
+                    FIRESTORE_EMULATOR_PORT
+                );
+
+                if (!(this.#db as any)._firestoreClient) {
+                    await enableIndexedDbPersistence(this.#db).catch((err) =>
+                        console.log(err.message)
+                    );
+                    this.log("IndexedDB persistence enabled");
+                }
+
+                this.log("Firebase emulators loaded");
+            }
+
+            await this.enablePersistence();
+        }
+
+        let isAnalyticsSupported = await isSupported();
+        if (isAnalyticsSupported) {
+            this.#analytics = getAnalytics(this.#app);
+        }
+
+        await loginAwait;
+    }
+
+    /**
+     * This method is used to verify that an element is not null or undefined.
+     * @param element The element to verify.
+     * @private
+     * @returns {boolean} True if the element is not null or undefined, false otherwise.
+     */
+    private elementExist(element: any): boolean {
+        return element !== undefined && element !== null;
+    }
+
+    /**
+     * Convert firebase timestamp to daypilot string
+     * @param date the firebase timestamp to convert
+     * @returns string daypilot Ex: (February 2, 2022 at 3:15 AM) = 2022-02-16T03:15:00
+     */
+    private getDayPilotDateString(date: Timestamp): string {
+        //Take UTC timestamp, remove timezone offset, convert to ISO format
+        let myDate = new Date((date.seconds - new Date().getTimezoneOffset() * 60) * 1000).toISOString();
+        return myDate.slice(0, -5);
+    }
+
+    /**
+     * Converti une date de daypilot en timestamp firebase
+     * @param daypilotString string daypilot Ex: (2 février 2022 à 3h15 AM) = 2022-02-16T03:15:00
+     * @returns Timestamp firebase
+     */
+    private getFirebaseTimestamp(daypilotString: string): Timestamp {
+        return new Timestamp(Date.parse(daypilotString) / 1000, 0);
+    }
+
+    /**
+     * Check if the unavailability already exist with the same dates in the DB and if it is yes, it update with the new data and return true
+     * @method checkUnavailabilityShouldUpdate
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<string | boolean>} boolean if the request was successful or it doesn't need to update,
+     * and the error message if it has an error in Firebase.
+     * @param list
+     */
+    private async unavailabilityUpdate(list: EmployeeAvailabilitiesForCreate): Promise<string | boolean> {
+        let errorMessage: string | undefined;
+        let isAdded = false;
+        let queryUnavailability = query(
+            collection(this.#db, `unavailabilities`),
+            where("employeeId", "==", this.#user?.uid),
+            where("isAccepted", "==", false)
+        );
+
+        let snaps = await getDocs(queryUnavailability).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+        list.recursiveExceptions.startDate = this.getFirebaseTimestamp(list.recursiveExceptions.startDate);
+        list.recursiveExceptions.endDate = this.getFirebaseTimestamp(list.recursiveExceptions.endDate);
+        if (snaps) {
+            //check if a document with the same dates and that is not accepted already exists
+            for (let document of snaps.docs) {
+                let data = document.data();
+                if (!data.unavailabilities.startDate._compareTo(list.recursiveExceptions.startDate)
+                    && !data.unavailabilities.endDate._compareTo(list.recursiveExceptions.endDate)) {
+                    await updateDoc(doc(this.#db, `unavailabilities`, document.id),
+                        {unavailabilities: list.recursiveExceptions}).catch((error) => {
+                        errorMessage = APIUtils.getErrorMessageFromCode(error);
+                    });
+                    isAdded = true;
+                    break;
+                }
+            }
+        }
+        return errorMessage ?? isAdded;
     }
 }
 

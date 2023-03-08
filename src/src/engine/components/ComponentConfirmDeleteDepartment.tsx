@@ -19,7 +19,8 @@ interface DeleteDepartmentProps {
  */
 export class ComponentConfirmDeleteDepartment extends React.Component<DeleteDepartmentProps, unknown> {
     public render(): JSX.Element {
-        return (<Modal show={this.props.department != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>
+        return (
+            <Modal show={this.props.department != undefined} onHide={this.#hideModal} onExit={() => this.#hideModal()}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirmation de suppression</Modal.Title>
                 </Modal.Header>
@@ -34,13 +35,13 @@ export class ComponentConfirmDeleteDepartment extends React.Component<DeleteDepa
                         Non
                     </Button>
                 </Modal.Footer>
-        </Modal>);
+            </Modal>);
     }
 
     readonly #hideModal = (confirm: boolean = false) => {
-        if(confirm && this.props.department) {
+        if (confirm && this.props.department) {
             this.props.onDeleteDepartment(this.props.department);
         }
         this.props.closePrompt();
-    }
+    };
 }

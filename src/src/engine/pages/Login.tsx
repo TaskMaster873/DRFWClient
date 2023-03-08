@@ -13,7 +13,23 @@ export class Login extends React.Component<unknown, unknown> {
         document.title = "Connexion - TaskMaster";
     }
 
-    readonly #onLoginRequest = async (email: string, password: string) : Promise<boolean> => {
+    public render(): JSX.Element {
+        return (
+            <Container>
+                <ComponentLogin onLoginRequest={this.#onLoginRequest}/>
+            </Container>
+        );
+    }
+
+    /**
+     * This function is called when the user wants to sign in.
+     * @param email - The email of the user
+     * @param password - The password of the user
+     * @private
+     * @return {Promise<boolean>} - True if the login was successful, false otherwise
+     * @async
+     */
+    readonly #onLoginRequest = async (email: string, password: string): Promise<boolean> => {
         let errorMessage = await API.loginWithPassword(email, password);
 
         if (errorMessage === null) {
@@ -23,13 +39,5 @@ export class Login extends React.Component<unknown, unknown> {
         }
 
         return errorMessage === null;
-    }
-
-    public render(): JSX.Element {
-        return (
-            <Container>
-                <ComponentLogin onLoginRequest={this.#onLoginRequest} />
-            </Container>
-        );
-    }
+    };
 }

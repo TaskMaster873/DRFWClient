@@ -8,6 +8,8 @@ import {MemoryRouter} from "react-router-dom";
 import {ForgotPassword} from "../src/engine/pages/ForgotPassword";
 import {API} from "../src/engine/api/APIManager";
 
+jest.mock("tsparticles");
+
 let user;
 beforeEach(async () => {
     user = userEvent.setup();
@@ -57,7 +59,7 @@ test("Valid email should submit form", async () => {
     expect(inputEmail.value).toBe(testConstants.validEmail);
     expect(form.classList.contains("was-validated")).toBeTruthy();
     expect(form.dataset.error).toBe(FormErrorType.NO_ERROR);
-    expect(API.sendResetPassword).toBeCalled();
+    expect(API.sendResetPassword).toHaveBeenCalled();
 });
 
 function getFields() {

@@ -5,13 +5,14 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import {errors, FormErrorType} from "../messages/FormMessages";
-import {Modal} from "react-bootstrap";
+import {CloseButton, Modal} from "react-bootstrap";
 import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
 import {JobTitle} from "../types/JobTitle";
 import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteJobTitle} from "./ComponentConfirmDeleteJobTitle";
 import {JobTitleActions} from "../types/Employee";
+import {IconContext} from "react-icons/lib";
 
 interface EditJobTitlesState {
     jobTitleToDelete?: JobTitle;
@@ -59,8 +60,9 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                                                     jobTitle={this.state.jobTitleToDelete}
                                                     onDeleteJobTitle={this.props.onDeleteJobTitle}/>
             <Modal show={this.props.showEdit} onHide={() => this.hideModal()}>
-                <Modal.Header closeButton>
+                <Modal.Header>
                     <Modal.Title>Édition de corps d'emploi</Modal.Title>
+                    <CloseButton variant="white" onClick={() => this.hideModal()}/>
                 </Modal.Header>
                 <Modal.Body>
                     <Form
@@ -111,21 +113,26 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group as={Col} md="2">
-                                <Button type="submit"><BiPlus className="adminActions mb-1"/></Button>
+                                <Button type="submit">
+                                    <IconContext.Provider value={{color: "white"}}>
+                                        <BiPlus className="adminActions mb-1"/>
+                                    </IconContext.Provider>
+                                </Button>
                             </Form.Group>
                         </Row>
                     </Form>
                 </Modal.Body>
             </Modal>
-        </div>
+        </div>;
     }
 
     /**
      * The function that hides the modal when the exit button is clicked
      */
     readonly hideModal = (): void => {
+        this.editJobTitle();
         this.props.cancelEdit();
-    }
+    };
 
     /**
      * When the delete button is clicked show the deletion confirmation window
@@ -134,7 +141,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      */
     readonly #onShowConfirmDeleteJobTitle = (value?: JobTitle): void => {
         this.setState({jobTitleToDelete: value});
-    }
+    };
 
     /**
      * Render edit and delete actions of the jobTitle
@@ -145,14 +152,21 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         if (this.state.editedJobTitle == title) {
             return <div>
                 <button className="transparentButton me-2" type="submit">
-                    <BiCheck className="adminActions"/>
+                    <IconContext.Provider value={{color: "white"}}>
+                        <BiCheck className="adminActions"/>
+                    </IconContext.Provider>
                 </button>
-                <CgUnavailable onClick={() => this.#editJobTitle} className="adminActions ms-1"/></div>
+                <IconContext.Provider value={{color: "white"}}>
+                    <CgUnavailable onClick={() => this.editJobTitle} className="adminActions ms-1"/>
+                </IconContext.Provider>
+            </div>;
         } else {
             return <div>
-                <BiPencil onClick={() => this.#editJobTitle(title)} className="adminActions me-2"/>
-                <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
-            </div>
+                <IconContext.Provider value={{color: "white"}}>
+                    <BiPencil onClick={() => this.editJobTitle(title)} className="adminActions me-2"/>
+                    <BiTrash onClick={() => this.#showDeletePrompt(title)} className="adminActions ms-2"/>
+                </IconContext.Provider>
+            </div>;
         }
     }
 
@@ -161,7 +175,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      * @param title The JobTitle to edit
      * @private
      */
-    readonly #editJobTitle = (title?: JobTitle): void => {
+    private editJobTitle(title?: JobTitle): void {
         this.setState({editedJobTitle: title});
     }
 
@@ -172,7 +186,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
      */
     readonly #showDeletePrompt = (title: JobTitle): void => {
         this.setState({jobTitleToDelete: title});
-    }
+    };
 
     /**
      * Function that is called when the add form is submitted.
@@ -191,9 +205,9 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
             if (formDataObj.id) {
                 await this.props.onEditJobTitle(formDataObj);
             }
-            this.setState({editedJobTitle: undefined});
+            this.editJobTitle();
         }
-    }
+    };
 
     /**
      * Function that is called when the add form is submitted.
@@ -210,7 +224,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         if (errorType === FormErrorType.NO_ERROR) {
             await this.props.onAddJobTitle(this.state.name);
         }
-    }
+    };
 
     /**
      * Function that is called when the form is changed. This update the state of the component.
@@ -223,7 +237,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
         const name = target.name;
 
         if (!name) {
-            throw new Error("Id is undefined for element in form.");
+            throw new Error("Name is undefined for element in form.");
         }
 
         this.setState({
@@ -231,5 +245,5 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                 [name]: value,
             }
         });
-    }
+    };
 }

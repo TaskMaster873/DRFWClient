@@ -1,14 +1,15 @@
 import React from "react";
 import {Button, Col, Form, ListGroup, Row, Table} from "react-bootstrap";
-import {Employee, employeeTableHeads, employeeAdminTableHeads} from "../types/Employee";
+import {Employee, employeeAdminTableHeads, employeeTableHeads} from "../types/Employee";
 import {LinkContainer} from "react-router-bootstrap";
 import {API} from "../api/APIManager";
-import {BiEdit} from "react-icons/bi"
+import {BiEdit} from "react-icons/bi";
 import {Roles} from "../types/Roles";
 import {CgCheckO, CgUnavailable} from "react-icons/cg";
 import {RoutesPath} from "../RoutesPath";
 import {ComponentLoadingBarSpinner} from "./ComponentLoadingBarSpinner";
 import {FilterUtils} from "../utils/FilterUtils";
+import {IconContext} from "react-icons/lib";
 
 export interface EmployeeListProps {
     employees: Employee[] | null;
@@ -34,7 +35,7 @@ export interface EmployeeListState {
 export class ComponentEmployeeList extends React.Component<EmployeeListProps, EmployeeListState> {
     public state: EmployeeListState = {
         filteredList: null,
-    }
+    };
 
     constructor(props: EmployeeListProps) {
         super(props);
@@ -51,7 +52,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
             <div className="mt-5">
                 {this.renderSearchBar()}
                 {this.renderList()}
-                {this.renderAddEmployeeButton()}
+                {this.renderNavigationButtons()}
             </div>
         );
     }
@@ -119,24 +120,18 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                         <ComponentLoadingBarSpinner/>
                     </td>
                 </tr>
-            ]
+            ];
         } else if (list.length !== 0) {
             return list.map((employee, index) => (
                 <tr key={"secondCol" + index}>
-                    <td key={"id" + index}>{index + 1}</td>
-                    <td key={"firstName" + index}>
-                        {employee.firstName}
-                    </td>
-
-                    <td key={"name " + index}>{employee.lastName}</td>
-                    <td key={"email " + index}>{employee.email}</td>
-                    <td key={"phoneNumber " + index}>
-                        {employee.phoneNumber}
-                    </td>
-
-                    <td key={"departmentId " + index}>{employee.department}</td>
-                    <td key={"actif " + index}>{employee.isActive ? "Oui" : "Non"}</td>
-                    <td key={"jobTitles " + index}>
+                    <td key={`id ${index}`}>{index + 1}</td>
+                    <td key={`firstName ${index}`}>{employee.firstName}</td>
+                    <td key={`name ${index}`}>{employee.lastName}</td>
+                    <td key={`email ${index}`}><a href={`mailto:${employee.email}`}>{employee.email}</a></td>
+                    <td key={`phoneNumber ${index}`}>{employee.phoneNumber}</td>
+                    <td key={`departmentId ${index}`}>{employee.department}</td>
+                    <td key={`actif ${index}`}>{employee.isActive ? `Oui` : `Non`}</td>
+                    <td key={`jobTitles ${index}`}>
                         <ListGroup variant="flush">
                             {employee.jobTitles.map((title: string) => (
                                 <ListGroup.Item key={title}>{title}</ListGroup.Item>
@@ -144,7 +139,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                         </ListGroup>
                     </td>
 
-                    <td key={"skills " + index}>
+                    <td key={`skills ${index}`}>
                         <ListGroup variant="flush">
                             {employee.skills.map((skill: string) => (
                                 <ListGroup.Item key={skill}>{skill}</ListGroup.Item>
@@ -186,29 +181,37 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
         );
     }
 
-    private renderAddEmployeeButton(): JSX.Element | undefined {
+    private renderNavigationButtons(): JSX.Element | undefined {
+        let container: JSX.Element = <Button onClick={() => history.back()} className="me-3" variant="secondary">
+            Retour
+        </Button>;
         if (API.hasPermission(Roles.ADMIN)) {
             return (
-                <LinkContainer to="/add-employee">
-                    <Button className="mt-3 mb-3">Ajouter</Button>
-                </LinkContainer>
+                <div className="mt-3">
+                    {container}
+                    <LinkContainer to="/add-employee">
+                        <Button>Ajouter</Button>
+                    </LinkContainer>
+                </div>
             );
-        } else {
-            return <></>;
         }
+        return container;
     }
 
     private renderAdminActions(index: number, employee: Employee): JSX.Element | undefined {
         if (employee.id && API.hasPermission(Roles.ADMIN) && API.userRole > employee.role) {
-            let component: JSX.Element = <CgUnavailable/>;
+            let component: JSX.Element = <IconContext.Provider
+                value={{color: "white"}}><CgUnavailable/></IconContext.Provider>;
             if (!employee.isActive) {
-                component = <CgCheckO/>
+                component = <IconContext.Provider value={{color: "white"}}><CgCheckO/></IconContext.Provider>;
             }
             return (
                 <td key={`action ${index}`}>
-                    <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
-                        <BiEdit/>
-                    </LinkContainer>
+                    <IconContext.Provider value={{color: "white"}}>
+                        <LinkContainer to={`${RoutesPath.EDIT_EMPLOYEE}${employee.id}`} className="adminActions mx-1">
+                            <BiEdit/>
+                        </LinkContainer>
+                    </IconContext.Provider>
                     <a className="adminActions ms-1 mx-1"
                        onClick={() => this.props.onEmployeeActivationChange(employee)}>{component}</a>
                 </td>
@@ -231,7 +234,7 @@ export class ComponentEmployeeList extends React.Component<EmployeeListProps, Em
                 <tr key={"firstCol"}>
                     {employeeTableHeads.map((th) => (<th key={th}>{th}</th>))}
                 </tr>
-            )
+            );
         }
     }
 }

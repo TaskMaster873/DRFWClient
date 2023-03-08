@@ -8,6 +8,7 @@ import {MemoryRouter} from "react-router-dom";
 import {ComponentEmployeeList} from "../src/engine/components/ComponentEmployeeList";
 import {employeeTableHeads} from "../src/engine/types/Employee";
 import {department, employees, employees2} from "../Constants/testConstants";
+import React from "react";
 
 jest.mock("../src/engine/api/APIManager");
 
@@ -170,7 +171,7 @@ function checkFieldValues(ths, trs, tds, list) {
     for (let i = 0; i < trs.length - 1; i++) {
         expect(tds[i * ths.length + 1].innerHTML).toBe(list[i].firstName);
         expect(tds[i * ths.length + 2].innerHTML).toBe(list[i].lastName);
-        expect(tds[i * ths.length + 3].innerHTML).toBe(list[i].email);
+        expect(tds[i * ths.length + 3].innerHTML).toBe(`<a href="mailto:${list[i].email}">${list[i].email}</a>`);
         expect(tds[i * ths.length + 4].innerHTML).toBe(list[i].phoneNumber);
         expect(tds[i * ths.length + 5].innerHTML).toBe(list[i].department);
         expect(tds[i * ths.length + 6].innerHTML).toBe(list[i].isActive ? "Oui" : "Non");
@@ -186,9 +187,9 @@ function checkFieldValues(ths, trs, tds, list) {
  */
 function expectedListItems(array) {
     let listItems = ``;
-    if(array.size === 0) return listItems;
+    if (array.size === 0) return listItems;
     for (const elem of array) {
-        listItems +=`<div class="list-group-item">${elem}</div>`
+        listItems += `<div class="list-group-item">${elem}</div>`
     }
     return listItems;
 }

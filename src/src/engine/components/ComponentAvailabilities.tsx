@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
 
@@ -11,23 +11,10 @@ interface ComponentAvailabilitiesProps {
     isCellInStartToEndTimeRange: (weekStart: DayPilot.Date, startDate: DayPilot.Date, endDate: DayPilot.Date) => boolean;
 }
 
-interface ComponentAvailabilitiesState {
-    daypilotSettings: {
-        businessBeginsHour: number
-    };
-}
-
-export class ComponentAvailabilities extends Component<ComponentAvailabilitiesProps, ComponentAvailabilitiesState> {
+export class ComponentAvailabilities extends Component<ComponentAvailabilitiesProps, unknown> {
+    public props: ComponentAvailabilitiesProps;
     private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
     private datePickerRef: React.RefObject<DayPilotNavigator> = React.createRef();
-
-    public state: ComponentAvailabilitiesState = {
-        daypilotSettings: {
-            businessBeginsHour: 0,
-        }
-    };
-
-    public props: ComponentAvailabilitiesProps;
 
     constructor(props) {
         super(props);
@@ -58,6 +45,54 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         this.datePicker?.update({
             events: events
         });
+    }
+
+    /**
+     *
+     * @returns all events in the calendar in {DayPilot.EventData[]} or undefined if the calendar is undefined
+     */
+    public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
+        return this.calendar?.events.list;
+    }
+
+    public render(): JSX.Element {
+        return (
+            <div className={"flex_hundred"}>
+                <div className={"left"}>
+                    <DayPilotNavigator
+                        locale={"fr-fr"}
+                        selectMode={"Week"}
+                        showMonths={1}
+                        skipMonths={1}
+                        weekStarts={0}
+                        rowsPerMonth={"Auto"}
+                        startDate={DayPilot.Date.today()}
+                        selectionDay={DayPilot.Date.today()}
+                        onTimeRangeSelected={this.#onTimeRangeSelectedNavigator}
+                        ref={this.datePickerRef}
+                    />
+                </div>
+                <div className="main">
+                    <DayPilotCalendar
+                        heightSpec={"Parent100Pct"}
+                        locale={"fr-fr"}
+                        headerDateFormat={"dddd"}
+                        viewType={"Week"}
+                        businessBeginsHour={6}
+                        businessEndsHour={24}
+                        weekStarts={0}
+                        onTimeRangeSelected={this.#onTimeRangeSelectedCalendar}
+                        eventDeleteHandling={"Update"}
+                        allowEventOverlap={false}
+                        durationBarVisible={true}
+                        onBeforeCellRender={this.#onBeforeCellRender}
+                        onEventMoved={this.#onEventMoved}
+                        onEventResized={this.#onEventResized}
+                        ref={this.calendarRef}
+                    />
+                </div>
+            </div>
+        );
     }
 
     /**
@@ -102,8 +137,8 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
         const eventToAdd: DayPilot.EventData = {
             start: args.start,
             end: args.end,
-            id: '',
-            text: ''
+            id: "",
+            text: this.transformToDayPilotText(args.start, args.end),
         };
 
         event.push(eventToAdd);
@@ -115,69 +150,53 @@ export class ComponentAvailabilities extends Component<ComponentAvailabilitiesPr
 
     /**
      *
+     * @param start date of the event
+     * @param end date of the event
+     * @returns A string containing the hours of the things
+     */
+    private transformToDayPilotText(start: DayPilot.Date, end: DayPilot.Date): string {
+        return start.toString().slice(11, 16) + " à " + end.toString().slice(11, 16);
+    }
+
+    /**
+     * Updates the event with its new time
+     * @param args the event data
+     */
+    readonly #onEventResized = (args: DayPilot.CalendarEventResizedArgs): void => {
+        args.e.text(this.transformToDayPilotText(args.newStart, args.newEnd));
+        this.datePicker?.update();
+        this.calendar?.update();
+    };
+
+    /**
+     * Updates the event with its new time
+     * @param args the events data
+     */
+    readonly #onEventMoved = (args: DayPilot.CalendarEventMovedArgs): void => {
+        args.e.text(this.transformToDayPilotText(args.newStart, args.newEnd));
+        this.datePicker?.update();
+        this.calendar?.update();
+    };
+
+    /**
+     *
      * @param args is the args that the method has by DayPilot
      */
     readonly #onBeforeCellRender = (args: any): void => {
         let cell = args.cell;
         let start: DayPilot.Date = cell.start;
         let end: DayPilot.Date = cell.end;
-        let startDateOfWeek: DayPilot.Date = start.firstDayOfWeek('en-us');
+        let startDateOfWeek: DayPilot.Date = start.firstDayOfWeek("en-us");
 
-        if(startDateOfWeek) {
+        if (startDateOfWeek) {
             let isDisabled: boolean = this.props.isCellInStartToEndTimeRange(startDateOfWeek, start, end);
 
-            if(isDisabled) {
+            if (isDisabled) {
                 args.cell.properties.disabled = true;
                 args.cell.properties.backColor = "#eeeeee";
             }
         }
-    }
-
-    /**
-     *
-     * @returns all events in the calendar in {DayPilot.EventData[]} or undefined if the calendar is undefined
-     */
-    public getListFromTheCalendar(): DayPilot.EventData[] | undefined {
-        return this.calendar?.events.list;
-    }
-
-    public render(): JSX.Element {
-        return (
-            <div className='flex_hundred'>
-                <div className='left'>
-                    <DayPilotNavigator
-                        selectMode={"Week"}
-                        showMonths={1}
-                        skipMonths={1}
-                        weekStarts={0}
-                        rowsPerMonth={"Auto"}
-                        startDate={DayPilot.Date.today()}
-                        selectionDay={DayPilot.Date.today()}
-                        onTimeRangeSelected={this.#onTimeRangeSelectedNavigator}
-                        ref={this.datePickerRef}
-                    />
-                </div>
-                <div className='main'>
-                    <DayPilotCalendar
-                        {...this.state.daypilotSettings}
-                        heightSpec={"Parent100Pct"}
-
-                        headerDateFormat={"dddd"}
-                        viewType={"Week"}
-                        businessBeginsHour={0}
-                        businessEndsHour={24}
-                        weekStarts={0}
-                        onTimeRangeSelected={this.#onTimeRangeSelectedCalendar}
-                        eventDeleteHandling={"Update"}
-                        allowEventOverlap={false}
-                        durationBarVisible={true}
-                        onBeforeCellRender={this.#onBeforeCellRender}
-                        ref={this.calendarRef}
-                    />
-                </div>
-            </div>
-        );
-    }
+    };
 }
 
 

@@ -1,12 +1,6 @@
 import {Employee} from "./Employee";
 import {IdElement} from "./Global";
 
-export interface DepartmentsState {
-    employees: Employee[];
-    employeeNb: number[];
-    departments: Department[];
-    redirectTo: string | null;
-}
 
 export interface DepartmentListState {
     editedDepartment?: Department;
@@ -25,20 +19,20 @@ export class Department implements IdElement {
         this.id = department.id;
         this.name = department.name;
         this.director = department.director;
-	}
+    }
 }
 
-export let departmentTableHeads : string[] =
+export let departmentTableHeads: string[] =
     ["#", "Nom", "Directeur/Gérant", "Nombre d'employés"];
 
-export let departmentAdminTableHeads : string[] =
+export let departmentAdminTableHeads: string[] =
     ["#", "Nom", "Directeur/Gérant", "Nombre d'employés", "Actions"];
 
 /**
  * Contient tous les renseignements pour créer un nouveau département dans la bd
  */
 export interface DepartmentModifyDTO {
-	readonly name: string;
+    readonly name: string;
     readonly director: string;
 }
 

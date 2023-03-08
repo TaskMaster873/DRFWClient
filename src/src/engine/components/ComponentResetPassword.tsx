@@ -10,6 +10,10 @@ import {Container} from "react-bootstrap";
 import Logo from "../../deps/images/logo.png";
 import {NotificationManager} from "../api/NotificationManager";
 import FormUtils from "../utils/FormUtils";
+import {ParticlesOpts} from "../types/Particles";
+import Particles from "react-particles";
+import {Engine} from "tsparticles-engine";
+import {loadFull} from "tsparticles";
 
 type Props = {
     actionCode: string,
@@ -43,13 +47,18 @@ export function ComponentResetPassword(props: Props) {
         }
     };
 
+    const customInit = async (engine: Engine) => {
+        await loadFull(engine);
+    };
+
     return (
         <Container>
+            <Particles options={ParticlesOpts} init={customInit}/>
             <div className="auth-form">
                 <div className="me-4">
                     <img
                         className="mx-auto d-block mt-5"
-                        src={Logo as any}
+                        src={Logo}
                         alt="Logo TaskMaster"
                         width={50}
                         height={60}

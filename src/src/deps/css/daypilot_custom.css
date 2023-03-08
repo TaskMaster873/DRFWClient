@@ -1,3 +1,13 @@
 .scheduler_default_shadow_overlap .scheduler_default_shadow_inner {
     background-color: red;
 }
+
+.submit-abilities-button {
+    position: absolute;
+    left: 5vh;
+    bottom: 2em;
+}
+
+.component-schedule-create-calendar-height {
+    height: 80vh;
+}

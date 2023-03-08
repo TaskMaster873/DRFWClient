@@ -31,11 +31,17 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         redirectTo: null
     };
 
+    constructor(props) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
+
     public async componentDidMount(): Promise<void> {
         document.title = "Horaire - TaskMaster";
 
         let isLoggedIn: boolean = await this.verifyLogin();
-        if(isLoggedIn) {
+        if (isLoggedIn) {
             let shifts = await this.loadShiftsFromAPI();
             if (typeof shifts === "string") {
                 this.setState({fetchState: enumStateOfFetching.ERROR});
@@ -46,6 +52,27 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         } else {
             NotificationManager.warn(errors.SORRY, errors.NO_PERMISSION);
         }
+    }
+
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        }
+
+        let listData: Shift[] = this.state.list;
+        if (this.state.fetchState === enumStateOfFetching.WAITING) {
+            return (
+                <ComponentLoading/>
+            );
+        } else if (this.state.fetchState === enumStateOfFetching.OK) {
+            return (<ComponentEmployeeScheduleView shifts={listData}/>);
+        } else {
+            return (<ComponentEmployeeScheduleView shifts={[]}/>);
+        }
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**
@@ -67,7 +94,9 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
 
         let hasPerms = this.verifyPermissions(Roles.EMPLOYEE);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             isLoggedIn = true;
         }
@@ -75,36 +104,8 @@ export class ScheduleEmployee extends React.Component<unknown, ScheduleState> {
         return isLoggedIn;
     }
 
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
-    }
-
     // I did this function if we need to do something before the return (if there is some changes)
     private async loadShiftsFromAPI(): Promise<Shift[] | string> {
         return await API.getCurrentEmployeeSchedule();
-    }
-
-    public render(): JSX.Element {
-        if(this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}></Navigate>);
-        }
-
-        let listData: Shift[] = this.state.list;
-        if (this.state.fetchState === enumStateOfFetching.WAITING) {
-            return (
-                <ComponentLoading />
-            );
-        } else if (this.state.fetchState === enumStateOfFetching.OK) {
-            return (<ComponentEmployeeScheduleView shifts={listData}/>);
-        } else {
-            return (<ComponentEmployeeScheduleView shifts={[]}/>);
-        }
     }
 }

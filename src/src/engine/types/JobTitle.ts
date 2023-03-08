@@ -1,6 +1,7 @@
 export class JobTitle {
     public id?: string;
     public name: string;
+
     constructor(jobTitle: JobTitleDTO) {
         this.id = jobTitle.id;
         this.name = jobTitle.name;

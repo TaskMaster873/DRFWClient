@@ -1,6 +1,6 @@
 export enum FormErrorType {
-    NO_ERROR = '0',
-    INVALID_FORM = '1'
+    NO_ERROR = "0",
+    INVALID_FORM = "1"
 }
 
 export const errors = {
@@ -21,6 +21,7 @@ export const errors = {
     INVALID_LOGIN: "Le numéro d'employé ou le mot de passe spécifié est invalide",
     INVALID_DATETIME: "La date doit être un multiple d'une demi-heure.",
     INVALID_DATE: "La date est invalide",
+    AVAILABILITY_ERROR: "Il y a eu une erreur de création de disponibilité",
     DEPARTMENT_ALREADY_EXISTS: "Le département existe déjà",
     MESSAGE_SCHEDULE_UNAVALIBLE: "l'horaire n'est pas disponible pour le moment, veuillez réessayer plus tard",
     SERVER_ERROR: "Une erreur s'est produite, veuillez réessayer plus tard",
@@ -38,7 +39,7 @@ export const errors = {
     SORRY: "Oops!",
     NO_PERMISSION: "Vous n'avez pas les permissions nécessaires pour visiter cette page.",
     GET_AVAILABILITIES: "Une erreur s'est produite lors de la récupération des données des disponibilités.",
-}
+};
 
 export const successes = {
     SUCCESS_GENERIC_MESSAGE: "Succès",
@@ -58,10 +59,12 @@ export const successes = {
     JOB_TITLE_EDITED: "Le corps d'emploi a bien été modifié !",
     SKILL_EDITED: "La compétence a bien été modifié !",
     JOB_TITLE_DELETED: "Le corps d'emploi a bien été supprimé !",
-    SKILL_DELETED: "La compétence a bien été supprimé !"
-}
+    SKILL_DELETED: "La compétence a bien été supprimé !",
+    AVAILABILITY_ACCEPTED: "La demande de disponibilité a bien été acceptée !",
+    AVAILABILITY_REFUSED: "La demande de disponibilité a bien été refusée !",
+};
 
 export const info = {
     PASSWORD_RESET: "Réinitialisation du mot de passe",
     EMAIL_SENT: "Un courriel a été envoyé à votre adresse courriel."
-}
+};

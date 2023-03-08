@@ -5,13 +5,14 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import {errors, FormErrorType} from "../messages/FormMessages";
-import {Modal} from "react-bootstrap";
+import {CloseButton, Modal} from "react-bootstrap";
 import {BiCheck, BiPencil, BiPlus, BiTrash} from "react-icons/bi";
 import {Skill} from "../types/Skill";
 import {CgUnavailable} from "react-icons/cg";
 import FormUtils from "../utils/FormUtils";
 import {ComponentConfirmDeleteSkill} from "./ComponentConfirmDeleteSkill";
 import {SkillActions} from "../types/Employee";
+import {IconContext} from "react-icons/lib";
 
 interface EditSkillsState {
     skillToDelete?: Skill;
@@ -56,10 +57,12 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
 
     public render(): JSX.Element {
         return <div><ComponentConfirmDeleteSkill closePrompt={this.#onShowConfirmDeleteSkills}
-                                                    skill={this.state.skillToDelete} onDeleteSkill={this.props.onDeleteSkill}/>
-            <Modal show={this.props.showEdit} onHide={this.hideModal}>
-                <Modal.Header closeButton>
+                                                 skill={this.state.skillToDelete}
+                                                 onDeleteSkill={this.props.onDeleteSkill}/>
+            <Modal variant="dark" show={this.props.showEdit} onHide={this.hideModal}>
+                <Modal.Header>
                     <Modal.Title>Édition de compétence</Modal.Title>
+                    <CloseButton variant="white" onClick={() => this.hideModal()}/>
                 </Modal.Header>
                 <Modal.Body>
                     <Form
@@ -110,21 +113,26 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group as={Col} md="2">
-                                <Button type="submit"><BiPlus className="adminActions mb-1"/></Button>
+                                <Button type="submit">
+                                    <IconContext.Provider value={{color: "white"}}>
+                                        <BiPlus className="adminActions mb-1"/>
+                                    </IconContext.Provider>
+                                </Button>
                             </Form.Group>
                         </Row>
                     </Form>
                 </Modal.Body>
             </Modal>
-        </div>
+        </div>;
     }
 
     /**
      * The function that hides the modal when the exit button is clicked
      */
     readonly hideModal = (): void => {
+        this.editSkill();
         this.props.cancelEdit();
-    }
+    };
 
     /**
      * When the delete button is clicked show the deletion confirmation window
@@ -133,7 +141,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
      */
     readonly #onShowConfirmDeleteSkills = (value?: Skill): void => {
         this.setState({skillToDelete: value});
-    }
+    };
 
     /**
      * Render edit and delete actions
@@ -144,15 +152,21 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         if (this.state.editedSkill == skill) {
             return <div>
                 <button className="transparentButton me-2" type="submit">
-                    <BiCheck className="adminActions"/>
+                    <IconContext.Provider value={{color: "white"}}>
+                        <BiCheck className="adminActions"/>
+                    </IconContext.Provider>
                 </button>
-                <CgUnavailable onClick={() => this.editSkill()} className="adminActions ms-1"/>
-            </div>
+                <IconContext.Provider value={{color: "white"}}>
+                    <CgUnavailable onClick={() => this.editSkill()} className="adminActions ms-1"/>
+                </IconContext.Provider>
+            </div>;
         } else {
             return <div>
-                <BiPencil onClick={() => this.editSkill(skill)} className="adminActions me-2"/>
-                <BiTrash onClick={() => this.showDeletePrompt(skill)} className="adminActions ms-2"/>
-            </div>
+                <IconContext.Provider value={{color: "white"}}>
+                    <BiPencil onClick={() => this.editSkill(skill)} className="adminActions me-2"/>
+                    <BiTrash onClick={() => this.showDeletePrompt(skill)} className="adminActions ms-2"/>
+                </IconContext.Provider>
+            </div>;
         }
     }
 
@@ -188,12 +202,12 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
 
         if (errorType === FormErrorType.NO_ERROR) {
             formDataObj.id = this.state.editedSkill?.id;
-            if(formDataObj.id) {
+            if (formDataObj.id) {
                 await this.props.onEditSkill(formDataObj);
             }
             this.setState({editedSkill: undefined});
         }
-    }
+    };
 
     /**
      * Function that is called when the add form is submitted.
@@ -210,7 +224,7 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
         if (errorType === FormErrorType.NO_ERROR) {
             await this.props.onAddSkill(this.state.name);
         }
-    }
+    };
 
     /**
      * Function that is called when the form is changed. This update the state of the component.
@@ -231,5 +245,5 @@ export class ComponentEditSkills extends React.Component<EditSkillsProps, EditSk
                 [name]: value,
             }
         });
-    }
+    };
 }

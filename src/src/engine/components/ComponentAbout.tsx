@@ -6,10 +6,10 @@ export class ComponentAbout extends React.Component {
     public render(): JSX.Element {
         return (
             <div className=" justify-content-left">
-                <Container className="mt-4 mb-4 d-flex justify-content-center"><h1> TaskMaster </h1></Container>
+                <Container className="mt-4 mb-4 d-flex justify-content-center"><h1>TaskMaster</h1></Container>
                 <Container className="mt-6 mb-4 d-flex justify-content-center"><img
                     className="me-3"
-                    src={Logo as any}
+                    src={Logo}
                     alt="Logo TaskMaster"
                     width={200}
                     height={240}

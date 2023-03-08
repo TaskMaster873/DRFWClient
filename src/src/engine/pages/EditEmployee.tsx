@@ -1,7 +1,6 @@
 import React from "react";
 import {API} from "../api/APIManager";
-import {AddEmployeeState, EmployeeEditDTO, EmployeeProps,} from "../types/Employee";
-
+import {AddEmployeeState, EmployeeEditDTO} from "../types/Employee";
 import {errors, successes} from "../messages/FormMessages";
 import {ComponentEditEmployee} from "../components/ComponentEditEmployee";
 import {Navigate, Params, useParams} from "react-router-dom";
@@ -19,11 +18,15 @@ export function EditEmployeeWrapper(): JSX.Element {
     );
 }
 
+interface EmployeeEditProps {
+    params: Readonly<Params>;
+}
+
 /**
  * The page to edit an employee
- * @param props {EmployeeProps} The props of the page
+ * @param props {EmployeeEditProps} The props of the page
  */
-export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmployeeState> {
+export class EditEmployeeInternal extends React.Component<EmployeeEditProps, AddEmployeeState> {
     public state: AddEmployeeState = {
         departments: [],
         roles: [],
@@ -31,13 +34,46 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         skills: [],
         editedEmployee: undefined,
         redirectTo: null
-    }
+    };
 
+    constructor(props: EmployeeEditProps) {
+        super(props);
+
+        API.subscribeToEvent(this.onEvent.bind(this));
+    }
 
     public async componentDidMount(): Promise<void> {
         document.title = "Modifier un Employé - TaskMaster";
 
         await this.fetchData();
+    }
+
+    public render(): JSX.Element {
+        if (this.state.redirectTo) {
+            return (<Navigate to={this.state.redirectTo}></Navigate>);
+        }
+
+        return (
+            <ComponentEditEmployee
+                departments={this.state.departments}
+                roles={this.state.roles}
+                jobTitles={this.state.titles}
+                skills={this.state.skills}
+                editedEmployee={this.state.editedEmployee}
+                employeeId={this.props.params.id}
+                onEditEmployee={this.#editEmployee}
+                onAddJobTitle={this.#addJobTitle}
+                onEditJobTitle={this.#editJobTitle}
+                onDeleteJobTitle={this.#deleteJobTitle}
+                onAddSkill={this.#addSkill}
+                onEditSkill={this.#editSkill}
+                onDeleteSkill={this.#deleteSkill}
+            />
+        );
+    }
+
+    private async onEvent(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**
@@ -77,39 +113,21 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
     }
 
     /**
-     * Verify if the user has the permission to access this page
-     * @param role
-     * @private
-     */
-    private verifyPermissions(role: Roles): boolean {
-        return API.hasPermission(role);
-    }
-
-    /**
      * Verify if the user is logged in
      * @private
      */
     private async verifyLogin(): Promise<boolean> {
         await API.awaitLogin;
 
-        const hasPerms = this.verifyPermissions(Roles.ADMIN);
+        const hasPerms = API.hasPermission(Roles.ADMIN);
         if (!API.isAuth() || !hasPerms) {
-            this.redirectTo(RoutesPath.INDEX);
+            this.setState({
+                redirectTo: RoutesPath.INDEX
+            });
         } else {
             return true;
         }
         return false;
-    }
-
-    /**
-     * Redirect to a path
-     * @param path
-     * @private
-     */
-    private redirectTo(path: string): void {
-        this.setState({
-            redirectTo: path
-        });
     }
 
     /**
@@ -124,7 +142,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         } else {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
-    }
+    };
 
     //#region JobTitles
     /**
@@ -136,13 +154,13 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         const error = await API.createJobTitle(titleName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.JOB_TITLE_CREATED);
-            const titles = [...this.state.titles, new JobTitle({ name: titleName })];
+            const titles = [...this.state.titles, new JobTitle({name: titleName})];
             this.setState({titles: titles});
             await this.fetchData();
         } else {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
-    }
+    };
 
     /**
      * Edit a jobTitle from the database
@@ -161,7 +179,8 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
-    }
+    };
+    //#endregion
 
     /**
      * Delete a jobTitle from the database
@@ -180,8 +199,7 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
-    }
-    //#endregion
+    };
 
     //#region Skills
     /**
@@ -193,13 +211,13 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
         const error = await API.createSkill(skillName);
         if (!error) {
             NotificationManager.success(successes.SUCCESS_GENERIC_MESSAGE, successes.SKILL_CREATED);
-            const skills = [...this.state.skills, new Skill({ name: skillName })];
+            const skills = [...this.state.skills, new Skill({name: skillName})];
             this.setState({skills: skills});
             await this.fetchData();
         } else {
             NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
         }
-    }
+    };
 
     /**
      * Edit a skill from the database
@@ -218,7 +236,9 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
-    }
+    };
+
+    //#endregion
 
     /**
      * Delete a skill from the database
@@ -237,31 +257,5 @@ export class EditEmployeeInternal extends React.Component<EmployeeProps, AddEmpl
                 NotificationManager.error(errors.ERROR_GENERIC_MESSAGE, error);
             }
         }
-    }
-
-    //#endregion
-
-    public render(): JSX.Element {
-        if (this.state.redirectTo) {
-            return (<Navigate to={this.state.redirectTo}></Navigate>);
-        }
-
-        return (
-            <ComponentEditEmployee
-                departments={this.state.departments}
-                roles={this.state.roles}
-                jobTitles={this.state.titles}
-                skills={this.state.skills}
-                editedEmployee={this.state.editedEmployee}
-                employeeId={this.props.params.id}
-                onEditEmployee={this.#editEmployee}
-                onAddJobTitle={this.#addJobTitle}
-                onEditJobTitle={this.#editJobTitle}
-                onDeleteJobTitle={this.#deleteJobTitle}
-                onAddSkill={this.#addSkill}
-                onEditSkill={this.#editSkill}
-                onDeleteSkill={this.#deleteSkill}
-            />
-        );
-    }
+    };
 }

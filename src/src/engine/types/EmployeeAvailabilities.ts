@@ -1,8 +1,8 @@
 import {DayPilot} from "@daypilot/daypilot-lite-react";
-import {Timestamp} from "firebase/firestore";
-/** 
- * Enum for all days name 
-*/
+
+/**
+ * Enum for all days name
+ */
 export enum DAYS {
     SUNDAY = 0,
     MONDAY = 1,
@@ -14,43 +14,27 @@ export enum DAYS {
 }
 
 /**
- * The start time of the exception and end of the exception.
- * It is used when someone is not able to work
+ * The startTime is when the employee starts being unavailable and the endTime is when the employee ends being unavailable
  */
-export interface EmployeeRecursiveException {
-    //should
-    startTime: number;
-    endTime: number;
-    details?: string;
+export interface EmployeeAvailabilityException {
+    startTime: DayPilot.Date;
+    endTime: DayPilot.Date;
 }
 
 /**
- * The startDate when the availability is effective (Sunday) and the endDate is when the availibility end (Sunday)
- */
-interface EmployeeAvailabilityException {
-    startDate: DayPilot.Date;
-    endDate: DayPilot.Date;
-}
-
-/**
- * Contains a list of {@link EmployeeRecursiveExceptionList} for everyDays that will be recursive every weeks
+ * Contains a list of {@link EmployeeAvailabilityExceptionList} for everyDays that will be recursive every weeks
  */
 export interface RecursiveAvailabilities {
-    startDate?: Date;
-    endDate?: Date;
-    [DAYS.SUNDAY]: EmployeeRecursiveExceptionList;
-    [DAYS.MONDAY]: EmployeeRecursiveExceptionList;
-    [DAYS.TUESDAY]: EmployeeRecursiveExceptionList;
-    [DAYS.WEDNESDAY]: EmployeeRecursiveExceptionList;
-    [DAYS.THURSDAY]: EmployeeRecursiveExceptionList;
-    [DAYS.FRIDAY]: EmployeeRecursiveExceptionList;
-    [DAYS.SATURDAY]: EmployeeRecursiveExceptionList;
+    startDate: DayPilot.Date;
+    endDate: DayPilot.Date;
+    [DAYS.SUNDAY]: EmployeeAvailabilityExceptionList;
+    [DAYS.MONDAY]: EmployeeAvailabilityExceptionList;
+    [DAYS.TUESDAY]: EmployeeAvailabilityExceptionList;
+    [DAYS.WEDNESDAY]: EmployeeAvailabilityExceptionList;
+    [DAYS.THURSDAY]: EmployeeAvailabilityExceptionList;
+    [DAYS.FRIDAY]: EmployeeAvailabilityExceptionList;
+    [DAYS.SATURDAY]: EmployeeAvailabilityExceptionList;
 }
-
-/**
- * Contains a list of {@link EmployeeRecursiveException}
- */
-export type EmployeeRecursiveExceptionList = EmployeeRecursiveException[];
 
 /**
  * Contains a list of {@link EmployeeAvailabilityException}
@@ -59,7 +43,7 @@ export type EmployeeAvailabilityExceptionList = EmployeeAvailabilityException[];
 
 /**
  * Should contains a {@link RecursiveAvailabilities } that contains the unavailabilities, {@link EmployeeAvailabilityExceptionList} and a employeeId : string.
- * It is used to show the user his availabilities or to push his availabilities to his manager. 
+ * It is used to show the user his availabilities or to push his availabilities to his manager.
  */
 export interface EmployeeAvailabilities {
     recursiveExceptions: RecursiveAvailabilitiesList;
@@ -80,14 +64,15 @@ export interface EventsForUnavailability {
 export type EventsForUnavailabilityList = EventsForUnavailability[];
 
 /**
- * It is all the informations used for 
+ * Used for the creation of availabilities
  */
 export interface EmployeeAvailabilitiesForCreate {
     recursiveExceptions: RecursiveAvailabilities;
     employeeId?: string;
 }
+
 /**
- * It is used for date convert
+ * The start and end date of unavailability
  */
 export interface DateOfUnavailability {
     start: Date,
@@ -99,4 +84,15 @@ export interface DateOfUnavailability {
  */
 export type DateOfUnavailabilityList = DateOfUnavailability[];
 
-export const unavailabilitiesTableHeads: string[] = ["#", "Prénom", "Nom", "Début", "Fin", "Actions"]
+export const unavailabilitiesTableHeads: string[] = ["#", "Prénom", "Nom", "Début", "Fin", "Actions"];
+
+/**
+ * Availabilities stored in DB.
+ */
+export interface ViewableAvailabilities {
+    id: string;
+    recursiveExceptions: RecursiveAvailabilities;
+    isAccepted: boolean;
+    department: string;
+    employeeId: string;
+}

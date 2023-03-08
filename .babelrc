@@ -1,10 +1,10 @@
 {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ],
-    "plugins": [
-      "transform-export-extensions",
-      "@babel/plugin-syntax-import-meta"
-    ]
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "transform-export-extensions",
+    "@babel/plugin-syntax-import-meta"
+  ]
 }

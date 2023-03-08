@@ -1,4 +1,4 @@
-import React, {ChangeEventHandler, useState} from "react";
+import React, {useState} from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {errors, FormErrorType, info} from "../messages/FormMessages";
@@ -6,6 +6,7 @@ import {API} from "../api/APIManager";
 import Logo from "../../deps/images/logo.png";
 import {NotificationManager} from "../api/NotificationManager";
 import FormUtils from "../utils/FormUtils";
+
 /***
  * Ce composant affiche le formulaire pour réinitialiser son mot de passe avec un courriel
  */
@@ -36,7 +37,7 @@ export function ComponentForgotPassword() {
             <div className="me-4">
                 <img
                     className="mx-auto d-block mt-5"
-                    src={Logo as any}
+                    src={Logo}
                     alt="Logo TaskMaster"
                     width={50}
                     height={60}

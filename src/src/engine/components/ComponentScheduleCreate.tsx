@@ -3,188 +3,230 @@ import {DayPilot, DayPilotCalendar} from "daypilot-pro-react";
 import {EventForCalendar, EventForShiftCreation, EventForShiftEdit} from "../types/Shift";
 import {ComponentPopupSchedule} from "./ComponentPopupSchedule";
 import {Employee} from "../types/Employee";
-import {HeightSpecType, EventManipulationType, ViewType, EventDeleteHandlingType, ColumnsType} from "../types/StatesForDaypilot";
-import {Container} from "react-bootstrap";
+import {ColumnsType, EventDeleteHandlingType, EventManipulationType, ViewType} from "../types/StatesForDaypilot";
+import {ViewableAvailabilities} from "../types/EmployeeAvailabilities";
 
 interface ScheduleCreateProps {
-	currentDay: DayPilot.Date;
-	events: EventForCalendar[];
-	employees: Employee[];
-	addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
-	editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
-	deleteShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
+    currentDay: DayPilot.Date;
+    events: EventForCalendar[];
+    employees: Employee[];
+    unavailabilities: ViewableAvailabilities[];
+    addShift: (shiftEvent: EventForShiftCreation) => Promise<void>;
+    editShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
+    deleteShift: (shiftEvent: EventForShiftEdit) => Promise<void>;
 }
 
 interface ScheduleCreateState {
-	/** is the popup child active or not */
-	isShowingModal: boolean;
-	/** Shift id and serves as a unique DayPilot marker */
-	currentEventId: string;
-	/** start of the calendar */
-	start: DayPilot.Date | string;
-	/** end of the calendar */
-	end: DayPilot.Date | string;
-	/** for the popup */
-	resource: string;
-	/** Popup taskType */
-	taskType: EventManipulationType;
+    /** is the popup child active or not */
+    isShowingModal: boolean;
+    /** Shift id and serves as a unique DayPilot marker */
+    currentEventId: string;
+    /** start of the calendar */
+    start: DayPilot.Date | string;
+    /** end of the calendar */
+    end: DayPilot.Date | string;
+    /** for the popup */
+    resource: string;
+    /** Popup taskType */
+    taskType: EventManipulationType;
 }
 
 export class ComponentScheduleCreate extends React.Component<ScheduleCreateProps, ScheduleCreateState> {
-	public state: ScheduleCreateState = {
-		isShowingModal: false,
-		currentEventId: "",
-		start: "",
-		end: "",
-		resource: "",
-		taskType: EventManipulationType.CREATE,
-	};
+    public state: ScheduleCreateState = {
+        isShowingModal: false,
+        currentEventId: "",
+        start: "",
+        end: "",
+        resource: "",
+        taskType: EventManipulationType.CREATE,
+    };
+    private calendarRef: React.RefObject<DayPilotCalendar> = React.createRef();
 
-	constructor(props: ScheduleCreateProps) {
-		super(props);
-	}
+    constructor(props: ScheduleCreateProps) {
+        super(props);
+    }
 
-	public render(): JSX.Element {
-		return (
-			<Container className="mt-3 mb-3">
-				<DayPilotCalendar
-					businessBeginsHour={8}
-					businessEndsHour={20}
-					height={2000}
-					cellHeight={20}
-					cellDuration={30}
-					onTimeRangeSelected={this.#onTimeRangeSelected}
-					onEventClick={this.#onEventClick}
-					onEventMoved={this.#onEventMoved}
-					onEventResized={this.#onEventResized}
-					onEventDelete={this.#onEventDelete}
-					startDate={this.props.currentDay}
-					columns={this.getEmployeeColumns()}
-					events={this.props.events as any}
-					heightSpec={HeightSpecType.Full}
-					viewType={ViewType.Resources}
-					eventDeleteHandling={EventDeleteHandlingType.Update}
-				/>
+    /**
+     * @returns the calendar that has a ref in the component
+     */
+    get calendar() {
+        return this.calendarRef?.current?.control;
+    }
 
-				<ComponentPopupSchedule
-					hideModal={this.#hideModal}
-					isShown={this.state.isShowingModal}
-					eventAdd={this.props.addShift}
-					eventEdit={this.props.editShift}
-					id={this.state.currentEventId}
-					start={this.state.start}
-					end={this.state.end}
-					resource={this.state.resource}
-					taskType={this.state.taskType}
-					employees={this.props.employees}
-				/>
-			</Container>
-		);
-	}
+    public render(): JSX.Element {
+        return (
+            <div className={"component-schedule-create-calendar-height"}>
+                <DayPilotCalendar
+                    heightSpec={"Parent100Pct"}
+                    headerDateFormat={"dddd"}
+                    locale={"fr-fr"}
+                    viewType={ViewType.Resources}
+                    businessBeginsHour={6}
+                    businessEndsHour={24}
+                    weekStarts={0}
+                    cellHeight={20}
+                    cellDuration={30}
+                    eventDeleteHandling={EventDeleteHandlingType.Update}
+                    allowEventOverlap={false}
+                    durationBarVisible={true}
 
-	/**
-	 * Called when the user selects a time range in the calendar
-	 * @private
-	 * @memberof ComponentScheduleCreate
-	 * @returns {void} The list of employee names formatted for DayPilotCalendar columns
-	 */
-	private getEmployeeColumns(): ColumnsType[] {
-		let listToReturn: ColumnsType[] = [];
-		if (this.props.employees.length > 0) {
-			for (let employee of this.props.employees) {
-				listToReturn.push({
-					id: employee.id ?? "1",
-					name: `${employee.firstName} ${employee.lastName}`
-				});
-			}
-		}
-		return listToReturn;
-	}
+                    onBeforeCellRender={this.#onBeforeCellRender}
+                    onTimeRangeSelected={this.#onTimeRangeSelected}
+                    onEventClick={this.#onEventClick}
+                    onEventMoved={this.#onEventMoved}
+                    onEventResized={this.#onEventResized}
+                    onEventDelete={this.#onEventDelete}
+                    startDate={this.props.currentDay.toString()}
+                    columns={this.getEmployeeColumns()}
+                    events={this.props.events as any}
+                    ref={this.calendarRef}
+                />
 
-	// TODO type this arg
-	/**
-	 * Called when the user selects a time range in the calendar
-	 * @param args {TimeRangeSelectedParams}
-	 * @private
-	 * @memberof ComponentScheduleCreate
-	 * @returns {void}
-	 */
-	readonly #onTimeRangeSelected = (args: any): void => {
-		this.setState({
-			isShowingModal: true,
-			start: args.start,
-			end: args.end,
-			resource: args.resource,
-			taskType: EventManipulationType.CREATE,
-		});
+                <ComponentPopupSchedule
+                    hideModal={this.#hideModal}
+                    isShown={this.state.isShowingModal}
+                    eventAdd={this.props.addShift}
+                    eventEdit={this.props.editShift}
+                    id={this.state.currentEventId}
+                    start={this.state.start}
+                    end={this.state.end}
+                    resource={this.state.resource}
+                    taskType={this.state.taskType}
+                    employees={this.props.employees}
+                />
+            </div>
+        );
+    }
 
-		// TODO Fix this.
-		//DayPilot.Calendar.clearSelection();
-	};
+    /**
+     * Called when the user selects a time range in the calendar
+     * @private
+     * @memberof ComponentScheduleCreate
+     * @returns {void} The list of employee names formatted for DayPilotCalendar columns
+     */
+    private getEmployeeColumns(): ColumnsType[] {
+        let listToReturn: ColumnsType[] = [];
+        if (this.props.employees.length > 0) {
+            for (let employee of this.props.employees) {
+                listToReturn.push({
+                    id: employee.id ?? "1",
+                    name: `${employee.firstName} ${employee.lastName}`
+                });
+            }
+        }
+        return listToReturn;
+    }
 
-	/**
-	 * When you click an event in order to modify its details, this function is called
-	 * @param args info on the clicked event
-	 */
-	readonly #onEventClick = (args: any): void => {
-		this.setState({
-			isShowingModal: true,
-			currentEventId: args.e.data.id,
-			start: args.e.data.start,
-			end: args.e.data.end,
-			resource: args.e.data.resource,
-			taskType: EventManipulationType.EDIT,
-		});
-	};
 
-	/**
-	 * When you drag an event in order to modify its position, this function is called
-	 * @param args info on the dragged event
-	 */
-	readonly #onEventMoved = async (args: any): Promise<void> => {
-		let eventToSend: EventForShiftEdit = {
-			id: args.e.data.id,
-			employeeId: args.newResource,
-			start: args.newStart,
-			end: args.newEnd,
-		};
-		await this.props.editShift(eventToSend);
-	};
+    /**
+     * Called before rendering each cell, used to set unavailability ranges
+     * @param args the cell's data and properties
+     */
+    readonly #onBeforeCellRender = (args: any): void => {
+        for (let unavailability of this.props.unavailabilities) {
+            //Is unavailability affecting correct column
+            if (unavailability.employeeId === args.cell.resource) {
+                //Is unavailability valid
+                if (unavailability.recursiveExceptions.endDate >= this.props.currentDay &&
+                    unavailability.recursiveExceptions.startDate <= this.props.currentDay
+                ) {
+                    //For each unavailability time range
+                    for (let timerange of unavailability.recursiveExceptions[this.props.currentDay.getDayOfWeek()]) {
+                        //Convert minutes to milliseconds and compare with cell millisends since start of day
+                        if (timerange.startTime * 60000 <= args.cell.start.getTimePart() &&
+                            timerange.endTime * 60000 >= args.cell.end.getTimePart()
+                        ) {
+                            args.cell.properties.disabled = true;
+                            args.cell.properties.backColor = "#eeeeee";
+                        }
+                    }
+                }
+            }
+        }
+    };
 
-	/**
-	 * When you resize an event in order to modify its length, this function is called
-	 * @param args info on the dragged event
-	 */
-	readonly #onEventResized = async (args: any): Promise<void> => {
-		let eventToSend: EventForShiftEdit = {
-			id: args.e.data.id,
-			employeeId: args.e.data.resource,
-			start: args.newStart,
-			end: args.newEnd,
-		};
-		await this.props.editShift(eventToSend);
-	};
+    /**
+     * Called when the user selects a time range in the calendar
+     * @param args
+     * @private
+     * @memberof ComponentScheduleCreate
+     * @returns {void}
+     */
+    readonly #onTimeRangeSelected = (args: any): void => {
+        this.setState({
+            isShowingModal: true,
+            start: args.start,
+            end: args.end,
+            resource: args.resource,
+            taskType: EventManipulationType.CREATE,
+        });
 
-	/**
-	 * When you delete an event, this function is called
-	 * @param args
-	 */
-	readonly #onEventDelete = async (args: any): Promise<void> => {
-		let eventToSend: EventForShiftEdit = {
-			id: args.e.data.id,
-			employeeId: args.e.data.resource,
-			start: args.e.data.start,
-			end: args.e.data.end,
-		};
-		await this.props.deleteShift(eventToSend);
-	};
+        this.calendar?.clearSelection();
+    };
 
-	/**
-	 * When you close the modal window, this function is called in order to hide it
-	 */
-	readonly #hideModal = () => {
-		this.setState({
-			isShowingModal: false
-		});
-	};
+    /**
+     * When you click an event in order to modify its details, this function is called
+     * @param args info on the clicked event
+     */
+    readonly #onEventClick = (args: any): void => {
+        this.setState({
+            isShowingModal: true,
+            currentEventId: args.e.data.id,
+            start: args.e.data.start,
+            end: args.e.data.end,
+            resource: args.e.data.resource,
+            taskType: EventManipulationType.EDIT,
+        });
+    };
+
+    /**
+     * When you drag an event in order to modify its position, this function is called
+     * @param args info on the dragged event
+     */
+    readonly #onEventMoved = async (args: any): Promise<void> => {
+        let eventToSend: EventForShiftEdit = {
+            id: args.e.data.id,
+            employeeId: args.newResource,
+            start: args.newStart,
+            end: args.newEnd,
+        };
+        await this.props.editShift(eventToSend);
+    };
+
+    /**
+     * When you resize an event in order to modify its length, this function is called
+     * @param args info on the dragged event
+     */
+    readonly #onEventResized = async (args: any): Promise<void> => {
+        let eventToSend: EventForShiftEdit = {
+            id: args.e.data.id,
+            employeeId: args.e.data.resource,
+            start: args.newStart,
+            end: args.newEnd,
+        };
+        await this.props.editShift(eventToSend);
+    };
+
+    /**
+     * When you delete an event, this function is called
+     * @param args
+     */
+    readonly #onEventDelete = async (args: any): Promise<void> => {
+        let eventToSend: EventForShiftEdit = {
+            id: args.e.data.id,
+            employeeId: args.e.data.resource,
+            start: args.e.data.start,
+            end: args.e.data.end,
+        };
+        await this.props.deleteShift(eventToSend);
+    };
+
+    /**
+     * When you close the modal window, this function is called in order to hide it
+     */
+    readonly #hideModal = () => {
+        this.setState({
+            isShowingModal: false
+        });
+    };
 }
