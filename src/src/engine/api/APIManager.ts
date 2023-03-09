@@ -411,7 +411,6 @@ class APIManager extends Logger {
     private resetEmployeeInfos() {
         this.#employeeInfos.role = 0;
         this.#employeeInfos.department = "";
-        console.log(this.#employeeInfos);
     }
 
     /**
@@ -1848,7 +1847,7 @@ class APIManager extends Logger {
 
                 if (!(this.#db as any)._firestoreClient) {
                     await enableIndexedDbPersistence(this.#db).catch((err) =>
-                        console.log(err.message)
+                        {}
                     );
                     this.log("IndexedDB persistence enabled");
                 }
