@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {DayPilot, DayPilotCalendar, DayPilotNavigator} from "daypilot-pro-react";
+import {DayPilot, DayPilotCalendar, DayPilotNavigator,} from "daypilot-pro-react";
 import "../../deps/css/navigator_default.css";
 
 interface ComponentAvailabilitiesProps {

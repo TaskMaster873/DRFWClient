@@ -560,6 +560,7 @@ class APIManager extends Logger {
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
+        
         await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
             return APIUtils.getErrorMessageFromCode(error);
         });

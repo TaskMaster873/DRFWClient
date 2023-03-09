@@ -41,7 +41,7 @@ export function ComponentAvailabilitiesPopup(props: Props) {
 
         if (errorType === FormErrorType.NO_ERROR) {
             setDisabled(true);
-            props.availabilityAdd(start ?? props.start, end ?? props.end);
+            await props.availabilityAdd(start ?? props.start, end ?? props.end);
             closeModal();
         }
     };
