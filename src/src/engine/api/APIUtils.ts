@@ -22,7 +22,7 @@ export class InternalAPIUtils extends Logger {
 
         if (typeof error === "string") {
             message = error;
-            if(message.includes("Firebase: Error (auth/email-already-in-use).")) {
+            if (message.includes("Firebase: Error (auth/email-already-in-use).")) {
                 errorMessage = errors.EMPLOYEE_EMAIL_ALREADY_USED;
             }
         } else {
