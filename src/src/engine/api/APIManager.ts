@@ -319,7 +319,6 @@ class APIManager extends Logger {
     /**
      * This method is used to edit an employee.
      * @param employeeId The id of the employee to edit.
-     * @param employee The employee data.
      * @method editEmployee
      * @async
      * @public
@@ -1302,7 +1301,6 @@ class APIManager extends Logger {
      * @public
      * @memberof APIManager
      * @returns {Promise<string | boolean>} Nothing if the request was successful, and the error message if it was not.
-     * @param list
      */
     public async getCurrentEmployeeUnavailabilities(): Promise<EmployeeAvailabilities | string> {
         let returnList: string | EmployeeAvailabilities;
@@ -1722,7 +1720,6 @@ class APIManager extends Logger {
 
     /**
      * This method is used to trigger an email verification.
-     * @param user The user to verify.
      * @private
      * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
      * @memberof APIManager
@@ -1847,12 +1844,9 @@ class APIManager extends Logger {
                 );
 
                 if (!(this.#db as any)._firestoreClient) {
-                    await enableIndexedDbPersistence(this.#db).catch((err) => {
-                        }
-                    );
-                    this.log("IndexedDB persistence enabled");
+                    await enableIndexedDbPersistence(this.#db).catch(() => {
+                    });
                 }
-
                 this.log("Firebase emulators loaded");
             }
 
