@@ -396,8 +396,8 @@ class APIManager extends Logger {
                         errorMessage = APIUtils.getErrorMessageFromCode(error);
                     });
 
-                    if (reAuth?.user) {
-                        this.#user = reAuth?.user || null;
+                    if (!reAuth?.user) {
+                        this.#user = null;
                         this.isAuthenticated = false;
                         this.resetEmployeeInfos();
                     }
