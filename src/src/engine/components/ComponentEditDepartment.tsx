@@ -105,8 +105,8 @@ export class ComponentEditDepartment extends React.Component<DepartmentEditProps
         event.preventDefault();
         event.stopPropagation();
 
-        let eventTarget: any = event.target;
-        let formData = new FormData(eventTarget);
+        let eventTarget: EventTarget = event.target;
+        let formData = new FormData(eventTarget as HTMLFormElement);
         let formDataObj: Department = Object.fromEntries(formData.entries()) as unknown as Department;
 
         let errorType = FormErrorType.NO_ERROR;

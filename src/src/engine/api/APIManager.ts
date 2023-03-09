@@ -265,7 +265,6 @@ class APIManager extends Logger {
      * @public
      */
     public async logout(): Promise<string | null> {
-        this.log("Logging out user...");
         let errorMessage: string | null = null;
 
         if (this.isAuthenticated) {
@@ -320,7 +319,6 @@ class APIManager extends Logger {
     /**
      * This method is used to edit an employee.
      * @param employeeId The id of the employee to edit.
-     * @param employee The employee data.
      * @method editEmployee
      * @async
      * @public
@@ -329,7 +327,9 @@ class APIManager extends Logger {
      */
     public async changeEmployeeResetToggle(employeeId: string): Promise<string | null> {
         let errorMessage: string | null = null;
-
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            return errors.PERMISSION_DENIED;
+        }
         if (employeeId) {
             await updateDoc(doc(this.#db, `employees`, employeeId), {
                 hasChangedDefaultPassword: true
@@ -395,9 +395,10 @@ class APIManager extends Logger {
                         errorMessage = APIUtils.getErrorMessageFromCode(error);
                     });
 
-                    if (reAuth?.user) {
-                        this.#user = reAuth?.user || null;
+                    if (!reAuth?.user) {
+                        this.#user = null;
                         this.isAuthenticated = false;
+                        this.resetEmployeeInfos();
                     }
                 }
             }
@@ -493,7 +494,9 @@ class APIManager extends Logger {
      */
     public async changeEmployeeActivation(employee: Employee): Promise<string | null> {
         let errorMessage: string | null = null;
-
+        if (!this.hasPermission(Roles.ADMIN)) {
+            return errors.PERMISSION_DENIED;
+        }
         if (employee.id) {
             if (!this.hasPermission) {
                 return errors.PERMISSION_DENIED;
@@ -520,7 +523,7 @@ class APIManager extends Logger {
     public async createDepartment(
         department: DepartmentModifyDTO
     ): Promise<string | null> {
-        if (!this.hasPermission) {
+        if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
         let queryDepartment = query(
@@ -558,7 +561,8 @@ class APIManager extends Logger {
         }
         let queryDepartment = query(
             collection(this.#db, `departments`),
-            where("name", "==", department.name)
+            where("name", "==", department.name),
+            where("__name__", "!=", departmentId)
         );
         let errorMessage = await APIUtils.checkIfAlreadyExists(
             queryDepartment,
@@ -597,13 +601,37 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
         if (department.id) {
-            let queryEmployeesInDepartment = await query(collection(this.#db, `employees`),
+            let queryEmployees = await query(collection(this.#db, `employees`),
                 where("department", "==", department.name));
-            let snaps = await getDocs(queryEmployeesInDepartment).catch((error) => {
+            let snapsEmployees = await getDocs(queryEmployees).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
-            if (snaps && snaps.docs.length > 0) {
+            if (snapsEmployees && snapsEmployees.docs.length > 0) {
                 return errors.EMPLOYEE_REMAINING_IN_DEPARTMENT;
+            }
+            let queryShift = await query(collection(this.#db, `shifts`),
+                where("department", "==", department.name));
+            let snapsShifts = await getDocs(queryShift).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+            if (snapsShifts) {
+                for (const snapShift of snapsShifts.docs) {
+                    await deleteDoc(doc(this.#db, `shifts`, snapShift.id)).catch((error) => {
+                        errorMessage = APIUtils.getErrorMessageFromCode(error);
+                    });
+                }
+            }
+            let queryUnavailabilities = await query(collection(this.#db, `unavailabilities`),
+                where("department", "==", department.name));
+            let snapsUnavailabilities = await getDocs(queryUnavailabilities).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+            if (snapsUnavailabilities) {
+                for (const snapUnavailability of snapsUnavailabilities.docs) {
+                    await deleteDoc(doc(this.#db, `unavailabilities`, snapUnavailability.id)).catch((error) => {
+                        errorMessage = APIUtils.getErrorMessageFromCode(error);
+                    });
+                }
             }
             await deleteDoc(doc(this.#db, `departments`, department.id)).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
@@ -611,8 +639,6 @@ class APIManager extends Logger {
         } else {
             errorMessage = errors.INVALID_DEPARTMENT_ID;
         }
-
-
         return errorMessage;
     }
 
@@ -629,7 +655,7 @@ class APIManager extends Logger {
     public async createJobTitle(
         titleName: string
     ): Promise<string | null> {
-        if (!this.hasPermission) {
+        if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
         let queryJobTitles = query(
@@ -708,7 +734,7 @@ class APIManager extends Logger {
      * @private
      */
     public async createSkill(skill: string): Promise<string | null> {
-        if (!this.hasPermission) {
+        if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
         let querySkills = query(
@@ -786,6 +812,10 @@ class APIManager extends Logger {
      * @returns {Promise<Employee[] | string>} The employees if the request was successful, and the error message if it was not.
      */
     public async getEmployees(department?: string): Promise<Employee[] | string> {
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
         let errorMessage: string | null = null;
         let employees: Employee[] = [];
         let queryDepartment = query(collection(this.#db, `employees`));
@@ -834,6 +864,10 @@ class APIManager extends Logger {
      * @returns {Promise<EmployeeEditDTO | string>} The employee if the request was successful, and the error message if it was not.
      */
     public async getEmployeeById(employeeId: string): Promise<EmployeeEditDTO | string> {
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
         let errorMessage: string | null = null;
 
         let snap = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
@@ -857,6 +891,10 @@ class APIManager extends Logger {
      * @returns {Promise<Department[] | string>} The departments if the request was successful, and the error message if it was not.
      */
     public async getDepartments(): Promise<Department[] | string> {
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
         let errorMessage: string | null = null;
         let departments: Department[] = [];
         let queryDepartment = query(collection(this.#db, `departments`));
@@ -891,6 +929,10 @@ class APIManager extends Logger {
     public async getEmployeeNbDepartments(
         departments: Department[]
     ): Promise<number[] | string> {
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
         return new Promise((resolve) => {
             let errorMessage: string | null = null;
             let employeeNb: number[] = [];
@@ -948,34 +990,6 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method is used to get employee information. If the request was not successful, it will return an error message.
-     * @param uid The ID of the employee.
-     * @method getEmployeeInfos
-     * @async
-     * @public
-     * @memberof APIManager
-     * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
-     */
-    public async getEmployeeInfos(uid: string): Promise<EmployeeInfos | string> {
-        let errorMessage: string | null = null;
-        let employeeInfos: EmployeeInfos = {
-            role: 0,
-            department: "",
-            hasChangedDefaultPassword: false
-        };
-
-        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
-            errorMessage = APIUtils.getErrorMessageFromCode(error);
-        });
-
-        if (employee) {
-            employeeInfos = employee.data() as EmployeeInfos;
-        }
-
-        return errorMessage ?? employeeInfos;
-    }
-
-    /**
      * This method is used to get the job titles list. If the request was not successful, it will return an error message.
      * @method getJobTitles
      * @async
@@ -984,6 +998,10 @@ class APIManager extends Logger {
      * @returns {Promise<EmployeeJobTitleList | string>} The job titles if the request was successful, and the error message if it was not.
      */
     public async getJobTitles(): Promise<EmployeeJobTitleList | string> {
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
         let errorMessage: string | null = null;
         let jobTitles: JobTitle[] = [];
         let queryJobTitles = query(collection(this.#db, `jobTitles`));
@@ -1007,6 +1025,10 @@ class APIManager extends Logger {
      * @returns {Promise<EmployeeSkillList | string>} The skills if the request was successful, and the error message if it was not.
      */
     public async getSkills(): Promise<EmployeeSkillList | string> {
+        if (!this.hasPermission(Roles.EMPLOYEE)) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
         let errorMessage: string | null = null;
         let skills: Skill[] = [];
         let querySkills = query(collection(this.#db, `skills`));
@@ -1030,29 +1052,30 @@ class APIManager extends Logger {
      * @returns {Promise<Shift[] | string>} The schedule of the employee if the request was successful, and the error message if it was not.
      */
     public async getCurrentEmployeeSchedule(): Promise<Shift[] | string> {
-        let shifts: Shift[] | string = [];
-        if (this.#user?.uid) {
-            shifts = await this.getScheduleForOneEmployee(this.#user.uid);
-        }
-        return shifts;
+        return await this.getScheduleForOneEmployee(this.#user?.uid);
+
     }
 
     /**
      * This method is used to get the schedule of one employee. If the request was not successful, it will return an error message.
-     * @param idEmployee The ID of the employee.
+     * @param employeeId The ID of the employee.
      * @method getScheduleForOneEmployee
      * @async
      * @public
      * @memberof APIManager
      * @returns {Promise<Shift[] | string>} The schedule of the employee if the request was successful, and the error message if it was not.
      */
-    public async getScheduleForOneEmployee(idEmployee?: string): Promise<Shift[] | string> {
+    public async getScheduleForOneEmployee(employeeId?: string): Promise<Shift[] | string> {
         let errorMessage: string | null = null;
         let shifts: Shift[] = [];
-        if (!idEmployee) {
+        if (!employeeId) {
             return errors.INVALID_EMPLOYEE_ID;
         }
-        let document = await getDoc(doc(this.#db, `employees`, idEmployee)).catch((error) => {
+        if (!this.hasPermission(Roles.EMPLOYEE) && employeeId == this.#user?.uid) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
+        let document = await getDoc(doc(this.#db, `employees`, employeeId)).catch((error) => {
             return APIUtils.getErrorMessageFromCode(error);
         });
 
@@ -1062,7 +1085,7 @@ class APIManager extends Logger {
         if (!errorMessage) {
             let queryShifts = query(
                 collection(this.#db, `shifts`),
-                where("employeeId", "==", idEmployee)
+                where("employeeId", "==", employeeId)
             );
 
             let snaps = await getDocs(queryShifts).catch((error) => {
@@ -1288,7 +1311,6 @@ class APIManager extends Logger {
      * @public
      * @memberof APIManager
      * @returns {Promise<string | boolean>} Nothing if the request was successful, and the error message if it was not.
-     * @param list
      */
     public async getCurrentEmployeeUnavailabilities(): Promise<EmployeeAvailabilities | string> {
         let returnList: string | EmployeeAvailabilities;
@@ -1307,6 +1329,10 @@ class APIManager extends Logger {
      * @returns the list of unavailabilities
      */
     public async getOneEmployeeUnavailabilities(employeeId: string): Promise<EmployeeAvailabilities | string> {
+        if (!this.hasPermission(Roles.EMPLOYEE) && employeeId == this.#user?.uid) {
+            //Is not an Employee
+            return errors.PERMISSION_DENIED;
+        }
         let errorMessage: string | null = null;
         //default value
         let list: EmployeeAvailabilities = {
@@ -1521,6 +1547,43 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    private resetEmployeeInfos() {
+        this.#employeeInfos.role = 0;
+        this.#employeeInfos.department = "";
+    }
+
+    /**
+     * This method is used to get employee information. If the request was not successful, it will return an error message.
+     * @param uid The ID of the employee.
+     * @method getEmployeeInfos
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
+     */
+    private async getEmployeeInfos(uid: string): Promise<EmployeeInfos | string> {
+        let errorMessage: string | null = null;
+        let employeeInfos: EmployeeInfos = {
+            role: 0,
+            department: "",
+            hasChangedDefaultPassword: false
+        };
+
+        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+
+        if (employee) {
+            employeeInfos = {
+                role: employee.data()?.role,
+                department: employee.data()?.department,
+                hasChangedDefaultPassword: employee.data()?.hasChangedDefaultPassword
+            };
+        }
+
+        return errorMessage ?? employeeInfos;
+    }
+
     /**
      * Create a new service worker and listen for messages.
      * @private
@@ -1667,7 +1730,6 @@ class APIManager extends Logger {
 
     /**
      * This method is used to trigger an email verification.
-     * @param user The user to verify.
      * @private
      * @returns {Promise<string | null>} The error message if an error occurred, null otherwise.
      * @memberof APIManager
@@ -1792,12 +1854,9 @@ class APIManager extends Logger {
                 );
 
                 if (!(this.#db as any)._firestoreClient) {
-                    await enableIndexedDbPersistence(this.#db).catch((err) =>
-                        console.log(err.message)
-                    );
-                    this.log("IndexedDB persistence enabled");
+                    await enableIndexedDbPersistence(this.#db).catch(() => {
+                    });
                 }
-
                 this.log("Firebase emulators loaded");
             }
 

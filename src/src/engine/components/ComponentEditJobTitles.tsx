@@ -157,7 +157,7 @@ export class ComponentEditJobTitles extends React.Component<EditJobTitlesProps, 
                     </IconContext.Provider>
                 </button>
                 <IconContext.Provider value={{color: "white"}}>
-                    <CgUnavailable onClick={() => this.editJobTitle} className="adminActions ms-1"/>
+                    <CgUnavailable onClick={() => this.editJobTitle()} className="adminActions ms-1"/>
                 </IconContext.Provider>
             </div>;
         } else {

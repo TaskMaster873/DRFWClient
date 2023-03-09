@@ -7,8 +7,12 @@ service cloud.firestore {
                 return get(/databases/$(database)/documents/employees/$(id)).data.role;
             }
 
+            function isEmployee() {
+                return getCurrentEmployeeRole(request.auth.uid) >= 1
+            }
+
             match /employees/{employeeId} {
-                allow read;
+                allow read: if isEmployee();
                 allow create: if isValidEmployee(employeeId);
                 allow update: if isValidEmployeeUpdate(employeeId);
             }
@@ -58,7 +62,7 @@ service cloud.firestore {
             }
 
             match /departments/{departmentId} {
-                allow read;
+                allow read: if isEmployee();
                 allow create: if isValidDepartment(departmentId);
                 allow update: if isValidDepartment(departmentId);
                 allow delete: if isValidDepartmentDelete(departmentId);
@@ -83,7 +87,7 @@ service cloud.firestore {
             }
 
             match /roles/{roleId} {
-                allow read;
+                allow read: if isEmployee();
                 allow create: if isValidRole(roleId);
                 allow update: if isValidRole(roleId);
             }
@@ -97,7 +101,7 @@ service cloud.firestore {
             }
 
             match /jobTitles/{jobTitleId} {
-                allow read;
+                allow read: if isEmployee();
                 allow create: if isValidJobTitle(jobTitleId);
                 allow update: if isValidJobTitle(jobTitleId);
                 allow delete: if isValidJobTitleDelete(jobTitleId);
@@ -118,7 +122,7 @@ service cloud.firestore {
             }
 
             match /skills/{skillId} {
-                allow read;
+                allow read: if isEmployee();
                 allow create: if isValidSkill(skillId);
                 allow update: if isValidSkill(skillId);
                 allow delete: if isValidSkillDelete(skillId);
@@ -140,7 +144,7 @@ service cloud.firestore {
             }
 
             match /shifts/{shiftId} {
-                allow read;
+                allow read: if isEmployee();
                 allow create: if isValidShiftCreate(shiftId);
                 allow update: if isValidShiftUpdate(shiftId);
                 allow delete: if isValidShiftDelete(shiftId);
@@ -156,11 +160,10 @@ service cloud.firestore {
             }
 
             match /unavailabilities/{unavailabilityId} {
-                allow read;
+                allow read: if isEmployee();
                 allow write: if isValidUnavailabilityCreate(unavailabilityId);
                 allow update: if isValidForUpdate(unavailabilityId);
-                allow delete: if isValidUnavailabilityDelete(unavailabilityId)
-
+                allow delete: if isValidUnavailabilityDelete(unavailabilityId);
             }
 
             function isValidForUpdate(unavailabilityId) {
@@ -229,7 +232,6 @@ service cloud.firestore {
                        request.resource.data.employeeId is string &&
                        request.resource.data.start is timestamp &&
                        request.resource.data.end is timestamp
-
             }
         }
 
