@@ -48,8 +48,8 @@ export class Engine extends React.Component<unknown, EngineState> {
         API.subscribeToEvent(this.onEvent.bind(this));
     }
 
-    public componentDidMount(): void {
-        this.verifyLogin();
+    public async componentDidMount(): Promise<void> {
+        await this.verifyLogin();
     }
 
     /**

@@ -1,4 +1,3 @@
-import {Logger} from "../Logger";
 import {AccountCreationData, CreatedAccountData, ThreadMessage, ThreadMessageType} from "./types/ThreadMessage";
 import {FirebaseApp, initializeApp} from "firebase/app";
 import {FIREBASE_AUTH_EMULATOR_PORT, firebaseConfig} from "./config/FirebaseConfig";
@@ -6,9 +5,7 @@ import * as FirebaseAuth from "firebase/auth";
 import {connectAuthEmulator} from "firebase/auth";
 import {Employee} from "../types/Employee";
 
-class TaskMasterServiceWorker extends Logger {
-    public moduleName: string = "TaskMasterServiceWorker";
-    public logColor: string = `#0ebccb`;
+class TaskMasterServiceWorker {
     private emulatorLoaded: boolean = false;
 
     // @ts-ignore
@@ -17,14 +14,10 @@ class TaskMasterServiceWorker extends Logger {
     #auth: FirebaseAuth.Auth;
 
     constructor() {
-        super();
-
         this.init();
     }
 
-    public async init(): Promise<void> {
-        this.log(`Initializing TaskMasterServiceWorker.`);
-
+    public init(): void {
         this.listenToMessages();
     }
 
@@ -33,8 +26,6 @@ class TaskMasterServiceWorker extends Logger {
      * @private
      */
     private listenToMessages(): void {
-        this.log(`Listening to messages.`);
-
         self.onmessage = this.onMessage.bind(this);
     }
 
@@ -48,8 +39,6 @@ class TaskMasterServiceWorker extends Logger {
     private async onMessage(message: MessageEvent): Promise<void> {
         let data = message.data as ThreadMessage;
 
-        this.log(`Received message from main thread.`);
-
         switch (data.type) {
             case ThreadMessageType.INIT: {
                 await this.createFirebaseApp();
@@ -62,7 +51,7 @@ class TaskMasterServiceWorker extends Logger {
             }
 
             default: {
-                this.warn(`Unknown message type ${data.type}.`);
+                console.warn(`Unknown message type ${data.type}.`);
             }
         }
     }
@@ -86,8 +75,6 @@ class TaskMasterServiceWorker extends Logger {
      * @returns {Promise<void>}
      */
     private async createNewAccount(taskId: string | null, data: AccountCreationData): Promise<void> {
-        this.log(`Creating new account for task ${taskId}`);
-
         let employee: Employee = data.employee;
 
         let errorMessage: string | null = null;
@@ -129,11 +116,9 @@ class TaskMasterServiceWorker extends Logger {
      */
     private async enablePersistence(): Promise<void> {
         await FirebaseAuth.setPersistence(this.#auth, FirebaseAuth.inMemoryPersistence).catch((error) => {
-            // Handle Errors here.
             const errorCode = error;
             const errorMessage = error.message;
-
-            this.error(`Error code: ${errorCode} - ${errorMessage}`);
+            console.error(`Error code: ${errorCode} - ${errorMessage}`);
         });
     }
 
@@ -144,22 +129,14 @@ class TaskMasterServiceWorker extends Logger {
      * @async
      */
     private async createFirebaseApp(): Promise<void> {
-        let start = Date.now();
-        this.log(`Creating Firebase app.`);
-
         this.#app = initializeApp(firebaseConfig);
         this.#auth = FirebaseAuth.getAuth(this.#app);
 
         if (location.hostname === "localhost" && !this.emulatorLoaded) {
             this.emulatorLoaded = true;
             connectAuthEmulator(this.#auth, "http://localhost:" + FIREBASE_AUTH_EMULATOR_PORT);
-
-            this.log("Firebase emulators loaded");
         }
-
         await this.enablePersistence();
-
-        this.log(`Firebase loaded successfully after ${Date.now() - start}ms.`);
     }
 }
 
