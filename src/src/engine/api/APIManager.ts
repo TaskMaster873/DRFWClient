@@ -556,22 +556,31 @@ class APIManager extends Logger {
      * @returns {Promise<string | null>} Null if the department was edited successfully, and the error message if it was not.
      */
     public async editDepartment(departmentId: string, department: DepartmentModifyDTO, oldDepartmentName: string): Promise<string | null> {
-        let errorMessage: string | null = null;
         if (!this.hasPermission(Roles.ADMIN)) {
             return errors.PERMISSION_DENIED;
         }
-        
-        await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
-            return APIUtils.getErrorMessageFromCode(error);
-        });
-        let queryEmployeesInDepartment = await query(collection(this.#db, `employees`),
-            where("department", "==", oldDepartmentName));
-        let snaps = await getDocs(queryEmployeesInDepartment).catch((error) => {
-            errorMessage = APIUtils.getErrorMessageFromCode(error);
-        });
-        if (snaps) {
-            for (const snap of snaps.docs) {
-                await updateDoc(doc(this.#db, `employees`, snap.id), {department: department.name});
+        let queryDepartment = query(
+            collection(this.#db, `departments`),
+            where("name", "==", department.name),
+            where("__name__", "!=", departmentId)
+        );
+        let errorMessage = await APIUtils.checkIfAlreadyExists(
+            queryDepartment,
+            errors.DEPARTMENT_ALREADY_EXISTS
+        );
+        if (!errorMessage) {
+            await updateDoc(doc(this.#db, `departments`, departmentId), {...department}).catch((error) => {
+                return APIUtils.getErrorMessageFromCode(error);
+            });
+            let queryEmployeesInDepartment = await query(collection(this.#db, `employees`),
+                where("department", "==", oldDepartmentName));
+            let snaps = await getDocs(queryEmployeesInDepartment).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+            if (snaps) {
+                for (const snap of snaps.docs) {
+                    await updateDoc(doc(this.#db, `employees`, snap.id), {department: department.name});
+                }
             }
         }
         return errorMessage;
