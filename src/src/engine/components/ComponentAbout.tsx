@@ -20,7 +20,7 @@ export class ComponentAbout extends React.Component {
                         <p className="text-left">David Lawton - Programmeur </p>
                         <p className="text-left">Romin Martignat - Programmeur</p>
                         <p className="text-left">Félix-Antoine Belleau - Programmeur</p>
-                        <p className="text-left">William Blanchet Lafernière - Programmeur</p>
+                        <p className="text-left">William Blanchet Lafrenière - Programmeur</p>
                     </div>
                 </Container>
             </div>
