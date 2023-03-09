@@ -265,7 +265,6 @@ class APIManager extends Logger {
      * @public
      */
     public async logout(): Promise<string | null> {
-        this.log("Logging out user...");
         let errorMessage: string | null = null;
 
         if (this.isAuthenticated) {
@@ -398,12 +397,19 @@ class APIManager extends Logger {
                     if (reAuth?.user) {
                         this.#user = reAuth?.user || null;
                         this.isAuthenticated = false;
+                        this.resetEmployeeInfos();
                     }
                 }
             }
         }
 
         return errorMessage;
+    }
+
+    private resetEmployeeInfos() {
+        this.#employeeInfos.role = 0;
+        this.#employeeInfos.department = "";
+        console.log(this.#employeeInfos)
     }
 
     /**
@@ -588,13 +594,37 @@ class APIManager extends Logger {
             return errors.PERMISSION_DENIED;
         }
         if (department.id) {
-            let queryEmployeesInDepartment = await query(collection(this.#db, `employees`),
+            let queryEmployees = await query(collection(this.#db, `employees`),
                 where("department", "==", department.name));
-            let snaps = await getDocs(queryEmployeesInDepartment).catch((error) => {
+            let snapsEmployees = await getDocs(queryEmployees).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
             });
-            if (snaps && snaps.docs.length > 0) {
+            if (snapsEmployees && snapsEmployees.docs.length > 0) {
                 return errors.EMPLOYEE_REMAINING_IN_DEPARTMENT;
+            }
+            let queryShift = await query(collection(this.#db, `shifts`),
+                where("department", "==", department.name));
+            let snapsShifts = await getDocs(queryShift).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+            if(snapsShifts) {
+                for (const snapShift of snapsShifts.docs) {
+                    await deleteDoc(doc(this.#db, `shifts`, snapShift.id)).catch((error) => {
+                        errorMessage = APIUtils.getErrorMessageFromCode(error);
+                    });
+                }
+            }
+            let queryUnavailabilities = await query(collection(this.#db, `unavailabilities`),
+                where("department", "==", department.name));
+            let snapsUnavailabilities = await getDocs(queryUnavailabilities).catch((error) => {
+                errorMessage = APIUtils.getErrorMessageFromCode(error);
+            });
+            if(snapsUnavailabilities) {
+                for (const snapUnavailability of snapsUnavailabilities.docs) {
+                    await deleteDoc(doc(this.#db, `unavailabilities`, snapUnavailability.id)).catch((error) => {
+                        errorMessage = APIUtils.getErrorMessageFromCode(error);
+                    });
+                }
             }
             await deleteDoc(doc(this.#db, `departments`, department.id)).catch((error) => {
                 errorMessage = APIUtils.getErrorMessageFromCode(error);
@@ -602,8 +632,6 @@ class APIManager extends Logger {
         } else {
             errorMessage = errors.INVALID_DEPARTMENT_ID;
         }
-
-
         return errorMessage;
     }
 
@@ -960,7 +988,11 @@ class APIManager extends Logger {
         });
 
         if (employee) {
-            employeeInfos = employee.data() as EmployeeInfos;
+            employeeInfos = {
+                role: employee.data()?.role,
+                department: employee.data()?.department,
+                hasChangedDefaultPassword: employee.data()?.hasChangedDefaultPassword
+            };
         }
 
         return errorMessage ?? employeeInfos;
