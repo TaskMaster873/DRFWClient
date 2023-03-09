@@ -22,6 +22,9 @@ export class InternalAPIUtils extends Logger {
 
         if (typeof error === "string") {
             message = error;
+            if(message.includes("Firebase: Error (auth/email-already-in-use).")) {
+                errorMessage = errors.EMPLOYEE_EMAIL_ALREADY_USED;
+            }
         } else {
             message = error.message;
             switch (message) {
@@ -33,6 +36,9 @@ export class InternalAPIUtils extends Logger {
                     break;
                 case "Firebase: Error (auth/wrong-password).":
                     errorMessage = errors.INVALID_LOGIN;
+                    break;
+                case "Firebase: Error (auth/email-already-in-use).":
+                    errorMessage = errors.EMPLOYEE_EMAIL_ALREADY_USED;
                     break;
                 case "Firebase: Error (permission-denied).":
                     errorMessage = errors.PERMISSION_DENIED;

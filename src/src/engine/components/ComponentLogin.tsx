@@ -46,7 +46,7 @@ export class ComponentLogin extends React.Component<ComponentPropsLogin, Compone
     }
 
     public render(): JSX.Element {
-        if (API.isAuth()) {
+        if (API.isAuth() && API.getCurrentEmployeeInfos().department != "") {
             return (
                 <Navigate to={RoutesPath.ON_LOGIN_SUCCESS_ROUTE}/>
             );

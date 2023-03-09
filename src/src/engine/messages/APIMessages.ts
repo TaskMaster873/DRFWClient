@@ -14,6 +14,7 @@ export const errors = {
     INVALID_JOB_TITLE_ID: "L'identifiant du corps d'emploi est invalide",
     AUTHENTIFICATION_ERROR: "Une erreur d'authentification s'est produite, veuillez réessayer ultérieurement",
     EMPLOYEE_REMAINING_IN_DEPARTMENT: "Des employés sont toujours présents dans le département",
+    EMPLOYEE_EMAIL_ALREADY_USED: "L'adresse courriel est déjà utilisée par un autre employé"
 
 };
 
