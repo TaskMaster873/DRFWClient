@@ -38,7 +38,7 @@ import {
 import {Department, DepartmentModifyDTO} from "../types/Department";
 import {Shift, ShiftCreateDTO} from "../types/Shift";
 import {errors} from "../messages/APIMessages";
-import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType, } from "./types/ThreadMessage";
+import {CreatedAccountData, Task, ThreadMessage, ThreadMessageType,} from "./types/ThreadMessage";
 
 import {Roles} from "../types/Roles";
 import {DayPilot} from "@daypilot/daypilot-lite-react";
@@ -406,11 +406,6 @@ class APIManager extends Logger {
         }
 
         return errorMessage;
-    }
-
-    private resetEmployeeInfos() {
-        this.#employeeInfos.role = 0;
-        this.#employeeInfos.department = "";
     }
 
     /**
@@ -986,38 +981,6 @@ class APIManager extends Logger {
     }
 
     /**
-     * This method is used to get employee information. If the request was not successful, it will return an error message.
-     * @param uid The ID of the employee.
-     * @method getEmployeeInfos
-     * @async
-     * @public
-     * @memberof APIManager
-     * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
-     */
-    private async getEmployeeInfos(uid: string): Promise<EmployeeInfos | string> {
-        let errorMessage: string | null = null;
-        let employeeInfos: EmployeeInfos = {
-            role: 0,
-            department: "",
-            hasChangedDefaultPassword: false
-        };
-
-        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
-            errorMessage = APIUtils.getErrorMessageFromCode(error);
-        });
-
-        if (employee) {
-            employeeInfos = {
-                role: employee.data()?.role,
-                department: employee.data()?.department,
-                hasChangedDefaultPassword: employee.data()?.hasChangedDefaultPassword
-            };
-        }
-
-        return errorMessage ?? employeeInfos;
-    }
-
-    /**
      * This method is used to get the job titles list. If the request was not successful, it will return an error message.
      * @method getJobTitles
      * @async
@@ -1080,7 +1043,8 @@ class APIManager extends Logger {
      * @returns {Promise<Shift[] | string>} The schedule of the employee if the request was successful, and the error message if it was not.
      */
     public async getCurrentEmployeeSchedule(): Promise<Shift[] | string> {
-        return await this.getScheduleForOneEmployee(this.#user?.uid);;
+        return await this.getScheduleForOneEmployee(this.#user?.uid);
+
     }
 
     /**
@@ -1575,6 +1539,43 @@ class APIManager extends Logger {
         return errorMessage;
     }
 
+    private resetEmployeeInfos() {
+        this.#employeeInfos.role = 0;
+        this.#employeeInfos.department = "";
+    }
+
+    /**
+     * This method is used to get employee information. If the request was not successful, it will return an error message.
+     * @param uid The ID of the employee.
+     * @method getEmployeeInfos
+     * @async
+     * @public
+     * @memberof APIManager
+     * @returns {Promise<number | string>} The role of the employee if the request was successful, and the error message if it was not.
+     */
+    private async getEmployeeInfos(uid: string): Promise<EmployeeInfos | string> {
+        let errorMessage: string | null = null;
+        let employeeInfos: EmployeeInfos = {
+            role: 0,
+            department: "",
+            hasChangedDefaultPassword: false
+        };
+
+        let employee = await getDoc(doc(this.#db, `employees`, uid)).catch((error) => {
+            errorMessage = APIUtils.getErrorMessageFromCode(error);
+        });
+
+        if (employee) {
+            employeeInfos = {
+                role: employee.data()?.role,
+                department: employee.data()?.department,
+                hasChangedDefaultPassword: employee.data()?.hasChangedDefaultPassword
+            };
+        }
+
+        return errorMessage ?? employeeInfos;
+    }
+
     /**
      * Create a new service worker and listen for messages.
      * @private
@@ -1846,8 +1847,8 @@ class APIManager extends Logger {
                 );
 
                 if (!(this.#db as any)._firestoreClient) {
-                    await enableIndexedDbPersistence(this.#db).catch((err) =>
-                        {}
+                    await enableIndexedDbPersistence(this.#db).catch((err) => {
+                        }
                     );
                     this.log("IndexedDB persistence enabled");
                 }
@@ -1928,8 +1929,8 @@ class APIManager extends Logger {
                     && !data.unavailabilities.endDate._compareTo(list.recursiveExceptions.endDate)) {
                     await updateDoc(doc(this.#db, `unavailabilities`, document.id),
                         {unavailabilities: list.recursiveExceptions}).catch((error) => {
-                            errorMessage = APIUtils.getErrorMessageFromCode(error);
-                        });
+                        errorMessage = APIUtils.getErrorMessageFromCode(error);
+                    });
                     isAdded = true;
                     break;
                 }

@@ -17,10 +17,10 @@ export class ComponentAbout extends React.Component {
                 <Container className="justify-content-left mt-4 mb-4">
                     <div className="me-4 mt-6 d-block  mx-auto">
                         <h2 className="text-left"> Auteurs</h2>
-                        <p className="text-left">David Lawton - Programmeur </p>
-                        <p className="text-left">Romin Martignat - Programmeur</p>
-                        <p className="text-left">Félix-Antoine Belleau - Programmeur</p>
-                        <p className="text-left">William Blanchet Lafernière - Programmeur</p>
+                        <p className="text-left">David Lawton - Horaire, Disponibilités</p>
+                        <p className="text-left">Romin Martignat - Calendrier, Disponibilités</p>
+                        <p className="text-left">Félix-Antoine Belleau - Employés, Horaire</p>
+                        <p className="text-left">William Blanchet Lafrenière - Départements, Employés</p>
                     </div>
                 </Container>
             </div>
